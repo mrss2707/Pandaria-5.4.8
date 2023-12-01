@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include "Timer.h"
+#include "LockedQueue.h"
 #include <memory>
 
 class ThreadPool;
@@ -35,11 +36,7 @@ public:
 
     //! Not singleton.
     //! Just global accessor for main thread scheduler.
-    static TaskMgr* Default()
-    {
-        static TaskMgr _default;
-        return &_default;
-    }
+    static TaskMgr* Default();
 
     //! Set time (in milliseconds) for executing task cycle.
     //! No garantees that it will be max time of Update() call.
@@ -68,7 +65,7 @@ public:
 
 private:
     typedef std::shared_ptr<TaskBase> TaskObject;
-    ACE_Based::LockedQueue<TaskObject, ACE_Thread_Mutex> _queue;
+    LockedQueue<TaskObject> _queue;
     std::list<TaskObject> _tasks;
     std::chrono::milliseconds _max = std::chrono::milliseconds(25);
     static std::unique_ptr<ThreadPool> _pool;

@@ -114,19 +114,19 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         case CONDITION_CLASS:
         {
             if (Unit* unit = object->ToUnit())
-                condMeets = unit->getClassMask() & ConditionValue1;
+                condMeets = unit->GetClassMask() & ConditionValue1;
             break;
         }
         case CONDITION_RACE:
         {
             if (Unit* unit = object->ToUnit())
-                condMeets = unit->getRaceMask() & ConditionValue1;
+                condMeets = unit->GetRaceMask() & ConditionValue1;
             break;
         }
         case CONDITION_GENDER:
         {
             if (Player* player = object->ToPlayer())
-                condMeets = player->getGender() == ConditionValue1;
+                condMeets = player->GetGender() == ConditionValue1;
             break;
         }
         case CONDITION_SKILL:
@@ -145,7 +145,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                     // One condition (which is not suitable for race) must be failed all the time.
                     if (auto quest = sObjectMgr->GetQuestTemplate(ConditionValue1))
                     {
-                        if (!quest->GetRequiredRaces() || (quest->GetRequiredRaces() & player->getRaceMask()))
+                        if (!quest->GetRequiredRaces() || (quest->GetRequiredRaces() & player->GetRaceMask()))
                             condMeets = player->GetQuestRewardStatus(ConditionValue1);
                         else
                             condMeets = NegativeCondition;
@@ -452,6 +452,11 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
 
                 condMeets = (!player->GetQuestRewardStatus(obj->QuestID) && player->IsQuestObjectiveComplete(qInfo, *obj));
             }
+            break;
+        }
+        case CONDITION_DIFFICULTY_ID:
+        {
+            condMeets = object->GetMap()->GetDifficulty() == ConditionValue1;
             break;
         }
         case CONDITION_SAI_PHASE:
@@ -1002,6 +1007,12 @@ ConditionList ConditionMgr::GetConditionsForNpcVendorEvent(uint32 creatureId, ui
         }
     }
     return cond;
+}
+
+ConditionMgr* ConditionMgr::instance()
+{
+    static ConditionMgr instance;
+    return &instance;
 }
 
 void ConditionMgr::LoadConditions(bool isReload)

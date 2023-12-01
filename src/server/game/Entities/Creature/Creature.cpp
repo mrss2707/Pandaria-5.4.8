@@ -376,9 +376,9 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
 
     SelectLevel(GetCreatureTemplate());
     if (team == HORDE)
-        setFaction(cInfo->faction_H);
+        SetFaction(cInfo->faction_H);
     else
-        setFaction(cInfo->faction_A);
+        SetFaction(cInfo->faction_A);
 
     uint32 npcflag, unit_flags, dynamicflags;
     ObjectMgr::ChooseCreatureFlags(cInfo, npcflag, unit_flags, dynamicflags, data);
@@ -432,7 +432,7 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
     {
         if (Player* owner = Creature::GetCharmerOrOwnerPlayerOrPlayerItself()) // this check comes in case we don't have a player
         {
-            setFaction(owner->getFaction()); // vehicles should have same as owner faction
+            SetFaction(owner->GetFaction()); // vehicles should have same as owner faction
             owner->VehicleSpellInitialize();
         }
     }
@@ -535,12 +535,15 @@ void Creature::Update(uint32 diff)
                 {
                     uint32 gguid = lootingGroupLowGUID;
                     uint64 crguid = GetGUID();
-                    TaskMgr::Default()->ScheduleInvocation([=]
-                    {
-                        if (Creature* creature = ObjectAccessor::FindCreature(crguid))
-                            if (Group* group = sGroupMgr->GetGroupByGUID(gguid))
-                                group->EndRoll(&creature->loot);
-                    });
+                    if (Creature* creature = ObjectAccessor::FindCreature(crguid))
+                        if (Group* group = sGroupMgr->GetGroupByGUID(gguid))
+                            group->EndRoll(&creature->loot);                    
+                    // TaskMgr::Default()->ScheduleInvocation([=]
+                    // {
+                    //     if (Creature* creature = ObjectAccessor::FindCreature(crguid))
+                    //         if (Group* group = sGroupMgr->GetGroupByGUID(gguid))
+                    //             group->EndRoll(&creature->loot);
+                    // });
                     m_groupLootTimer = 0;
                     lootingGroupLowGUID = 0;
                 }
@@ -609,7 +612,6 @@ void Creature::Update(uint32 diff)
             break;
     }
 
-    sScriptMgr->OnCreatureUpdate(this, diff);
 }
 
 void Creature::RegenerateMana()
@@ -709,12 +711,12 @@ void Creature::Motion_Initialize()
 {
     if (!m_formation)
         GetMotionMaster()->Initialize();
-    else if (m_formation->getLeader() == this)
+    else if (m_formation->GetLeader() == this)
     {
         m_formation->FormationReset(false);
         GetMotionMaster()->Initialize();
     }
-    else if (m_formation->isFormed())
+    else if (m_formation->IsFormed())
         GetMotionMaster()->MoveIdle(); //wait the order of leader
     else
         GetMotionMaster()->Initialize();
@@ -850,7 +852,7 @@ bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
 {
     return player->GetLevel() >= 10
         && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
-        && player->getClass() == GetCreatureTemplate()->trainer_class;
+        && player->GetClass() == GetCreatureTemplate()->trainer_class;
 }
 
 void Creature::StartPickPocketRefillTimer()
@@ -891,8 +893,7 @@ void Creature::SetLootRecipient(Unit* unit)
 
     if (IsPet())
     {
-        ACE_Stack_Trace st;
-        TC_LOG_ERROR("shitlog", "Creature::SetLootRecipient unit: %s guid: " UI64FMTD "\n%s\n", unit->GetName().c_str(), unit->GetGUID(), st.c_str());
+        TC_LOG_ERROR("shitlog", "Creature::SetLootRecipient unit: %s guid: " UI64FMTD "\n%s\n", unit->GetName().c_str(), unit->GetGUID());
         return;
     }
 
@@ -1043,9 +1044,9 @@ void Creature::SaveToDB(uint32 mapid, uint16 spawnMask, uint32 phaseMask)
     data.WalkMode = m_WalkMode;
 
     // update in DB
-    SQLTransaction trans = WorldDatabase.BeginTransaction();
+    WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 
@@ -1143,7 +1144,7 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     uint32 mana = stats->GenerateMana(cinfo);
     SetCreateMana(mana);
 
-    switch (getClass())
+    switch (GetClass())
     {
         case CLASS_WARRIOR:
             SetPowerType(POWER_RAGE);
@@ -1430,9 +1431,9 @@ void Creature::DeleteFromDB()
     GetMap()->RemoveCreatureRespawnTime(m_DBTableGuid);
     sObjectMgr->DeleteCreatureData(m_DBTableGuid);
 
-    SQLTransaction trans = WorldDatabase.BeginTransaction();
+    WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 
@@ -1581,7 +1582,7 @@ void Creature::setDeathState(DeathState s)
         }
 
         //Dismiss group if is leader
-        if (m_formation && m_formation->getLeader() == this)
+        if (m_formation && m_formation->GetLeader() == this)
             m_formation->FormationReset(true);
 
         if ((CanFly() || IsFlying()))
@@ -2050,7 +2051,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
     // only from same creature faction
     if (checkfaction)
     {
-        if (getFaction() != u->getFaction())
+        if (GetFaction() != u->GetFaction())
             return false;
     }
     else

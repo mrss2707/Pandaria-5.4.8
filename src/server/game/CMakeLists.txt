@@ -35,11 +35,11 @@ file(GLOB_RECURSE sources_Groups Groups/*.cpp Groups/*.h)
 file(GLOB_RECURSE sources_Guilds Guilds/*.cpp Guilds/*.h)
 file(GLOB_RECURSE sources_Handlers Handlers/*.cpp Handlers/*.h)
 file(GLOB_RECURSE sources_Instances Instances/*.cpp Instances/*.h)
-file(GLOB_RECURSE sources_CustomLogs CustomLogs/*.cpp CustomLogs/*.h)
 file(GLOB_RECURSE sources_Loot Loot/*.cpp Loot/*.h)
 file(GLOB_RECURSE sources_Mails Mails/*.cpp Mails/*.h)
 file(GLOB_RECURSE sources_Maps Maps/*.cpp Maps/*.h)
 file(GLOB_RECURSE sources_Miscellaneous Miscellaneous/*.cpp Miscellaneous/*.h)
+file(GLOB_RECURSE sources_Motd Motd/*.cpp Motd/*.h)
 file(GLOB_RECURSE sources_Movement Movement/*.cpp Movement/*.h)
 file(GLOB_RECURSE sources_OutdoorPvP OutdoorPvP/*.cpp OutdoorPvP/*.h)
 file(GLOB_RECURSE sources_Pools Pools/*.cpp Pools/*.h)
@@ -48,7 +48,7 @@ file(GLOB_RECURSE sources_Quests Quests/*.cpp Quests/*.h)
 file(GLOB_RECURSE sources_Reputation Reputation/*.cpp Reputation/*.h)
 file(GLOB_RECURSE sources_Scenarios Scenarios/*.cpp Scenarios/*.h)
 file(GLOB_RECURSE sources_Scripting Scripting/*.cpp Scripting/*.h)
-file(GLOB_RECURSE sources_Server Server/*.cpp Server/*.h)
+file(GLOB_RECURSE sources_Server Server/*.cpp Server/*.h Server/Packets/*.h Server/Packets/*.cpp Server/Protocol/*.h Server/Protocol/*.cpp)
 file(GLOB_RECURSE sources_Services Services/*.cpp Services/*.h)
 file(GLOB_RECURSE sources_Skills Skills/*.cpp Skills/*.h)
 file(GLOB_RECURSE sources_Spells Spells/*.cpp Spells/*.h)
@@ -79,7 +79,6 @@ source_group(Chat FILES ${sources_Chat})
 source_group(Combat FILES ${sources_Combat})
 source_group(Conditions FILES ${sources_Conditions})
 source_group(CustomTransmogrification FILES ${sources_CustomTransmogrification})
-source_group(CustomLogs FILES ${sources_CustomLogs})
 source_group(DataStores FILES ${sources_DataStores})
 source_group(DungeonFinding FILES ${sources_DungeonFinding})
 source_group(Entities FILES ${sources_Entities})
@@ -94,6 +93,7 @@ source_group(Loot FILES ${sources_Loot})
 source_group(Mails FILES ${sources_Mails})
 source_group(Maps FILES ${sources_Maps})
 source_group(Miscellaneous FILES ${sources_Miscellaneous})
+source_group(Motd FILES ${sources_Motd})
 source_group(Movement FILES ${sources_Movement})
 source_group(OutdoorPvP FILES ${sources_OutdoorPvP})
 source_group(Pools FILES ${sources_Pools})
@@ -137,7 +137,6 @@ set(game_STAT_SRCS
   ${sources_Chat}
   ${sources_Combat}
   ${sources_Conditions}
-  ${sources_CustomLogs}
   ${sources_CustomTransmogrification}
   ${sources_DataStores}
   ${sources_DungeonFinding}
@@ -153,6 +152,7 @@ set(game_STAT_SRCS
   ${sources_Mails}
   ${sources_Maps}
   ${sources_Miscellaneous}
+  ${sources_Motd}
   ${sources_Movement}
   ${sources_OutdoorPvP}
   ${sources_Pools}
@@ -178,31 +178,38 @@ set(game_STAT_SRCS
 include_directories(
   PUBLIC
     ${CMAKE_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/src/common/Utilities    
   PRIVATE
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Include
     ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
     ${CMAKE_SOURCE_DIR}/dep/SFMT
-    ${CMAKE_SOURCE_DIR}/dep/zlib
     ${ACE_INCLUDE_DIR}
     ${MYSQL_INCLUDE_DIR}
     ${OPENSSL_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/src/common
+    ${CMAKE_SOURCE_DIR}/src/common/Asio
+    ${CMAKE_SOURCE_DIR}/src/common/Configuration
+    ${CMAKE_SOURCE_DIR}/src/common/Cryptography
+    ${CMAKE_SOURCE_DIR}/src/common/Cryptography/Authentication
+    ${CMAKE_SOURCE_DIR}/src/common/Debugging
+    ${CMAKE_SOURCE_DIR}/src/common/IPLocation
+    ${CMAKE_SOURCE_DIR}/src/common/Logging
+    ${CMAKE_SOURCE_DIR}/src/common/Threading
     ${CMAKE_SOURCE_DIR}/src/server/collision
     ${CMAKE_SOURCE_DIR}/src/server/collision/Management
     ${CMAKE_SOURCE_DIR}/src/server/collision/Models
     ${CMAKE_SOURCE_DIR}/src/server/collision/Maps
+    ${CMAKE_SOURCE_DIR}/src/server/database/Database
     ${CMAKE_SOURCE_DIR}/src/server/shared
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography/Authentication
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Database
     ${CMAKE_SOURCE_DIR}/src/server/shared/DataStores
     ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
     ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic/LinkedReference
     ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Logging
     ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
+    ${CMAKE_SOURCE_DIR}/src/server/shared/Networking
     ${CMAKE_SOURCE_DIR}/src/server/shared/Threading
+    ${CMAKE_SOURCE_DIR}/src/server/shared/Realms
     ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/Accounts
@@ -228,7 +235,6 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/Chat/Channels
     ${CMAKE_CURRENT_SOURCE_DIR}/Combat
     ${CMAKE_CURRENT_SOURCE_DIR}/Conditions
-    ${CMAKE_CURRENT_SOURCE_DIR}/CustomLogs
     ${CMAKE_CURRENT_SOURCE_DIR}/CustomTransmogrification
     ${CMAKE_CURRENT_SOURCE_DIR}/DataStores
     ${CMAKE_CURRENT_SOURCE_DIR}/DungeonFinding
@@ -287,8 +293,8 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/Warden/Modules
     ${CMAKE_CURRENT_SOURCE_DIR}/Weather
     ${CMAKE_CURRENT_SOURCE_DIR}/World
-    ${CMAKE_SOURCE_DIR}/src/server/scripts/Pandaria/TimelessIsle
-    ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders          
+    ${CMAKE_SOURCE_DIR}/dep/zlib
+    ${CMAKE_SOURCE_DIR}/dep/fmt/include
 )
 
 if (Boost_FOUND)
@@ -310,11 +316,22 @@ if (ELUNA)
     PRIVATE
       ${CMAKE_SOURCE_DIR}/dep/lualib
       ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine
+      ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders
   )
 endif()
 
 add_library(game STATIC
   ${game_STAT_SRCS}
+)
+
+target_link_libraries(game
+  PRIVATE
+    Detour
+    zlib
+    common
+    database
+    shared
+    ${ACE_LIBRARY}
 )
 
 if (ELUNA)

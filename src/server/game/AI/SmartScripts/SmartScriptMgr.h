@@ -30,19 +30,25 @@
 
 struct WayPoint
 {
-    WayPoint(uint32 _id, float _x, float _y, float _z)
+    WayPoint(uint32 _id, float _x, float _y, float _z,Optional<float> _orientation = { }, uint32 _delay = 0)
     {
-        id = _id;
-        x = _x;
-        y = _y;
-        z = _z;
+        id    = _id;
+        x     = _x;
+        y     = _y;
+        z     = _z;
+        o     = _orientation;
+        delay = _delay;
     }
 
     uint32 id;
     float x;
     float y;
     float z;
+    Optional<float> o;
+    uint32 delay;
 };
+
+typedef uint32 SAIBool;
 
 enum eSmartAI
 {
@@ -424,6 +430,7 @@ struct SmartEvent
             uint32 param2;
             uint32 param3;
             uint32 param4;
+            uint32 param5;
         } raw;
     };
 };
@@ -580,7 +587,14 @@ struct SmartAction
         {
             uint32 textGroupID;
             uint32 duration;
+            SAIBool useTalkTarget;
         } talk;
+
+        struct
+        {
+            uint32 textGroupID;
+            uint32 duration;
+        } simpleTalk;
 
         struct
         {
@@ -596,7 +610,9 @@ struct SmartAction
         struct
         {
             uint32 sound;
-            uint32 onlySelf;
+            SAIBool onlySelf;
+            uint32 distance;
+            uint32 keyBroadcastTextId; // UNUSED: param reserved for compatibility with master branch            
         } sound;
 
         struct
@@ -608,6 +624,12 @@ struct SmartAction
         {
             uint32 quest;
         } quest;
+
+        struct
+        {
+            uint32 questID;
+            SAIBool directAdd;
+        } questOffer;
 
         struct
         {
@@ -790,6 +812,7 @@ struct SmartAction
         {
             uint32 entry;
             uint32 despawnTime;
+            uint32 summonType;
         } summonGO;
 
         struct
@@ -1246,6 +1269,7 @@ struct SmartTarget
             uint32 param1;
             uint32 param2;
             uint32 param3;
+            uint32 param4;
         } raw;
 
         struct
@@ -1455,23 +1479,21 @@ typedef std::unordered_map<uint32, GuidList> GuidListMap;
 
 class SmartWaypointMgr
 {
-    friend class ACE_Singleton<SmartWaypointMgr, ACE_Null_Mutex>;
-    SmartWaypointMgr() { }
     public:
-        ~SmartWaypointMgr();
+        static SmartWaypointMgr* instance();    
 
         void LoadFromDB();
 
-        WPPath* GetPath(uint32 id)
-        {
-            if (waypoint_map.find(id) != waypoint_map.end())
-                return waypoint_map[id];
-            else return 0;
-        }
+        WPPath* GetPath(uint32 id);
 
     private:
+        SmartWaypointMgr() { }
+        ~SmartWaypointMgr() { }
+
         std::unordered_map<uint32, WPPath*> waypoint_map;
 };
+
+#define sSmartWaypointMgr SmartWaypointMgr::instance()
 
 // all events for a single entry
 typedef std::vector<SmartScriptHolder> SmartAIEventList;
@@ -1481,11 +1503,11 @@ typedef std::unordered_map<int32, SmartAIEventList> SmartAIEventMap;
 
 class SmartAIMgr
 {
-    friend class ACE_Singleton<SmartAIMgr, ACE_Null_Mutex>;
-    SmartAIMgr(){ }
+    private:
+        SmartAIMgr() { }
+        ~SmartAIMgr() { }
     public:
-        ~SmartAIMgr(){ }
-
+        static SmartAIMgr* instance();
         void LoadSmartAIFromDB();
 
         SmartAIEventList GetScript(int32 entry, SmartScriptType type)
@@ -1649,6 +1671,7 @@ class SmartAIMgr
         }
 
         //bool IsTextValid(SmartScriptHolder const& e, uint32 id);
+        static bool IsTextValid(SmartScriptHolder const& e, uint32 id);
 
         struct SpellEffectPair
         {
@@ -1661,6 +1684,5 @@ class SmartAIMgr
         std::unordered_map<uint32, SpellEffectPair> _killCreditsSpellCache;
 };
 
-#define sSmartScriptMgr ACE_Singleton<SmartAIMgr, ACE_Null_Mutex>::instance()
-#define sSmartWaypointMgr ACE_Singleton<SmartWaypointMgr, ACE_Null_Mutex>::instance()
+#define sSmartScriptMgr SmartAIMgr::instance()
 #endif

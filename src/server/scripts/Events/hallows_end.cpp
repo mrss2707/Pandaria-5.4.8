@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "GameEventMgr.h"
 #include "Vehicle.h"
+#include "Random.h"
 
 struct PostionEventoHallowend
 {
@@ -969,7 +970,7 @@ class spell_halloween_wand : public SpellScript
             return;
 
         uint32 spellId = 0;
-        uint8 gender = target->getGender();
+        uint8 gender = target->GetGender();
 
         switch (GetSpellInfo()->Id)
         {

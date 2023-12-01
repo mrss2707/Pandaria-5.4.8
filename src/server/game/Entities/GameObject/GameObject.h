@@ -22,12 +22,14 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 #include "Object.h"
+#include "GridObject.h"
 #include "LootMgr.h"
 #include "DBCStores.h"
 
 class GameObjectAI;
 class Group;
 class Transport;
+enum SpellTargetCheckTypes : uint8;
 
 #define MAX_GAMEOBJECT_QUEST_ITEMS 6
 
@@ -718,6 +720,11 @@ struct TransportAnimation;
 
 union GameObjectValue
 {
+    //6 GAMEOBJECT_TYPE_TRAP
+    struct
+    {
+        SpellTargetCheckTypes TargetSearcherCheckType;
+    } Trap;
     //11 GAMEOBJECT_TYPE_TRANSPORT
     struct
     {

@@ -17,6 +17,7 @@
 
 #include "TaskMgr.h"
 #include "Task.h"
+#include "LockedQueue.h"
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include "Optional.h"
@@ -62,6 +63,12 @@ std::unique_ptr<ThreadPool> TaskMgr::_pool(new ThreadPool{1});
 // Yes, this must be here.
 TaskMgr::~TaskMgr()
 {
+}
+
+TaskMgr* TaskMgr::Default()
+{
+    static TaskMgr _default;
+    return &_default;
 }
 
 void TaskMgr::Update()

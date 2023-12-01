@@ -86,19 +86,26 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Include
     ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
+    ${CMAKE_SOURCE_DIR}/src/common
+    ${CMAKE_SOURCE_DIR}/src/common/Asio
+    ${CMAKE_SOURCE_DIR}/src/common/Configuration
+    ${CMAKE_SOURCE_DIR}/src/common/Cryptography
+    ${CMAKE_SOURCE_DIR}/src/common/Debugging 
+    ${CMAKE_SOURCE_DIR}/src/common/IPLocation 
+    ${CMAKE_SOURCE_DIR}/src/common/Logging  
+    ${CMAKE_SOURCE_DIR}/src/common/Threading
+    ${CMAKE_SOURCE_DIR}/src/common/Utilities
+    ${CMAKE_SOURCE_DIR}/src/server/database/Database
+    ${CMAKE_SOURCE_DIR}/src/server/database/Logging    
     ${CMAKE_SOURCE_DIR}/src/server/shared
     ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Database
     ${CMAKE_SOURCE_DIR}/src/server/shared/DataStores
     ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
     ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic/LinkedReference
     ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Logging
+    ${CMAKE_SOURCE_DIR}/src/server/shared/Realms
     ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Threading
     ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Database    
     ${CMAKE_SOURCE_DIR}/src/server/collision
     ${CMAKE_SOURCE_DIR}/src/server/collision/Management
     ${CMAKE_SOURCE_DIR}/src/server/collision/Models
@@ -124,7 +131,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/server/game/Chat
     ${CMAKE_SOURCE_DIR}/src/server/game/Chat/Channels
     ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
-    ${CMAKE_SOURCE_DIR}/src/server/game/CustomLogs
     ${CMAKE_SOURCE_DIR}/src/server/game/CustomTransmogrification
     ${CMAKE_SOURCE_DIR}/src/server/game/Combat
     ${CMAKE_SOURCE_DIR}/src/server/game/DataStores
@@ -187,7 +193,8 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders
     ${ACE_INCLUDE_DIR}
     ${MYSQL_INCLUDE_DIR}
-    ${OPENSSL_INCLUDE_DIR}
+    ${OPENSSL_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/dep/fmt/include   
 )
 
 if (ELUNA)
@@ -217,6 +224,10 @@ add_library(scripts STATIC
   ${scripts_STAT_SRCS} 
 )
 
+target_link_libraries(scripts
+  PUBLIC
+    game)
+
 if (ELUNA)
   add_dependencies(scripts lua)
   target_link_libraries(scripts
@@ -224,6 +235,8 @@ if (ELUNA)
       lua
   )
 endif()
+
+
 
 add_dependencies(scripts revision.h)
 

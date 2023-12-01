@@ -112,7 +112,7 @@ bool Pet::LoadPetFromDB(PetLoadMode mode, uint32 param, Position const* pos)
     Player* owner = GetOwner();
     uint32 ownerid = owner->GetGUIDLow();
 
-    PreparedStatement* stmt;
+    CharacterDatabasePreparedStatement* stmt;
     PreparedQueryResult result;
 
     switch (mode)
@@ -224,7 +224,7 @@ bool Pet::LoadPetFromDB(PetLoadMode mode, uint32 param, Position const* pos)
     AddToTransportIfNeeded(owner->GetTransport());
 
     setPetType(petType);
-    setFaction(owner->getFaction());
+    SetFaction(owner->GetFaction());
     SetUInt32Value(UNIT_FIELD_CREATED_BY_SPELL, summonSpellId);
 
     CreatureTemplate const* cinfo = GetCreatureTemplate();
@@ -341,7 +341,7 @@ bool Pet::LoadPetFromDB(PetLoadMode mode, uint32 param, Position const* pos)
 
     if (getPetType() == HUNTER_PET)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_DECLINED_NAME);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_DECLINED_NAME);
         stmt->setUInt32(0, owner->GetGUIDLow());
         stmt->setUInt32(1, GetCharmInfo()->GetPetNumber());
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -388,7 +388,7 @@ bool Pet::LoadPetFromDB(PetLoadMode mode, uint32 param, Position const* pos)
     return true;
 }
 
-void Pet::SavePetToDB(SQLTransaction trans)
+void Pet::SavePetToDB(CharacterDatabaseTransaction trans)
 {
     if (!GetEntry())
         return;
@@ -466,9 +466,9 @@ void Pet::SavePetToDB(SQLTransaction trans)
 
 void Pet::DeleteFromDB(uint32 guidlow)
 {
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
     stmt->setUInt32(0, guidlow);
     trans->Append(stmt);
 
@@ -695,7 +695,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     PetType petType = MAX_PET_TYPE;
     if (IsPet() && GetOwner()->GetTypeId() == TYPEID_PLAYER)
     {
-        switch (GetOwner()->getClass())
+        switch (GetOwner()->GetClass())
         {
             case CLASS_WARLOCK:
             case CLASS_SHAMAN:
@@ -708,7 +708,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
                 break;
             default:
-                TC_LOG_ERROR("entities.pet", "Unknown type pet %u is summoned by player class %u", GetEntry(), GetOwner()->getClass());
+                TC_LOG_ERROR("entities.pet", "Unknown type pet %u is summoned by player class %u", GetEntry(), GetOwner()->GetClass());
                 break;
         }
     }
@@ -776,7 +776,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     if (GetOwner()->ToPlayer())
     {
-        if (auto scaling = sGtSpellScalingStore.LookupEntry((GetOwner()->getClass() - 1) * 100 + GetOwner()->GetLevel() - 1))
+        if (auto scaling = sGtSpellScalingStore.LookupEntry((GetOwner()->GetClass() - 1) * 100 + GetOwner()->GetLevel() - 1))
         {
             float min = scaling->value;
             float max = scaling->value;
@@ -797,7 +797,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     {
         case SUMMON_PET:
         {
-            switch (GetOwner()->getClass())
+            switch (GetOwner()->GetClass())
             {
                 case CLASS_WARLOCK:
                     if (GetOwner()->HasAura(77219) && !HasAura(115556)) // Master demonologist
@@ -921,7 +921,7 @@ void Pet::_LoadAuras(uint32 timediff)
 {
     TC_LOG_DEBUG("entities.pet", "Loading auras for pet %u", GetGUIDLow());
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURAS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURAS);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1030,7 +1030,7 @@ void Pet::_LoadAuras(uint32 timediff)
 
 void Pet::_LoadSpells()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1045,7 +1045,7 @@ void Pet::_LoadSpells()
             auto itr = m_spells.find(spellId);
             if (itr == m_spells.end() || !spellInfo)
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
                 stmt->setUInt32(0, m_charmInfo->GetPetNumber());
                 stmt->setUInt32(1, spellId);
                 CharacterDatabase.Execute(stmt);
@@ -1062,13 +1062,13 @@ void Pet::_LoadSpells()
     }
 }
 
-void Pet::_SaveSpells(SQLTransaction& trans)
+void Pet::_SaveSpells(CharacterDatabaseTransaction trans)
 {
     for (PetSpellMap::iterator itr = m_spells.begin(), next = m_spells.begin(); itr != m_spells.end(); itr = next)
     {
         ++next;
 
-        PreparedStatement* stmt;
+        CharacterDatabasePreparedStatement* stmt;
 
         switch (itr->second.state)
         {
@@ -1105,9 +1105,9 @@ void Pet::_SaveSpells(SQLTransaction& trans)
     }
 }
 
-void Pet::_SaveAuras(SQLTransaction& trans)
+void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
@@ -1375,7 +1375,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= NULL*/)
     // now need only reset for offline pets (all pets except online case)
     uint32 exceptPetNumber = onlinePet ? onlinePet->GetCharmInfo()->GetPetNumber() : 0;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET);
     stmt->setUInt32(0, owner->GetGUIDLow());
     stmt->setUInt32(1, exceptPetNumber);
     PreparedQueryResult resultPets = CharacterDatabase.Query(stmt);
@@ -1510,7 +1510,7 @@ bool Pet::IsPermanentPetFor(Player* owner) const
     switch (getPetType())
     {
         case SUMMON_PET:
-            switch (owner->getClass())
+            switch (owner->GetClass())
             {
                 case CLASS_WARLOCK:
                     return GetCreatureTemplate()->type == CREATURE_TYPE_DEMON;

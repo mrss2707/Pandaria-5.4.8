@@ -33,7 +33,6 @@
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
-#include <ace/Singleton.h>
 #include "VehicleDefines.h"
 #include <string>
 #include <map>
@@ -52,7 +51,6 @@ class AreaTrigger;
 class Item;
 class PhaseMgr;
 struct AccessRequirement;
-struct PlayerInfo;
 struct PlayerLevelInfo;
 struct DeclinedName;
 
@@ -473,8 +471,6 @@ typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap
 // Trinity string ranges
 #define MIN_TRINITY_STRING_ID           1                    // 'trinity_string'
 #define MAX_TRINITY_STRING_ID           2000000000
-#define MIN_DB_SCRIPT_STRING_ID        MAX_TRINITY_STRING_ID // 'db_script_string'
-#define MAX_DB_SCRIPT_STRING_ID        2000010000
 #define MIN_CREATURE_AI_TEXT_STRING_ID (-1)                 // 'creature_ai_texts'
 #define MAX_CREATURE_AI_TEXT_STRING_ID (-1000000)
 
@@ -641,6 +637,73 @@ struct QuestPOI
 
 typedef std::vector<QuestPOI> QuestPOIVector;
 typedef std::unordered_map<uint32, QuestPOIVector> QuestPOIContainer;
+
+struct PlayerCreateInfoItem
+{
+    PlayerCreateInfoItem(uint32 id, uint32 amount) : item_id(id), item_amount(amount)
+    { }
+
+    uint32 item_id;
+    uint32 item_amount;
+};
+
+typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
+
+struct PlayerLevelInfo
+{
+    PlayerLevelInfo()
+    {
+        for (uint8 i = 0; i < MAX_STATS; ++i) stats [i] = 0;
+    }
+
+    uint8 stats [MAX_STATS];
+};
+
+struct PlayerCreateInfoSkill
+{
+    uint16 SkillId;
+    uint16 Rank;
+};
+
+typedef std::vector<PlayerCreateInfoSkill> PlayerCreateInfoSkills;
+
+typedef std::list<uint32> PlayerCreateSkillRaceClassList;
+
+struct PlayerCreateInfoAction
+{
+    PlayerCreateInfoAction() : button(0), type(0), action(0)
+    { }
+    PlayerCreateInfoAction(uint8 _button, uint32 _action, uint8 _type) : button(_button), type(_type), action(_action)
+    { }
+
+    uint8 button;
+    uint8 type;
+    uint32 action;
+};
+
+typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
+
+struct PlayerInfo
+{
+    // existence checked by displayId != 0
+    PlayerInfo() : displayId_m(0), displayId_f(0), levelInfo(NULL)
+    { }
+
+    uint32 mapId;
+    uint32 areaId;
+    float positionX;
+    float positionY;
+    float positionZ;
+    float orientation;
+    uint16 displayId_m;
+    uint16 displayId_f;
+    PlayerCreateInfoItems item;
+    //PlayerCreateInfoSkills skills;      // Not skill id - index from SkillRaceClassInfo.dbc 
+    PlayerCreateSkillRaceClassList skills;
+    PlayerCreateInfoActions action;
+
+    PlayerLevelInfo* levelInfo;                             //[level-1] 0..MaxPlayerLevel-1
+};
 
 struct GraveYardData
 {
@@ -883,13 +946,15 @@ namespace ObjectVisibilityState
 class ObjectMgr
 {
     friend class PlayerDumpReader;
-    friend class ACE_Singleton<ObjectMgr, ACE_Null_Mutex>;
 
     private:
         ObjectMgr();
         ~ObjectMgr();
 
     public:
+
+        static ObjectMgr* instance();
+
         typedef std::unordered_map<uint32, Item*> ItemMap;
 
         typedef std::unordered_map<uint32, Quest*> QuestMap;
@@ -969,11 +1034,7 @@ class ObjectMgr
         void GetTaxiPath(uint32 source, uint32 destination, uint32 &path, uint32 &cost);
         uint32 GetTaxiMountDisplayId(uint32 id, uint32 team, bool allowed_alt_team = false);
 
-        Quest const* GetQuestTemplate(uint32 quest_id) const
-        {
-            QuestMap::const_iterator itr = _questTemplates.find(quest_id);
-            return itr != _questTemplates.end() ? itr->second : NULL;
-        }
+        Quest const* GetQuestTemplate(uint32 quest_id) const;
 
         QuestMap const& GetQuestTemplates() const { return _questTemplates; }
 
@@ -1012,21 +1073,9 @@ class ObjectMgr
         void LoadGraveyardZones();
         GraveYardData const* FindGraveYardData(uint32 id, uint32 zone);
 
-        AreaTriggerStruct const* GetAreaTrigger(uint32 trigger) const
-        {
-            AreaTriggerContainer::const_iterator itr = _areaTriggerStore.find(trigger);
-            if (itr != _areaTriggerStore.end())
-                return &itr->second;
-            return NULL;
-        }
+        AreaTriggerStruct const* GetAreaTrigger(uint32 trigger) const;
 
-        AccessRequirement const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
-        {
-            AccessRequirementContainer::const_iterator itr = _accessRequirementStore.find(MAKE_PAIR32(mapid, difficulty));
-            if (itr != _accessRequirementStore.end())
-                return itr->second;
-            return NULL;
-        }
+        AccessRequirement const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const;
 
         AreaTriggerStruct const* GetGoBackTrigger(uint32 Map) const;
         AreaTriggerStruct const* GetMapEntranceTrigger(uint32 Map) const;
@@ -1040,7 +1089,7 @@ class ObjectMgr
             if (itr != _repRewardRateStore.end())
                 return &itr->second;
 
-            return NULL;
+            return nullptr;
         }
 
         ReputationOnKillEntry const* GetReputationOnKilEntry(uint32 id) const
@@ -1048,7 +1097,7 @@ class ObjectMgr
             RepOnKillContainer::const_iterator itr = _repOnKillStore.find(id);
             if (itr != _repOnKillStore.end())
                 return &itr->second;
-            return NULL;
+            return nullptr;
         }
 
         int32 GetBaseReputationOf(FactionEntry const* factionEntry, uint8 race, uint8 playerClass);
@@ -1091,17 +1140,7 @@ class ObjectMgr
         void LoadQuests();
         void LoadQuestObjectives();
         void LoadQuestObjectiveVisualEffects();
-        void LoadQuestStartersAndEnders()
-        {
-            TC_LOG_INFO("server.loading", "Loading GO Start Quest Data...");
-            LoadGameobjectQuestStarters();
-            TC_LOG_INFO("server.loading", "Loading GO End Quest Data...");
-            LoadGameobjectQuestEnders();
-            TC_LOG_INFO("server.loading", "Loading Creature Start Quest Data...");
-            LoadCreatureQuestStarters();
-            TC_LOG_INFO("server.loading", "Loading Creature End Quest Data...");
-            LoadCreatureQuestEnders();
-        }
+        void LoadQuestStartersAndEnders();
         void LoadGameobjectQuestStarters();
         void LoadGameobjectQuestEnders();
         void LoadCreatureQuestStarters();
@@ -1156,7 +1195,6 @@ class ObjectMgr
 
         bool LoadTrinityStrings(char const* table, int32 min_value, int32 max_value);
         bool LoadTrinityStrings() { return LoadTrinityStrings("trinity_string", MIN_TRINITY_STRING_ID, MAX_TRINITY_STRING_ID); }
-        void LoadDbScriptStrings();
         void LoadBroadcastTexts();
         void LoadBroadcastTextLocales();        
         void LoadCreatureClassLevelStats();
@@ -1615,16 +1653,7 @@ class ObjectMgr
 
         void LoadHotfixData();
         HotfixData const& GetHotfixData() const { return _hotfixData; }
-        time_t GetHotfixDate(uint32 entry, uint32 type) const
-        {
-            time_t ret = 0;
-            for (HotfixData::const_iterator itr = _hotfixData.begin(); itr != _hotfixData.end(); ++itr)
-                if (itr->Entry == entry && itr->Type == type)
-                    if (itr->Timestamp > ret)
-                        ret = itr->Timestamp;
-
-            return ret ? ret : time(NULL);
-        }
+        time_t GetHotfixDate(uint32 entry, uint32 type) const;
 
         void LoadMissingKeyChains();
 
@@ -1636,65 +1665,15 @@ class ObjectMgr
         void LoadArchaeologyFindInfo();
         void LoadResearchProjectRequirements();
 
-        ResearchDigsiteInfo const* GetResearchDigsiteInfo(uint32 digsiteId) const
-        {
-            for (ResearchDigsiteContainer::const_iterator itr = _researchDigsiteStore.begin(); itr != _researchDigsiteStore.end(); ++itr)
-                for (ResearchDigsiteList::const_iterator digsite = itr->second.begin(); digsite != itr->second.end(); ++digsite)
-                    if (digsite->digsiteId == digsiteId)
-                        return &(*digsite);
+        ResearchDigsiteInfo const* GetResearchDigsiteInfo(uint32 digsiteId) const;
+        ResearchDigsiteList const* GetResearchDigsitesForContinent(uint32 mapId) const;
 
-            return NULL;
-        }
+        ArchaeologyFindInfo const* GetArchaeologyFindInfo(uint32 findGUID, uint32 digsiteId);
+        ArchaeologyFindInfo const* GetRandomArchaeologyFindForDigsite(uint32 digsiteId);
+        ArchaeologyFindList const* GetArcheologyFindListForDigsite(uint32 digsiteId);
 
-        ResearchDigsiteList const* GetResearchDigsitesForContinent(uint32 mapId) const
-        {
-            ResearchDigsiteContainer::const_iterator iter = _researchDigsiteStore.find(mapId);
-            if (iter != _researchDigsiteStore.end())
-                return &iter->second;
-
-            return NULL;
-        }
-
-        ArchaeologyFindInfo const* GetArchaeologyFindInfo(uint32 findGUID, uint32 digsiteId)
-        {
-            ArchaeologyFindContainer::const_iterator itr = _archaeologyFindStore.find(digsiteId);
-            if (itr == _archaeologyFindStore.end())
-                return NULL;
-
-            for (ArchaeologyFindList::const_iterator find = itr->second.begin(); find != itr->second.end(); ++find)
-                if (find->guid == findGUID)
-                    return &(*find);
-
-            return NULL;
-        }
-
-        ArchaeologyFindInfo const* GetRandomArchaeologyFindForDigsite(uint32 digsiteId)
-        {
-            ArchaeologyFindContainer::const_iterator itr = _archaeologyFindStore.find(digsiteId);
-            if (itr == _archaeologyFindStore.end())
-                return NULL;
-
-            if (itr->second.empty())
-                return NULL;
-
-            return &Trinity::Containers::SelectRandomContainerElement(itr->second);
-        }
-
-        ArchaeologyFindList const* GetArcheologyFindListForDigsite(uint32 digsiteId)
-        {
-            ArchaeologyFindContainer::const_iterator itr = _archaeologyFindStore.find(digsiteId);
-            return itr != _archaeologyFindStore.end() ? &itr->second : nullptr;
-        }
-
-        ResearchProjectRequirements const* GetResearchProjectRequirements(uint32 projectId) const
-        {
-            ResearchProjectRequirementContainer::const_iterator iter = _researchProjectRequirementStore.find(projectId);
-            if (iter != _researchProjectRequirementStore.end())
-                return &iter->second;
-
-            return NULL;
-        }
-
+        ResearchProjectRequirements const* GetResearchProjectRequirements(uint32 projectId) const;
+        
         CreatureDifficultyInfo const* GetCreatureDifficultyInfo(Difficulty difficulty, uint32 id) const;
         CreatureDifficultyInfo const* SelectDifficultyInfo(Map const* map, uint32 entry) const;
 
@@ -1855,7 +1834,6 @@ class ObjectMgr
 
     private:
         void LoadScripts(ScriptsType type);
-        void CheckScripts(ScriptsType type, std::set<int32>& ids);
         void LoadQuestRelationsHelper(QuestRelations& map, std::string const& table, bool starter, bool go);
         void PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint32 itemId, int32 count);
 
@@ -1969,7 +1947,7 @@ class ObjectMgr
         PromotionAurasMap _promotionAuras;
 };
 
-#define sObjectMgr ACE_Singleton<ObjectMgr, ACE_Null_Mutex>::instance()
+#define sObjectMgr ObjectMgr::instance()
 
 // scripting access functions
 bool LoadTrinityStrings(char const* table, int32 start_value = MAX_CREATURE_AI_TEXT_STRING_ID, int32 end_value = std::numeric_limits<int32>::min());

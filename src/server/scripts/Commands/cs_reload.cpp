@@ -98,7 +98,6 @@ public:
             { "creature_scaling",              SEC_ADMINISTRATOR,  true,   &HandleReloadCreatureScallingCommand,           },
             { "creature_summon_groups",         SEC_ADMINISTRATOR,  true,   &HandleReloadCreatureSummonGroupsCommand,       },
             { "creature_template",              SEC_ADMINISTRATOR,  true,   &HandleReloadCreatureTemplateCommand,           },
-            //{ "db_script_string",              SEC_ADMINISTRATOR, true,  &HandleReloadDbScriptStringCommand,            },
             { "disables",                       SEC_ADMINISTRATOR,  true,   &HandleReloadDisablesCommand,                   },
             { "disenchant_loot_template",       SEC_ADMINISTRATOR,  true,   &HandleReloadLootTemplatesDisenchantCommand,    },
             { "event_scripts",                  SEC_ADMINISTRATOR,  true,   &HandleReloadEventScriptsCommand,               },
@@ -117,9 +116,9 @@ public:
             { "item_template_locale",           SEC_ADMINISTRATOR,  true,   &HandleReloadLocalesItemCommand,                },
             { "lfg_dungeon_rewards",            SEC_ADMINISTRATOR,  true,   &HandleReloadLfgRewardsCommand,                 },
             { "locales_achievement_reward",     SEC_ADMINISTRATOR,  true,   &HandleReloadLocalesAchievementRewardCommand,   },
-            { "locales_creature",               SEC_ADMINISTRATOR,  true,   &HandleReloadLocalesCreatureCommand,            },
+            { "gossip_menu_option_locale",      SEC_ADMINISTRATOR,  true,   &HandleReloadLocalesCreatureCommand,            },
             { "locales_gossip_menu_option",     SEC_ADMINISTRATOR,  true,   &HandleReloadLocalesGossipMenuOptionCommand,    },
-            { "locales_quest",                  SEC_ADMINISTRATOR,  true,   &HandleReloadLocalesQuestCommand,               },
+            { "quest_template_locale",          SEC_ADMINISTRATOR,  true,   &HandleReloadLocalesQuestCommand,               },
             { "mail_level_reward",              SEC_ADMINISTRATOR,  true,   &HandleReloadMailLevelRewardCommand,            },
             { "mail_loot_template",             SEC_ADMINISTRATOR,  true,   &HandleReloadLootTemplatesMailCommand,          },
             { "milling_loot_template",          SEC_ADMINISTRATOR,  true,   &HandleReloadLootTemplatesMillingCommand,       },
@@ -284,7 +283,6 @@ public:
         HandleReloadEventScriptsCommand(handler, "a");
         HandleReloadSpellScriptsCommand(handler, "a");
         handler->SendGlobalGMSysMessage("DB tables `*_scripts` reloaded.");
-        HandleReloadDbScriptStringCommand(handler, "a");
         HandleReloadWpScriptsCommand(handler, "a");
         HandleReloadWpCommand(handler, "a");
         return true;
@@ -457,7 +455,7 @@ public:
         {
             uint32 entry = uint32(atoi(*itr));
 
-            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
+            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
             stmt->setUInt32(0, entry);
             PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -1065,14 +1063,6 @@ public:
         if (*args != 'a')
             handler->SendGlobalGMSysMessage("DB table `spell_scripts` reloaded.");
 
-        return true;
-    }
-
-    static bool HandleReloadDbScriptStringCommand(ChatHandler* handler, const char* /*args*/)
-    {
-        TC_LOG_INFO("misc", "Re-Loading Script strings from `db_script_string`...");
-        sObjectMgr->LoadDbScriptStrings();
-        handler->SendGlobalGMSysMessage("DB table `db_script_string` reloaded.");
         return true;
     }
 

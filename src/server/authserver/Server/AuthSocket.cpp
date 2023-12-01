@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <openssl/md5.h>
 
+#include "BigNumber.h"
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "ByteBuffer.h"
@@ -29,6 +30,9 @@
 #include "TOTP.h"
 #include "SHA1.h"
 #include "openssl/crypto.h"
+#include "UtilACE.h"
+#include "Threading/Threading.h"
+#include "IPLocation.h"
 
 #define ChunkSize 2048
 
@@ -146,7 +150,7 @@ typedef struct AuthHandler
 #endif
 
 // Launch a thread to transfer a patch to the client
-class PatcherRunnable: public ACE_Based::Runnable
+class PatcherRunnable: public MopCore::Runnable
 {
 public:
     PatcherRunnable(class AuthSocket*);
@@ -310,7 +314,7 @@ void AuthSocket::_SetVSFields(const std::string& rI)
     v_hex = v.AsHexStr();
     s_hex = s.AsHexStr();
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_VS);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_VS);
     stmt->setString(0, v_hex);
     stmt->setString(1, s_hex);
     stmt->setString(2, _login);
@@ -381,7 +385,7 @@ bool AuthSocket::_HandleLogonChallenge()
     LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS));
 
     std::string const& ip_address = socket().getRemoteAddress();
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED);
     stmt->setString(0, ip_address);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (result)
@@ -420,6 +424,25 @@ bool AuthSocket::_HandleLogonChallenge()
                     
                 }
                     
+            }
+            else
+            {
+                std::string LockCountry(fields[7].GetCString()); 
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(ip_address))
+                    _ipCountry = location->CountryCode;
+                TC_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
+                if (LockCountry.empty() || LockCountry == "00")
+                    TC_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
+                else if (!_ipCountry.empty())
+                {
+                    TC_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _login.c_str(), LockCountry.c_str(), _ipCountry.c_str());
+                    if (_ipCountry != LockCountry)
+                    {
+                        pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
+                        socket().send((char const*)pkt.contents(), pkt.size());
+                        return true;
+                    }
+                }
             }
             if (!locked)
             {
@@ -564,7 +587,7 @@ bool AuthSocket::_HandleLogonProof()
     A.SetBinary(lp.A, 32);
 
     // SRP safeguard: abort if A == 0
-    if (A.isZero())
+    if (A.IsZero())
     {
         socket().shutdown();
         return true;
@@ -643,7 +666,7 @@ bool AuthSocket::_HandleLogonProof()
         // No SQL injection (escaped user name) and IP address as received by socket
         const char *K_hex = K.AsHexStr();
 
-        PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
+        LoginDatabasePreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
         stmt->setString(0, K_hex);
         stmt->setString(1, socket().getRemoteAddress().c_str());
         stmt->setUInt32(2, GetLocaleByName(_localizationName));
@@ -711,7 +734,7 @@ bool AuthSocket::_HandleLogonProof()
         if (MaxWrongPassCount > 0)
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
-            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
+            LoginDatabasePreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
             stmt->setString(0, _login);
             LoginDatabase.Execute(stmt);
 
@@ -789,7 +812,7 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     _login = (const char*)ch->I;
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SESSIONKEY);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SESSIONKEY);
     stmt->setString(0, _login);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -871,7 +894,7 @@ bool AuthSocket::_HandleReconnectProof()
 
 ACE_INET_Addr const& AuthSocket::GetAddressForClient(Realm const& realm, ACE_INET_Addr const& clientAddr)
 {
-    return realm.ExternalAddress;
+    return *realm.ExternalAddress;
 }
 
 // Realm List command handler
@@ -885,7 +908,7 @@ bool AuthSocket::_HandleRealmList()
 
     // Get the user id (else close the connection)
     // No SQL injection (prepared statement)
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
     stmt->setString(0, _login);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
@@ -908,15 +931,14 @@ bool AuthSocket::_HandleRealmList()
     ByteBuffer pkt;
 
     size_t RealmListSize = 0;
-    for (RealmList::RealmMap::const_iterator i = sRealmList->begin(); i != sRealmList->end(); ++i)
+    for (auto& [realmHandle, realm] : sRealmList->GetRealms())
     {
-        const Realm &realm = i->second;
         // don't work with realms which not compatible with the client
-        bool okBuild = ((_expversion & POST_BC_EXP_FLAG) && realm.gamebuild == _build) || ((_expversion & PRE_BC_EXP_FLAG) && !AuthHelper::IsPreBCAcceptedClientBuild(realm.gamebuild));
+        bool okBuild = ((_expversion & POST_BC_EXP_FLAG) && realm.Build == _build) || ((_expversion & PRE_BC_EXP_FLAG) && !AuthHelper::IsPreBCAcceptedClientBuild(realm.Build));
 
         // No SQL injection. id of realm is controlled by the database.
-        uint32 flag = realm.flag;
-        RealmBuildInfo const* buildInfo = AuthHelper::GetBuildInfo(realm.gamebuild);
+        uint32 flag = realm.Flags;
+        RealmBuildInfo const* buildInfo = sRealmList->GetBuildInfo(realm.Build);
         if (!okBuild)
         {
             if (!buildInfo)
@@ -928,7 +950,7 @@ bool AuthSocket::_HandleRealmList()
         if (!buildInfo)
             flag &= ~REALM_FLAG_SPECIFYBUILD;
 
-        std::string name = i->first;
+        std::string name = realm.Name;
         if (_expversion & PRE_BC_EXP_FLAG && flag & REALM_FLAG_SPECIFYBUILD)
         {
             std::ostringstream ss;
@@ -937,29 +959,29 @@ bool AuthSocket::_HandleRealmList()
         }
 
         // We don't need the port number from which client connects with but the realm's port
-        clientAddr.set_port_number(realm.ExternalAddress.get_port_number());
+        clientAddr.set_port_number(realm.ExternalAddress->get_port_number());
 
-        uint8 lock = (realm.allowedSecurityLevel > _accountSecurityLevel) ? 1 : 0;
+        uint8 lock = (realm.AllowedSecurityLevel > _accountSecurityLevel) ? 1 : 0;
 
         uint8 AmountOfCharacters = 0;
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_NUM_CHARS_ON_REALM);
-        stmt->setUInt32(0, realm.m_ID);
+        stmt->setUInt32(0, realm.Id.Realm);
         stmt->setUInt32(1, id);
         result = LoginDatabase.Query(stmt);
         if (result)
             AmountOfCharacters = (*result)[0].GetUInt8();
 
-        pkt << realm.icon;                                  // realm type
+        pkt << realm.Type;                                  // realm type
         if (_expversion & POST_BC_EXP_FLAG)                 // only 2.x and 3.x clients
             pkt << lock;                                    // if 1, then realm locked
         pkt << uint8(flag);                                 // RealmFlags
         pkt << name;
         pkt << GetAddressString(GetAddressForClient(realm, clientAddr));
-        pkt << realm.populationLevel;
+        pkt << realm.PopulationLevel;
         pkt << AmountOfCharacters;
-        pkt << realm.timezone;                              // realm category
+        pkt << realm.Timezone;                              // realm category
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
-            pkt << uint8(0x2C);                             // unk, may be realm number/id?
+            pkt << uint8(realm.Id.Realm);                   
         else
             pkt << uint8(0x0);                              // 1.12.1 and 1.12.2 clients
 
@@ -1021,7 +1043,7 @@ bool AuthSocket::_HandleXferResume()
     socket().recv((char*)&start, sizeof(start));
     fseek(pPatch, long(start), 0);
 
-    ACE_Based::Thread u(new PatcherRunnable(this));
+    MopCore::Thread u(new PatcherRunnable(this));
     return true;
 }
 
@@ -1053,7 +1075,7 @@ bool AuthSocket::_HandleXferAccept()
     socket().recv_skip(1);                                         // clear input buffer
     fseek(pPatch, 0, 0);
 
-    ACE_Based::Thread u(new PatcherRunnable(this));
+    MopCore::Thread u(new PatcherRunnable(this));
     return true;
 }
 

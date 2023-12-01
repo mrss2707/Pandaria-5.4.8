@@ -22,6 +22,7 @@
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
 
+#include <atomic>
 #include "Common.h"
 #include "SharedDefines.h"
 #include "AddonMgr.h"
@@ -31,6 +32,8 @@
 #include "Opcodes.h"
 #include "AccountMgr.h"
 #include "Object.h"
+#include "AsyncCallbackProcessor.h"
+#include "DatabaseEnvFwd.h"
 
 class BigNumber;
 class AccountAchievementMgr;
@@ -159,7 +162,6 @@ enum DB2Types : uint32
 
 enum AccountFlags
 {
-    ACC_FLAG_ITEM_LOG            = 0x00000001,
     ACC_FLAG_TOURNAMENT_OBSERVER = 0x00000002, // not used, just for compatibility with wotlk
     ACC_FLAG_VALOR_CAP_REACHED   = 0x00000004,
 };
@@ -252,7 +254,7 @@ struct MuteInfo
 };
 
 /// Player session in the World
-class WorldSession : public Schedulable
+class TC_GAME_API WorldSession 
 {
     public:
         WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, uint32 flags, bool isARecruiter, bool hasBoost);
@@ -289,13 +291,10 @@ class WorldSession : public Schedulable
         void SendDispalyPromotionOpcode();
 
         AccountTypes GetSecurity() const { return _security; }
-        bool IsPremium() { return _projectMemberInfo && _projectMemberInfo->IsPremium(); }
         uint32 GetAccountId() const { return _accountId; }
         Player* GetPlayer() const { return _player; }
         std::string const& GetPlayerName() const;
         std::string GetPlayerInfo() const;
-        projectMemberInfo* GetprojectMemberInfo() const { return _projectMemberInfo; }
-        void UpdateprojectMemberInfo();
 
         uint32 GetCurrentVendor() const { return m_currentVendorEntry; }
         void SetCurrentVendor(uint32 vendorEntry) { m_currentVendorEntry = vendorEntry; }
@@ -383,7 +382,7 @@ class WorldSession : public Schedulable
 
         void LoadTutorialsData();
         void SendTutorialsData();
-        void SaveTutorialsData(SQLTransaction& trans);
+        void SaveTutorialsData(CharacterDatabaseTransaction trans);
         uint32 GetTutorialInt(uint8 index) const { return m_Tutorials[index]; }
         void SetTutorialInt(uint8 index, uint32 value)
         {
@@ -400,7 +399,7 @@ class WorldSession : public Schedulable
         void SendAuctionCommandResult(AuctionEntry* auction, uint32 Action, uint32 ErrorCode, uint32 bidError = 0);
         void SendAuctionBidderNotification(uint32 location, uint32 auctionId, uint64 bidder, uint32 bidSum, uint32 diff, uint32 item_template);
         void SendAuctionOwnerNotification(AuctionEntry* auction);
-        void SendAuctionRemovedNotification(uint32 auctionId, uint32 itemEntry, int32 randomPropertyId);
+        //void SendAuctionRemovedNotification(uint32 auctionId, uint32 itemEntry, int32 randomPropertyId);
 
         //Item Enchantment
         void SendEnchantmentLog(uint64 target, uint64 caster, uint64 item, uint32 itemId, uint32 enchantId, uint8 slot);
@@ -435,10 +434,10 @@ class WorldSession : public Schedulable
         void SetLatency(uint32 latency) { m_latency = latency; }
         uint32 getDialogStatus(Player* player, Object* questgiver, uint32 defstatus);
 
-        ACE_Atomic_Op<ACE_Thread_Mutex, time_t> m_timeOutTime;
+        std::atomic<time_t> m_timeOutTime;
         void UpdateTimeOutTime(uint32 diff)
         {
-            if (time_t(diff) > m_timeOutTime.value())
+            if (time_t(diff) > m_timeOutTime)
                 m_timeOutTime = 0;
             else
                 m_timeOutTime -= diff;
@@ -477,11 +476,10 @@ class WorldSession : public Schedulable
         void HandleCharEnumOpcode(WorldPacket& recvPacket);
         void HandleCharDeleteOpcode(WorldPacket& recvPacket);
         void HandleCharCreateOpcode(WorldPacket& recvPacket);
-        void HandleCharCreateCallback(PreparedQueryResult result, CharacterCreateInfo* createInfo);
         void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
         void HandleLoadScreenOpcode(WorldPacket& recvPacket);
         void HandleCharEnum(PreparedQueryResult result);
-        void HandlePlayerLogin(LoginQueryHolder* charHolder);
+        void HandlePlayerLogin(LoginQueryHolder const& holder);
         void HandleCharFactionOrRaceChange(WorldPacket& recvData);
         void HandleRandomizeCharNameOpcode(WorldPacket& recvData);
         void HandleReorderCharacters(WorldPacket& recvData);
@@ -856,7 +854,7 @@ class WorldSession : public Schedulable
         void HandleChannelModerate(WorldPacket& recvPacket);
         void HandleChannelDeclineInvite(WorldPacket& recvPacket);
         void HandleChannelDisplayListQuery(WorldPacket& recvPacket);
-        void HandleGetChannelMemberCount(WorldPacket& recvPacket);
+        //void HandleGetChannelMemberCount(WorldPacket& recvPacket);
         void HandleSetChannelWatch(WorldPacket& recvPacket);
 
         void HandleCompleteCinematic(WorldPacket& recvPacket);
@@ -969,7 +967,7 @@ class WorldSession : public Schedulable
         void HandleAreaSpiritHealerQueueOpcode(WorldPacket& recvData);
         void HandleCancelMountAuraOpcode(WorldPacket& recvData);
         void HandleSelfResOpcode(WorldPacket& recvData);
-        void HandleComplainOpcode(WorldPacket& recvData);
+        //void HandleComplainOpcode(WorldPacket& recvData);
         void HandleRequestPetInfoOpcode(WorldPacket& recvData);
 
         // Socket gem
@@ -1144,18 +1142,17 @@ class WorldSession : public Schedulable
 
         bool ChannelCheck(std::string channel);
 
+    public:
+        QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
+        TransactionCallback& AddTransactionCallback(TransactionCallback&& callback);
+        SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback);
+
     private:
-        void InitializeQueryCallbackParameters();
         void ProcessQueryCallbacks();
 
-        PreparedQueryResultFuture _charEnumCallback;
-        PreparedQueryResultFuture _addIgnoreCallback;
-        PreparedQueryResultFuture _stablePetCallback;
-        QueryCallback<PreparedQueryResult, std::string> _charRenameCallback;
-        QueryCallback<PreparedQueryResult, std::string> _addFriendCallback;
-        QueryCallback<PreparedQueryResult, uint32> _unstablePetCallback;
-        QueryCallback<PreparedQueryResult, uint32> _stableSwapCallback;
-        QueryCallback<PreparedQueryResult, CharacterCreateInfo*, true> _charCreateCallback;
+        QueryCallbackProcessor _queryProcessor;
+        AsyncCallbackProcessor<TransactionCallback> _transactionCallbacks;
+        AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     friend class World;
     protected:
@@ -1253,13 +1250,11 @@ class WorldSession : public Schedulable
         uint32 recruiterId;
         bool isRecruiter;
         bool m_hasBoost;
-        ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
+        LockedQueue<WorldPacket*> _recvQueue;
         time_t timeLastWhoCommand;
         z_stream_s* _compressionStream;
 
         std::unique_ptr<AccountAchievementMgr> _achievementMgr;
-
-        projectMemberInfo* _projectMemberInfo;
 
         MuteInfo _mute;
         uint32 m_currentVendorEntry;

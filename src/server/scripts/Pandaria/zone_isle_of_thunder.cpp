@@ -25,6 +25,7 @@
 #include "Transport.h"
 #include "Group.h"
 #include "Player.h"
+#include "Random.h"
 
 enum Spells
 {
@@ -3779,7 +3780,7 @@ struct npc_ingaluk_roach : public ScriptedAI
     void Reset() override
     {
         SetCombatMovement(false);
-        me->setFaction(14);
+        me->SetFaction(14);
         me->SetReactState(REACT_AGGRESSIVE);
     }
 
@@ -3787,7 +3788,7 @@ struct npc_ingaluk_roach : public ScriptedAI
     {
         if (who && who->ToPlayer())
         {
-            me->setFaction(190); // won`t attack by default with 190, only assist
+            me->SetFaction(190); // won`t attack by default with 190, only assist
             who->ToPlayer()->KilledMonsterCredit(me->GetEntry());
             me->Kill(me);
         }

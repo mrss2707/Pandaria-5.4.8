@@ -23,8 +23,14 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Include
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
+    ${CMAKE_SOURCE_DIR}/src/common
+    ${CMAKE_SOURCE_DIR}/src/common/Logging
+    ${CMAKE_SOURCE_DIR}/src/common/Utilities
     ${CMAKE_SOURCE_DIR}/src/server/shared
+    ${CMAKE_SOURCE_DIR}/src/server/shared/Database
+    ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities   
     ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
+    ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous
     ${CMAKE_SOURCE_DIR}/src/server/collision
     ${CMAKE_SOURCE_DIR}/src/server/collision/Management
     ${CMAKE_SOURCE_DIR}/src/server/collision/Maps
@@ -35,6 +41,7 @@ add_executable(mmaps_generator ${mmap_gen_sources})
 
 target_link_libraries(mmaps_generator
   PRIVATE
+    common
     shared
     collision
     g3dlib

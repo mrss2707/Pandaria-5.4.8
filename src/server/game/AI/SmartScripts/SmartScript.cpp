@@ -39,32 +39,6 @@
 #include "GameEventMgr.h"
 #include "Chat.h"
 
-// class TrinityStringTextBuilder
-// {
-//     public:
-//         TrinityStringTextBuilder(WorldObject* obj, ChatMsg msgtype, int32 id, uint32 language, uint64 targetGUID)
-//             : _source(obj), _msgType(msgtype), _textId(id), _language(language), _targetGUID(targetGUID)
-//         {
-//         }
-
-//         size_t operator()(WorldPacket* data, LocaleConstant locale, uint64 guid) const
-//         {
-//             std::string text = sObjectMgr->GetTrinityString(_textId, locale);
-//             std::string localizedName = _source->GetNameForLocaleIdx(locale);
-//             ObjectGuid receiverGuid = guid ? guid : _targetGUID;
-
-//             ChatHandler::BuildChatPacket(*data, _msgType, Language(_language), _source->GetGUID(), _targetGUID, text, 0,
-//                 _source->GetNameForLocaleIdx(locale));
-//             return ChatHandler::BuildChatPacket(*data, _msgType, Language(_language), _talker, _target, text, 0, "", locale);
-//         }
-
-//         WorldObject* _source;
-//         ChatMsg _msgType;
-//         int32 _textId;
-//         uint32 _language;
-//         uint64 _targetGUID;
-// };
-
 SmartScript::SmartScript()
 {
     go = NULL;
@@ -148,20 +122,27 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_TALK:
         {
             ObjectList* targets = GetTargets(e, unit);
-            Creature* talker = me;
-            Player* targetPlayer = NULL;
+            Creature* talker = e.target.type == 0 ? me : nullptr;
+            //Player* targetPlayer = nullptr;
+            Unit* talkTarget = nullptr;
             if (targets)
             {
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
                     if (IsCreature((*itr)) && !(*itr)->ToCreature()->IsPet()) // Prevented sending text to pets.
                     {
-                        talker = (*itr)->ToCreature();
+                        if (e.action.talk.useTalkTarget)
+                        {
+                            talker = me;
+                            talkTarget = (*itr)->ToCreature();
+                        }
+                        else
+                            talker = (*itr)->ToCreature();
                         break;
                     }
                     else if (IsPlayer((*itr)))
                     {
-                        targetPlayer = (*itr)->ToPlayer();
+                        talkTarget = (*itr)->ToPlayer();
                         break;
                     }
                 }
@@ -169,18 +150,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 delete targets;
             }
 
+            if (!talkTarget)
+                talkTarget = GetLastInvoker();
+            
             if (!talker)
                 break;
 
             mTalkerEntry = talker->GetEntry();
             mLastTextID = e.action.talk.textGroupID;
             mTextTimer = e.action.talk.duration;
-            Unit* talkTarget = NULL;
-            if (IsPlayer(GetLastInvoker())) // used for $vars in texts and whisper target
-                talkTarget = GetLastInvoker();
-            else
-                talkTarget = targetPlayer;
-
             mUseTextTimer = true;
             sCreatureTextMgr->SendChat(talker, uint8(e.action.talk.textGroupID), talkTarget);
             TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_TALK: talker: %s (GuidLow: %u), textGuid: %u",
@@ -258,7 +236,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (e.action.faction.factionID)
                         {
-                            (*itr)->ToCreature()->setFaction(e.action.faction.factionID);
+                            (*itr)->ToCreature()->SetFaction(e.action.faction.factionID);
                             TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_SET_FACTION: Creature entry %u, GuidLow %u set faction to %u",
                                 (*itr)->GetEntry(), (*itr)->GetGUIDLow(), e.action.faction.factionID);
                         }
@@ -266,9 +244,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         {
                             if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate((*itr)->ToCreature()->GetEntry()))
                             {
-                                if ((*itr)->ToCreature()->getFaction() != ci->faction_A)
+                                if ((*itr)->ToCreature()->GetFaction() != ci->faction_A)
                                 {
-                                    (*itr)->ToCreature()->setFaction(ci->faction_A);
+                                    (*itr)->ToCreature()->SetFaction(ci->faction_A);
                                     TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_SET_FACTION: Creature entry %u, GuidLow %u set faction to %u",
                                         (*itr)->GetEntry(), (*itr)->GetGUIDLow(), ci->faction_A);
                                 }
@@ -762,7 +740,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             me->DoFleeToGetAssistance();
             if (e.action.flee.withEmote)
             {
-                Trinity::BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_FLEE_FOR_ASSIST, me->getGender());
+                Trinity::BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_FLEE_FOR_ASSIST, me->GetGender());
                 sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
             }
             TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_FLEE_FOR_ASSIST: Creature %u DoFleeToGetAssistance", me->GetGUIDLow());
@@ -817,7 +795,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             ObjectList* targets = GetTargets(e, unit);
             if (!targets)
+            {
+                ENSURE_AI(SmartAI, me->AI())->StopFollow(false);
                 break;
+            }
 
             for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
             {
@@ -997,10 +978,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (me)
             {
-                me->CallForHelp((float)e.action.callHelp.range);
+                me->CallForHelp(float(e.action.callHelp.range));
                 if (e.action.callHelp.withEmote)
                 {
-                    Trinity::BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, me->getGender());
+                    Trinity::BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, me->GetGender());
                     sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
                 }
                 TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_FOR_HELP: Creature %u", me->GetGUIDLow());
@@ -1207,7 +1188,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     y += e.target.y;
                     z += e.target.z;
                     o += e.target.o;
-                    GetBaseObject()->SummonGameObject(e.action.summonGO.entry, x, y, z, o, { }, e.action.summonGO.despawnTime);
+                    GetBaseObject()->SummonGameObject(e.action.summonGO.entry, x, y, z, o, { }, e.action.summonGO.despawnTime, GOSummonType(e.action.summonGO.summonType));
                 }
 
                 delete targets;
@@ -1216,7 +1197,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (e.GetTargetType() != SMART_TARGET_POSITION)
                 break;
 
-            GetBaseObject()->SummonGameObject(e.action.summonGO.entry, e.target.x, e.target.y, e.target.z, e.target.o, { }, e.action.summonGO.despawnTime);
+            GetBaseObject()->SummonGameObject(e.action.summonGO.entry, e.target.x, e.target.y, e.target.z, e.target.o, { }, e.action.summonGO.despawnTime, GOSummonType(e.action.summonGO.summonType));
             break;
         }
         case SMART_ACTION_KILL_UNIT:
@@ -2628,6 +2609,7 @@ SmartScriptHolder SmartScript::CreateEvent(SMART_EVENT e, uint32 event_flags, ui
     script.event.raw.param2 = event_param2;
     script.event.raw.param3 = event_param3;
     script.event.raw.param4 = event_param4;
+    //script.event.raw.param5 = event_param5;
     script.event.event_phase_mask = phaseMask;
     script.event.event_flags = event_flags;
     script.event.event_chance = 100;
@@ -2644,6 +2626,7 @@ SmartScriptHolder SmartScript::CreateEvent(SMART_EVENT e, uint32 event_flags, ui
     script.target.raw.param1 = target_param1;
     script.target.raw.param2 = target_param2;
     script.target.raw.param3 = target_param3;
+    //script.target.raw.param4 = target_param4;
 
     script.source_type = SMART_SCRIPT_TYPE_CREATURE;
     InitTimer(script);
@@ -3317,6 +3300,13 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             break;
         }
         case SMART_EVENT_SUMMON_DESPAWNED:
+        {
+            if (e.event.summoned.creature && e.event.summoned.creature != var0)
+                return;
+            RecalcTimer(e, e.event.summoned.cooldownMin, e.event.summoned.cooldownMax);
+            ProcessAction(e, unit, var0);
+            break;            
+        }
         case SMART_EVENT_INSTANCE_PLAYER_ENTER:
         {
             if (e.event.instancePlayerEnter.team && var0 != e.event.instancePlayerEnter.team)

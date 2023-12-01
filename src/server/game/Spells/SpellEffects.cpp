@@ -56,6 +56,7 @@
 #include "SkillDiscovery.h"
 #include "Formulas.h"
 #include "Vehicle.h"
+#include "Random.h"
 #include "ScriptMgr.h"
 #include "GameObjectAI.h"
 #include "AccountMgr.h"
@@ -68,7 +69,6 @@
 #include "BattlePetMgr.h"
 #include "PetBattle.h"
 #include "UpdateFieldFlags.h"
-#include "CustomLogs.h"
 #include "ServiceMgr.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
@@ -1435,7 +1435,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
         return;
 
     if (unitTarget->GetPowerType() != powerType)
-        if (m_spellInfo->Id != 108222 || GetPowerIndexByClass(powerType, unitTarget->getClass()) == MAX_POWERS) // Mana Void (Cobalt Globule)
+        if (m_spellInfo->Id != 108222 || GetPowerIndexByClass(powerType, unitTarget->GetClass()) == MAX_POWERS) // Mana Void (Cobalt Globule)
             return;
 
     // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
@@ -1737,9 +1737,6 @@ void Spell::DoCreateItem(uint32 /*i*/, uint32 itemtype)
             player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
             return;
         }
-
-        if (player->GetSession()->HasFlag(ACC_FLAG_ITEM_LOG))
-            logs::ItemLog(player, pItem, num_to_add, "Created");
 
         // set the "Crafted by ..." property of the item
         if (pItem->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && pItem->GetTemplate()->Class != ITEM_CLASS_QUEST && newitemid != 6265 && newitemid != 6948)
@@ -2331,10 +2328,6 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
                 {
                     player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue, 1, gameObjTarget);
                     gameObjTarget->AddToSkillupList(player->GetGUIDLow());
-
-                    if (sWorld->AreprojectDailyQuestsEnabled())
-                        if (skillId == SKILL_HERBALISM || skillId == SKILL_MINING)
-                            player->CreditprojectDailyQuest(180013); // project Daily Quest Credit - Nodes Gathered
                 }
             }
             else if (itemTarget)
@@ -2637,7 +2630,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                         if (properties->Category == SUMMON_CATEGORY_ALLY)
                         {
                             summon->SetOwnerGUID(m_originalCaster->GetGUID());
-                            summon->setFaction(m_originalCaster->getFaction());
+                            summon->SetFaction(m_originalCaster->GetFaction());
                             summon->SetUInt32Value(UNIT_FIELD_CREATED_BY_SPELL, m_spellInfo->Id);
                         }
                         ExecuteLogEffectSummonObject(effIndex, summon);
@@ -2670,9 +2663,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
             uint32 faction = properties->Faction;
             if (!faction)
-                faction = m_originalCaster->getFaction();
+                faction = m_originalCaster->GetFaction();
 
-            summon->setFaction(faction);
+            summon->SetFaction(faction);
             break;
     }
 
@@ -3038,7 +3031,7 @@ void Spell::EffectLearnSkill(SpellEffIndex effIndex)
 
     uint32 skillid = m_spellInfo->Effects[effIndex].MiscValue;
 
-    auto entry = GetSkillRaceClassInfo(skillid, unitTarget->getRace(), unitTarget->getClass());
+    auto entry = GetSkillRaceClassInfo(skillid, unitTarget->GetRace(), unitTarget->GetClass());
     if (!entry)
     {
         TC_LOG_ERROR("spells", "Spell::EffectLearnSkill skill (%u) not found in SkillRaceClassInfo.dbc", skillid);
@@ -3312,7 +3305,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
     if (creatureTarget->IsPet())
         return;
 
-    if (m_caster->getClass() != CLASS_HUNTER)
+    if (m_caster->GetClass() != CLASS_HUNTER)
         return;
 
     // cast finish successfully
@@ -3350,11 +3343,11 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
 
     pet->InitTalentForLevel();
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     player->AddNewPet(newPetSlot, pet);
     player->SetCurrentPetId(pet->GetCharmInfo()->GetPetNumber(), trans);
     pet->SavePetToDB(trans);
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
     stmt->setUInt8(0, newPetSlot);
     stmt->setUInt32(1, player->GetGUIDLow());
     stmt->setUInt32(2, pet->GetCharmInfo()->GetPetNumber());
@@ -4164,7 +4157,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 {
                     char buf[128];
                     const char *gender = "his";
-                    if (m_caster->getGender() > 0)
+                    if (m_caster->GetGender() > 0)
                         gender = "her";
                     sprintf(buf, "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
                     m_caster->MonsterTextEmote(buf, 0);
@@ -4175,7 +4168,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 {
                     char buf[128];
                     const char *gender = "his";
-                    if (m_caster->getGender() > 0)
+                    if (m_caster->GetGender() > 0)
                         gender = "her";
                     sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName().c_str(), gender, urand(1, 6), urand(1, 6));
                     m_caster->MonsterTextEmote(buf, 0);
@@ -4619,7 +4612,7 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
 
     pGameObj->AddToTransportIfNeeded(m_caster->GetTransport());
 
-    pGameObj->SetFaction(m_caster->getFaction());
+    pGameObj->SetFaction(m_caster->GetFaction());
     pGameObj->SetUInt32Value(GAMEOBJECT_FIELD_LEVEL, m_caster->GetLevel()+1);
     int32 duration = m_spellInfo->GetDuration();
     pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
@@ -5031,7 +5024,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     {
         if (GameObject* obj = m_caster->GetMap()->GetGameObject(guid))
         {
-            bool hunterTrap = obj->GetGoType() == GAMEOBJECT_TYPE_TRAP && m_caster->getClass() == CLASS_HUNTER;
+            bool hunterTrap = obj->GetGoType() == GAMEOBJECT_TYPE_TRAP && m_caster->GetClass() == CLASS_HUNTER;
             if (hunterTrap)
             {
                 if (m_spellInfo->Id == obj->GetSpellId())
@@ -5389,9 +5382,6 @@ void Spell::EffectSkinning(SpellEffIndex /*effIndex*/)
     // Double chances for elites
     m_caster->ToPlayer()->UpdateGatherSkill(skill, skillValue, reqValue, creature->isElite() ? 2 : 1, unitTarget);
 
-    if (sWorld->AreprojectDailyQuestsEnabled())
-        if (skill == SKILL_HERBALISM || skill == SKILL_MINING || skill == SKILL_SKINNING)
-            m_caster->ToPlayer()->CreditprojectDailyQuest(180013); // project Daily Quest Credit - Nodes Gathered
 }
 
 void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
@@ -6274,7 +6264,7 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
 
     Player* player = m_caster->ToPlayer();
 
-    if (player->getClass() != CLASS_DEATH_KNIGHT)
+    if (player->GetClass() != CLASS_DEATH_KNIGHT)
         return;
 
     // needed later
@@ -6302,7 +6292,7 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget || unitTarget->GetPetGUID() || unitTarget->getClass() != CLASS_HUNTER)
+    if (!unitTarget || unitTarget->GetPetGUID() || unitTarget->GetClass() != CLASS_HUNTER)
         return;
 
     Player* player = unitTarget->ToPlayer();
@@ -6331,11 +6321,11 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
 
     pet->InitTalentForLevel();
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     player->AddNewPet(newPetSlot, pet);
     player->SetCurrentPetId(pet->GetCharmInfo()->GetPetNumber(), trans);
     pet->SavePetToDB(trans);
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
     stmt->setUInt8(0, newPetSlot);
     stmt->setUInt32(1, player->GetGUIDLow());
     stmt->setUInt32(2, pet->GetCharmInfo()->GetPetNumber());
@@ -6462,7 +6452,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
             ((Guardian*)summon)->InitStatsForLevel(level);
 
         if (properties && properties->Category == SUMMON_CATEGORY_ALLY)
-            summon->setFaction(caster->getFaction());
+            summon->SetFaction(caster->GetFaction());
 
         if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && m_targets.HasDst())
             ((Minion*)summon)->SetFollowAngle(m_caster->GetAngle(summon));
@@ -6883,8 +6873,32 @@ void Spell::EffectResurrectWithAura(SpellEffIndex effIndex)
     SpellInfo const* spellInfo = m_spellInfo;
 
     // Shitty workaround but still better than unsafe access
-    TaskMgr::Default()->ScheduleInvocation([playerGuid, casterGuid, effectValue, spellInfo, effIndex]
-    {
+//     TaskMgr::Default()->ScheduleInvocation([playerGuid, casterGuid, effectValue, spellInfo, effIndex]
+//     {
+//         Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(playerGuid);
+//         Player* caster = ObjectAccessor::FindPlayerInOrOutOfWorld(casterGuid);
+//         if (!player || !caster)
+//             return;
+
+//         if (player->IsRessurectRequested())       // already have one active request
+//             return;
+
+//         uint32 health = player->CountPctFromMaxHealth(effectValue);
+//         uint32 mana = CalculatePct(player->GetMaxPower(POWER_MANA), effectValue);
+
+//         uint32 resurrectAura = 0;
+//         if (sSpellMgr->GetSpellInfo(spellInfo->Effects[effIndex].TriggerSpell))
+//             resurrectAura = spellInfo->Effects[effIndex].TriggerSpell;
+//         if (resurrectAura && player->HasAura(resurrectAura))
+//             return;
+
+//         player->SetResurrectRequestData(caster, health, mana, resurrectAura);
+// #pragma warning(push)
+// #pragma warning(disable : 4573)
+//         Spell::SendResurrectRequest(caster, player, spellInfo->Id);
+// #pragma warning(pop)
+//     });
+
         Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(playerGuid);
         Player* caster = ObjectAccessor::FindPlayerInOrOutOfWorld(casterGuid);
         if (!player || !caster)
@@ -6907,7 +6921,8 @@ void Spell::EffectResurrectWithAura(SpellEffIndex effIndex)
 #pragma warning(disable : 4573)
         Spell::SendResurrectRequest(caster, player, spellInfo->Id);
 #pragma warning(pop)
-    });
+
+    
     ExecuteLogEffectResurrect(effIndex, target);
 }
 

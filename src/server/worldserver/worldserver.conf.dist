@@ -38,7 +38,40 @@
 #    STARTING GUILD
 #
 ###################################################################################################
-
+Battleground.PremadeGroupWaitForMatch = 1800000
+Battleground.PrematureFinishTimer = 300000
+mmap.AllowReuseOfPreviousPathSegments = 1
+AuthServer.Process =
+AuthServer.Command =
+DEBUG_LFG_QUEUE_SAVE_PREV_STATE = 0
+Arena.BonusReward.GamesCount.2v2 = 0
+Arena.BonusReward.Item.2v2 = 0
+Arena.BonusReward.MailTitle.2v2 = 
+Arena.BonusReward.MailText.2v2 =
+Arena.BonusReward.GamesCount.3v3 = 0
+Arena.BonusReward.Item.3v3 = 0
+Arena.BonusReward.MailTitle.3v3 = 
+Arena.BonusReward.MailText.3v3 =
+Arena.BonusReward.GamesCount.5v5 = 0
+Arena.BonusReward.Item.5v5 = 0
+Arena.BonusReward.MailTitle.5v5 = 
+Arena.BonusReward.MailText.5v5 = 
+Arena.BonusReward.GamesCount.RBG = 0
+Arena.BonusReward.Item.RBG = 0 
+Arena.BonusReward.MailTitle.RBG = 
+Arena.BonusReward.MailText.RBG = 
+Arena.SeasonReward.Cleanup.KeepWithAchievements = 2091
+Arena.SeasonReward.Cleanup.Achievements = 2093 2092 2090
+Arena.SeasonReward.Cleanup.Titles = 44 43 45
+Arena.SeasonReward.RatingThreshold.3x3 = -1
+Arena.SeasonReward.RatingThreshold.5x5 = -1
+Arena.SeasonReward.RatingThreshold.2x2 = -1
+Updates.AutoSetup = 1
+Updates.EnableDatabases = 1
+Updates.CleanDeadRefMaxCount = 3
+Updates.ArchivedRedundancy = 0
+Updates.AllowRehash = 1
+Updates.Redundancy = 1
 ###################################################################################################
 # EXAMPLE CONFIG
 #
@@ -96,13 +129,10 @@ LogsDir = "Logs"
 #        Default:     "127.0.0.1;3306;skyfire;skyfire;auth"       - (LoginDatabaseInfo)
 #                     "127.0.0.1;3306;skyfire;skyfire;world"      - (WorldDatabaseInfo)
 #                     "127.0.0.1;3306;skyfire;skyfire;characters" - (CharacterDatabaseInfo)
-#                     "127.0.0.1;3306;skyfire;skyfire;FusionCMS"  - (FusionCMSDatabaseInfo)
 
-LoginDatabaseInfo     = "127.0.0.1;3306;root;rootx;auth"
-WorldDatabaseInfo     = "127.0.0.1;3306;root;rootx;world"
-CharacterDatabaseInfo = "127.0.0.1;3306;root;rootx;characters"
-ArchiveDatabaseInfo   = "127.0.0.1;3306;root;rootx;archive"
-FusionCMSDatabaseInfo = "127.0.0.1;3306;root;rootx;fusion"
+LoginDatabaseInfo     = "127.0.0.1;3306;root;root;auth"
+WorldDatabaseInfo     = "127.0.0.1;3306;root;root;world"
+CharacterDatabaseInfo = "127.0.0.1;3306;root;root;characters"
 
 #
 #    LoginDatabase.WorkerThreads
@@ -114,13 +144,10 @@ FusionCMSDatabaseInfo = "127.0.0.1;3306;root;rootx;fusion"
 #        Default:     1 - (LoginDatabase.WorkerThreads)
 #                     1 - (WorldDatabase.WorkerThreads)
 #                     1 - (CharacterDatabase.WorkerThreads)
-#                     1 - (FusionCMSDatabase.WorkerThreads)
 
 LoginDatabase.WorkerThreads     = 1
 WorldDatabase.WorkerThreads     = 1
 CharacterDatabase.WorkerThreads = 1
-ArchiveDatabase.WorkerThreads   = 1
-FusionCMSDatabase.WorkerThreads = 1
 
 #
 #    LoginDatabase.SynchThreads
@@ -130,13 +157,10 @@ FusionCMSDatabase.WorkerThreads = 1
 #        Default:     1 - (LoginDatabase.WorkerThreads)
 #                     1 - (WorldDatabase.WorkerThreads)
 #                     2 - (CharacterDatabase.WorkerThreads)
-#                     1 - (FusionCMSDatabase.WorkerThreads)
 
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
 CharacterDatabase.SynchThreads = 2
-ArchiveDatabase.SynchThreads   = 1
-FusionCMSDatabase.SynchThreads = 1
 
 #
 #    MaxPingTime
@@ -158,6 +182,67 @@ WorldServerPort = 8085
 #        Default:     "0.0.0.0" - (Bind to all IPs on the system)
 
 BindIP = "0.0.0.0"
+
+#
+#    ThreadPool
+#        Description: Number of threads to be used for the global thread pool
+#                     The thread pool is currently used for:
+#                      - Signal handling
+#                      - Remote access
+#                      - Database keep-alive ping
+#                      - Core freeze check
+#                      - World socket networking
+#        Default:     2
+
+ThreadPool = 2
+
+#
+#    CMakeCommand
+#        Description: The path to your CMake binary.
+#                     If the path is left empty, the built-in CMAKE_COMMAND is used.
+#        Example:     "C:/Program Files (x86)/CMake/bin/cmake.exe"
+#                     "/usr/bin/cmake"
+#        Default:     ""
+
+CMakeCommand  = ""
+
+#
+#    BuildDirectory
+#        Description: The path to your build directory.
+#                     If the path is left empty, the built-in CMAKE_BINARY_DIR is used.
+#        Example:     "../TrinityCore"
+#        Default:     ""
+
+BuildDirectory  = ""
+
+#
+#    SourceDirectory
+#        Description: The path to your TrinityCore source directory.
+#                     If the path is left empty, the built-in CMAKE_SOURCE_DIR is used.
+#        Example:     "../TrinityCore"
+#        Default:     ""
+
+SourceDirectory  = ""
+
+#
+#    MySQLExecutable
+#        Description: The path to your MySQL CLI binary.
+#                     If the path is left empty, built-in path from cmake is used.
+#        Example:     "C:/Program Files/MySQL/MySQL Server 5.6/bin/mysql.exe"
+#                     "mysql.exe"
+#                     "/usr/bin/mysql"
+#        Default:     ""
+
+MySQLExecutable = ""
+
+#
+#    IPLocationFile
+#        Description: The path to your IP2Location database CSV file.
+#        Example:     "C:/Trinity/IP2LOCATION-LITE-DB1.CSV"
+#                     "/home/trinity/IP2LOCATION-LITE-DB1.CSV"
+#        Default:     ""  - (Disabled)
+
+IPLocationFile = ""
 
 #
 ###################################################################################################
@@ -3739,7 +3824,7 @@ Transmogrification.NotAllowed = ""
 #
 #    For custom gold cost set ScaledCostModifier to 0.0 and CopperCost to what ever cost you want
 
-Transmogrification.ScaledCostModifier = 1.0f
+Transmogrification.ScaledCostModifier = 1.000000
 Transmogrification.CopperCost = 0
 
 #
@@ -3974,7 +4059,7 @@ Solocraft.GruulsLair.Level = 70
 Solocraft.SunwellPlateau.Level = 70
 Solocraft.MagistersTerrace.Level = 68
 Solocraft.Naxxramas.Level = 78
-Solocraft.UtgardeKeep = 78
+Solocraft.UtgardeKeep.Level = 78
 Solocraft.UtgardePinnacle.Level = 78
 Solocraft.Oculus.Level = 78
 Solocraft.TheCullingOfStratholme.Level = 78
@@ -4351,6 +4436,7 @@ DungeonFinder.DPSNeeded = 3
 DungeonFinder.ShortageCheckInterval = 5
 DungeonFinder.ShortagePercent = 50
 DungeonFinder.MaxLfrQueues = 3
+DungeonFinder.ScenarioDebug = 0
 
 GM.LogTrade = 0
 GM.AllowFriend = 0

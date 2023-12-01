@@ -58,20 +58,28 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/dep/gsoap
     ${CMAKE_SOURCE_DIR}/dep/sockets/include
     ${CMAKE_SOURCE_DIR}/dep/SFMT
+    ${CMAKE_SOURCE_DIR}/src/common
+    ${CMAKE_SOURCE_DIR}/src/common/Asio
+    ${CMAKE_SOURCE_DIR}/src/common/Configuration
+    ${CMAKE_SOURCE_DIR}/src/common/Debugging
+    ${CMAKE_SOURCE_DIR}/src/common/IPLocation
+    ${CMAKE_SOURCE_DIR}/src/common/Logging
+    ${CMAKE_SOURCE_DIR}/src/common/Threading
+    ${CMAKE_SOURCE_DIR}/src/common/Utilities
     ${CMAKE_SOURCE_DIR}/src/server/collision
     ${CMAKE_SOURCE_DIR}/src/server/collision/Management
     ${CMAKE_SOURCE_DIR}/src/server/collision/Models
     ${CMAKE_SOURCE_DIR}/src/server/shared
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography/Authentication
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Database
+    ${CMAKE_SOURCE_DIR}/src/common/Cryptography
+    ${CMAKE_SOURCE_DIR}/src/common/Cryptography/Authentication
+    ${CMAKE_SOURCE_DIR}/src/server/database/Database
+    ${CMAKE_SOURCE_DIR}/src/server/database/Logging    
     ${CMAKE_SOURCE_DIR}/src/server/shared/DataStores
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
     ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic/LinkedReference
     ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic
-    ${CMAKE_SOURCE_DIR}/src/server/shared/Logging
+    ${CMAKE_SOURCE_DIR}/src/server/shared/Networking
     ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
+    ${CMAKE_SOURCE_DIR}/src/server/shared/Realms
     ${CMAKE_SOURCE_DIR}/src/server/shared/Threading
     ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities
     ${CMAKE_SOURCE_DIR}/src/server/game
@@ -92,7 +100,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/server/game/Chat/Channels
     ${CMAKE_SOURCE_DIR}/src/server/game/Combat
     ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
-    ${CMAKE_SOURCE_DIR}/src/server/game/CustomLogs
     ${CMAKE_SOURCE_DIR}/src/server/game/DataStores
     ${CMAKE_SOURCE_DIR}/src/server/game/DungeonFinding
     ${CMAKE_SOURCE_DIR}/src/server/game/Entities
@@ -124,6 +131,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/server/game/Mails
     ${CMAKE_SOURCE_DIR}/src/server/game/Maps
     ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous
+    ${CMAKE_SOURCE_DIR}/src/server/game/Motd
     ${CMAKE_SOURCE_DIR}/src/server/game/Movement
     ${CMAKE_SOURCE_DIR}/src/server/game/Movement/MovementGenerators
     ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Spline
@@ -156,6 +164,7 @@ include_directories(
     ${ACE_INCLUDE_DIR}
     ${MYSQL_INCLUDE_DIR}
     ${OPENSSL_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/dep/fmt/include
 )
 
 if (Boost_FOUND)
@@ -185,13 +194,16 @@ set_target_properties(worldserver PROPERTIES LINK_FLAGS "${worldserver_LINK_FLAG
 
 target_link_libraries(worldserver
   PRIVATE
+    sfmt
+    common
+    database
     scripts
     game
     shared
     collision
     g3dlib
     gsoap
-    Detour
+    #Detour
     ${JEMALLOC_LIBRARY}
     ${READLINE_LIBRARY}
     ${TERMCAP_LIBRARY}

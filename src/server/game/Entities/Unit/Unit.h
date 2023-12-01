@@ -31,6 +31,7 @@
 #include "SpellMgr.h"
 #include "TimeValue.h"
 #include "SpellInfo.h"
+#include "UnitDefines.h"
 #include <array>
 #include <memory>
 
@@ -125,24 +126,8 @@ enum SpellFacingFlags
     SPELL_FACING_FLAG_INFRONT = 0x0001
 };
 
-#define BASE_MINDAMAGE 1.0f
-#define BASE_MAXDAMAGE 2.0f
-#define BASE_ATTACK_TIME 2000
 
-// byte value (UNIT_FIELD_ANIM_TIER, 0)
-enum UnitStandStateType
-{
-    UNIT_STAND_STATE_STAND = 0,
-    UNIT_STAND_STATE_SIT = 1,
-    UNIT_STAND_STATE_SIT_CHAIR = 2,
-    UNIT_STAND_STATE_SLEEP = 3,
-    UNIT_STAND_STATE_SIT_LOW_CHAIR = 4,
-    UNIT_STAND_STATE_SIT_MEDIUM_CHAIR = 5,
-    UNIT_STAND_STATE_SIT_HIGH_CHAIR = 6,
-    UNIT_STAND_STATE_DEAD = 7,
-    UNIT_STAND_STATE_KNEEL = 8,
-    UNIT_STAND_STATE_SUBMERGED = 9
-};
+
 
 // byte flag value (UNIT_FIELD_ANIM_TIER, 2)
 enum UnitStandFlags
@@ -211,28 +196,7 @@ enum ShapeshiftForm
     FORM_SPIRITOFREDEMPTION = 0x20
 };
 
-// low byte (0 from 0..3) of UNIT_FIELD_SHAPESHIFT_FORM
-enum SheathState
-{
-    SHEATH_STATE_UNARMED = 0,                              // non prepared weapon
-    SHEATH_STATE_MELEE = 1,                              // prepared melee weapon
-    SHEATH_STATE_RANGED = 2                               // prepared ranged weapon
-};
 
-#define MAX_SHEATH_STATE    3
-
-// byte (1 from 0..3) of UNIT_FIELD_SHAPESHIFT_FORM
-enum UnitPVPStateFlags
-{
-    UNIT_BYTE2_FLAG_PVP = 0x01,
-    UNIT_BYTE2_FLAG_UNK1 = 0x02,
-    UNIT_BYTE2_FLAG_FFA_PVP = 0x04,
-    UNIT_BYTE2_FLAG_SANCTUARY = 0x08,
-    UNIT_BYTE2_FLAG_UNK4 = 0x10,
-    UNIT_BYTE2_FLAG_UNK5 = 0x20,
-    UNIT_BYTE2_FLAG_UNK6 = 0x40,
-    UNIT_BYTE2_FLAG_UNK7 = 0x80
-};
 
 // byte (2 from 0..3) of UNIT_FIELD_SHAPESHIFT_FORM
 enum UnitRename
@@ -1470,11 +1434,16 @@ public:
         i_AI = newAI;
     }
 
+public:
+
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
     void CleanupBeforeRemoveFromMap(bool finalCleanup);
     void CleanupsBeforeDelete(bool finalCleanup = true) override;                        // used in ~Creature/~Player (or before mass creature delete to remove cross-references to already deleted units)
+
+    // uint32 GetDynamicFlags() const override { return GetUInt32Value(UNIT_DYNAMIC_FLAGS); }
+    // void ReplaceAllDynamicFlags(uint32 flag) override { SetUInt32Value(UNIT_DYNAMIC_FLAGS, flag); }
 
     DiminishingLevels GetDiminishing(DiminishingGroup  group);
     void IncrDiminishing(DiminishingGroup group);
@@ -1489,7 +1458,7 @@ public:
     float GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
     float GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
 
-    virtual void Update(uint32 time);
+    virtual void Update(uint32 time) override;
 
     void UpdateAttackTimer(WeaponAttackType type, uint32 diff);
     void setAttackTimer(WeaponAttackType type, uint32 time)
@@ -1576,60 +1545,24 @@ public:
     uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
     uint8 GetLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
     void SetLevel(uint8 lvl, bool sendUpdate = true);
-
-    uint8 getRace() const
-    {
-        return GetByteValue(UNIT_FIELD_SEX, 0);
-    }
-    uint32 getRaceMask() const
-    {
-        return 1 << (getRace() - 1);
-    }
-    uint8 getClass() const
-    {
-        return GetByteValue(UNIT_FIELD_SEX, 1);
-    }
-    uint32 getClassMask() const
-    {
-        return 1 << (getClass() - 1);
-    }
-    uint8 getGender() const
-    {
-        return GetByteValue(UNIT_FIELD_SEX, 3);
-    }
+    // uint8 GetRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE); }
+    // void SetRace(uint8 race) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE, race); }
+    uint8 GetRace() const { return GetByteValue(UNIT_FIELD_SEX, 0); }
+    void SetRace(uint8 race) { SetByteValue(UNIT_FIELD_SEX, 0, race);}
+    uint32 GetRaceMask() const { return 1 << (GetRace() - 1); }
+    uint8 GetClass() const { return GetByteValue(UNIT_FIELD_SEX, 1); }
+    void SetClass(uint8 newClass) { SetByteValue(UNIT_FIELD_SEX, 1, newClass);}
+    uint32 GetClassMask() const { return 1 << (GetClass() - 1); }
+    uint8 GetGender() const { return GetByteValue(UNIT_FIELD_SEX, 3); }
+    void SetGender(uint8 gender) { SetByteValue(UNIT_FIELD_SEX, 3, gender); }
 
     // Gender GetGender() const { return Gender(GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER)); }
     // void SetGender(Gender gender) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, gender); }
 
-    void SetRace(uint8 race)
-    {
-        SetByteValue(UNIT_FIELD_SEX, 0, race);
-    }
-    void SetClass(uint8 newClass)
-    {
-        SetByteValue(UNIT_FIELD_SEX, 1, newClass);
-    }
-    void SetGender(uint8 gender)
-    {
-        SetByteValue(UNIT_FIELD_SEX, 3, gender);
-    }
-
-    float GetStat(Stats stat) const
-    {
-        return float(GetUInt32Value(UNIT_FIELD_STATS + stat));
-    }
-    void SetStat(Stats stat, int32 val)
-    {
-        SetStatInt32Value(UNIT_FIELD_STATS + stat, val);
-    }
-    uint32 GetArmor() const
-    {
-        return GetResistance(SPELL_SCHOOL_NORMAL);
-    }
-    void SetArmor(int32 val)
-    {
-        SetResistance(SPELL_SCHOOL_NORMAL, val);
-    }
+    float GetStat(Stats stat) const { return float(GetUInt32Value(UNIT_FIELD_STATS + stat)); }
+    void SetStat(Stats stat, int32 val) { SetStatInt32Value(UNIT_FIELD_STATS + stat, val); }
+    uint32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL); }
+    void SetArmor(int32 val) { SetResistance(SPELL_SCHOOL_NORMAL, val); }
 
     uint32 GetResistance(SpellSchools school) const
     {
@@ -1726,24 +1659,15 @@ public:
         SetFloatValue(UNIT_FIELD_ATTACK_ROUND_BASE_TIME + att, val*m_modAttackSpeedPct [att]);
     }
 
-    SheathState GetSheath() const
-    {
-        return SheathState(GetByteValue(UNIT_FIELD_SHAPESHIFT_FORM, 0));
-    }
-    virtual void SetSheath(SheathState sheathed)
-    {
-        SetByteValue(UNIT_FIELD_SHAPESHIFT_FORM, 0, sheathed);
-    }
+    Emote GetEmoteState() const { return Emote(GetUInt32Value(UNIT_FIELD_NPC_EMOTESTATE)); }
+    void SetEmoteState(Emote emote) { SetUInt32Value(UNIT_FIELD_NPC_EMOTESTATE, emote); }
+
+    SheathState GetSheath() const { return SheathState(GetByteValue(UNIT_FIELD_SHAPESHIFT_FORM, 0)); }
+    virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_SHAPESHIFT_FORM, 0, sheathed); }
 
     // faction template id
-    uint32 getFaction() const
-    {
-        return GetUInt32Value(UNIT_FIELD_FACTION_TEMPLATE);
-    }
-    void setFaction(uint32 faction)
-    {
-        SetUInt32Value(UNIT_FIELD_FACTION_TEMPLATE, faction);
-    }
+    uint32 GetFaction() const { return GetUInt32Value(UNIT_FIELD_FACTION_TEMPLATE); }
+    void SetFaction(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTION_TEMPLATE, faction); }
     FactionTemplateEntry const* GetFactionTemplateEntry() const;
 
     ReputationRank GetReactionTo(Unit const* target) const;
@@ -1773,11 +1697,11 @@ public:
     bool IsStandState() const;
     void SetStandState(uint8 state);
 
-    void  SetStandFlags(uint8 flags)
+    void SetStandFlags(uint8 flags)
     {
         SetByteFlag(UNIT_FIELD_ANIM_TIER, 2, flags);
     }
-    void  RemoveStandFlags(uint8 flags)
+    void RemoveStandFlags(uint8 flags)
     {
         RemoveByteFlag(UNIT_FIELD_ANIM_TIER, 2, flags);
     }
@@ -1864,10 +1788,13 @@ public:
 
     MeleeHitOutcome RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackType attType) const;
 
-    bool IsVendor() const
-    {
-        return HasFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
-    }
+    NPCFlags GetNpcFlags() const { return NPCFlags(GetUInt32Value(UNIT_FIELD_NPC_FLAGS)); }
+    bool HasNpcFlag(NPCFlags flags) const { return HasFlag(UNIT_FIELD_NPC_FLAGS, flags) != 0; }
+    void SetNpcFlag(NPCFlags flags) { SetFlag(UNIT_FIELD_NPC_FLAGS, flags); }
+    void RemoveNpcFlag(NPCFlags flags) { RemoveFlag(UNIT_FIELD_NPC_FLAGS, flags); }
+    void ReplaceAllNpcFlags(NPCFlags flags) { SetUInt32Value(UNIT_FIELD_NPC_FLAGS, flags); } // UNIT_NPC_FLAGS
+
+    bool IsVendor() const { return HasFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR); }
     bool IsTrainer() const
     {
         return HasFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER);
@@ -2727,24 +2654,14 @@ public:
         return i_motionMaster;
     }
 
-    bool IsStopped() const
-    {
-        return !(HasUnitState(UNIT_STATE_MOVING));
-    }
+    bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
     void StopMoving();
+    void PauseMovement(uint32 timer = 0, uint8 slot = 0, bool forced = true); // timer in ms
+    void ResumeMovement(uint32 timer = 0, uint8 slot = 0); // timer in ms
 
-    void AddUnitMovementFlag(uint32 f)
-    {
-        m_movementInfo.AddMovementFlag(f);
-    }
-    void RemoveUnitMovementFlag(uint32 f)
-    {
-        m_movementInfo.RemoveMovementFlag(f);
-    }
-    bool HasUnitMovementFlag(uint32 f) const
-    {
-        return m_movementInfo.HasMovementFlag(f);
-    }
+    void AddUnitMovementFlag(uint32 f) { m_movementInfo.AddMovementFlag(f); }
+    void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.RemoveMovementFlag(f); }
+    bool HasUnitMovementFlag(uint32 f) const { return m_movementInfo.HasMovementFlag(f); }
     uint32 GetUnitMovementFlags() const
     {
         return m_movementInfo.GetMovementFlags();
@@ -3012,7 +2929,7 @@ public:
     void JumpWithDelay(uint32 delay, float x, float y, float z, float speedXY, float speedZ, uint32 id);
 
 protected:
-    explicit Unit(bool isWorldObject);
+    explicit Unit (bool isWorldObject);
 
     void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const;
 

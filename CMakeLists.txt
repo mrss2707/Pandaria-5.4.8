@@ -22,7 +22,7 @@ if(POLICY CMP0043)
 endif(POLICY CMP0043)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
 # add this options before PROJECT keyword
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -82,7 +82,10 @@ if(WIN32)
   set(BOOST_DEBUG OFF)
   if(DEFINED ENV{BOOST_ROOT})
     set(BOOST_ROOT $ENV{BOOST_ROOT})
+    list(APPEND BOOST_LIBRARYDIR
+      ${BOOST_ROOT}/lib${PLATFORM}-msvc-14.2 )
   endif()
+
 
   set(Boost_USE_STATIC_LIBS        ON)
   set(Boost_USE_MULTITHREADED      ON)
@@ -91,7 +94,7 @@ else()
   set(Boost_USE_STATIC_LIBS ON)
 endif()
 
-find_package(Boost COMPONENTS system locale thread regex serialization
+find_package(Boost COMPONENTS system locale thread serialization filesystem program_options iostreams regex
     REQUIRED
 )
 
