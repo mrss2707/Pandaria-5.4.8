@@ -38,7 +38,7 @@ jobs:
         Start-Process -Wait -FilePath "${{ env.TEMP }}\boost.exe" "/SILENT","/SP-","/SUPPRESSMSGBOXES",/DIR=${{ env.BOOST_ROOT }}
     - name: Configure CMake
       run: >
-        cmake -G"Visual Studio 17 2022" -B ${{ steps.strings.outputs.build-output-dir }}
+        cmake -G"Visual Studio 17 2019" -B ${{ steps.strings.outputs.build-output-dir }}
         -DSCRIPTS=dynamic -DTOOLS=True -DCMAKE_CXX_FLAGS=" /DWIN32 /D_WINDOWS /W3 /GR /EHsc /WX" -DCMAKE_C_FLAGS="/DWIN32 /D_WINDOWS /W3 /WX"
         -S ${{ github.workspace }}
     - name: Build
@@ -55,6 +55,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: ${{ steps.strings.outputs.build-output-dir }}/bin/RelWithDebInfo
-        name: TrinityCoreMasterWin64VS2022
+        name: TrinityCoreMasterWin64VS2029
         # Set a custom retention for artifacts
         #retention-days: 7
