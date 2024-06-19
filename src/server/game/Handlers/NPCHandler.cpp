@@ -221,7 +221,6 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle, boo
 
     // reputation discount
     float fDiscountMod = _player->GetReputationPriceDiscount(unit);
-    bool can_learn_primary_prof = GetPlayer()->GetFreePrimaryProfessionPoints() > 0;
 
     uint32 count = 0;
     for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
@@ -282,7 +281,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle, boo
     data.WriteByteSeq(oGuid[7]);
     data.WriteByteSeq(oGuid[1]);
     data.WriteByteSeq(oGuid[3]);
-    data << uint32(1);                      // different value for each trainer, also found in CMSG_TRAINER_BUY_SPELL
+    data << unit->GetEntry();                  // TrainerID
     data.WriteByteSeq(oGuid[5]);
     data.WriteByteSeq(oGuid[0]);
     data.WriteByteSeq(oGuid[2]);
@@ -741,8 +740,8 @@ void WorldSession::HandleSetPetSlot(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
     stmt->setUInt8(0, newSlot);
     stmt->setUInt32(1, GetPlayer()->GetGUIDLow());
     stmt->setUInt32(2, oldPetId);
@@ -944,13 +943,17 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
 
     // Find swapped pet slot in stable
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOT_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOT_BY_ID);
 
     stmt->setUInt32(0, _player->GetGUIDLow());
     stmt->setUInt32(1, petId);
 
-    _stableSwapCallback.SetParam(petId);
-    _stableSwapCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
+    // _stableSwapCallback.SetParam(petId);
+    // _stableSwapCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
+
+    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
+        .WithPreparedCallback(std::bind(&WorldSession::HandleStableSwapPetCallback, this, std::placeholders::_1, petId )));
+
 }
 
 void WorldSession::HandleStableSwapPetCallback(PreparedQueryResult result, uint32 petId)

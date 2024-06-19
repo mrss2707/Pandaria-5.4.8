@@ -19,16 +19,17 @@
 /// @{
 /// \file
 
-#ifndef SF_WORLD_H
-#define SF_WORLD_H
+#ifndef __WORLD_H
+#define __WORLD_H
 
-#include <ace/Future.h>
-#include <ace/Future_Set.h>
 #include "Common.h"
 #include "Timer.h"
 #include "SharedDefines.h"
 #include "ByteBuffer.h"
 #include "LockedQueue.h"
+#include "AsyncCallbackProcessor.h"
+#include "DatabaseEnvFwd.h"
+#include "Realm.h"
 
 #include <thread>
 #include <map>
@@ -46,13 +47,10 @@ class Quest;
 enum class DevToolType : uint8;
 union DevToolSettings;
 struct CliCommandHolder;
+struct Realm;
 
 class PreparedResultSet;
-//class SQLTransaction;
-class Transaction;
-typedef std::shared_ptr<Transaction> SQLTransaction;
 class Field;
-//class PreparedQueryResult;
 typedef std::shared_ptr<PreparedResultSet> PreparedQueryResult;
 
 // ServerMessages.dbc
@@ -178,6 +176,7 @@ enum WorldBoolConfigs
     CONFIG_LFG_OVERRIDE_ROLES_REQUIRED,
     CONFIG_LFG_MULTIQUEUE_ENABLED,
     CONFIG_LFG_KEEP_QUEUES_IN_DUNGEON,
+    CONFIG_LFG_SOLO,
     CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES,
     CONFIG_PRESERVE_CUSTOM_CHANNELS,
     CONFIG_PDUMP_NO_PATHS,
@@ -186,7 +185,6 @@ enum WorldBoolConfigs
     CONFIG_QUEST_IGNORE_AUTO_COMPLETE,
     CONFIG_WARDEN_ENABLED,
     CONFIG_ENABLE_MMAPS,
-    CONFIG_MMAP_ALLOW_REUSE_OF_PREVIOUS_PATH_SEGMENTS,
     CONFIG_WINTERGRASP_ENABLE,
     CONFIG_GUILD_LEVELING_ENABLED,
     CONFIG_UI_QUESTLEVELS_IN_DIALOGS,     // Should we add quest levels to the title in the NPC dialogs?
@@ -211,7 +209,6 @@ enum WorldBoolConfigs
     CONFIG_TRANSPORT_DISABLE_LOCAL_PRESPAWN,
     CONFIG_TRANSPORT_PREFER_SERVER_WORLD_POSITION,
     CONFIG_TRANSPORT_LOAD_GRIDS,
-    CONFIG_DEBUG_OPCODES,
     CONFIG_ANTICHEAT_ENABLE,
     CONFIG_BONUS_RATES_ENABLED,
     CONFIG_TRANSFER_MAIL_ENABLED,
@@ -611,6 +608,7 @@ enum WorldIntConfigs
     CONFIG_WORD_FILTER_MUTE_DURATION,
     CONFIG_PLAYED_TIME_REWARD,
     CONFIG_AUTO_SERVER_RESTART_HOUR,
+    CONFIG_SOCKET_TIMEOUTTIME_ACTIVE,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -701,18 +699,6 @@ enum BillingPlanFlags
     SESSION_TIME_MIXTURE    = 0x20,
     SESSION_RESTRICTED      = 0x40,
     SESSION_ENABLE_CAIS     = 0x80
-};
-
-/// Type of server, this is values from second column of Cfg_Configs.dbc
-enum RealmType
-{
-    REALM_TYPE_NORMAL       = 0,
-    REALM_TYPE_PVP          = 1,
-    REALM_TYPE_NORMAL2      = 4,
-    REALM_TYPE_RP           = 6,
-    REALM_TYPE_RPPVP        = 8,
-    REALM_TYPE_FFA_PVP      = 16                            // custom, free for all pvp mode like arena PvP in all zones except rest activated places and sanctuaries
-                                                            // replaced by REALM_PVP in realm list
 };
 
 enum RealmZone
@@ -904,20 +890,18 @@ private:
 };
 
 /// The World
-class World
+class TC_GAME_API World
 {
 
     public:
-        static uint32 m_worldLoopCounter;
-
         static World* instance();
+
+        static std::atomic<uint32> m_worldLoopCounter;
 
         WorldSession* FindSession(uint32 id) const;
         void AddSession(WorldSession* s);
-        bool RemoveSession(uint32 id);
-
-        /// Autobroadcast
         void SendAutoBroadcast();
+        bool RemoveSession(uint32 id);
         /// Get the number of current active sessions
         void UpdateMaxSessionCounters();
         const SessionMap& GetAllSessions() const { return m_sessions; }
@@ -1167,8 +1151,6 @@ class World
         bool IsArenaPrecastSpell(uint32 spellID) const { return m_arenaPrecastSpells.find(spellID) != m_arenaPrecastSpells.end(); }
         std::set<uint32> m_arenaPrecastSpells;
 
-        void SendRaidQueueInfo(Player* player = nullptr);
-
         union DebugValue { uint32 UInt32; float Float; };
         DebugValue & GetDebugValue(uint32 id) { return m_debugValues[id]; }
 
@@ -1198,7 +1180,7 @@ class World
         World();
         ~World();
 
-        static std::atomic_long m_stopEvent;
+        static std::atomic<bool> m_stopEvent;
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;
         uint32 m_ShutdownMask;
@@ -1290,7 +1272,7 @@ class World
         std::map<uint32, AccountCacheData> _accountCacheData;
 
         void ProcessQueryCallbacks();
-        ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+        QueryCallbackProcessor _queryProcessor;
 
         uint32 m_minDiff = 0;
         uint32 m_maxDiff = 0;
@@ -1305,11 +1287,10 @@ class World
 typedef std::map<uint32, std::string> RealmNameMap;
 
 extern RealmNameMap realmNameStore;
-extern uint32 realmID;
+
+TC_GAME_API extern Realm realm;
 
 #define sWorld World::instance()
-
-#define ENSURE_WORLD_THREAD() ASSERT(std::this_thread::get_id() == sWorld->GetThreadId())
 
 #endif
 /// @}

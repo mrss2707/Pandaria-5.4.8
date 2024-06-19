@@ -40,6 +40,7 @@
 #include "Pet.h"
 #include "AchievementMgr.h"
 #include "BattlegroundTOK.h"
+#include "Realm.h"
 
 namespace Trinity
 {
@@ -1285,7 +1286,7 @@ void Battleground::EndBattleground(uint32 winner)
 
             uint8 arenaType = IsRatedBG() ? 10 : ArenaTeam::GetTypeBySlot(at->GetSlot());
 
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ARENA_GAMES);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ARENA_GAMES);
             int32 index = 1;        // gameid is not known at this time.
             stmt->setInt64(  index, (at->GetSlot() + 1) * 100000000000LL + GUID_LOPART(it.first));
             stmt->setInt32(++index, GUID_LOPART(it.first));
@@ -1310,7 +1311,7 @@ void Battleground::EndBattleground(uint32 winner)
             stmt->setUInt8(++index, classID);
             stmt->setUInt16(++index, sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID));
             stmt->setUInt8(++index, arenaType);
-            stmt->setUInt8(++index, realmID);
+            stmt->setUInt8(++index, realm.Id.Realm);
             stmt->setUInt16(++index, mmr);
             stat.Data.push_back(stmt);
         }
@@ -1942,6 +1943,9 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
         delete go;
         return false;
     }
+
+    for (auto phase : go->GetPhases())
+        go->SetPhased(phase, false, true);
 /*
     uint32 guid = go->GetGUIDLow();
 
@@ -2080,6 +2084,9 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, uint32 teamval, f
     // Force using DB speeds
     creature->SetSpeed(MOVE_WALK,  cinfo->speed_walk);
     creature->SetSpeed(MOVE_RUN,   cinfo->speed_run);
+
+    for (auto phase : creature->GetPhases())
+        creature->SetPhased(phase, false, true);
 
     if (!map->AddToMap(creature))
     {
@@ -2642,7 +2649,7 @@ uint32 Battleground::GetTeamScore(uint32 teamId) const
     return 0;
 }
 
-void Battleground::HandleAreaTrigger(Player* player, uint32 trigger)
+void Battleground::HandleAreaTrigger(Player* player, uint32 trigger, bool /*entered*/)
 {
     TC_LOG_DEBUG("bg.battleground", "Unhandled AreaTrigger %u in Battleground %u. Player coords (x: %f, y: %f, z: %f)",
                    trigger, player->GetMapId(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());

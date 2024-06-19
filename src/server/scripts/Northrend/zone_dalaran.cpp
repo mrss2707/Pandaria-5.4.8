@@ -74,7 +74,7 @@ struct npc_mageguard_dalaran : public ScriptedAI
 
     void Reset() override { }
 
-    void EnterCombat(Unit* /*who*/) override { }
+    void JustEngagedWith(Unit* /*who*/) override { }
 
     void AttackStart(Unit* /*who*/) override { }
 
@@ -140,7 +140,7 @@ struct npc_minigob_manabonk : public ScriptedAI
         me->setActive(true);
     }
 
-    void Reset()
+    void Reset() override
     {
         playerGuid = ObjectGuid();
         me->SetVisible(false);
@@ -166,7 +166,7 @@ struct npc_minigob_manabonk : public ScriptedAI
 
     void SendMailToPlayer(Player* player) const
     {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         int16 deliverDelay = irand(MAIL_DELIVER_DELAY_MIN, MAIL_DELIVER_DELAY_MAX);
         MailDraft(MAIL_MINIGOB_ENTRY, true).SendMailTo(trans, MailReceiver(player), MailSender(MAIL_CREATURE, me->GetEntry()), MAIL_CHECK_MASK_NONE, deliverDelay);
         CharacterDatabase.CommitTransaction(trans);

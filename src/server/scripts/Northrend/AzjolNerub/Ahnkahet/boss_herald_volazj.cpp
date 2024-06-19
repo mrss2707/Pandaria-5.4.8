@@ -17,6 +17,7 @@
 
 #include "ScriptPCH.h"
 #include "ahnkahet.h"
+#include "Random.h"
 
 enum Spells
 {
@@ -204,7 +205,7 @@ class boss_volazj : public CreatureScript
                 Reset();
             }
 
-            void EnterCombat(Unit* who) override
+            void JustEngagedWith(Unit* who) override
             {
                 Talk(SAY_AGGRO);
                 DoCastAOE(SPELL_VOLAZJ_WHISPER_AGGRO, true);
@@ -435,7 +436,7 @@ class npc_twisted_visage : public CreatureScript
                 me->DespawnOrUnsummon(1000);
             }
 
-            void EnterCombat(Unit* who) override { }
+            void JustEngagedWith(Unit* who) override { }
 
             void SpellHitTarget(Unit* target, SpellInfo const* spell) override
             {

@@ -31,6 +31,10 @@
 #include <time.h>
 #include <cstdarg>
 
+#include "ObjectGuid.h"
+
+class MessageBuffer;
+
 // Root of ByteBuffer exception hierarchy
 class ByteBufferException : public std::exception
 {
@@ -70,68 +74,6 @@ public:
     ~ByteBufferInvalidValueException() noexcept = default;
 };
 
-//! Structure to ease conversions from single 64 bit integer guid into individual bytes, for packet sending purposes
-//! Nuke this out when porting ObjectGuid from MaNGOS, but preserve the per-byte storage
-struct ObjectGuid
-{
-public:
-    ObjectGuid() { _data.u64 = UI64LIT(0); }
-    ObjectGuid(uint64 guid) { _data.u64 = guid; }
-    ObjectGuid(ObjectGuid const& other) { _data.u64 = other._data.u64; }
-
-    uint8& operator[](uint32 index)
-    {
-        ASSERT(index < sizeof(uint64));
-
-#if TRINITY_ENDIAN == TRINITY_LITTLEENDIAN
-        return _data.byte[index];
-#else
-        return _data.byte[7 - index];
-#endif
-    }
-
-    uint8 const& operator[](uint32 index) const
-    {
-        ASSERT(index < sizeof(uint64));
-
-#if TRINITY_ENDIAN == TRINITY_LITTLEENDIAN
-        return _data.byte[index];
-#else
-        return _data.byte[7 - index];
-#endif
-    }
-
-    operator uint64()
-    {
-        return _data.u64;
-    }
-
-    ObjectGuid& operator=(uint64 guid)
-    {
-        _data.u64 = guid;
-        return *this;
-    }
-
-    ObjectGuid& operator=(ObjectGuid const& other)
-    {
-        _data.u64 = other._data.u64;
-        return *this;
-    }
-
-    void Clear() 
-    {
-        _data.u64 = 0;
-    }
-
-private:
-    union
-    {
-        uint64 u64;
-        uint8 byte[8];
-    } _data;
-
-};
-
 
 class ByteBuffer
 {
@@ -149,11 +91,49 @@ public:
         _storage.reserve(reserve);
     }
 
-    // copy constructor
     ByteBuffer(const ByteBuffer &buf) : _rpos(buf._rpos), _wpos(buf._wpos),
         _bitpos(buf._bitpos), _curbitval(buf._curbitval), _storage(buf._storage)
     {
     }
+
+    ByteBuffer(ByteBuffer&& buf) noexcept : _rpos(buf._rpos), _wpos(buf._wpos), _bitpos(buf._bitpos), 
+        _curbitval(buf._curbitval), _storage(std::move(buf._storage))
+    {
+        buf._rpos = 0;
+        buf._wpos = 0;
+    }
+
+    ByteBuffer(MessageBuffer&& buffer);
+
+    ByteBuffer& operator=(ByteBuffer const& right)
+    {
+        if (this != &right)
+        {
+            _rpos = right._rpos;
+            _wpos = right._wpos;
+            _bitpos = right._bitpos;
+            _curbitval = right._curbitval;            
+            _storage = right._storage;
+        }
+
+        return *this;
+    }
+
+    ByteBuffer& operator=(ByteBuffer&& right) noexcept
+    {
+        if (this != &right)
+        {
+            _rpos = right._rpos;
+            right._rpos = 0;
+            _wpos = right._wpos;
+            right._wpos = 0;
+            _storage = std::move(right._storage);
+        }
+
+        return *this;
+    }
+
+    virtual ~ByteBuffer() { }
 
     void clear();
 
@@ -423,20 +403,22 @@ public:
         return *this;
     }
 
-    ByteBuffer &operator<<(const std::string &value)
+    ByteBuffer &operator<<(std::string_view value)
     {
         if (size_t len = value.length())
-            append((uint8 const*)value.c_str(), len);
-        append((uint8)0);
+            append(reinterpret_cast<uint8 const*>(value.data()), len);
+        append(static_cast<uint8>(0));
         return *this;
     }
 
-    ByteBuffer &operator<<(const char *str)
+    ByteBuffer& operator<<(std::string const& str)
     {
-        if (size_t len = (str ? strlen(str) : 0))
-            append((uint8 const*)str, len);
-        append((uint8)0);
-        return *this;
+        return operator<<(std::string_view(str));
+    }
+
+    ByteBuffer &operator<<(char const* str)
+    {
+        return operator<<(std::string_view(str ? str : ""));
     }
 
     ByteBuffer &operator>>(bool &value)
@@ -674,6 +656,11 @@ public:
     void append(const char *src, size_t cnt)
     {
         return append((const uint8 *)src, cnt);
+    }
+
+    void shrink_to_fit()
+    {
+        _storage.shrink_to_fit();
     }
 
     template<class T> void append(const T *src, size_t cnt)

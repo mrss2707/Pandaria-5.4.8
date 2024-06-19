@@ -312,7 +312,7 @@ struct HookMgr
     void OnLootStateChanged(GameObject* pGameObject, uint32 state, Unit* pUnit);
     void OnGameObjectStateChanged(GameObject* pGameObject, uint32 state);
     /* Player */
-    void OnPlayerEnterCombat(Player* pPlayer, Unit* pEnemy);
+    void OnPlayerJustEngagedWith(Player* pPlayer, Unit* pEnemy);
     void OnPlayerLeaveCombat(Player* pPlayer);
     void OnPVPKill(Player* pKiller, Player* pKilled);
     void OnCreatureKill(Player* pKiller, Creature* pKilled);
@@ -351,7 +351,7 @@ struct HookMgr
     void OnAddPassenger(Vehicle* vehicle, Unit* passenger, int8 seatId);
     void OnRemovePassenger(Vehicle* vehicle, Unit* passenger);
     /* AreaTrigger */
-    bool OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pTrigger);
+    bool OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pTrigger, bool entered);
     /* Weather */
     void OnChange(Weather* weather, WeatherState state, float grade);
     /* Auction House */
@@ -360,7 +360,7 @@ struct HookMgr
     void OnSuccessful(AuctionHouseObject* ah);
     void OnExpire(AuctionHouseObject* ah);
     /* Condition */
-    bool OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo) { return false; }; // TODO ?
+    bool OnConditionCheck(const Condition* condition, ConditionSourceInfo& sourceInfo) { return false; }; // TODO ?
     /* Transport */
     void OnAddPassenger(Transport* transport, Player* player);
     void OnAddCreaturePassenger(Transport* transport, Creature* creature);
@@ -409,5 +409,7 @@ public:
         return sHookMgr->GetAI(gameObject);
     }
 };
+
+void AddElunaScripts();
 
 #endif

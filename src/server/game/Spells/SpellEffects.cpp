@@ -56,6 +56,7 @@
 #include "SkillDiscovery.h"
 #include "Formulas.h"
 #include "Vehicle.h"
+#include "Random.h"
 #include "ScriptMgr.h"
 #include "GameObjectAI.h"
 #include "AccountMgr.h"
@@ -68,7 +69,6 @@
 #include "BattlePetMgr.h"
 #include "PetBattle.h"
 #include "UpdateFieldFlags.h"
-#include "CustomLogs.h"
 #include "ServiceMgr.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
@@ -240,10 +240,10 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectRemoveAura,                               //164 SPELL_EFFECT_REMOVE_AURA
     &Spell::EffectDamageFromMaxHealthPCT,                   //165 SPELL_EFFECT_DAMAGE_FROM_MAX_HEALTH_PCT
     &Spell::EffectGiveCurrency,                             //166 SPELL_EFFECT_GIVE_CURRENCY
-    &Spell::EffectNULL,                                     //167 SPELL_EFFECT_167
+    &Spell::EffectUpdatePlayerPhase,                        //167 SPELL_EFFECT_UPDATE_PLAYER_PHASE
     &Spell::EffectNULL,                                     //168 SPELL_EFFECT_168
     &Spell::EffectDestroyItem,                              //169 SPELL_EFFECT_DESTROY_ITEM
-    &Spell::EffectNULL,                                     //170 SPELL_EFFECT_170
+    &Spell::EffectUpdateZoneAurasAndPhases,                 //170 SPELL_EFFECT_UPDATE_ZONE_AURAS_AND_PHASES
     &Spell::EffectNULL,                                     //171 SPELL_EFFECT_171
     &Spell::EffectResurrectWithAura,                        //172 SPELL_EFFECT_RESURRECT_WITH_AURA
     &Spell::EffectUnlockGuildVaultTab,                      //173 SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB
@@ -1738,9 +1738,6 @@ void Spell::DoCreateItem(uint32 /*i*/, uint32 itemtype)
             return;
         }
 
-        if (player->GetSession()->HasFlag(ACC_FLAG_ITEM_LOG))
-            logs::ItemLog(player, pItem, num_to_add, "Created");
-
         // set the "Crafted by ..." property of the item
         if (pItem->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && pItem->GetTemplate()->Class != ITEM_CLASS_QUEST && newitemid != 6265 && newitemid != 6948)
             pItem->SetUInt32Value(ITEM_FIELD_CREATOR, player->GetGUIDLow());
@@ -2177,7 +2174,7 @@ void Spell::SendLoot(uint64 guid, LootType loottype)
         if (sScriptMgr->OnGossipHello(player, gameObjTarget))
             return;
 
-        if (gameObjTarget->AI()->GossipHello(player))
+        if (gameObjTarget->AI()->OnGossipHello(player))
             return;
 
         switch (gameObjTarget->GetGoType())
@@ -3346,11 +3343,11 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
 
     pet->InitTalentForLevel();
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     player->AddNewPet(newPetSlot, pet);
     player->SetCurrentPetId(pet->GetCharmInfo()->GetPetNumber(), trans);
     pet->SavePetToDB(trans);
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
     stmt->setUInt8(0, newPetSlot);
     stmt->setUInt32(1, player->GetGUIDLow());
     stmt->setUInt32(2, pet->GetCharmInfo()->GetPetNumber());
@@ -3703,7 +3700,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         float weapon_total_pct = 1.0f;
         if (m_spellInfo->SchoolMask & SPELL_SCHOOL_MASK_NORMAL)
         {
-            weapon_total_pct = m_caster->GetModifierValue(unitMod, TOTAL_PCT);
+            weapon_total_pct = m_caster->GetPctModifierValue(unitMod, TOTAL_PCT);
             weapon_total_pct *= m_caster->GetTotalAuraEffectValue(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
             weapon_total_pct *= m_caster->GetScallingDamageMod();
             // Bonus weapon damage should not be subject to 50% off-hand damage penalty
@@ -3875,6 +3872,9 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
 
     pGameObj->AddToTransportIfNeeded(m_caster->GetTransport());
 
+    for (auto phase : m_caster->GetPhases())
+        pGameObj->SetPhased(phase, false, true);
+
     int32 duration = m_spellInfo->GetDuration();
 
     pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
@@ -3897,6 +3897,9 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), { }, 100, GO_STATE_READY))
         {
             linkedGO->AddToTransportIfNeeded(m_caster->GetTransport());
+
+            for (auto phase : m_caster->GetPhases())
+                linkedGO->SetPhased(phase, false, true);
 
             linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
             linkedGO->SetSpellId(m_spellInfo->Id);
@@ -4583,14 +4586,14 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
 
     // Players can only fight a duel in zones with this flag
     AreaTableEntry const* casterAreaEntry = sAreaTableStore.LookupEntry(caster->GetAreaId());
-    if (casterAreaEntry && !(casterAreaEntry->flags & AREA_FLAG_ALLOW_DUELS))
+    if (casterAreaEntry && !(casterAreaEntry->Flags & AREA_FLAG_ALLOW_DUELS))
     {
         SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here
         return;
     }
 
     AreaTableEntry const* targetAreaEntry = sAreaTableStore.LookupEntry(target->GetAreaId());
-    if (targetAreaEntry && !(targetAreaEntry->flags & AREA_FLAG_ALLOW_DUELS))
+    if (targetAreaEntry && !(targetAreaEntry->Flags & AREA_FLAG_ALLOW_DUELS))
     {
         SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here
         return;
@@ -4614,6 +4617,9 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     }
 
     pGameObj->AddToTransportIfNeeded(m_caster->GetTransport());
+
+    for (auto phase : m_caster->GetPhases())
+        pGameObj->SetPhased(phase, false, true);
 
     pGameObj->SetFaction(m_caster->GetFaction());
     pGameObj->SetUInt32Value(GAMEOBJECT_FIELD_LEVEL, m_caster->GetLevel()+1);
@@ -5067,6 +5073,9 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
 
     go->AddToTransportIfNeeded(m_caster->GetTransport());
 
+    for (auto phase : m_caster->GetPhases())
+        go->SetPhased(phase, false, true);
+
     //pGameObj->SetUInt32Value(GAMEOBJECT_FIELD_LEVEL, m_caster->GetLevel());
     int32 duration = m_spellInfo->GetDuration();
     go->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
@@ -5214,11 +5223,6 @@ void Spell::EffectLeap(SpellEffIndex effIndex)
         return;
 
     Position pos;
-    destTarget->GetPosition(&pos);
-    if (m_spellInfo->Effects[effIndex].TargetB.GetTarget() != TARGET_DEST_CASTER_FRONT_LEAP && 
-        m_spellInfo->Effects[effIndex].TargetB.GetTarget() != TARGET_DEST_CASTER_MOVEMENT_DIR &&
-        m_spellInfo->Effects[effIndex].TargetB.GetTarget() != TARGET_DEST_CASTER_FRONT)
-        unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetDistance(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ() + 2.0f), 0.0f);
     unitTarget->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), unitTarget == m_caster);
 }
 
@@ -5833,6 +5837,9 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     pGameObj->AddToTransportIfNeeded(m_caster->GetTransport());
 
+    for (auto phase : m_caster->GetPhases())
+        pGameObj->SetPhased(phase, false, true);
+
     int32 duration = m_spellInfo->GetDuration();
 
     switch (goinfo->type)
@@ -5896,6 +5903,9 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
             m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), { }, 100, GO_STATE_READY))
         {
             linkedGO->AddToTransportIfNeeded(m_caster->GetTransport());
+
+            for (auto phase : m_caster->GetPhases())
+                linkedGO->SetPhased(phase, false, true);
 
             linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
             //linkedGO->SetUInt32Value(GAMEOBJECT_FIELD_LEVEL, m_caster->GetLevel());
@@ -6324,11 +6334,11 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
 
     pet->InitTalentForLevel();
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     player->AddNewPet(newPetSlot, pet);
     player->SetCurrentPetId(pet->GetCharmInfo()->GetPetNumber(), trans);
     pet->SavePetToDB(trans);
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
     stmt->setUInt8(0, newPetSlot);
     stmt->setUInt32(1, player->GetGUIDLow());
     stmt->setUInt32(2, pet->GetCharmInfo()->GetPetNumber());
@@ -6876,8 +6886,32 @@ void Spell::EffectResurrectWithAura(SpellEffIndex effIndex)
     SpellInfo const* spellInfo = m_spellInfo;
 
     // Shitty workaround but still better than unsafe access
-    TaskMgr::Default()->ScheduleInvocation([playerGuid, casterGuid, effectValue, spellInfo, effIndex]
-    {
+//     TaskMgr::Default()->ScheduleInvocation([playerGuid, casterGuid, effectValue, spellInfo, effIndex]
+//     {
+//         Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(playerGuid);
+//         Player* caster = ObjectAccessor::FindPlayerInOrOutOfWorld(casterGuid);
+//         if (!player || !caster)
+//             return;
+
+//         if (player->IsRessurectRequested())       // already have one active request
+//             return;
+
+//         uint32 health = player->CountPctFromMaxHealth(effectValue);
+//         uint32 mana = CalculatePct(player->GetMaxPower(POWER_MANA), effectValue);
+
+//         uint32 resurrectAura = 0;
+//         if (sSpellMgr->GetSpellInfo(spellInfo->Effects[effIndex].TriggerSpell))
+//             resurrectAura = spellInfo->Effects[effIndex].TriggerSpell;
+//         if (resurrectAura && player->HasAura(resurrectAura))
+//             return;
+
+//         player->SetResurrectRequestData(caster, health, mana, resurrectAura);
+// #pragma warning(push)
+// #pragma warning(disable : 4573)
+//         Spell::SendResurrectRequest(caster, player, spellInfo->Id);
+// #pragma warning(pop)
+//     });
+
         Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(playerGuid);
         Player* caster = ObjectAccessor::FindPlayerInOrOutOfWorld(casterGuid);
         if (!player || !caster)
@@ -6900,7 +6934,8 @@ void Spell::EffectResurrectWithAura(SpellEffIndex effIndex)
 #pragma warning(disable : 4573)
         Spell::SendResurrectRequest(caster, player, spellInfo->Id);
 #pragma warning(pop)
-    });
+
+    
     ExecuteLogEffectResurrect(effIndex, target);
 }
 
@@ -7172,4 +7207,26 @@ void Spell::EffectPlayerChoice(SpellEffIndex effIndex)
         return;
 
     player->GetSession()->SendPlayerChoice(choiceId);
+}
+
+void Spell::EffectUpdatePlayerPhase(SpellEffIndex /*effIndex*/)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    unitTarget->UpdateAreaAndZonePhase();
+}
+
+void Spell::EffectUpdateZoneAurasAndPhases(SpellEffIndex /*effIndex*/)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    unitTarget->ToPlayer()->UpdateAreaDependentAuras(unitTarget->GetAreaId());
 }

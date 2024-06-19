@@ -20,6 +20,7 @@
 
 #include "Duration.h"
 #include "Errors.h"
+#include "Optional.h"
 
 #include <algorithm>
 #include <string>
@@ -87,62 +88,7 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText = false, bool hou
 uint32 TimeStringToSecs(const std::string& timestring);
 std::string TimeToTimestampStr(time_t t);
 
-/* Return a random number in the range min..max; (max-min) must be smaller than 32768. */
-int32 irand(int32 min, int32 max);
-
-/* Return a random number in the range min..max (inclusive). For reliable results, the difference
-* between max and min should be less than RAND32_MAX. */
-uint32 urand(uint32 min, uint32 max);
-
-/* Return a random number in the range 0 .. RAND32_MAX. */
-int32 rand32();
-
-/* Return a random time in the range min..max (up to millisecond precision). */
-Milliseconds randtime(Milliseconds const& min, Milliseconds const& max);
-
-/* Return a random number in the range min..max */
-float frand(float min, float max);
-
-/* Return a random double from 0.0 to 1.0 (exclusive). Floats support only 7 valid decimal digits.
- * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
- * With an FPU, there is usually no difference in performance between float and double.
-*/
-double rand_norm(void);
-
-/* Return a random double from 0.0 to 99.9999999999999. Floats support only 7 valid decimal digits.
- * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
- * With an FPU, there is usually no difference in performance between float and double.
-*/
-double rand_chance(void);
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_f(float chance)
-{
-    return chance > rand_chance();
-}
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_i(int chance)
-{
-    return chance > irand(0, 99);
-}
-
 struct tm* localtime_r(time_t const* time, struct tm *result);
-
-/*
-* SFMT wrapper satisfying UniformRandomNumberGenerator concept for use in <random> algorithms
-*/
-class SFMTEngine
-{
-public:
-    typedef uint32 result_type;
-
-    static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
-    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
-    result_type operator()() const { return rand32(); }
-
-    static SFMTEngine& Instance();
-};
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
@@ -389,15 +335,54 @@ bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
 bool Utf8FitTo(const std::string& str, std::wstring search);
 void utf8printf(FILE* out, const char *str, ...);
 void vutf8printf(FILE* out, const char *str, va_list* ap);
+TC_COMMON_API bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
 TC_COMMON_API bool ReadWinConsole(std::string& str, size_t size = 256);
 TC_COMMON_API bool WriteWinConsole(std::string_view str, bool error = false);
 #endif
 
+TC_COMMON_API Optional<std::size_t> RemoveCRLF(std::string& str);
+
+TC_COMMON_API bool IsIPAddress(char const* ipaddress);
+
 uint32 CreatePIDFile(const std::string& filename);
 
-std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
+namespace Trinity::Impl
+{
+    TC_COMMON_API std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
+    TC_COMMON_API void HexStrToByteArray(std::string_view str, uint8* out, size_t outlen, bool reverse = false);
+}
+
+template <typename Container>
+std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
+{
+    return Trinity::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
+}
+
+template <size_t Size>
+void HexStrToByteArray(std::string_view str, std::array<uint8, Size>& buf, bool reverse = false)
+{
+    Trinity::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
+}
+template <size_t Size>
+std::array<uint8, Size> HexStrToByteArray(std::string_view str, bool reverse = false)
+{
+    std::array<uint8, Size> arr;
+    HexStrToByteArray(str, arr, reverse);
+    return arr;
+}
+
+inline std::vector<uint8> HexStrToByteVector(std::string_view str, bool reverse = false)
+{
+    std::vector<uint8> buf;
+    size_t const sz = (str.size() / 2);
+    buf.resize(sz);
+    Trinity::Impl::HexStrToByteArray(str, buf.data(), sz, reverse);
+    return buf;
+}
+
+//std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
 bool StringToBool(std::string const& str);
 TC_COMMON_API bool StringEqualI(std::string_view str1, std::string_view str2);
 #endif

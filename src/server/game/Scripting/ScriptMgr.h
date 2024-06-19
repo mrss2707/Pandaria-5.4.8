@@ -23,6 +23,7 @@
 
 #include "DBCStores.h"
 #include "SharedDefines.h"
+#include "Types.h"
 #include "World.h"
 #include "Weather.h"
 #include "ItemPrototype.h"
@@ -210,19 +211,19 @@ class ServerScript : public ScriptObject
         virtual void OnNetworkStop() { }
 
         // Called when a remote socket establishes a connection to the server. Do not store the socket object.
-        virtual void OnSocketOpen(WorldSocket* /*socket*/) { }
+        virtual void OnSocketOpen(std::shared_ptr<WorldSocket> /*socket*/) { }
 
         // Called when a socket is closed. Do not store the socket object, and do not rely on the connection
         // being open; it is not.
-        virtual void OnSocketClose(WorldSocket* /*socket*/, bool /*wasNew*/) { }
+        virtual void OnSocketClose(std::shared_ptr<WorldSocket> /*socket*/) { }
 
         // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
         // and modifying it is safe.
-        virtual void OnPacketSend(WorldSocket* /*socket*/, WorldPacket& /*packet*/) { }
+        virtual void OnPacketSend(WorldSession* /*socket*/, WorldPacket& /*packet*/) { }
 
         // Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
         // reading and modifying it is safe.
-        virtual void OnPacketReceive(WorldSocket* /*socket*/, WorldPacket& /*packet*/) { }
+        virtual void OnPacketReceive(WorldSession* /*socket*/, WorldPacket& /*packet*/) { }
 
         // Called when an invalid (unknown opcode) packet is received by a client. The packet is a reference to the orignal
         // packet; not a copy. This allows you to actually handle unknown packets (for whatever purpose).
@@ -511,6 +512,9 @@ class AreaTriggerScript : public ScriptObject
 
         // Called when the area trigger is activated by a player.
         virtual bool OnTrigger(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) { return false; }
+
+        // Called when the area trigger is left by a player.
+        virtual bool OnExit(Player* player, AreaTriggerEntry const* trigger) { return false; }
 };
 
 class SpellAreaTriggerScript : public ScriptObject
@@ -603,7 +607,7 @@ class ConditionScript : public ScriptObject
     public:
 
         // Called when a single condition is checked for a player.
-        virtual bool OnConditionCheck(Condition* /*condition*/, ConditionSourceInfo& /*sourceInfo*/) { return true; }
+        virtual bool OnConditionCheck(const Condition* /*condition*/, ConditionSourceInfo& /*sourceInfo*/) { return true; }
 };
 
 class VehicleScript : public ScriptObject
@@ -929,7 +933,7 @@ protected:
 public:
 
     // items
-    virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, uint32 /*itemGuid*/) { }
+    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, uint32 /*itemGuid*/) { }
     virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
 };
 
@@ -943,7 +947,7 @@ extern UnusedScriptContainer UnusedScripts;
 extern UnusedScriptNamesContainer UnusedScriptNames;
 
 // Manages registration, loading, and execution of scripts.
-class ScriptMgr
+class TC_GAME_API ScriptMgr
 {
     friend class ScriptObject;
 
@@ -982,10 +986,10 @@ class ScriptMgr
 
         void OnNetworkStart();
         void OnNetworkStop();
-        void OnSocketOpen(WorldSocket* socket);
-        void OnSocketClose(WorldSocket* socket, bool wasNew);
-        void OnPacketReceive(WorldSocket* socket, WorldPacket packet);
-        void OnPacketSend(WorldSocket* socket, WorldPacket packet);
+        void OnSocketOpen(std::shared_ptr<WorldSocket>);
+        void OnSocketClose(std::shared_ptr<WorldSocket>);
+        void OnPacketReceive(WorldSession* session, WorldPacket packet);
+        void OnPacketSend(WorldSession* session, WorldPacket packet);
         void OnUnknownPacketReceive(WorldSocket* socket, WorldPacket packet);
 
     public: /* WorldScript */
@@ -1065,7 +1069,7 @@ class ScriptMgr
 
     public: /* AreaTriggerScript */
 
-        bool OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger);
+        bool OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger, bool entered);
 
     public: /* SpellAreaTriggerScript */
 
@@ -1099,7 +1103,7 @@ class ScriptMgr
 
     public: /* ConditionScript */
 
-        bool OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo);
+        bool OnConditionCheck(const Condition* condition, ConditionSourceInfo& sourceInfo);
 
     public: /* VehicleScript */
 
@@ -1200,7 +1204,7 @@ class ScriptMgr
         void FillGameEventWorldStates(GameEventData const& event, Player* player, WorldStateBuilder& builder);
 
     public: /* GlobalScript */
-        void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
+        void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, uint32 itemGuid);
         void OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display);
 
     public: /* UnitScript */
@@ -1235,6 +1239,36 @@ class ScriptMgr
         std::atomic_long _scheduledScripts;
 };
 
+// template <typename... Ts>
+// class GenericSpellAndAuraScriptLoader : public SpellScriptLoader
+// {
+//     using SpellScriptType = typename Trinity::find_type_if_t<Trinity::SpellScripts::is_SpellScript, Ts...>;
+//     using AuraScriptType = typename Trinity::find_type_if_t<Trinity::SpellScripts::is_AuraScript, Ts...>;
+//     using ArgsType = typename Trinity::find_type_if_t<Trinity::is_tuple, Ts...>;
+
+// public:
+//     GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
+
+// private:
+//     SpellScript* GetSpellScript() const override
+//     {
+//         if constexpr (!std::is_same_v<SpellScriptType, Trinity::find_type_end>)
+//             return Trinity::new_from_tuple<SpellScriptType>(_args);
+//         else
+//             return nullptr;
+//     }
+
+//     AuraScript* GetAuraScript() const override
+//     {
+//         if constexpr (!std::is_same_v<AuraScriptType, Trinity::find_type_end>)
+//             return Trinity::new_from_tuple<AuraScriptType>(_args);
+//         else
+//             return nullptr;
+//     }
+
+//     ArgsType _args;
+// };
+
 template <class T>
 struct aura_script : SpellScriptLoader
 {
@@ -1248,6 +1282,11 @@ struct spell_script : SpellScriptLoader
     spell_script(char const* name) : SpellScriptLoader(name) { }
     SpellScript* GetSpellScript() const override { return new T(); }
 };
+
+#define RegisterSpellScriptWithArgs(spell_script, script_name, ...) new GenericSpellAndAuraScriptLoader<spell_script, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellScript(spell_script) RegisterSpellScriptWithArgs(spell_script, #spell_script)
+#define RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, script_name, ...) new GenericSpellAndAuraScriptLoader<script_1, script_2, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellAndAuraScriptPair(script_1, script_2) RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, #script_1)
 
 template <class T>
 struct atrigger_script : public SpellAreaTriggerScript
