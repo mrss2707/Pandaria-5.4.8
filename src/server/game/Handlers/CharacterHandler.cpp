@@ -23,6 +23,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GitRevision.h"
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -35,6 +36,7 @@
 #include "Pet.h"
 #include "PlayerDump.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
@@ -351,9 +353,8 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
 void WorldSession::HandleCharEnumOpcode(WorldPacket & /*recvData*/)
 {
     // remove expired bans
-    //PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
-    //CharacterDatabase.Execute(stmt);
-    CharacterDatabasePreparedStatement* stmt;
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
+    CharacterDatabase.Execute(stmt);
 
     /// get all the data necessary for loading all characters (along with their pets) on the account
 
@@ -731,13 +732,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS_BY_REALM);
             stmt->setUInt32(0, GetAccountId());
-            stmt->setUInt32(1, realmID);
+            stmt->setUInt32(1, realm.Id.Realm);
             trans->Append(stmt);
 
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_REALM_CHARACTERS);
             stmt->setUInt32(0, createInfo->CharCount);
             stmt->setUInt32(1, GetAccountId());
-            stmt->setUInt32(2, realmID);
+            stmt->setUInt32(2, realm.Id.Realm);
             trans->Append(stmt);
 
             LoginDatabase.CommitTransaction(trans);
@@ -919,9 +920,6 @@ void WorldSession::HandleLoadScreenOpcode(WorldPacket& recvPacket)
     TC_LOG_INFO("general", "WORLD: Recvd CMSG_LOAD_SCREEN");
     uint32 mapID = recvPacket.read<uint32>();
     bool loading = recvPacket.ReadBit();
-
-    if (!loading)
-        sWorld->SendRaidQueueInfo(GetPlayer());
 }
 
 void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
@@ -1036,7 +1034,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
-            chH.PSendSysMessage(_FULLVERSION);
+            chH.PSendSysMessage(GitRevision::GetFullVersion());
 
         TC_LOG_DEBUG("network", "WORLD: Sent server info");
     }
@@ -1187,59 +1185,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 
-        if (pCurrChar->GetClass() == CLASS_HUNTER)
-        {
-            static uint32 const HunterCreatePetSpells[MAX_RACES] =
-            {
-                0,      /* None */                          79597,  /* Human - Young Wolf */
-                79598,  /* Orc - Young Boar */              79593,  /* Dwarf - Young Bear */
-                79602,  /* Night Elf - Young Cat */         79600,  /* Undead - Young Widow */
-                79603,  /* Tauren - Young Tallstrider */    0,      /* Gnome */
-                79599,  /* Troll - Young Raptor */          79595,  /* Goblin - Young Crab */
-                79594,  /* Blood Elf - Young Dragonhawk */  79601,  /* Draenei - Young Moth */
-                0,      /* Fel Orc */                       0,      /* Naga */
-                0,      /* Broken */                        0,      /* Skeleton */
-                0,      /* Vrykul */                        0,      /* Tuskarr */
-                0,      /* Forest Troll */                  0,      /* Taunka */
-                0,      /* Northrend Skeleton */            0,      /* Ice Troll */
-                79596,  /* Worgen - Young Mastiff */        0,      /* Gilnean */
-                107924, /* Pandaren - Wise Turtle */        0,      /* Pandaren Alliance */
-                0       /* Pandaren Horde*/
-            };
-
-            pCurrChar->CastSpell(pCurrChar, HunterCreatePetSpells[pCurrChar->GetRace()], true);
-        }
-
-        if (pCurrChar->GetRace() == RACE_UNDEAD_PLAYER && pCurrChar->GetClass() != CLASS_DEATH_KNIGHT)
-            pCurrChar->CastSpell(pCurrChar, 73523, true); // Undead - Rigor Mortis
-
-        if (pCurrChar->GetRace() == RACE_PANDAREN_NEUTRAL)
-        {
-            static uint32 const PandarenStartingQuestSpells[MAX_CLASSES] =
-            {
-                0,      /* None */         107922, /* Warrior */
-                0,      /* Paladin */      107917, /* Hunter */
-                107920, /* Rogue */        107919, /* Priest */
-                0,      /* Death Knight */ 107921, /* Shaman */
-                107916, /* Mage */         0,      /* Warlock */
-                107915, /* Monk */         0       /* Druid */
-            };
-
-            pCurrChar->CastSpell(pCurrChar, 100750, true); // Launch Starting Quest
-            pCurrChar->CastSpell(pCurrChar, PandarenStartingQuestSpells[pCurrChar->GetClass()], true);
-
-            static uint32 const PandarenRemoveWeaponSpells[MAX_CLASSES] =
-            {
-                0,      /* None */         108059, /* Warrior */
-                0,      /* Paladin */      108061, /* Hunter */
-                108058, /* Rogue */        108057, /* Priest */
-                0,      /* Death Knight */ 108056, /* Shaman */
-                108055, /* Mage */         0,      /* Warlock */
-                108060, /* Monk */         0       /* Druid */
-            };
-
-            pCurrChar->CastSpell(pCurrChar, PandarenRemoveWeaponSpells[pCurrChar->GetClass()], true);
-        }
+        PlayerInfo const* info = sObjectMgr->GetPlayerInfo(pCurrChar->GetRace(), pCurrChar->GetClass());
+        for (uint32 spellId : info->castSpells)
+            pCurrChar->CastSpell(pCurrChar, spellId, true);
     }
 
     if (auto servicesResult = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SERVICES))
@@ -2564,7 +2512,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                 {
                     Quest const* quest = iter->second;
                     uint32 newRaceMask = (team == TEAM_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE;
-                    if (!(quest->GetRequiredRaces() & newRaceMask))
+                    if (!(quest->GetAllowableRaces() & newRaceMask))
                     {
                         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_QUESTSTATUS_REWARDED_ACTIVE_BY_QUEST);
                         stmt->setUInt32(0, lowGuid);

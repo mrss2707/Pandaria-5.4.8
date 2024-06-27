@@ -20,6 +20,7 @@
 
 #include "Duration.h"
 #include "Errors.h"
+#include "Optional.h"
 
 #include <algorithm>
 #include <string>
@@ -334,11 +335,16 @@ bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
 bool Utf8FitTo(const std::string& str, std::wstring search);
 void utf8printf(FILE* out, const char *str, ...);
 void vutf8printf(FILE* out, const char *str, va_list* ap);
+TC_COMMON_API bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
 TC_COMMON_API bool ReadWinConsole(std::string& str, size_t size = 256);
 TC_COMMON_API bool WriteWinConsole(std::string_view str, bool error = false);
 #endif
+
+TC_COMMON_API Optional<std::size_t> RemoveCRLF(std::string& str);
+
+TC_COMMON_API bool IsIPAddress(char const* ipaddress);
 
 uint32 CreatePIDFile(const std::string& filename);
 
@@ -352,6 +358,28 @@ template <typename Container>
 std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
 {
     return Trinity::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
+}
+
+template <size_t Size>
+void HexStrToByteArray(std::string_view str, std::array<uint8, Size>& buf, bool reverse = false)
+{
+    Trinity::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
+}
+template <size_t Size>
+std::array<uint8, Size> HexStrToByteArray(std::string_view str, bool reverse = false)
+{
+    std::array<uint8, Size> arr;
+    HexStrToByteArray(str, arr, reverse);
+    return arr;
+}
+
+inline std::vector<uint8> HexStrToByteVector(std::string_view str, bool reverse = false)
+{
+    std::vector<uint8> buf;
+    size_t const sz = (str.size() / 2);
+    buf.resize(sz);
+    Trinity::Impl::HexStrToByteArray(str, buf.data(), sz, reverse);
+    return buf;
 }
 
 //std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);

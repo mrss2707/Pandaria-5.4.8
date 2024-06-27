@@ -15,10 +15,12 @@
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Util.h"
+
 #include "Common.h"
-#include "utf8.h"
 #include "Errors.h" // for ASSERT
+#include "IpAddress.h"
+#include "Util.h"
+#include "utf8.h"
 #include <memory>
 #include <random>
 #include <cstring>
@@ -218,6 +220,17 @@ std::string TimeToTimestampStr(time_t t)
     char buf[20];
     snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year+1900, aTm.tm_mon+1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
     return std::string(buf);
+}
+
+/// Check if the string is a valid ip address representation
+bool IsIPAddress(char const* ipaddress)
+{
+    if (!ipaddress)
+        return false;
+
+    boost::system::error_code error;
+    Trinity::Net::make_address(ipaddress, error);
+    return !error;
 }
 
 /// create PID file
@@ -561,29 +574,26 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
 #endif
 }
 
-// std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse /* = false */)
-// {
-//     int32 init = 0;
-//     int32 end = arrayLen;
-//     int8 op = 1;
+bool Utf8ToUpperOnlyLatin(std::string& utf8String)
+{
+    std::wstring wstr;
+    if (!Utf8toWStr(utf8String, wstr))
+        return false;
 
-//     if (reverse)
-//     {
-//         init = arrayLen - 1;
-//         end = -1;
-//         op = -1;
-//     }
+    std::transform(wstr.begin(), wstr.end(), wstr.begin(), wcharToUpperOnlyLatin);
 
-//     std::ostringstream ss;
-//     for (int32 i = init; i != end; i += op)
-//     {
-//         char buffer[4];
-//         sprintf(buffer, "%02X", bytes[i]);
-//         ss << buffer;
-//     }
+    return WStrToUtf8(wstr, utf8String);
+}
 
-//     return ss.str();
-// }
+TC_COMMON_API Optional<std::size_t> RemoveCRLF(std::string & str)
+{
+    std::size_t nextLineIndex = str.find_first_of("\r\n");
+    if (nextLineIndex == std::string::npos)
+        return std::nullopt;
+
+    str.erase(nextLineIndex);
+    return nextLineIndex;
+}
 
 std::string Trinity::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
 {

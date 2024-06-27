@@ -36,6 +36,7 @@
 #include "MapManager.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
@@ -1144,9 +1145,9 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement, 
     data.WriteByteSeq(guid[1]);
     data.WriteByteSeq(guid2[0]);
     data.WriteByteSeq(guid[5]);
-    data << uint32(realmID);
+    data << uint32(realm.Id.Realm);
     data.WriteByteSeq(guid[5]);
-    data << uint32(realmID);
+    data << uint32(realm.Id.Realm);
     data.WriteByteSeq(guid2[2]);
     referencePlayer->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 
@@ -1463,7 +1464,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     }
 
     TC_LOG_DEBUG("achievement", "UpdateAchievementCriteria: %s, %s (%u), " UI64FMTD ", " UI64FMTD ", " UI64FMTD,
-        GetLogNameForGuid(GetGUID()), AchievementGlobalMgr::GetCriteriaTypeString(type), type, miscValue1, miscValue2, miscValue3);
+        GetLogNameForGuid(referencePlayer->GetGUID()), AchievementGlobalMgr::GetCriteriaTypeString(type), type, miscValue1, miscValue2, miscValue3);
 
     // Lua_GetGuildLevelEnabled() is checked in achievement UI to display guild tab
     if (m_type == AchievementType::Guild && !sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
@@ -2729,10 +2730,10 @@ void PlayerAchievementMgr::SendAllAchievementData() const
             data.WriteBit(guid[3]);
 
             completedData << uint32(it.first);                      // achievement Id
-            completedData << uint32(achievement->Flags & ACHIEVEMENT_FLAG_ACCOUNT ? 0 : realmID);
+            completedData << uint32(achievement->Flags & ACHIEVEMENT_FLAG_ACCOUNT ? 0 : realm.Id.Realm);
             completedData.WriteByteSeq(guid[5]);
             completedData.WriteByteSeq(guid[7]);
-            completedData << uint32(achievement->Flags & ACHIEVEMENT_FLAG_ACCOUNT ? 0 : realmID);
+            completedData << uint32(achievement->Flags & ACHIEVEMENT_FLAG_ACCOUNT ? 0 : realm.Id.Realm);
             completedData.AppendPackedTime(it.second.Date);         // achievement date
             completedData.WriteByteSeq(guid[0]);
             completedData.WriteByteSeq(guid[4]);
@@ -4467,7 +4468,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
         std::string localeName  = fields[1].GetString();
 
         LocaleConstant locale = GetLocaleByName(localeName);
-        if (locale == LOCALE_enUS)
+        if (!sWorld->getBoolConfig(CONFIG_LOAD_LOCALES) || locale == LOCALE_enUS)
             continue;
 
         if (m_achievementRewards.find(id) == m_achievementRewards.end())

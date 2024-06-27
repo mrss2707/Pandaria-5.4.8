@@ -32,6 +32,7 @@
 #include "Config.h"
 #include <vector>
 #include "DatabaseEnv.h"
+#include "Realm.h"
 
 enum eAuctionHouse
 {
@@ -176,7 +177,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
     else
     {
         bidderAccId = sObjectMgr->GetPlayerAccountIdByGUID(bidderGuid);
-        logGmTrade = AccountMgr::GetSecurity(bidderAccId, realmID) >= SEC_MODERATOR;
+        logGmTrade = AccountMgr::GetSecurity(bidderAccId, realm.Id.Realm) >= SEC_MODERATOR;
 
         if (logGmTrade && !sObjectMgr->GetPlayerNameByGUID(bidderGuid, bidderName))
             bidderName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
@@ -309,8 +310,8 @@ void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, Ch
     if (!bidder)
         bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(bidder_guid);
 
-    if (bidder)
-        bidder->GetSession()->SendAuctionRemovedNotification(auction->Id, auction->itemEntry, item->GetItemRandomPropertyId());
+    // if (bidder)
+    //     bidder->GetSession()->SendAuctionRemovedNotification(auction->Id, auction->itemEntry, item->GetItemRandomPropertyId());
 
     // bidder exist
     if (bidder || bidder_accId)
@@ -1033,7 +1034,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
         return false;
     }
 
-    factionTemplateId = auctioneerInfo->faction_A;
+    factionTemplateId = auctioneerInfo->faction;
     auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(factionTemplateId);
     if (!auctionHouseEntry)
     {
@@ -1159,7 +1160,7 @@ bool AuctionEntry::LoadFromFieldList(Field* fields)
         return false;
     }
 
-    factionTemplateId = auctioneerInfo->faction_A;
+    factionTemplateId = auctioneerInfo->faction;
     auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(factionTemplateId);
 
     if (!auctionHouseEntry)
@@ -1178,7 +1179,7 @@ std::string AuctionEntry::BuildAuctionMailSubject(MailAuctionAnswers response) c
     return strm.str();
 }
 
-#if COMPILER == COMPILER_MICROSOFT
+#if COMPILER == TRINITY_COMPILER_MICROSOFT
 #define GUID_FORMAT "%16I64X"
 #else
 #define GUID_FORMAT "%16llX"

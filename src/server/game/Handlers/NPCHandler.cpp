@@ -221,7 +221,6 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle, boo
 
     // reputation discount
     float fDiscountMod = _player->GetReputationPriceDiscount(unit);
-    bool can_learn_primary_prof = GetPlayer()->GetFreePrimaryProfessionPoints() > 0;
 
     uint32 count = 0;
     for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
@@ -282,7 +281,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle, boo
     data.WriteByteSeq(oGuid[7]);
     data.WriteByteSeq(oGuid[1]);
     data.WriteByteSeq(oGuid[3]);
-    data << uint32(1);                      // different value for each trainer, also found in CMSG_TRAINER_BUY_SPELL
+    data << unit->GetEntry();                  // TrainerID
     data.WriteByteSeq(oGuid[5]);
     data.WriteByteSeq(oGuid[0]);
     data.WriteByteSeq(oGuid[2]);

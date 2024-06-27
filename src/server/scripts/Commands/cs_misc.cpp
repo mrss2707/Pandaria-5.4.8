@@ -15,33 +15,38 @@
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Chat.h"
-#include "ScriptMgr.h"
 #include "AccountMgr.h"
+#include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "Chat.h"
+#include "Config.h"
+#include "DevTool.h"
+#include "DisableMgr.h"
 #include "GridNotifiers.h"
 #include "Group.h"
+#include "GroupMgr.h"
 #include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
-#include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
-#include "ace/INET_Addr.h"
 #include "Player.h"
 #include "Pet.h"
 #include "LFG.h"
-#include "GroupMgr.h"
 #include "MMapFactory.h"
-#include "DevTool.h"
-#include "BattlegroundMgr.h"
+#include "Realm.h"
 #include "ServiceMgr.h"
-#include "Config.h"
+#include "ScriptMgr.h"
 #include "ServiceMgr.h"
+#include "SpellAuras.h"
 #include "SpellHistory.h"
 #include "WordFilterMgr.h"
+#include "World.h"
+#include "IPLocation.h"
+
+
 #include <fstream>
 
 class misc_commandscript : public CommandScript
@@ -402,7 +407,7 @@ public:
 
         uint32 haveMap = Map::ExistMap(mapId, gridX, gridY) ? 1 : 0;
         uint32 haveVMap = Map::ExistVMap(mapId, gridX, gridY) ? 1 : 0;
-        uint32 haveMMap = (MMAP::MMapFactory::IsPathfindingEnabledInMap(mapId) && MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId())) ? 1 : 0;
+        uint32 haveMMap = (sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_MMAP_MAP, mapId, nullptr) && MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId())) ? 1 : 0;
 
         if (haveVMap)
         {
@@ -443,11 +448,33 @@ public:
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
 
         LiquidData liquidStatus;
-        float collisionHeight = object->GetTypeId() == TYPEID_PLAYER ? object->ToPlayer()->GetCollisionHeight(object->ToPlayer()->IsMounted()) : DEFAULT_UNIT_HEIGHT;
-        ZLiquidStatus status = map->getLiquidStatus(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus, collisionHeight);
+        float collisionHeight = object->GetTypeId() == TYPEID_PLAYER ? object->ToPlayer()->GetCollisionHeight() : DEFAULT_UNIT_HEIGHT;
+        ZLiquidStatus status = map->GetLiquidStatus(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus, collisionHeight);
 
         if (status)
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
+
+        if (!object->GetPhases().empty())
+        {
+            std::stringstream ss;
+            for (uint32 swap : object->GetPhases())
+                ss << swap << " ";
+            handler->PSendSysMessage("Target's active phase swaps: %s", ss.str().c_str());
+        }
+        if (!object->GetTerrainSwaps().empty())
+        {
+            std::stringstream ss;
+            for (uint32 swap : object->GetTerrainSwaps())
+                ss << swap << " ";
+            handler->PSendSysMessage("Target's active terrain swaps: %s", ss.str().c_str());
+        }
+        if (!object->GetWorldMapSwaps().empty())
+        {
+            std::stringstream ss;
+            for (uint32 swap : object->GetWorldMapSwaps())
+                ss << swap << " ";
+            handler->PSendSysMessage("Target's active world map area swaps: %s", ss.str().c_str());
+        }
 
         return true;
     }
@@ -1164,7 +1191,7 @@ public:
         uint32 zoneId = player->GetZoneId();
 
         AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(zoneId);
-        if (!areaEntry || areaEntry->zone !=0)
+        if (!areaEntry || areaEntry->ParentAreaID !=0)
         {
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDWRONGZONE, graveyardId, zoneId);
             handler->SetSentErrorMessage(true);
@@ -1254,10 +1281,10 @@ public:
         for (uint32 id = 0; id < numRows; ++id)
         {
             AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(id);
-            if (!at || at->mapid != from.GetMapId())
+            if (!at || at->ContinentID != from.GetMapId())
                 continue;
 
-            Position pos = { at->x, at->y, at->z };
+            Position pos = { at->Pos.X, at->Pos.Y, at->Pos.Z };
             if (from.GetExactDistSq(&pos) > distance * distance)
                 continue;
 
@@ -1266,13 +1293,13 @@ public:
 
         areatriggers.sort([&from](AreaTriggerEntry const* a, AreaTriggerEntry const* b)
         {
-            Position posA = { a->x, a->y, a->z };
-            Position posB = { b->x, b->y, b->z };
+            Position posA = { a->Pos.X, a->Pos.Y, a->Pos.Z };
+            Position posB = { b->Pos.X, b->Pos.Y, b->Pos.Z };
             return from.GetExactDist2dSq(&posA) < from.GetExactDist2dSq(&posB);
         });
 
         for (auto at : areatriggers)
-            handler->PSendSysMessage("|cFFFFFFFFTrigger %u, x: %.5f, y: %.5f, z: %.5f, radius: %g, box: { %g, %g, %g, %g }", at->id, at->x, at->y, at->z, at->radius, at->box_x, at->box_y, at->box_z, at->box_orientation);
+            handler->PSendSysMessage("|cFFFFFFFFTrigger %u, x: %.5f, y: %.5f, z: %.5f, radius: %g, box: { %g, %g, %g, %g }", at->ID, at->Pos.X, at->Pos.Y, at->Pos.Z, at->Radius, at->BoxLength, at->BoxWidth, at->BoxHeight, at->BoxYaw);
 
         handler->PSendSysMessage("Found near areatriggers (distance %f): %lu", distance, areatriggers.size());
 
@@ -1845,7 +1872,7 @@ public:
 
         // Query the prepared statement for login data
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
-        stmt->setInt32(0, int32(realmID));
+        stmt->setInt32(0, int32(realm.Id.Realm));
         stmt->setUInt32(1, accId);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1858,6 +1885,13 @@ public:
             eMail         = fields[2].GetString();
             lastIp        = fields[3].GetString();
             lastLogin     = fields[4].GetString();
+
+            if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
+            {
+                lastIp.append(" (");
+                lastIp.append(location->CountryName);
+                lastIp.append(")");
+            }
 
             muteTime      = fields[5].GetUInt64();
             failedLogins  = fields[6].GetUInt32();
@@ -1952,7 +1986,7 @@ public:
         {
             if (onlineMuteTimer)
             {
-                QueryResult qresult = LoginDatabase.PQuery("SELECT muted_by, mute_reason FROM account_muted WHERE id = '%u' AND acc_id = '%u' AND realmid = '%u'", activeMuteId, accId, realmID);
+                QueryResult qresult = LoginDatabase.PQuery("SELECT muted_by, mute_reason FROM account_muted WHERE id = '%u' AND acc_id = '%u' AND realmid = '%u'", activeMuteId, accId, realm.Id.Realm);
                 if (qresult)
                 {
                     Field* fields = qresult->Fetch();
@@ -2018,7 +2052,7 @@ public:
         {
             areaName = area->area_name[handler->GetSessionDbcLocale()];
 
-            AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->zone);
+            AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->ParentAreaID);
             if (zone)
                 zoneName = zone->area_name[handler->GetSessionDbcLocale()];
         }
@@ -2063,10 +2097,6 @@ public:
             if (totalmail >= 1)
                handler->PSendSysMessage(LANG_PINFO_CHR_MAILS, rmailint, totalmail);
         }
-
-        // Output XXII. LANG_PINFO_CHAR_HWID
-        if (handler->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
-            handler->PSendSysMessage(LANG_PINFO_CHAR_HWID, HWID.c_str());
 
         return true;
     }
@@ -2170,7 +2200,7 @@ public:
             {
                 QueryResult result = LoginDatabase.PQuery("SELECT m.mute_timer, am.muted_by, am.mute_reason, am.public_channels_only "
                     "FROM mute_active AS m, account_muted AS am "
-                    "WHERE m.realmid = '%u' AND m.account = '%u' AND m.mute_id = am.id", realmID, accId);
+                    "WHERE m.realmid = '%u' AND m.account = '%u' AND m.mute_id = am.id", realm.Id.Realm, accId);
                 if (result)
                 {
                     Field* fields = result->Fetch();
@@ -2207,7 +2237,7 @@ public:
         LoginDatabase.EscapeString(muteReason);
         trans->PAppend("INSERT INTO account_muted (realmid, id, acc_id, char_id, mute_acc, mute_name, mute_date, muted_by, mute_time, mute_reason, public_channels_only) "
             "SELECT %u, %u, id, %u, username, '%s', UNIX_TIMESTAMP(), '%s', %u, '%s', %u FROM account "
-            "WHERE id = '%u'", realmID, muteId, GUID_LOPART(charId), name.c_str(), mutedBy.c_str(), muteTime, muteReason.c_str(), publicChannelsOnly, accId);
+            "WHERE id = '%u'", realm.Id.Realm, muteId, GUID_LOPART(charId), name.c_str(), mutedBy.c_str(), muteTime, muteReason.c_str(), publicChannelsOnly, accId);
 
         if (sWorld->getBoolConfig(CONFIG_GM_USE_ONLINE_MUTES))
         {
@@ -2218,7 +2248,7 @@ public:
                 session->SetMute({ onlineMuteTimer, mutedBy, muteReason, publicChannelsOnly });
 
             trans->PAppend("INSERT INTO mute_active (realmid, account, mute_id, mute_timer) VALUES ('%u', '%u', '%u', '%u')",
-                realmID, accId, muteId, onlineMuteTimer);
+                realm.Id.Realm, accId, muteId, onlineMuteTimer);
         }
         else
         {
@@ -2296,7 +2326,7 @@ public:
                 session->GetMute().Timer = 0;
             }
 
-            LoginDatabase.PExecute("DELETE FROM mute_active WHERE realmid = '%u' AND account = '%u'", realmID, accId);
+            LoginDatabase.PExecute("DELETE FROM mute_active WHERE realmid = '%u' AND account = '%u'", realm.Id.Realm, accId);
         }
         else
         {
@@ -2375,7 +2405,7 @@ public:
         if (sWorld->getBoolConfig(CONFIG_GM_USE_ONLINE_MUTES))
         {
             // Get mute info
-            QueryResult result = LoginDatabase.PQuery("SELECT mute_timer, mute_id FROM mute_active WHERE account = '%u' AND realmid = '%u'", accId, realmID);
+            QueryResult result = LoginDatabase.PQuery("SELECT mute_timer, mute_id FROM mute_active WHERE account = '%u' AND realmid = '%u'", accId, realm.Id.Realm);
 
             if (result)
             {
@@ -2443,7 +2473,7 @@ public:
             sAccountMgr->GetName(accId, acc);
 
             // Get mute info
-            result = LoginDatabase.PQuery("SELECT mute_timer, mute_id FROM mute_active WHERE account = '%u' AND realmid = '%u'", accId, realmID);
+            result = LoginDatabase.PQuery("SELECT mute_timer, mute_id FROM mute_active WHERE account = '%u' AND realmid = '%u'", accId, realm.Id.Realm);
 
             if (result)
             {
@@ -2476,14 +2506,14 @@ public:
         {
             //                                    0        1          2          3         4          5            6
             result = LoginDatabase.PQuery("SELECT char_id, mute_name, mute_date, muted_by, mute_time, mute_reason, id = '%u' FROM account_muted "
-                                          "WHERE realmid = '%u' AND mute_acc = '%s' AND char_id <> '%u' ORDER BY mute_date ASC", activeMuteId, realmID, acc.c_str(), excludeCharId);
+                                          "WHERE realmid = '%u' AND mute_acc = '%s' AND char_id <> '%u' ORDER BY mute_date ASC", activeMuteId, realm.Id.Realm, acc.c_str(), excludeCharId);
         }
         else
         {
             //                                                   0        1          2          3         4          5            6
             result = LoginDatabase.PQuery("SELECT * FROM (SELECT char_id, mute_name, mute_date, muted_by, mute_time, mute_reason, id = '%u' FROM account_muted "
                                           "               WHERE realmid = '%u' AND mute_acc = '%s' AND char_id <> '%u' ORDER BY mute_date DESC LIMIT %u) AS last_muted "
-                                          "ORDER BY last_muted.mute_date ASC", activeMuteId, realmID, acc.c_str(), excludeCharId, limit);
+                                          "ORDER BY last_muted.mute_date ASC", activeMuteId, realm.Id.Realm, acc.c_str(), excludeCharId, limit);
         }
 
         if (limit)
@@ -2545,14 +2575,14 @@ public:
         {
             //                                    0        1         2          3          4         5          6            7
             result = LoginDatabase.PQuery("SELECT char_id, mute_acc, mute_name, mute_date, muted_by, mute_time, mute_reason, id = '%u' FROM account_muted "
-                                          "WHERE realmid = '%u' AND (char_id = '%u' OR mute_name = '%s') ORDER BY mute_date ASC", activeMuteId, realmID, charId, name.c_str());
+                                          "WHERE realmid = '%u' AND (char_id = '%u' OR mute_name = '%s') ORDER BY mute_date ASC", activeMuteId, realm.Id.Realm, charId, name.c_str());
         }
         else
         {
             //                                                   0        1         2          3          4         5          6            7
             result = LoginDatabase.PQuery("SELECT * FROM (SELECT char_id, mute_acc, mute_name, mute_date, muted_by, mute_time, mute_reason, id = '%u' FROM account_muted "
                                           "               WHERE realmid = %u AND (char_id = '%u' OR mute_name = '%s') ORDER BY mute_date DESC LIMIT %u) AS last_muted "
-                                          "ORDER BY last_muted.mute_date ASC", activeMuteId, realmID, charId, name.c_str(), limit);
+                                          "ORDER BY last_muted.mute_date ASC", activeMuteId, realm.Id.Realm, charId, name.c_str(), limit);
         }
 
         if (!result)
