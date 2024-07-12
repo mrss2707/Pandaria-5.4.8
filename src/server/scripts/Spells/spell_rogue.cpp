@@ -656,7 +656,7 @@ class spell_rog_deadly_poison : public SpellScriptLoader
                             if (!spellInfo)
                             {
                                 TC_LOG_ERROR("spells", "Player::CastItemCombatSpell Enchant %i, player (Name: %s, GUID: %u) cast unknown spell %i",
-                                             enchant->ID, player->GetName().c_str(), player->GetGUIDLow(), enchant->SpellID[s]);
+                                             enchant->ID, player->GetName().c_str(), player->GetGUID().GetCounter(), enchant->SpellID[s]);
                                 continue;
                             }
 

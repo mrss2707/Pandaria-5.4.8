@@ -83,30 +83,62 @@ namespace Trinity
         return (t != NULL ? t : Insert(elements._TailElements, obj));
     }
 
-    //// non-const remove method
-    //template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Remove(ContainerMapList<SPECIFIC_TYPE> & /*elements*/, SPECIFIC_TYPE *obj)
-    //{
-    //    obj->GetGridRef().unlink();
-    //    return obj;
-    //}
+    // Find helpers
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    SPECIFIC_TYPE* Find(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE> const& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    {
+        auto i = elements._element.find(handle);
+        if (i != elements._element.end())
+            return i->second;
 
-    //template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Remove(ContainerMapList<TypeNull> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
-    //{
-    //    return NULL;
-    //}
+        return nullptr;
+    }
 
-    //// this is a missed
-    //template<class SPECIFIC_TYPE, class T> SPECIFIC_TYPE* Remove(ContainerMapList<T> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
-    //{
-    //    return NULL;                                        // a missed
-    //}
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    SPECIFIC_TYPE* Find(ContainerUnorderedMap<TypeNull, KEY_TYPE> const& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return nullptr;
+    }
 
-    //template<class SPECIFIC_TYPE, class T, class H> SPECIFIC_TYPE* Remove(ContainerMapList<TypeList<H, T> > &elements, SPECIFIC_TYPE *obj)
-    //{
-    //    // The head element is bad
-    //    SPECIFIC_TYPE* t = Remove(elements._elements, obj);
-    //    return ( t != NULL ? t : Remove(elements._TailElements, obj) );
-    //}
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
+    SPECIFIC_TYPE* Find(ContainerUnorderedMap<T, KEY_TYPE> const& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return nullptr;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
+    SPECIFIC_TYPE* Find(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE> const& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    {
+        SPECIFIC_TYPE* ret = Find(elements._elements, handle, (SPECIFIC_TYPE*)nullptr);
+        return ret ? ret : Find(elements._tailElements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
+
+    // Erase helpers
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Remove(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    {
+        elements._element.erase(handle);
+        return true;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Remove(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return false;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
+    bool Remove(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return false;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
+    bool Remove(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    {
+        bool ret = Remove(elements._elements, handle, (SPECIFIC_TYPE*)nullptr);
+        return ret ? ret : Remove(elements._tailElements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
 }
 #endif
 

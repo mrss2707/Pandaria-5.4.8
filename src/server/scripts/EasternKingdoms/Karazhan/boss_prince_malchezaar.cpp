@@ -391,7 +391,7 @@ class boss_malchezaar : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_STUNNED))      // While shifting to phase 2 malchezaar stuns himself
                     return;
 
-                if (me->GetUInt64Value(UNIT_FIELD_TARGET) != me->GetVictim()->GetGUID())
+                if (me->GetGuidValue(UNIT_FIELD_TARGET) != me->GetVictim()->GetGUID())
                     me->SetTarget(me->GetVictim()->GetGUID());
 
                 if (phase == 1)

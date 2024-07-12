@@ -179,7 +179,7 @@ public:
                     return true;
                 }
                 // action = presetID
-                CharacterDatabase.PExecute("DELETE FROM `custom_transmogrification_sets` WHERE Owner = %u AND PresetID = %u", player->GetGUIDLow(), action);
+                CharacterDatabase.PExecute("DELETE FROM `custom_transmogrification_sets` WHERE Owner = %u AND PresetID = %u", player->GetGUID().GetCounter(), action);
                 sT->presetById[player->GetGUID()][action].clear();
                 sT->presetById[player->GetGUID()].erase(action);
                 sT->presetByName[player->GetGUID()].erase(action);
@@ -239,7 +239,7 @@ public:
                     return true;
                 }
                 // sender = slot, action = display
-                TransmogTrinityStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HIGHGUID_ITEM), sender);
+                TransmogTrinityStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HighGuid::Item), sender);
                 if (res != LANG_ERR_TRANSMOG_OK)
                     /*session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                 else*/
@@ -310,7 +310,7 @@ public:
                     sT->presetById[player->GetGUID()][presetID][it->first] = it->second;
                 }
                 sT->presetByName[player->GetGUID()][presetID] = name; // Make sure code doesnt mess up SQL!
-                CharacterDatabase.PExecute("REPLACE INTO `custom_transmogrification_sets` (`Owner`, `PresetID`, `SetName`, `SetData`) VALUES (%u, %u, \"%s\", \"%s\")", player->GetGUIDLow(), uint32(presetID), name.c_str(), ss.str().c_str());
+                CharacterDatabase.PExecute("REPLACE INTO `custom_transmogrification_sets` (`Owner`, `PresetID`, `SetName`, `SetData`) VALUES (%u, %u, \"%s\", \"%s\")", player->GetGUID().GetCounter(), uint32(presetID), name.c_str(), ss.str().c_str());
                 if (cost)
                     player->ModifyMoney(-cost);
                 break;
@@ -402,13 +402,13 @@ public:
     {
         uint64 playerGUID = player->GetGUID();
         sT->entryMap.erase(playerGUID);
-        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = %u", player->GetGUIDLow());
+        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = %u", player->GetGUID().GetCounter());
         if (result)
         {
             do
             {
-                uint64 itemGUID = MAKE_NEW_GUID((*result)[0].GetUInt32(), 0, HIGHGUID_ITEM);
-                uint32 fakeEntry = (*result)[1].GetUInt32();
+                ObjectGuid itemGUID = ObjectGuid(HighGuid::Item, (*result)[0].GetUInt32());
+                ObjectGuid fakeEntry = ObjectGuid(uint64((*result)[1].GetUInt32()));
                 if (sObjectMgr->GetItemTemplate(fakeEntry))
                 {
                     sT->dataMap[itemGUID] = playerGUID;
@@ -436,7 +436,7 @@ public:
 
     void OnLogout(Player* player)
     {
-        uint64 pGUID = player->GetGUID();
+        ObjectGuid pGUID = player->GetGUID();
         for (Transmogrification::transmogData::const_iterator it = sT->entryMap[pGUID].begin(); it != sT->entryMap[pGUID].end(); ++it)
             sT->dataMap.erase(it->first);
         sT->entryMap.erase(pGUID);

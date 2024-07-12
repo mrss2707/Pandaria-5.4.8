@@ -616,17 +616,29 @@ void SpellHistory::SendCooldown(uint32 spellId, int32 cooldown)
 {
     ObjectGuid guid = _owner->GetGUID();
     WorldPacket data(SMSG_SPELL_COOLDOWN, 9 + 3 + 8);
-    data.WriteGuidMask(guid, 0, 6);
+    data.WriteBit(guid[0]);
+data.WriteBit(guid[6]);
     data.WriteBit(1); // Missing flags
-    data.WriteGuidMask(guid, 7, 3, 1, 5);
+    data.WriteBit(guid[7]);
+data.WriteBit(guid[3]);
+data.WriteBit(guid[1]);
+data.WriteBit(guid[5]);
     data.WriteBits(1, 21);
-    data.WriteGuidMask(guid, 2, 4);
+    data.WriteBit(guid[2]);
+data.WriteBit(guid[4]);
 
     data.FlushBits();
 
     data << uint32(spellId);
     data << uint32(cooldown);
-    data.WriteGuidBytes(guid, 5, 3, 7, 4, 1, 0, 2, 6);
+    data.WriteByteSeq(guid[5]);
+data.WriteByteSeq(guid[3]);
+data.WriteByteSeq(guid[7]);
+data.WriteByteSeq(guid[4]);
+data.WriteByteSeq(guid[1]);
+data.WriteByteSeq(guid[0]);
+data.WriteByteSeq(guid[2]);
+data.WriteByteSeq(guid[6]);
     GetPlayer()->SendDirectMessage(&data);
 }
 
@@ -642,10 +654,23 @@ void SpellHistory::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId, 
 
     WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
 
-    data.WriteGuidMask(guid, 4, 7, 1, 5, 6, 0, 2, 3);
-    data.WriteGuidBytes(guid, 5, 7);
+    data.WriteBit(guid[4]);
+data.WriteBit(guid[7]);
+data.WriteBit(guid[1]);
+data.WriteBit(guid[5]);
+data.WriteBit(guid[6]);
+data.WriteBit(guid[0]);
+data.WriteBit(guid[2]);
+data.WriteBit(guid[3]);
+    data.WriteByteSeq(guid[5]);
+data.WriteByteSeq(guid[7]);
     data << uint32(spellInfo->Id);
-    data.WriteGuidBytes(guid, 3, 1, 2, 4, 6, 0);
+    data.WriteByteSeq(guid[3]);
+data.WriteByteSeq(guid[1]);
+data.WriteByteSeq(guid[2]);
+data.WriteByteSeq(guid[4]);
+data.WriteByteSeq(guid[6]);
+data.WriteByteSeq(guid[0]);
 
     player->SendDirectMessage(&data);
 }
@@ -925,8 +950,22 @@ void SpellHistory::ClearAllSpellCharges()
 {
     ObjectGuid guid = GetPlayer()->GetGUID();
     WorldPacket data(SMSG_CLEAR_ALL_SPELL_CHARGES);
-    data.WriteGuidMask(guid, 0, 2, 5, 4, 3, 7, 6, 1);
-    data.WriteGuidBytes(guid, 6, 0, 1, 7, 3, 2, 5, 4);
+    data.WriteBit(guid[0]);
+data.WriteBit(guid[2]);
+data.WriteBit(guid[5]);
+data.WriteBit(guid[4]);
+data.WriteBit(guid[3]);
+data.WriteBit(guid[7]);
+data.WriteBit(guid[6]);
+data.WriteBit(guid[1]);
+    data.WriteByteSeq(guid[6]);
+data.WriteByteSeq(guid[0]);
+data.WriteByteSeq(guid[1]);
+data.WriteByteSeq(guid[7]);
+data.WriteByteSeq(guid[3]);
+data.WriteByteSeq(guid[2]);
+data.WriteByteSeq(guid[5]);
+data.WriteByteSeq(guid[4]);
     GetPlayer()->SendDirectMessage(&data);
 }
 
@@ -934,9 +973,22 @@ void SpellHistory::ClearChargesForSpell(uint32 spell)
 {
     ObjectGuid guid = GetPlayer()->GetGUID();
     WorldPacket data(SMSG_CLEAR_SPELL_CHARGES);
-    data.WriteGuidMask(guid, 6, 0, 2, 7, 5, 4, 3, 1);
-    data.WriteGuidBytes(guid, 7, 6, 4);
+    data.WriteBit(guid[6]);
+data.WriteBit(guid[0]);
+data.WriteBit(guid[2]);
+data.WriteBit(guid[7]);
+data.WriteBit(guid[5]);
+data.WriteBit(guid[4]);
+data.WriteBit(guid[3]);
+data.WriteBit(guid[1]);
+    data.WriteByteSeq(guid[7]);
+data.WriteByteSeq(guid[6]);
+data.WriteByteSeq(guid[4]);
     data << uint32(spell);
-    data.WriteGuidBytes(guid, 1, 3, 2, 0, 5);
+    data.WriteByteSeq(guid[1]);
+data.WriteByteSeq(guid[3]);
+data.WriteByteSeq(guid[2]);
+data.WriteByteSeq(guid[0]);
+data.WriteByteSeq(guid[5]);
     GetPlayer()->SendDirectMessage(&data);
 }

@@ -147,7 +147,7 @@ class Aura
         uint32 GetId() const{ return GetSpellInfo()->Id; }
 
         uint64 GetCastItemGUID() const { return m_castItemGuid; }
-        uint64 GetCasterGUID() const { return m_casterGuid; }
+        ObjectGuid GetCasterGUID() const { return m_casterGuid; }
         Unit* GetCaster() const;
         WorldObject* GetOwner() const { return m_owner; }
         Unit* GetUnitOwner() const { ASSERT(GetType() == UNIT_AURA_TYPE); return (Unit*)m_owner; }
@@ -300,7 +300,7 @@ class Aura
         void _DeleteRemovedApplications();
     protected:
         SpellInfo const* const m_spellInfo;
-        uint64 const m_casterGuid;
+        ObjectGuid const m_casterGuid;
         uint64 const m_castItemGuid;                        // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t const m_applyTime;
         WorldObject* const m_owner;                        //

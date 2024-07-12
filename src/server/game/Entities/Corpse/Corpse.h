@@ -63,7 +63,7 @@ class TC_GAME_API Corpse : public WorldObject, public GridObject<Corpse>
         void DeleteBonesFromWorld();
         void DeleteFromDB(CharacterDatabaseTransaction trans);
 
-        uint64 GetOwnerGUID() const { return GetUInt64Value(CORPSE_FIELD_OWNER); }
+        ObjectGuid GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
 
         time_t const& GetGhostTime() const { return m_time; }
         void ResetGhostTime() { m_time = time(NULL); }

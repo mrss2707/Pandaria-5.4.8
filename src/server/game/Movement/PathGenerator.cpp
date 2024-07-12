@@ -1080,7 +1080,7 @@ void PathGenerator::VisualizePath(uint32 duration)
     {
         if (TempSummon* waypoint = new TempSummon(nullptr, nullptr, false))
         {
-            if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, pos.x, pos.y, pos.z, 0))
+            if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, pos.x, pos.y, pos.z, 0))
             {
                 delete waypoint;
                 return 0;
@@ -1153,7 +1153,7 @@ void PathGenerator::VisualizeNavmesh(uint32 duration)
             G3D::Vector3 wpos{ pos };
             if (Transport* transport = source->GetTransport())
                 transport->CalculatePassengerPosition(wpos.x, wpos.y, wpos.z);
-            if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, wpos.x, wpos.y, wpos.z, 0))
+            if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, wpos.x, wpos.y, wpos.z, 0))
             {
                 delete waypoint;
                 return 0;

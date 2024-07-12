@@ -245,8 +245,8 @@ uint64 SpellCastTargets::GetUnitTargetGUID() const
     switch (GUID_HIPART(m_objectTargetGUID))
     {
         case HIGHGUID_PLAYER:
-        case HIGHGUID_VEHICLE:
-        case HIGHGUID_UNIT:
+        case HighGuid::Vehicle:
+        case HighGuid::Unit:
         case HIGHGUID_PET:
             return m_objectTargetGUID;
         default:
@@ -277,7 +277,7 @@ uint64 SpellCastTargets::GetGOTargetGUID() const
     {
         case HIGHGUID_TRANSPORT:
         case HIGHGUID_MO_TRANSPORT:
-        case HIGHGUID_GAMEOBJECT:
+        case HighGuid::GameObject:
             return m_objectTargetGUID;
         default:
             return 0LL;
@@ -305,7 +305,7 @@ uint64 SpellCastTargets::GetCorpseTargetGUID() const
 {
     switch (GUID_HIPART(m_objectTargetGUID))
     {
-        case HIGHGUID_CORPSE:
+        case HighGuid::Corpse:
             return m_objectTargetGUID;
         default:
             return 0LL;
@@ -5291,9 +5291,13 @@ void Spell::SendLogExecute()
     uint32 unkBitsSize = 0;
 
     WorldPacket data(SMSG_SPELL_EXECUTE_LOG);
-    data.WriteGuidMask(guid, 0, 6, 5, 7, 2);
+    data.WriteBit(guid[0]);
+data.WriteBit(guid[6]);
+data.WriteBit(guid[5]);
+data.WriteBit(guid[7]);
+data.WriteBit(guid[2]);
     data.WriteBits(m_effectExecuteData.size(), 19);
-    data.WriteGuidMask(guid, 4);
+    data.WriteBit(guid[4]);
 
     for (auto itr : m_effectExecuteData)
     {
@@ -5313,10 +5317,18 @@ void Spell::SendLogExecute()
 
         data.WriteBits(helper.Targets.size(), 24);
         for (auto target : helper.Targets)
-            data.WriteGuidMask(target, 6, 5, 1, 0, 3, 4, 7, 2);
+            data.WriteBit(target[6]);
+data.WriteBit(target[5]);
+data.WriteBit(target[1]);
+data.WriteBit(target[0]);
+data.WriteBit(target[3]);
+data.WriteBit(target[4]);
+data.WriteBit(target[7]);
+data.WriteBit(target[2]);
     }
 
-    data.WriteGuidMask(guid, 1, 3);
+    data.WriteBit(guid[1]);
+data.WriteBit(guid[3]);
 
     data.WriteBit(unkBit);
     if (unkBit)
@@ -5343,7 +5355,14 @@ void Spell::SendLogExecute()
         auto helper = itr.second;
 
         for (auto target : helper.Targets)
-            data.WriteGuidBytes(target, 7, 5, 1, 2, 6, 4, 0, 3);
+            data.WriteByteSeq(target[7]);
+data.WriteByteSeq(target[5]);
+data.WriteByteSeq(target[1]);
+data.WriteByteSeq(target[2]);
+data.WriteByteSeq(target[6]);
+data.WriteByteSeq(target[4]);
+data.WriteByteSeq(target[0]);
+data.WriteByteSeq(target[3]);
 
         for (auto energize : helper.Energizes)
         {
@@ -5372,7 +5391,14 @@ void Spell::SendLogExecute()
     }
 
     data << uint32(m_spellInfo->Id);
-    data.WriteGuidBytes(guid, 5, 7, 1, 6, 2, 0, 4, 3);
+    data.WriteByteSeq(guid[5]);
+data.WriteByteSeq(guid[7]);
+data.WriteByteSeq(guid[1]);
+data.WriteByteSeq(guid[6]);
+data.WriteByteSeq(guid[2]);
+data.WriteByteSeq(guid[0]);
+data.WriteByteSeq(guid[4]);
+data.WriteByteSeq(guid[3]);
 
     m_caster->SendMessageToSet(&data, true);
 

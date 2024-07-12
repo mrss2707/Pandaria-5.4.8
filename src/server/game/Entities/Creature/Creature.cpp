@@ -144,7 +144,7 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Creature::Creature(bool isWorldObject): Unit(isWorldObject), MapObject(),
 lootForPickPocketed(false), lootForBody(false), m_groupLootTimer(0), lootingGroupLowGUID(0),
-m_PlayerDamageReq(0), m_lootRecipient(0), m_lootRecipientGroup(0), m_corpseRemoveTime(0), m_respawnTime(0),
+m_PlayerDamageReq(0), m_lootRecipient(), m_lootRecipientGroup(0), m_corpseRemoveTime(0), m_respawnTime(0),
 m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_WalkMode(0.0f), m_reactState(REACT_AGGRESSIVE),
 m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
 m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),
@@ -184,7 +184,7 @@ void Creature::AddToWorld()
     ///- Register the creature for guid lookup
     if (!IsInWorld())
     {
-        sObjectAccessor->AddObject(this);
+        ObjectAccessor::AddObject(this);
         Unit::AddToWorld();
         SearchFormation();
         AIM_Initialize();
@@ -210,7 +210,7 @@ void Creature::RemoveFromWorld()
         if (m_formation)
             sFormationMgr->RemoveCreatureFromGroup(m_formation, this);
         Unit::RemoveFromWorld();
-        sObjectAccessor->RemoveObject(this);
+        ObjectAccessor::RemoveObject(this);
     }
 }
 
@@ -508,11 +508,11 @@ void Creature::Update(uint32 diff)
     {
         case JUST_RESPAWNED:
             // Must not be called, see Creature::setDeathState JUST_RESPAWNED -> ALIVE promoting.
-            TC_LOG_ERROR("entities.unit", "Creature (GUID: %u Entry: %u) in wrong state: JUST_RESPAWNED (4)", GetGUIDLow(), GetEntry());
+            TC_LOG_ERROR("entities.unit", "Creature (GUID: %u Entry: %u) in wrong state: JUST_RESPAWNED (4)", GetGUID().GetCounter(), GetEntry());
             break;
         case JUST_DIED:
             // Must not be called, see Creature::setDeathState JUST_DIED -> CORPSE promoting.
-            TC_LOG_ERROR("entities.unit", "Creature (GUID: %u Entry: %u) in wrong state: JUST_DEAD (1)", GetGUIDLow(), GetEntry());
+            TC_LOG_ERROR("entities.unit", "Creature (GUID: %u Entry: %u) in wrong state: JUST_DEAD (1)", GetGUID().GetCounter(), GetEntry());
             break;
         case DEAD:
         {
@@ -523,7 +523,7 @@ void Creature::Update(uint32 diff)
                 if (!allowed)                                               // Will be rechecked on next Update call
                     break;
 
-                uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_UNIT);
+                uint64 dbtableHighGuid = ObjectGuid(HighGuid::Unit, GetEntry(), m_DBTableGuid);
                 time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                 if (!linkedRespawntime)             // Can respawn
                 {
@@ -559,8 +559,8 @@ void Creature::Update(uint32 diff)
                 if (m_groupLootTimer <= diff)
                 {
                     uint32 gguid = lootingGroupLowGUID;
-                    uint64 crguid = GetGUID();
-                    if (Creature* creature = ObjectAccessor::FindCreature(crguid))
+                    ObjectGuid crguid = GetGUID();
+                    if (Creature* creature = this->GetMap()->GetCreature(crguid))
                         if (Group* group = sGroupMgr->GetGroupByGUID(gguid))
                             group->EndRoll(&creature->loot);                    
                     // TaskMgr::Default()->ScheduleInvocation([=]
@@ -605,7 +605,7 @@ void Creature::Update(uint32 diff)
                         AI()->EnterEvadeMode();
                 }
 
-                LastCharmerGUID = 0;
+                LastCharmerGUID.Clear();
             }
 
             if (!IsInEvadeMode() && IsAIEnabled)
@@ -915,7 +915,7 @@ void Creature::SetLootRecipient(Unit* unit)
 
     if (!unit)
     {
-        m_lootRecipient = 0;
+        m_lootRecipient.Clear();
         m_lootRecipientGroup = 0;
         m_lootRecipients.clear();
         m_lootRecipientGroupMembers.clear();
@@ -926,7 +926,7 @@ void Creature::SetLootRecipient(Unit* unit)
 
     if (IsPet())
     {
-        TC_LOG_ERROR("shitlog", "Creature::SetLootRecipient unit: %s guid: " UI64FMTD "\n%s\n", unit->GetName().c_str(), unit->GetGUID());
+        TC_LOG_ERROR("shitlog", "Creature::SetLootRecipient unit: %s guid: " UI64FMTD "\n%s\n", unit->GetName().c_str(), unit->GetGUID().GetRawValue());
         return;
     }
 
@@ -1267,7 +1267,7 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint3
     if (Entry == 71795 && (GetMap()->Is25ManRaid() || GetMap()->GetDifficulty() == RAID_DIFFICULTY_1025MAN_FLEX))
         vehId = 2916;
 
-    Object::_Create(guidlow, Entry, (vehId || cinfo->VehicleId) ? HIGHGUID_VEHICLE : HIGHGUID_UNIT);
+    Object::_Create(guidlow, Entry, (vehId || cinfo->VehicleId) ? HighGuid::Vehicle : HighGuid::Unit);
 
     if (!UpdateEntry(Entry, team, data))
         return false;
@@ -1306,11 +1306,11 @@ bool Creature::LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap)
     m_DBTableGuid = guid;
     if (map->GetInstanceId() == 0)
     {
-        if (map->GetCreature(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT)))
+        if (map->GetCreature(ObjectGuid(HighGuid::Unit, data->id, guid)))
             return false;
     }
     else
-        guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
+        guid = map->GenerateLowGuid<HighGuid::Unit>();
 
     uint16 team = 0;
     if (!Create(guid, map, data->phaseMask, data->id, 0, team, data->posX, data->posY, data->posZ, data->orientation, data))
@@ -1425,7 +1425,7 @@ void Creature::DeleteFromDB()
 {
     if (!m_DBTableGuid)
     {
-        TC_LOG_ERROR("entities.unit", "Trying to delete not saved creature! LowGUID: %u, Entry: %u", GetGUIDLow(), GetEntry());
+        TC_LOG_ERROR("entities.unit", "Trying to delete not saved creature! LowGUID: %u, Entry: %u", GetGUID().GetCounter(), GetEntry());
         return;
     }
 
@@ -1563,7 +1563,7 @@ void Creature::setDeathState(DeathState s)
         if (sWorld->getBoolConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY) || isWorldBoss())
             SaveRespawnTime();
 
-        SetTarget(0);                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
+        SetTarget(ObjectGuid::Empty);                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
         SetUInt32Value(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
         SetUInt32Value(UNIT_FIELD_NPC_FLAGS + 1, UNIT_NPC_FLAG2_NONE);
 
@@ -1635,7 +1635,7 @@ void Creature::Respawn(bool force)
             GetMap()->RemoveCreatureRespawnTime(m_DBTableGuid);
 
         TC_LOG_DEBUG("entities.unit", "Respawning creature %s (GuidLow: %u, Full GUID: " UI64FMTD " Entry: %u)",
-            GetName().c_str(), GetGUIDLow(), GetGUID(), GetEntry());
+            GetName().c_str(), GetGUID().GetCounter(), GetGUID().GetRawValue(), GetEntry());
         m_respawnTime = 0;
         lootForPickPocketed = false;
         lootForBody         = false;
@@ -1894,7 +1894,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 
     if (dist > MAX_VISIBILITY_DISTANCE)
     {
-        TC_LOG_ERROR("entities.unit", "Creature (GUID: %u Entry: %u) SelectNearestTargetInAttackDistance called with dist > MAX_VISIBILITY_DISTANCE. Distance set to ATTACK_DISTANCE.", GetGUIDLow(), GetEntry());
+        TC_LOG_ERROR("entities.unit", "Creature (GUID: %u Entry: %u) SelectNearestTargetInAttackDistance called with dist > MAX_VISIBILITY_DISTANCE. Distance set to ATTACK_DISTANCE.", GetGUID().GetCounter(), GetEntry());
         dist = ATTACK_DISTANCE;
     }
 
@@ -2221,7 +2221,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(*itr);
             if (!AdditionalSpellInfo)
             {
-                TC_LOG_ERROR("sql.sql", "Creature (GUID: %u Entry: %u) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
+                TC_LOG_ERROR("sql.sql", "Creature (GUID: %u Entry: %u) has wrong spell %u defined in `auras` field.", GetGUID().GetCounter(), GetEntry(), *itr);
                 continue;
             }
 
@@ -2238,7 +2238,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 CastSpell(this, *itr, true);
             else
                 AddAura(*itr, this);
-            TC_LOG_DEBUG("entities.unit", "Spell: %u added to creature (GUID: %u Entry: %u)", *itr, GetGUIDLow(), GetEntry());
+            TC_LOG_DEBUG("entities.unit", "Spell: %u added to creature (GUID: %u Entry: %u)", *itr, GetGUID().GetCounter(), GetEntry());
         }
     }
 
@@ -2388,7 +2388,7 @@ void Creature::PrepareChanneledCast(float facing, uint32 spell_id, bool triggere
         CastSpell(this, spell_id, triggered);
 }
 
-void Creature::RemoveChanneledCast(uint64 target)
+void Creature::RemoveChanneledCast(ObjectGuid target)
 {
     SetReactState(REACT_AGGRESSIVE);
 
@@ -2404,7 +2404,7 @@ void Creature::RemoveChanneledCast(uint64 target)
     }
 }
 
-void Creature::FixateOnTarget(uint64 targetGUID, uint32 timer)
+void Creature::FixateOnTarget(ObjectGuid targetGUID, uint32 timer)
 {
     if (Unit* target = ObjectAccessor::GetUnit(*this, targetGUID))
     {
@@ -2823,10 +2823,10 @@ void Creature::SetDisplayId(uint32 modelId)
     }
 }
 
-void Creature::SetTarget(uint64 guid)
+void Creature::SetTarget(ObjectGuid guid)
 {
     if (!_focusSpell)
-        SetUInt64Value(UNIT_FIELD_TARGET, guid);
+        SetGuidValue(UNIT_FIELD_TARGET, guid);
 }
 
 void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
@@ -2836,7 +2836,7 @@ void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
         return;
 
     _focusSpell = focusSpell;
-    SetUInt64Value(UNIT_FIELD_TARGET, target->GetGUID());
+    SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
     if (focusSpell && focusSpell->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_DONT_TURN_DURING_CAST)
         AddUnitState(UNIT_STATE_ROTATING);
 
@@ -2852,9 +2852,9 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
 
     _focusSpell = NULL;
     if (Unit* victim = GetVictim())
-        SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
+        SetGuidValue(UNIT_FIELD_TARGET, victim->GetGUID());
     else
-        SetUInt64Value(UNIT_FIELD_TARGET, 0);
+        SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
 
     if (focusSpell && focusSpell->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_DONT_TURN_DURING_CAST)
         ClearUnitState(UNIT_STATE_ROTATING);
@@ -2866,7 +2866,7 @@ void Creature::SetTextRepeatId(uint8 textGroup, uint8 id)
     if (std::find(repeats.begin(), repeats.end(), id) == repeats.end())
         repeats.push_back(id);
     else
-        TC_LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup %u for Creature(%s) GuidLow %u Entry %u, id %u already added", uint32(textGroup), GetName().c_str(), GetGUIDLow(), GetEntry(), uint32(id));
+        TC_LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup %u for Creature(%s) GuidLow %u Entry %u, id %u already added", uint32(textGroup), GetName().c_str(), GetGUID().GetCounter(), GetEntry(), uint32(id));
 }
 
 CreatureTextRepeatIds Creature::GetTextRepeatGroup(uint8 textGroup)
@@ -2914,7 +2914,7 @@ void Creature::ApplyInstanceAuraIfNeeded()
                 return;
  
         if (TempSummon* me = ToTempSummon())
-            if (IS_PLAYER_GUID(me->GetSummonerGUID()))
+            if (me->GetSummonerGUID().IsPlayer())
                 return;
 
         AddAura(aura, this);

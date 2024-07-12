@@ -43,7 +43,7 @@ class AuraEffect
 
     public:
         Unit* GetCaster() const { return GetBase()->GetCaster(); }
-        uint64 GetCasterGUID() const { return GetBase()->GetCasterGUID(); }
+        ObjectGuid GetCasterGUID() const { return GetBase()->GetCasterGUID(); }
         Aura* GetBase() const { return m_base; }
         void GetTargetList(std::list<Unit*> & targetList) const;
         void GetApplicationList(std::list<AuraApplication*> & applicationList) const;

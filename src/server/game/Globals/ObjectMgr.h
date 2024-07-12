@@ -865,11 +865,11 @@ struct RealmCompletedChallenge
     {
         ChallengeMember()
         {
-            Guid = 0;
+            Guid = ObjectGuid::Empty;
             SpecId = 0;
         }
 
-        uint64 Guid;
+        ObjectGuid Guid;
         uint32 SpecId;
     };
 
@@ -1030,7 +1030,7 @@ class ObjectMgr
 
         void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
-        uint64 GetPlayerGUIDByName(std::string const& name) const;
+        ObjectGuid GetPlayerGUIDByName(std::string const& name) const;
 
         /**
         * Retrieves the player name by guid.
@@ -1045,9 +1045,9 @@ class ObjectMgr
         *
         * @return true if player was found, false otherwise
         */
-        bool GetPlayerNameByGUID(uint64 guid, std::string& name) const;
-        uint32 GetPlayerTeamByGUID(uint64 guid) const;
-        uint32 GetPlayerAccountIdByGUID(uint64 guid) const;
+        bool GetPlayerNameByGUID(ObjectGuid guid, std::string& name) const;
+        uint32 GetPlayerTeamByGUID(ObjectGuid guid) const;
+        uint32 GetPlayerAccountIdByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
         uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 team);
@@ -1404,14 +1404,21 @@ class ObjectMgr
         CreatureBaseStats const* GetCreatureBaseStats(uint8 level, uint8 unitClass);
 
         void SetHighestGuids();
-        uint32 GenerateLowGuid(HighGuid guidhigh);
+
+        template<HighGuid type>
+        inline ObjectGuidGeneratorBase& GetGenerator()
+        {
+            static_assert(ObjectGuidTraits<type>::Global, "Only global guid can be generated in ObjectMgr context");
+            return GetGuidSequenceGenerator<type>();
+        }
+
         uint32 GenerateAuctionID();
         uint64 GenerateEquipmentSetGuid();
         uint32 GenerateMailID();
-        uint32 GenerateMuteID();
         uint32 GeneratePetNumber();
-        uint64 GenerateVoidStorageItemId();
+        uint32 GenerateMuteID();
         uint64 GenerateBattlePetId();
+        uint64 GenerateVoidStorageItemId();
 
         typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
         typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
@@ -1766,11 +1773,6 @@ class ObjectMgr
         bool CanTransmogrifyItemWithItem(ItemTemplate const* transmogrified, ItemTemplate const* transmogrifier);
         bool HasStats(ItemTemplate const* proto) const;
 
-        uint32 GenerateNewVignetteGUID()
-        {
-            return _HiVignetteGuid++;
-        }
-
         void LoadCreatureScaling();
         CreatureScalingInfo const* GetCreatureScalingData(uint32 entry, uint32 groupSize) const
         {
@@ -1800,19 +1802,21 @@ class ObjectMgr
         std::atomic<uint64> _voidItemId{ 1 };
         std::atomic<uint32> _battlePetId{ 1 };
 
+        ObjectGuid::LowType _creatureSpawnId;
+        ObjectGuid::LowType _gameObjectSpawnId;
+
         // first free low guid for selected guid type
-        std::atomic<uint32> _hiCharGuid{ 1 };
-        std::atomic<uint32> _hiCreatureGuid{ 1 };
-        std::atomic<uint32> _hiPetGuid{ 1 };
-        std::atomic<uint32> _hiVehicleGuid{ 1 };
-        std::atomic<uint32> _hiItemGuid{ 1 };
-        std::atomic<uint32> _hiGoGuid{ 1 };
-        std::atomic<uint32> _hiDoGuid{ 1 };
-        std::atomic<uint32> _hiCorpseGuid{ 1 };
-        std::atomic<uint32> _hiAreaTriggerGuid{ 1 };
-        std::atomic<uint32> _hiTransGuid{ 1 };
-        std::atomic<uint32> _hiMoTransGuid{ 1 };
-        std::atomic<uint32> _HiVignetteGuid{ 1 };
+        template<HighGuid high>
+        inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
+        {
+            auto itr = _guidGenerators.find(high);
+            if (itr == _guidGenerators.end())
+                itr = _guidGenerators.insert(std::make_pair(high, std::unique_ptr<ObjectGuidGenerator<high>>(new ObjectGuidGenerator<high>()))).first;
+
+            return *itr->second;
+        }
+
+        std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
 
         QuestMap _questTemplates;
         QuestObjectivesByIdContainer _questObjectives;

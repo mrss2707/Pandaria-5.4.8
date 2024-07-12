@@ -75,7 +75,7 @@ void OPvPCapturePoint::AddGO(uint32 type, uint32 guid, uint32 entry)
             return;
         entry = data->id;
     }
-    m_Objects[type] = MAKE_NEW_GUID(guid, entry, HIGHGUID_GAMEOBJECT);
+    m_Objects[type] = MAKE_NEW_GUID(guid, entry, HighGuid::GameObject);
     m_ObjectTypes[m_Objects[type]]=type;
 }
 
@@ -88,7 +88,7 @@ void OPvPCapturePoint::AddCre(uint32 type, uint32 guid, uint32 entry)
             return;
         entry = data->id;
     }
-    m_Creatures[type] = MAKE_NEW_GUID(guid, entry, HIGHGUID_UNIT);
+    m_Creatures[type] = MAKE_NEW_GUID(guid, entry, HighGuid::Unit);
     m_CreatureTypes[m_Creatures[type]] = type;
 }
 

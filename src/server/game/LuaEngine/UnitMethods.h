@@ -1093,8 +1093,8 @@ namespace LuaUnit
         {
             switch (GUID_HIPART(receiver))
             {
-            case HIGHGUID_UNIT:
-            case HIGHGUID_VEHICLE:
+            case HighGuid::Unit:
+            case HighGuid::Vehicle:
                 target = HashMapHolder<Creature>::Find(receiver);
                 break;
             case HIGHGUID_PET:
@@ -1104,10 +1104,10 @@ namespace LuaUnit
                 target = HashMapHolder<Player>::Find(receiver);
                 break;
             case HIGHGUID_TRANSPORT:
-            case HIGHGUID_GAMEOBJECT:
+            case HighGuid::GameObject:
                 target = HashMapHolder<GameObject>::Find(receiver);
                 break;
-            case HIGHGUID_CORPSE:
+            case HighGuid::Corpse:
                 target = HashMapHolder<Corpse>::Find(receiver);
                 break;
                 //case HIGHGUID_MO_TRANSPORT:
@@ -1140,8 +1140,8 @@ namespace LuaUnit
         {
             switch (GUID_HIPART(receiver))
             {
-            case HIGHGUID_UNIT:
-            case HIGHGUID_VEHICLE:
+            case HighGuid::Unit:
+            case HighGuid::Vehicle:
                 target = HashMapHolder<Creature>::Find(receiver);
                 break;
             case HIGHGUID_PET:
@@ -1151,10 +1151,10 @@ namespace LuaUnit
                 target = HashMapHolder<Player>::Find(receiver);
                 break;
             case HIGHGUID_TRANSPORT:
-            case HIGHGUID_GAMEOBJECT:
+            case HighGuid::GameObject:
                 target = HashMapHolder<GameObject>::Find(receiver);
                 break;
-            case HIGHGUID_CORPSE:
+            case HighGuid::Corpse:
                 target = HashMapHolder<Corpse>::Find(receiver);
                 break;
             //case HIGHGUID_MO_TRANSPORT:
@@ -1185,10 +1185,10 @@ namespace LuaUnit
         WorldObject* target = nullptr;
         if (guid)
         {
-            switch (GUID_HIPART(guid))
+            switch (guid.GetHigh())
             {
-            case HIGHGUID_UNIT:
-            case HIGHGUID_VEHICLE:
+            case HighGuid::Unit:
+            case HighGuid::Vehicle:
                 target = HashMapHolder<Creature>::Find(guid);
                 break;
             case HIGHGUID_PET:
@@ -1198,10 +1198,10 @@ namespace LuaUnit
                 target = HashMapHolder<Player>::Find(guid);
                 break;
             case HIGHGUID_TRANSPORT:
-            case HIGHGUID_GAMEOBJECT:
+            case HighGuid::GameObject:
                 target = HashMapHolder<GameObject>::Find(guid);
                 break;
-            case HIGHGUID_CORPSE:
+            case HighGuid::Corpse:
                 target = HashMapHolder<Corpse>::Find(guid);
                 break;
             //case HIGHGUID_MO_TRANSPORT:
@@ -1232,10 +1232,10 @@ namespace LuaUnit
         WorldObject* target = nullptr;
         if (guid)
         {
-            switch (GUID_HIPART(guid))
+            switch (guid.GetHigh())
             {
-            case HIGHGUID_UNIT:
-            case HIGHGUID_VEHICLE:
+            case HighGuid::Unit:
+            case HighGuid::Vehicle:
                 target = HashMapHolder<Creature>::Find(guid);
                 break;
             case HIGHGUID_PET:
@@ -1245,10 +1245,10 @@ namespace LuaUnit
                 target = HashMapHolder<Player>::Find(guid);
                 break;
             case HIGHGUID_TRANSPORT:
-            case HIGHGUID_GAMEOBJECT:
+            case HighGuid::GameObject:
                 target = HashMapHolder<GameObject>::Find(guid);
                 break;
-            case HIGHGUID_CORPSE:
+            case HighGuid::Corpse:
                 target = HashMapHolder<Corpse>::Find(guid);
                 break;
                 //case HIGHGUID_MO_TRANSPORT:

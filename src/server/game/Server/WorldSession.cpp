@@ -176,21 +176,21 @@ std::string WorldSession::GetPlayerInfo() const
     std::ostringstream ss;
 
     ss << "[Player: " << GetPlayerName()
-       << " (Guid: " << (_player != NULL ? _player->GetGUIDLow() : 0)
+       << " (Guid: " << (_player != NULL ? _player->GetGUID().GetCounter() : 0)
        << ", Account: " << GetAccountId() << ")]";
 
     return ss.str();
 }
 
-uint32 WorldSession::GetGUID() const 
+ObjectGuid WorldSession::GetGUID() const
 {
-    return _player ? _player->GetGUID() : 0;
+    return _player ? _player->GetGUID() : ObjectGuid::Empty;
 }
 
 /// Get player guid if available. Use for logging purposes only
 uint32 WorldSession::GetGuidLow() const
 {
-    return GetPlayer() ? GetPlayer()->GetGUIDLow() : 0;
+    return GetPlayer() ? GetPlayer()->GetGUID().GetCounter() : 0;
 }
 
 /// Send a packet to the client
@@ -627,8 +627,8 @@ void WorldSession::LogoutPlayer(bool save)
         }
 
         //! Broadcast a logout message to the player's friends
-        sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
-        sSocialMgr->RemovePlayerSocial(_player->GetGUIDLow());
+        sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUID().GetCounter(), true);
+        sSocialMgr->RemovePlayerSocial(_player->GetGUID().GetCounter());
 
         // forfiet any pet battles in progress
         sPetBattleSystem->ForfietBattle(_player->GetGUID());
@@ -642,7 +642,7 @@ void WorldSession::LogoutPlayer(bool save)
         // calls to GetMap in this case may cause crashes
         _player->CleanupsBeforeDelete();
         TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s) Logout Character:[%s] (GUID: %u) Level: %d",
-            GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUIDLow(), _player->GetLevel());
+            GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUID().GetCounter(), _player->GetLevel());
         if (Map* _map = _player->FindMap())
             _map->RemovePlayerFromMap(_player, true);
 
@@ -1194,7 +1194,7 @@ void WorldSession::SetPlayer(Player* player)
 
     // set m_GUID that can be used while player loggined and later until m_playerRecentlyLogout not reset
     if (_player)
-        m_GUIDLow = _player->GetGUIDLow();
+        m_GUIDLow = _player->GetGUID().GetCounter();
     GetAchievementMgr().SetCurrentPlayer(player);
 }
 

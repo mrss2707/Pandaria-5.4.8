@@ -35,11 +35,10 @@
 
 void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
-    ObjectGuid guid2 = 0;
+    ObjectGuid guid2 = ObjectGuid::Empty;
     ObjectGuid guid3 = guid;
 
-    Player* player = ObjectAccessor::FindPlayer(guid);
-    CharacterNameData const* nameData = sWorld->GetCharacterNameData(GUID_LOPART(guid));
+    CharacterNameData const* nameData = sWorld->GetCharacterNameData(guid);
 
     WorldPacket data(SMSG_NAME_QUERY_RESPONSE, 500);
     data.WriteBit(guid[3]);
@@ -457,7 +456,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
     else
     {
         TC_LOG_DEBUG("network", "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for (GUID: %u, ENTRY: %u)",
-            GUID_LOPART((uint64)guid), entry);
+            guid.GetCounter(), entry);
         TC_LOG_DEBUG("network", "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
     }
 
@@ -508,7 +507,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 
     _player->SendCorpseReclaimDelay();
 
-    ObjectGuid corpseGuid = 0; // need correct condition, guid shouldn't always be sent to player (corpse->GetGUID())
+    ObjectGuid corpseGuid = ObjectGuid::Empty; // need correct condition, guid shouldn't always be sent to player (corpse->GetGUID())
 
     WorldPacket data(SMSG_CORPSE_QUERY, 9 + 1 + (4 * 5));
     data.WriteBit(corpseGuid[0]);
@@ -685,8 +684,22 @@ void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
     TC_LOG_DEBUG("network", "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
 
     ObjectGuid corpseGuid;
-    recvData.ReadGuidMask(corpseGuid, 7, 6, 3, 0, 4, 1, 5, 2);
-    recvData.ReadGuidBytes(corpseGuid, 1, 6, 0, 5, 3, 2, 4, 7);
+    corpseGuid[7] = recvData.ReadBit();
+    corpseGuid[6] = recvData.ReadBit();
+    corpseGuid[3] = recvData.ReadBit();
+    corpseGuid[0] = recvData.ReadBit();
+    corpseGuid[4] = recvData.ReadBit();
+    corpseGuid[1] = recvData.ReadBit();
+    corpseGuid[5] = recvData.ReadBit();
+    corpseGuid[2] = recvData.ReadBit();
+    recvData.ReadByteSeq(corpseGuid[1]);
+    recvData.ReadByteSeq(corpseGuid[6]);
+    recvData.ReadByteSeq(corpseGuid[0]);
+    recvData.ReadByteSeq(corpseGuid[5]);
+    recvData.ReadByteSeq(corpseGuid[3]);
+    recvData.ReadByteSeq(corpseGuid[2]);
+    recvData.ReadByteSeq(corpseGuid[4]);
+    recvData.ReadByteSeq(corpseGuid[7]);
 
     WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
     data << float(0);

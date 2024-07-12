@@ -75,8 +75,9 @@ InstanceScript::InstanceScript(Map* map) : instance(map), completedEncounters(0)
     scenarioId = sScenarioMgr->GetScenarioIdForMap(map->GetId());
     beginningTime = 0;
 
-    instanceGuid = MAKE_NEW_GUID(0, instance->GetInstanceId(), HIGHGUID_INSTANCE_SAVE);
-    scenarioGuid = MAKE_NEW_GUID(scenarioId, instance->GetInstanceId(), HIGHGUID_SCENARIO);
+    // TODO: ObjectGuid - do we need a non-zero counter here?
+    instanceGuid = ObjectGuid(HighGuid::Instance, instance->GetInstanceId(), uint32(0));
+    scenarioGuid = ObjectGuid(HighGuid::Scenario, instance->GetInstanceId(), scenarioId);
 }
 
 void InstanceScript::SaveToDB()
@@ -603,7 +604,7 @@ void InstanceScript::DoDampeningForCreatures(Creature* creature)
             return;
 
     if (TempSummon* temp = creature->ToTempSummon())
-        if (IS_PLAYER_GUID(temp->GetSummonerGUID()))
+        if (temp->GetSummonerGUID().IsPlayer())
             return;
 
     if (creature->HasAura(GetDampeningSpell()))
@@ -699,7 +700,7 @@ void InstanceScript::DoStartMovie(uint32 movieId)
                 player->SendMovieStart(movieId);
 }
 
-void InstanceScript::DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid/* =0*/)
+void InstanceScript::DoKilledMonsterKredit(uint32 questId, uint32 entry, ObjectGuid guid/* =0*/)
 {
     Map::PlayerList const &plrList = instance->GetPlayers();
     
@@ -885,31 +886,46 @@ void InstanceScript::SendScenarioState(ScenarioData scenarioData, Player* player
     ByteBuffer byteBuffer;
     for (CriteriaProgressData progressData : scenarioData.criteriaProgress)
     {
-        uint64 quantity = progressData.Quantity; // sad, but true...
+        ObjectGuid quantity(progressData.Quantity); // sad, but true...
         ObjectGuid instanceGuid = progressData.InstanceGuid;
 
-        data.WriteGuidMask(instanceGuid, 3, 5);
-        data.WriteGuidMask(quantity, 2);
-        data.WriteGuidMask(instanceGuid, 6);
-        data.WriteGuidMask(quantity, 7);
-        data.WriteGuidMask(instanceGuid, 1, 7, 0);
-        data.WriteGuidMask(quantity, 3);
-        data.WriteGuidMask(instanceGuid, 4);
-        data.WriteGuidMask(quantity, 0, 5, 1, 4);
-        data.WriteGuidMask(instanceGuid, 2);
-        data.WriteGuidMask(quantity, 6);
+        data.WriteBit(instanceGuid[3]);
+        data.WriteBit(instanceGuid[5]);
+        data.WriteBit(quantity[2]);
+        data.WriteBit(instanceGuid[6]);
+        data.WriteBit(quantity[7]);
+        data.WriteBit(instanceGuid[1]);
+        data.WriteBit(instanceGuid[7]);
+        data.WriteBit(instanceGuid[0]);
+        data.WriteBit(quantity[3]);
+        data.WriteBit(instanceGuid[4]);
+        data.WriteBit(quantity[0]);
+        data.WriteBit(quantity[5]);
+        data.WriteBit(quantity[1]);
+        data.WriteBit(quantity[4]);
+        data.WriteBit(instanceGuid[2]);
+        data.WriteBit(quantity[6]);
         data.WriteBits(progressData.Flags, 4);
 
-        byteBuffer.WriteGuidBytes(quantity, 3, 7, 5);
+        byteBuffer.WriteByteSeq(quantity[3]);
+        byteBuffer.WriteByteSeq(quantity[7]);
+        byteBuffer.WriteByteSeq(quantity[5]);
         byteBuffer << uint32(progressData.TimeFromStart);
-        byteBuffer.WriteGuidBytes(quantity, 2);
+        byteBuffer.WriteByteSeq(quantity[2]);
         byteBuffer << uint32(progressData.TimeFromCreate);
-        byteBuffer.WriteGuidBytes(quantity, 6, 4);
+        byteBuffer.WriteByteSeq(quantity[6]);
+        byteBuffer.WriteByteSeq(quantity[4]);
         byteBuffer.AppendPackedTime(progressData.Date);
-        byteBuffer.WriteGuidBytes(quantity, 1);
-        byteBuffer.WriteGuidBytes(instanceGuid, 3, 2, 1, 5, 4, 7);
-        byteBuffer.WriteGuidBytes(quantity, 0);
-        byteBuffer.WriteGuidBytes(instanceGuid, 6, 0);
+        byteBuffer.WriteByteSeq(quantity[1]);
+        byteBuffer.WriteByteSeq(instanceGuid[3]);
+        byteBuffer.WriteByteSeq(instanceGuid[2]);
+        byteBuffer.WriteByteSeq(instanceGuid[1]);
+        byteBuffer.WriteByteSeq(instanceGuid[5]);
+        byteBuffer.WriteByteSeq(instanceGuid[4]);
+        byteBuffer.WriteByteSeq(instanceGuid[7]);
+        byteBuffer.WriteByteSeq(quantity[0]);
+        byteBuffer.WriteByteSeq(instanceGuid[6]);
+        byteBuffer.WriteByteSeq(instanceGuid[0]);
         byteBuffer << uint32(progressData.Id);
     }
 
@@ -928,33 +944,48 @@ void InstanceScript::SendScenarioState(ScenarioData scenarioData, Player* player
 
 void InstanceScript::SendScenarioProgressUpdate(CriteriaProgressData progressData, Player* player /*= nullptr*/)
 {
-    uint64 quantity = progressData.Quantity; // sad, but true...
+    ObjectGuid quantity(progressData.Quantity); // sad, but true...
     ObjectGuid instanceGuid = progressData.InstanceGuid;
     WorldPacket data(SMSG_SCENARIO_PROGRESS_UPDATE);
 
-    data.WriteGuidMask(instanceGuid, 6, 4, 5);
-    data.WriteGuidMask(quantity, 1, 5, 6, 7, 4);
-    data.WriteGuidMask(instanceGuid, 1);
-    data.WriteGuidMask(quantity, 0);
-    data.WriteGuidMask(instanceGuid, 2, 3);
-    data.WriteGuidMask(quantity, 2, 3);
-    data.WriteGuidMask(instanceGuid, 0);
+    data.WriteBit(instanceGuid[6]);
+    data.WriteBit(instanceGuid[4]);
+    data.WriteBit(instanceGuid[5]);
+    data.WriteBit(quantity[1]);
+    data.WriteBit(quantity[5]);
+    data.WriteBit(quantity[6]);
+    data.WriteBit(quantity[7]);
+    data.WriteBit(quantity[4]);
+    data.WriteBit(instanceGuid[1]);
+    data.WriteBit(quantity[0]);
+    data.WriteBit(instanceGuid[2]);
+    data.WriteBit(instanceGuid[3]);
+    data.WriteBit(quantity[2]);
+    data.WriteBit(quantity[3]);
+    data.WriteBit(instanceGuid[0]);
     data.WriteBits(progressData.Flags, 4);
-    data.WriteGuidMask(instanceGuid, 7);
+    data.WriteBit(instanceGuid[7]);
 
-    data.WriteGuidBytes(quantity, 5, 2);
-    data.WriteGuidBytes(instanceGuid, 7, 4);
-    data.WriteGuidBytes(quantity, 4, 0);
-    data.WriteGuidBytes(instanceGuid, 1, 2);
+    data.WriteByteSeq(quantity[5]);
+    data.WriteByteSeq(quantity[2]);
+    data.WriteByteSeq(instanceGuid[7]);
+    data.WriteByteSeq(instanceGuid[4]);
+    data.WriteByteSeq(quantity[4]);
+    data.WriteByteSeq(quantity[0]);
+    data.WriteByteSeq(instanceGuid[1]);
+    data.WriteByteSeq(instanceGuid[2]);
     data << uint32(progressData.TimeFromStart);
-    data.WriteGuidBytes(quantity, 3);
+    data.WriteByteSeq(quantity[3]);
     data << uint32(progressData.Id);
-    data.WriteGuidBytes(quantity, 1);
+    data.WriteByteSeq(quantity[1]);
     data.AppendPackedTime(progressData.Date);
     data << uint32(progressData.TimeFromCreate);
-    data.WriteGuidBytes(instanceGuid, 0, 3, 6);
-    data.WriteGuidBytes(quantity, 7, 6);
-    data.WriteGuidBytes(instanceGuid, 5);
+    data.WriteByteSeq(instanceGuid[0]);
+    data.WriteByteSeq(instanceGuid[3]);
+    data.WriteByteSeq(instanceGuid[6]);
+    data.WriteByteSeq(quantity[7]);
+    data.WriteByteSeq(quantity[6]);
+    data.WriteByteSeq(instanceGuid[5]);
 
     if (!player)
         instance->SendToPlayers(&data);
@@ -1079,7 +1110,7 @@ void InstanceScript::SendChallengeNewPlayerRecord()
                 stmt->setUInt32(1, challengeTime);
                 stmt->setUInt8(2, newBestMedal ? medalType : challenge->BestMedal);
                 stmt->setUInt32(3, newBestMedal ? time(NULL) : challenge->BestMedalDate);
-                stmt->setUInt32(4, player->GetGUIDLow());
+                stmt->setUInt32(4, player->GetGUID().GetCounter());
                 stmt->setUInt32(5, mapId);
                 CharacterDatabase.Execute(stmt);
 
@@ -1101,7 +1132,7 @@ void InstanceScript::SendChallengeNewPlayerRecord()
             else
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_COMPLETED_CHALLENGE);
-                stmt->setUInt32(0, player->GetGUIDLow());
+                stmt->setUInt32(0, player->GetGUID().GetCounter());
                 stmt->setUInt32(1, mapId);
                 stmt->setUInt32(2, challengeTime);
                 stmt->setUInt32(3, challengeTime);
@@ -1251,11 +1282,11 @@ void InstanceScript::SaveNewGroupChallenge(uint32 guildId /*= 0*/)
         {
             if (Player* player = itr.GetSource())
             {
-                newGroup.Members[j].Guid = MAKE_NEW_GUID(player->GetGUIDLow(), 0, HIGHGUID_PLAYER);
+                newGroup.Members[j].Guid = ObjectGuid(HighGuid::Player, player->GetGUID().GetCounter());
                 newGroup.Members[j].SpecId = player->GetTalentSpecialization(player->GetActiveSpec());
                 j++;
 
-                stmt->setUInt32(index++, player->GetGUIDLow());
+                stmt->setUInt32(index++, player->GetGUID().GetCounter());
                 stmt->setUInt32(index++, player->GetTalentSpecialization(player->GetActiveSpec()));
             }
         }
@@ -1265,7 +1296,7 @@ void InstanceScript::SaveNewGroupChallenge(uint32 guildId /*= 0*/)
     {
         for (uint8 i = 0; i < (5 - count); i++)
         {
-            newGroup.Members[j].Guid = 0;
+            newGroup.Members[j].Guid.Clear();
             newGroup.Members[j].SpecId = 0;
             j++;
 
@@ -1335,7 +1366,7 @@ void InstanceScript::RewardNewRealmRecord(RealmCompletedChallenge* oldChallenge 
             {
                 uint32 index = title->bit_index / 32;
                 uint32 flag = 1 << (title->bit_index % 32);
-                uint32 lowGuid = GUID_LOPART(oldChallenge->Members[i].Guid);
+                uint32 lowGuid = oldChallenge->Members[i].Guid.GetCounter();
 
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_AT_LOGIN_TITLES);
                 stmt->setUInt32(0, lowGuid);
@@ -1485,7 +1516,7 @@ void InstanceScript::PromotionIfLFR(uint32 data)
     }
 }
 
-void InstanceScript::UpdateDynamicHealth(uint64 single)
+void InstanceScript::UpdateDynamicHealth(ObjectGuid single)
 {
     if (instance->GetDifficulty() != RAID_DIFFICULTY_1025MAN_FLEX)
         return;
@@ -1500,7 +1531,7 @@ void InstanceScript::UpdateDynamicHealth(uint64 single)
     if (count < 10)
         count = 10;
 
-    std::function<void(uint64)> updateHealth = [this, count](uint64 guid)
+    std::function<void(ObjectGuid)> updateHealth = [this, count](ObjectGuid guid)
     {
         if (Creature* creature = instance->GetCreature(guid))
             if (creature->IsHostileToPlayers())

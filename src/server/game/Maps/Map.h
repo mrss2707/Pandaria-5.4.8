@@ -31,6 +31,7 @@
 #include "MapRefManager.h"
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
+#include "ObjectGuid.h"
 
 #include <bitset>
 #include <list>
@@ -476,13 +477,18 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
         void UpdateIteratorBack(Player* player);
 
-        TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = NULL, uint32 duration = 0, Unit* summoner = NULL, uint32 spellId = 0, uint32 vehId = 0, uint64 privateObjectOwner = 0);
+        TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = NULL, uint32 duration = 0, Unit* summoner = NULL, uint32 spellId = 0, uint32 vehId = 0, ObjectGuid privateObjectOwner = ObjectGuid::Empty);
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = NULL);
-        Player* GetPlayer(uint64 guid);
-        Creature* GetCreature(uint64 guid);
-        GameObject* GetGameObject(uint64 guid);
-        Transport* GetTransport(uint64 guid);
-        DynamicObject* GetDynamicObject(uint64 guid);
+        Player* GetPlayer(ObjectGuid guid);
+        AreaTrigger* GetAreaTrigger(ObjectGuid const& guid);
+        Corpse* GetCorpse(ObjectGuid const& guid);
+        Creature* GetCreature(ObjectGuid guid);
+        GameObject* GetGameObject(ObjectGuid guid);
+        Transport* GetTransport(ObjectGuid guid);
+        DynamicObject* GetDynamicObject(ObjectGuid guid);
+        Pet* GetPet(ObjectGuid const& guid);
+
+        MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
 
         MapInstanced* ToMapInstanced(){ if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return NULL;  }
         const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return NULL;  }
@@ -556,6 +562,13 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         void AddCustomVisibilityObject(WorldObject* obj, uint32 zoneId = 0) { (zoneId ? m_customVisibilityObjectsByZone[zoneId] : m_customVisibilityObjects).insert(obj); }
         void RemoveCustomVisibilityObject(WorldObject* obj, uint32 zoneId = 0) { (zoneId ? m_customVisibilityObjectsByZone[zoneId] : m_customVisibilityObjects).erase(obj); }
         std::unordered_set<WorldObject*> const& GetCustomVisibilityObjects(uint32 zoneId = 0) { return zoneId ? m_customVisibilityObjectsByZone[zoneId] : m_customVisibilityObjects; }
+
+        template<HighGuid high>
+        inline ObjectGuid::LowType GenerateLowGuid()
+        {
+            static_assert(ObjectGuidTraits<high>::MapSpecific, "Only map specific guid can be generated in Map context");
+            return GetGuidSequenceGenerator<high>().Generate();
+        }
 
         uint32 GetUpdateTime() const { return m_updateTime; }
         void AddUpdateObject(Object* object) { m_updatable.insert(object); }
@@ -727,6 +740,19 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
                 return m_activeNonPlayers.erase(obj) != 0;
         }
 
+        template<HighGuid high>
+        inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
+        {
+            auto itr = _guidGenerators.find(high);
+            if (itr == _guidGenerators.end())
+                itr = _guidGenerators.insert(std::make_pair(high, std::unique_ptr<ObjectGuidGenerator<high>>(new ObjectGuidGenerator<high>()))).first;
+
+            return *itr->second;
+        }
+
+        std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
+        MapStoredObjectTypesContainer _objectsStore;
+
         std::unordered_map<uint32 /*dbGUID*/, time_t> _creatureRespawnTimes;
         std::unordered_map<uint32 /*dbGUID*/, time_t> _goRespawnTimes;
 
@@ -782,7 +808,7 @@ class InstanceMap : public Map
         bool m_isLfgMap;
         InstanceScript* i_data;
         uint32 i_script_id;
-        std::set<uint32> m_stillInMapPlayers;
+        GuidSet m_stillInMapPlayers;
 };
 
 class BattlegroundMap : public Map

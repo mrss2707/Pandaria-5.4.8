@@ -254,7 +254,7 @@ class transport_merry_go_round : public TransportScript
             {
                 Map* map = transport->GetMap();
                 Creature* creature = new Creature();
-                if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, PHASEMASK_NORMAL, passenger.first, 0, 0, passenger.second.GetPositionX(), passenger.second.GetPositionY(), passenger.second.GetPositionZ(), passenger.second.GetOrientation()))
+                if (!creature->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), map, PHASEMASK_NORMAL, passenger.first, 0, 0, passenger.second.GetPositionX(), passenger.second.GetPositionY(), passenger.second.GetPositionZ(), passenger.second.GetOrientation()))
                 {
                     delete creature;
                     return;

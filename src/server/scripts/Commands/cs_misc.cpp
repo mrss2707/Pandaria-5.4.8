@@ -868,7 +868,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_OBJECT_GUID, GUID_LOPART(guid), GUID_HIPART(guid));
+        handler->PSendSysMessage(LANG_OBJECT_GUID, GUID_LOPART(guid), guid.GetHigh());
         return true;
     }
 
@@ -3019,7 +3019,7 @@ public:
 
         if (args && strlen(args) > 0)
         {
-            target = sObjectAccessor->FindPlayerByName(args);
+            target = ObjectAccessor::FindPlayerByName(args);
             if (!target)
             {
                 handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -3081,7 +3081,7 @@ public:
         {
             name = TargetName;
             normalizePlayerName(name);
-            player = sObjectAccessor->FindPlayerByName(name);
+            player = ObjectAccessor::FindPlayerByName(name);
         }
 
         if (!player)
@@ -3132,7 +3132,7 @@ public:
         {
             name = targetName;
             normalizePlayerName(name);
-            player = sObjectAccessor->FindPlayerByName(name);
+            player = ObjectAccessor::FindPlayerByName(name);
         }
         else // If no name was entered - use target
         {
@@ -3309,7 +3309,7 @@ public:
                 pos.RelocateOffset(0, 1.0f);
             if (TempSummon* waypoint = new TempSummon(nullptr, nullptr, false))
             {
-                if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
+                if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
                 {
                     delete waypoint;
                     continue;
@@ -3337,7 +3337,7 @@ public:
             pos.RelocateOffset(2 * M_PI * i / max, radius);
             if (TempSummon* waypoint = new TempSummon(nullptr, nullptr, false))
             {
-                if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
+                if (!waypoint->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), source->GetMap(), source->GetPhaseMask(), 190012, 0, 0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
                 {
                     delete waypoint;
                     continue;

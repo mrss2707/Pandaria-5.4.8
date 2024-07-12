@@ -217,7 +217,7 @@ class TC_GAME_API SmartAI : public CreatureAI
         uint32 mFollowArrivedTimer;
         uint32 mFollowCredit;
         uint32 mFollowArrivedEntry;
-        uint64 mFollowGuid;
+        ObjectGuid mFollowGuid;
         float mFollowDist;
         float mFollowAngle;
 

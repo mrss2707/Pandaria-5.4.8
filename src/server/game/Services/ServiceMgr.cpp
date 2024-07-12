@@ -145,13 +145,13 @@ void ServiceMgr::HandleReplaceSkill(Player* player, uint32 oldSkill, uint32 newS
 
     if (!oldProf || !newProf)
     {
-        TC_LOG_ERROR("misc", "ServiceManager::HandleReplaceSkill - Unknown profession skill: %u (GUID: %u)", oldProf ? newSkill : oldSkill, player->GetGUIDLow());
+        TC_LOG_ERROR("misc", "ServiceManager::HandleReplaceSkill - Unknown profession skill: %u (GUID: %u)", oldProf ? newSkill : oldSkill, player->GetGUID().GetCounter());
         return;
     }
 
     if (!player->HasSkill(oldSkill))
     {
-        TC_LOG_ERROR("misc", "ServiceManager::HandleReplaceSkill - Player (%u) hasn't skill: %u", player->GetGUIDLow(), oldSkill);
+        TC_LOG_ERROR("misc", "ServiceManager::HandleReplaceSkill - Player (%u) hasn't skill: %u", player->GetGUID().GetCounter(), oldSkill);
         return;
     }
 
@@ -289,7 +289,7 @@ void ServiceMgr::ApplyRetroactiveFixes(Player* player)
 {
     for (auto&& fix : _retroactiveFixes)
         if (fix->IsActive() && fix->IsApplicable(player) && fix->Execute(player))
-            TC_LOG_INFO("retroactivefix", "Performed fix on player %s (GUID: %u): %s", player->GetName().c_str(), player->GetGUIDLow(), fix->GetDescription());
+            TC_LOG_INFO("retroactivefix", "Performed fix on player %s (GUID: %u): %s", player->GetName().c_str(), player->GetGUID().GetCounter(), fix->GetDescription());
 }
 
 void ServiceMgr::LoadSpells()
@@ -590,7 +590,7 @@ void ServiceMgr::_LoadPremium()
             {
                 Field* fields = result->Fetch();
                 uint32 guid = fields[0].GetUInt32();
-                _aucGUIDs[i].push_back(MAKE_NEW_GUID(guid, auctioneers[i][j++], HIGHGUID_UNIT));
+                _aucGUIDs[i].push_back(MAKE_NEW_GUID(guid, auctioneers[i][j++], HighGuid::Unit));
             }
         }
     }

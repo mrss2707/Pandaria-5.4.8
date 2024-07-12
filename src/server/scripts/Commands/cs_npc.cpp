@@ -280,7 +280,7 @@ public:
         }
 
         Creature* creature = new Creature();
-        if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
+        if (!creature->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
         {
             delete creature;
             return false;
@@ -378,7 +378,7 @@ public:
 
         /* FIXME: impossible without entry
         if (lowguid)
-            creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HIGHGUID_UNIT));
+            creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HighGuid::Unit));
         */
 
         // attempt check creature existence by DB data
@@ -525,7 +525,7 @@ public:
                 return false;
 
             if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(lowguid))
-                unit = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(lowguid, cr_data->id, HIGHGUID_UNIT));
+                unit = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(lowguid, cr_data->id, HighGuid::Unit));
         }
         else
             unit = handler->getSelectedCreature();
@@ -871,7 +871,7 @@ public:
 
             /* FIXME: impossible without entry
             if (lowguid)
-                creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HIGHGUID_UNIT));
+                creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HighGuid::Unit));
             */
 
             // Attempting creature load from DB data
@@ -1067,7 +1067,7 @@ public:
 
             /* impossible without entry
             if (lowguid)
-                creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HIGHGUID_UNIT));
+                creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HighGuid::Unit));
             */
 
             // attempt check creature existence by DB data
@@ -1527,7 +1527,7 @@ public:
         pet->SavePetToDB(trans);
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->setUInt8(0, newPetSlot);
-        stmt->setUInt32(1, player->GetGUIDLow());
+        stmt->setUInt32(1, player->GetGUID().GetCounter());
         stmt->setUInt32(2, pet->GetCharmInfo()->GetPetNumber());
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);

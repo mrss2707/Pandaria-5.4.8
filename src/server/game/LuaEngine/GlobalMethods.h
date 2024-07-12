@@ -278,7 +278,7 @@ namespace LuaGlobalFunctions
     int GetPlayerByName(lua_State* L)
     {
         const char* message = luaL_checkstring(L, 1);
-        sEluna->Push(L, sObjectAccessor->FindPlayerByName(message));
+        sEluna->Push(L, ObjectAccessor::FindPlayerByName(message));
         return 1;
     }
 
@@ -493,7 +493,7 @@ namespace LuaGlobalFunctions
     static int GetItemGUID(lua_State* L)
     {
         uint32 lowguid = luaL_checkunsigned(L, 1);
-        sEluna->Push(L, MAKE_NEW_GUID(lowguid, 0, HIGHGUID_ITEM));
+        sEluna->Push(L, MAKE_NEW_GUID(lowguid, 0, HighGuid::Item));
         return 1;
     }
 
@@ -502,7 +502,7 @@ namespace LuaGlobalFunctions
     {
         uint32 lowguid = luaL_checkunsigned(L, 1);
         uint32 entry = luaL_checkunsigned(L, 2);
-        sEluna->Push(L, MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT));
+        sEluna->Push(L, MAKE_NEW_GUID(lowguid, entry, HighGuid::GameObject));
         return 1;
     }
 
@@ -511,7 +511,7 @@ namespace LuaGlobalFunctions
     {
         uint32 lowguid = luaL_checkunsigned(L, 1);
         uint32 entry = luaL_checkunsigned(L, 2);
-        sEluna->Push(L, MAKE_NEW_GUID(lowguid, entry, HIGHGUID_UNIT));
+        sEluna->Push(L, MAKE_NEW_GUID(lowguid, entry, HighGuid::Unit));
         return 1;
     }
 
@@ -579,7 +579,7 @@ namespace LuaGlobalFunctions
             if (save)
             {
                 Creature* creature = new Creature();
-                if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, phase, entry, 0, 0, x, y, z, o))
+                if (!creature->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), map, phase, entry, 0, 0, x, y, z, o))
                 {
                     delete creature;
                     return 0;
@@ -624,7 +624,7 @@ namespace LuaGlobalFunctions
                 return 0;
 
             GameObject* object = new GameObject;
-            uint32 lowguid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
+            uint32 lowguid = sObjectMgr->GenerateLowGuid(HighGuid::GameObject);
             G3D::Quat r;
             if (!object->Create(lowguid, objectInfo->entry, map, phase, x, y, z, o, r, 0.0f, GO_STATE_READY))
             {
@@ -903,7 +903,7 @@ namespace LuaGlobalFunctions
     int GetGUIDType(lua_State* L)
     {
         uint64 guid = sEluna->CHECK_ULONG(L, 1);
-        sEluna->Push(L, GUID_HIPART(guid));
+        sEluna->Push(L, guid.GetHigh());
         return 1;
     }
 

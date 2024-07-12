@@ -4786,7 +4786,7 @@ class spell_brawlers_guild_lumbering_charge : public AuraScript
     {
         if (GetCaster() && GetCaster()->ToCreature())
             if (uint32 lumberingLow = GetCaster()->ToCreature()->AI()->GetData(TYPE_LUMBERING))
-                if (Unit* lumbering = ObjectAccessor::GetUnit(*GetCaster(), MAKE_NEW_GUID(lumberingLow, NPC_LUMBERING_CHARGE_TARGET, HIGHGUID_UNIT)))
+                if (Unit* lumbering = ObjectAccessor::GetUnit(*GetCaster(), MAKE_NEW_GUID(lumberingLow, NPC_LUMBERING_CHARGE_TARGET, HighGuid::Unit)))
                     GetCaster()->GetMotionMaster()->MoveCharge(lumbering->GetPositionX(), lumbering->GetPositionY(), lumbering->GetPositionZ(), 20.0f, EVENT_CHARGE);
     }
 

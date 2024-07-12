@@ -467,7 +467,7 @@ union DevToolSettings
             }
 
             Creature* creature = new Creature();
-            if (creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), player->GetMap(), player->GetPhaseMask() == PHASEMASK_ANYWHERE ? PHASEMASK_NORMAL : player->GetPhaseMask(), ID, 0, 0, x, y, z, o))
+            if (creature->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), player->GetMap(), player->GetPhaseMask() == PHASEMASK_ANYWHERE ? PHASEMASK_NORMAL : player->GetPhaseMask(), ID, 0, 0, x, y, z, o))
             {
                 player->GetMap()->AddToMap(creature);
                 if (SaveToDB)
@@ -562,7 +562,7 @@ union DevToolSettings
             }
 
             GameObject* go = new GameObject();
-            if (go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), ID, player->GetMap(), player->GetPhaseMask() == PHASEMASK_ANYWHERE ? PHASEMASK_NORMAL : player->GetPhaseMask(), x, y, z, o, { Rotation[0], Rotation[1], Rotation[2], Rotation[3] }, 255, GO_STATE_READY))
+            if (go->Create(sObjectMgr->GenerateLowGuid(HighGuid::GameObject), ID, player->GetMap(), player->GetPhaseMask() == PHASEMASK_ANYWHERE ? PHASEMASK_NORMAL : player->GetPhaseMask(), x, y, z, o, { Rotation[0], Rotation[1], Rotation[2], Rotation[3] }, 255, GO_STATE_READY))
             {
                 player->GetMap()->AddToMap(go);
                 if (SaveToDB)

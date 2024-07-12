@@ -406,7 +406,7 @@ class boss_warmaster_blackhorn: public CreatureScript
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                 {
-                    if (clearShockwaveTarget && me->GetUInt64Value(UNIT_FIELD_TARGET))
+                    if (clearShockwaveTarget && me->GetGuidValue(UNIT_FIELD_TARGET))
                     {
                         me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
                         clearShockwaveTarget = false;

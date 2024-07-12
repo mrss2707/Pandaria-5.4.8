@@ -202,7 +202,7 @@ struct CriteriaProgressData
     {
         Id                = 0;
         Quantity          = 0;
-        InstanceGuid      = 0;
+        InstanceGuid      = ObjectGuid::Empty;
         Date              = 0;
         TimeFromStart     = 0;
         TimeFromCreate    = 0;
@@ -369,7 +369,7 @@ class InstanceScript : public ZoneScript
 
         void DoStartMovie(uint32 movieId);
 
-        void DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid = 0);
+        void DoKilledMonsterKredit(uint32 questId, uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
 
         void DoFinishLFGDungeon(uint32 dungeonId);
 
@@ -429,7 +429,7 @@ class InstanceScript : public ZoneScript
         // Scenarios
         void SendScenarioState(ScenarioData data, Player* player = nullptr);
         void SendScenarioProgressUpdate(CriteriaProgressData data, Player* player = nullptr);
-        void SetScenarioId(uint32 newScenarioId) { scenarioId = newScenarioId; scenarioGuid = MAKE_NEW_GUID(scenarioId, instance->GetInstanceId(), HIGHGUID_SCENARIO); } // used only for 5ppl dungeons
+        void SetScenarioId(uint32 newScenarioId) { scenarioId = newScenarioId; scenarioGuid = ObjectGuid::Create<HighGuid::Scenario>(instance->GetInstanceId(), scenarioId); } // used only for 5ppl dungeons
         uint32 GetScenarioId() const { return scenarioId; }
         uint8 GetcurrentScenarioStep() const { return scenarioStep; }
         ObjectGuid GetScenarioGUID() const { return scenarioGuid; }
@@ -460,8 +460,8 @@ class InstanceScript : public ZoneScript
 
         void GameObjectRemoved(GameObject* go);
 
-        void UpdateDynamicHealth(uint64 single = 0);
-        void AddFlexCreature(uint64 guid) { flexCreatures.push_back(guid); }
+        void UpdateDynamicHealth(ObjectGuid single = ObjectGuid::Empty);
+        void AddFlexCreature(ObjectGuid guid) { flexCreatures.push_back(guid); }
 
     protected:
         void SetBossNumber(uint32 number);
@@ -481,8 +481,8 @@ class InstanceScript : public ZoneScript
     private:
         std::vector<BossInfo> bosses;
         std::vector<ScenarioBosses> bossesScenarios;
-        std::vector<uint64> dampenedGUIDs;
-        std::vector<uint64> flexCreatures;
+        std::vector<ObjectGuid> dampenedGUIDs;
+        std::vector<ObjectGuid> flexCreatures;
         DoorInfoMap doors;
         MinionInfoMap minions;
         uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets

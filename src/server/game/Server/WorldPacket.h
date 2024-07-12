@@ -29,11 +29,11 @@ class WorldPacket : public ByteBuffer
 {
     public:
                                                             // just container for later use
-        WorldPacket() : ByteBuffer(0), m_opcode(UNKNOWN_OPCODE)
+        WorldPacket() : ByteBuffer(0, Reserve{}), m_opcode(UNKNOWN_OPCODE)
         {
         }
 
-        WorldPacket(Opcodes opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode)
+        WorldPacket(Opcodes opcode, size_t res = 200) : ByteBuffer(res, Reserve{}), m_opcode(opcode)
         {
         }
 

@@ -696,7 +696,7 @@ public:
 
                 if (item->GetOwnerGUID() != player->GetGUID())
                 {
-                    handler->PSendSysMessage("The item with slot %d and itemguid %d does have non-matching owner guid (%d) and player guid (%d) !", item->GetSlot(), item->GetGUIDLow(), GUID_LOPART(item->GetOwnerGUID()), player->GetGUIDLow());
+                    handler->PSendSysMessage("The item with slot %d and itemguid %d does have non-matching owner guid (%d) and player guid (%d) !", item->GetSlot(), item->GetGUIDLow(), GUID_LOPART(item->GetOwnerGUID()), player->GetGUID().GetCounter());
                     error = true;
                     continue;
                 }
@@ -1006,7 +1006,7 @@ public:
 
         Map* map = handler->GetSession()->GetPlayer()->GetMap();
 
-        if (!v->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_VEHICLE), map, handler->GetSession()->GetPlayer()->GetPhaseMask(), entry, id, handler->GetSession()->GetPlayer()->GetTeam(), x, y, z, o))
+        if (!v->Create(sObjectMgr->GenerateLowGuid(HighGuid::Vehicle), map, handler->GetSession()->GetPlayer()->GetPhaseMask(), entry, id, handler->GetSession()->GetPlayer()->GetTeam(), x, y, z, o))
         {
             delete v;
             return false;
@@ -1068,7 +1068,7 @@ public:
         uint32 guid = (uint32)atoi(e);
         uint32 index = (uint32)atoi(f);
 
-        Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HIGHGUID_ITEM));
+        Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HighGuid::Item));
 
         if (!i)
             return false;
@@ -1099,7 +1099,7 @@ public:
         uint32 index = (uint32)atoi(f);
         uint32 value = (uint32)atoi(g);
 
-        Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HIGHGUID_ITEM));
+        Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HighGuid::Item));
 
         if (!i)
             return false;
@@ -1123,7 +1123,7 @@ public:
 
         uint32 guid = (uint32)atoi(e);
 
-        Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HIGHGUID_ITEM));
+        Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HighGuid::Item));
 
         if (!i)
             return false;
@@ -1625,20 +1625,46 @@ public:
 
         data.WriteBits(1, 24);                                // Added count
         {
-            data.WriteGuidMask(vignetteGUID, 1, 4, 3, 6, 2, 0, 7, 5);
-            playersAddBuffer.WriteGuidBytes(vignetteGUID, 7, 1, 0, 6, 2, 3, 4, 5);
+            data.WriteBit(vignetteGUID[1]);
+data.WriteBit(vignetteGUID[4]);
+data.WriteBit(vignetteGUID[3]);
+data.WriteBit(vignetteGUID[6]);
+data.WriteBit(vignetteGUID[2]);
+data.WriteBit(vignetteGUID[0]);
+data.WriteBit(vignetteGUID[7]);
+data.WriteBit(vignetteGUID[5]);
+            playersAddBuffer.WriteByteSeq(vignetteGUID[7]);
+playersAddBuffer.WriteByteSeq(vignetteGUID[1]);
+playersAddBuffer.WriteByteSeq(vignetteGUID[0]);
+playersAddBuffer.WriteByteSeq(vignetteGUID[6]);
+playersAddBuffer.WriteByteSeq(vignetteGUID[2]);
+playersAddBuffer.WriteByteSeq(vignetteGUID[3]);
+playersAddBuffer.WriteByteSeq(vignetteGUID[4]);
+playersAddBuffer.WriteByteSeq(vignetteGUID[5]);
         }
 
         data.WriteBits(1, 20);
         {
-            data.WriteGuidMask(vignetteGUID, 5, 3, 7, 4, 2, 0, 6, 1);
-            objectAddBuffer.WriteGuidBytes(vignetteGUID, 2, 5);
+            data.WriteBit(vignetteGUID[5]);
+data.WriteBit(vignetteGUID[3]);
+data.WriteBit(vignetteGUID[7]);
+data.WriteBit(vignetteGUID[4]);
+data.WriteBit(vignetteGUID[2]);
+data.WriteBit(vignetteGUID[0]);
+data.WriteBit(vignetteGUID[6]);
+data.WriteBit(vignetteGUID[1]);
+            objectAddBuffer.WriteByteSeq(vignetteGUID[2]);
+objectAddBuffer.WriteByteSeq(vignetteGUID[5]);
             objectAddBuffer << float(selectedUnit->GetPositionZ());
             objectAddBuffer << uint32(vignetteID);
             objectAddBuffer << float(selectedUnit->GetPositionY());
-            objectAddBuffer.WriteGuidBytes(vignetteGUID, 1);
+            objectAddBuffer.WriteByteSeq(vignetteGUID[1]);
             objectAddBuffer << float(selectedUnit->GetPositionX());
-            objectAddBuffer.WriteGuidBytes(vignetteGUID, 6, 7, 4, 3, 0);
+            objectAddBuffer.WriteByteSeq(vignetteGUID[6]);
+objectAddBuffer.WriteByteSeq(vignetteGUID[7]);
+objectAddBuffer.WriteByteSeq(vignetteGUID[4]);
+objectAddBuffer.WriteByteSeq(vignetteGUID[3]);
+objectAddBuffer.WriteByteSeq(vignetteGUID[0]);
         }
 
         data.WriteBits(0, 20);                                // UpdateDataCount

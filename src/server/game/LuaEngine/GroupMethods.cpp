@@ -66,7 +66,7 @@ namespace LuaGroup
         Player* player = sEluna->CHECK_PLAYER(L, 1);
         if (!player)
             if (const char* name = luaL_checkstring(L, 1))
-                player = sObjectAccessor->FindPlayerByName(name);
+                player = ObjectAccessor::FindPlayerByName(name);
         if (!player)
             return 0;
 

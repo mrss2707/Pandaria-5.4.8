@@ -1216,7 +1216,7 @@ void GameEventMgr::UpdateEventNPCFlags(uint16 event_id)
         // get the creature data from the low guid to get the entry, to be able to find out the whole guid
         if (CreatureData const* data = sObjectMgr->GetCreatureData(itr->first))
         {
-            Creature* cr = HashMapHolder<Creature>::Find(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT));
+            Creature* cr = HashMapHolder<Creature>::Find(ObjectGuid(HighGuid::Unit, data->id, itr->first));
             // if we found the creature, modify its npcflag
             if (cr)
             {
@@ -1347,7 +1347,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveCreatureFromGrid(*itr, data);
 
-            if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_UNIT), (Creature*)NULL))
+            if (Creature* creature = ObjectAccessor::GetObjectInWorld(ObjectGuid(HighGuid::Unit, data->id, *itr), (Creature*)NULL))
                 creature->AddObjectToRemoveList();
         }
     }
@@ -1369,7 +1369,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveGameobjectFromGrid(*itr, data);
 
-            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL))
+            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(ObjectGuid(HighGuid::GameObject, data->id, *itr), (GameObject*)NULL))
                 pGameobject->AddObjectToRemoveList();
         }
     }
@@ -1395,7 +1395,7 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
             continue;
 
         // Update if spawned
-        Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT), (Creature*)NULL);
+        Creature* creature = ObjectAccessor::GetObjectInWorld(ObjectGuid(HighGuid::Unit, data->id, itr->first), (Creature*)NULL);
         if (creature)
         {
             if (activate)
@@ -2157,9 +2157,9 @@ namespace AprilFoolsDay
                 }
             }
 
-            if (GameObject* portal = HashMapHolder<GameObject>::Find(MAKE_NEW_GUID(161561, 195141, HIGHGUID_GAMEOBJECT)))
+            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195141), uint32(161561))))
                 portal->SetFaction(1801);
-            if (GameObject* portal = HashMapHolder<GameObject>::Find(MAKE_NEW_GUID(163187, 195142, HIGHGUID_GAMEOBJECT)))
+            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195142), uint32(163187))))
                 portal->SetFaction(1802);
         }
         else
@@ -2197,9 +2197,9 @@ namespace AprilFoolsDay
             }
             guidToOriginalData.clear();
 
-            if (GameObject* portal = HashMapHolder<GameObject>::Find(MAKE_NEW_GUID(161561, 195141, HIGHGUID_GAMEOBJECT)))
+            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195141), uint32(161561))))
                 portal->SetFaction(1802);
-            if (GameObject* portal = HashMapHolder<GameObject>::Find(MAKE_NEW_GUID(163187, 195142, HIGHGUID_GAMEOBJECT)))
+            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195142), uint32(163187))))
                 portal->SetFaction(1801);
         }
 
