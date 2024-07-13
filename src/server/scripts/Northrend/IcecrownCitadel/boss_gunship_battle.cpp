@@ -1166,7 +1166,7 @@ class npc_gunship_boss : public CreatureScript
             void SummonGameObjectWild(Map* map, uint32 entry, float x, float y, float z, float o, uint32 respawnTime)
             {
                 GameObject* go = new GameObject();
-                if (!go->Create(sObjectMgr->GenerateLowGuid(HighGuid::GameObject), entry, map, 65535, x, y, z, o, { }, 255, GO_STATE_READY))
+                if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, 65535, x, y, z, o, { }, 255, GO_STATE_READY))
                 {
                     delete go;
                     return;

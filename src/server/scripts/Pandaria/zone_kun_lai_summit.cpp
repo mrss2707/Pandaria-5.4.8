@@ -973,7 +973,7 @@ class npc_waterspeaker_gorai : public CreatureScript
             if (action == GOSSIP_ACTION_INFO_DEF + 1)
             {
                 player->KilledMonsterCredit(creature->GetEntry());
-                creature->AI()->SetGUID(player->GetGUID(), 0);
+                creature->AI()->SetGUID(player->GetGUID(), ObjectGuid::Empty);
                 creature->RemoveFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
                 player->CLOSE_GOSSIP_MENU();
             }

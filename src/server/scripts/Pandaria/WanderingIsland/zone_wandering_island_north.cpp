@@ -244,7 +244,7 @@ class boss_jaomin_ro : public CreatureScript
                     std::list<Player*> playerList;
                     GetPlayerListInGrid(playerList, me, 10.0f);
                     for (auto&& player: playerList)
-                        player->KilledMonsterCredit(me->GetEntry(), 0);
+                        player->KilledMonsterCredit(me->GetEntry(), ObjectGuid::Empty);
 
                     Talk(1);
                     EnterEvadeMode();
@@ -698,7 +698,7 @@ class npc_aysa : public CreatureScript
                             UpdatePlayerList();
                             for (auto&& player: playersInvolved)
                             {
-                                player->KilledMonsterCredit(NPC_MASTER_LI_FEI, 0);
+                                player->KilledMonsterCredit(NPC_MASTER_LI_FEI, ObjectGuid::Empty);
                                 player->RemoveAura(SPELL_MEDITATION_BAR);
                             }
                             break;
@@ -772,7 +772,7 @@ class boss_li_fei_fight : public CreatureScript
                 {
                     auto unit = hostileRef->getTarget();
                     if (unit && unit->GetTypeId() == TYPEID_PLAYER)
-                        unit->ToPlayer()->KilledMonsterCredit(54734, 0);
+                        unit->ToPlayer()->KilledMonsterCredit(54734, ObjectGuid::Empty);
                 }
 
                 // TODO: it seems that spell 106275 is used to display a text message
@@ -902,7 +902,7 @@ class AreaTrigger_at_temple_entrance : public AreaTriggerScript
         {
             if (player->GetQuestStatus(29423) == QUEST_STATUS_INCOMPLETE)
             {
-                player->KilledMonsterCredit(61128, 0);
+                player->KilledMonsterCredit(61128, ObjectGuid::Empty);
 
                 std::list<Creature*> huoList;
                 GetCreatureListWithEntryInGrid(huoList, player, 54958, 20.0f);

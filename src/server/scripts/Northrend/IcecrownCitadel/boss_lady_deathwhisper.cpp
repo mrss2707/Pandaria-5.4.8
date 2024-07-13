@@ -397,10 +397,10 @@ class boss_lady_deathwhisper : public CreatureScript
                             {
                                 for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                                     if (Player* member = itr->GetSource())
-                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, ObjectGuid::Empty);
                             }
                             else
-                                owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                                owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, ObjectGuid::Empty);
                         }
                     }
                 }

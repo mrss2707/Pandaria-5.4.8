@@ -1855,7 +1855,7 @@ class transport_ulduar_tram : public TransportScript
         {
             Map* map = transport->GetMap();
             GameObject* go = new GameObject();
-            if (!go->Create(sObjectMgr->GenerateLowGuid(HighGuid::GameObject), GO_ACTIVATE_TRAM, map, PHASEMASK_NORMAL, 0.0f, -10.30644f, 0.0f, 1.570796f, { 0.0f, 0.0f, 0.7071066f, 0.7071069f }, 0/*Blizzlike: 255, but we handle it in a strange way, making it despawn*/, GO_STATE_READY))
+            if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), GO_ACTIVATE_TRAM, map, PHASEMASK_NORMAL, 0.0f, -10.30644f, 0.0f, 1.570796f, { 0.0f, 0.0f, 0.7071066f, 0.7071069f }, 0/*Blizzlike: 255, but we handle it in a strange way, making it despawn*/, GO_STATE_READY))
             {
                 delete go;
                 return;

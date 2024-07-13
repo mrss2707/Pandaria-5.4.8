@@ -373,7 +373,7 @@ public:
                 if (uiRand < 25)
                 {
                     player->CastSpell(me, 45532, true);
-                    player->KilledMonsterCredit(WARSONG_PEON, 0);
+                    player->KilledMonsterCredit(WARSONG_PEON, ObjectGuid::Empty);
                 }
                 else if (uiRand < 75)
                     player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
@@ -569,7 +569,7 @@ public:
                 if (summon->IsSummon())
                     if (Unit* temp = summon->GetSummoner())
                         if (Player* player = temp->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry(), 0);
+                            player->KilledMonsterCredit(me->GetEntry(), ObjectGuid::Empty);
 
             if (GameObject* go_caribou = me->GetMap()->GetGameObject(go_caribouGUID))
                 go_caribou->SetGoState(GO_STATE_READY);
@@ -866,7 +866,7 @@ public:
                 {
                     if (Player* pHarpooner = ObjectAccessor::GetPlayer(*me, HarpoonerGUID))
                     {
-                        pHarpooner->KilledMonsterCredit(26175, 0);
+                        pHarpooner->KilledMonsterCredit(26175, ObjectGuid::Empty);
                         pHarpooner->RemoveAura(SPELL_DRAKE_HATCHLING_SUBDUED);
                         SetFollowComplete();
                         HarpoonerGUID = 0;
@@ -1620,7 +1620,7 @@ public:
                 DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
 
                 if (Player* player = pCaster->ToPlayer())
-                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER, 0);
+                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER, ObjectGuid::Empty);
 
                 bEnslaved = true;
             }
@@ -1750,7 +1750,7 @@ public:
                         break;
                     case 7:
                         Talk(SAY_IMPRISIONED_BERYL_7);
-                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER, 0);
+                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER, ObjectGuid::Empty);
                         break;
                 }
             }
@@ -2091,7 +2091,7 @@ public:
                     {
                         if (objective.StorageIndex == 0)
                         {
-                            player->KilledMonsterCredit(objective.ObjectID, 0);
+                            player->KilledMonsterCredit(objective.ObjectID, ObjectGuid::Empty);
                             break;
                         }
                     }

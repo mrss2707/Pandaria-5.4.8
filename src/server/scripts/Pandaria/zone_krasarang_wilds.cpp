@@ -2134,7 +2134,7 @@ struct npc_stoneplow_envoy : public ScriptedAI
             script_timer = 500;
             if (Player* player = caster->ToPlayer())
             {
-                player->KilledMonsterCredit(58955, 0);
+                player->KilledMonsterCredit(58955, ObjectGuid::Empty);
                 player_guid = player->GetGUID();
             }
         }
@@ -2473,7 +2473,7 @@ class go_mysterious_whirlpool : public GameObjectScript
             if (go->FindNearestCreature(NPC_ENTRY_NARJON, 100.0f, true))
                 return false;
 
-            uint64 guid = player->GetGUID();
+            ObjectGuid guid = player->GetGUID();
 
             if (Creature* narjon = player->SummonCreature(NPC_ENTRY_NARJON, { -1126.79f, 1368.609f, 18.94868f, 5.59949f }))
             {
@@ -2730,7 +2730,7 @@ struct npc_na_lek : public ScriptedAI
         me->RemoveAura(SPELL_MOGU_RUNE_PRISON);
         me->RemoveFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-        uint64 guid = player->GetGUID();
+        ObjectGuid guid = player->GetGUID();
         me->m_Events.Schedule(2000, [this]()
         {
             me->SetFacingTo(me->GetAngle(brojaiPos.GetPositionX(), brojaiPos.GetPositionY()));
@@ -2871,7 +2871,7 @@ struct npc_the_bell_peaks_start : public ScriptedAI
             return false;
 
         Creature* starter = kite->SummonCreature(player->GetTeamId() == TEAM_HORDE ? NPC_ENTRY_TAK_TAK : NPC_ENTRY_FENNIE_HORNSWAGGLE, kite->GetPosition(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420 * IN_MILLISECONDS);
-        uint64 guid = player->GetGUID();
+        ObjectGuid guid = player->GetGUID();
 
         if (starter)
         {

@@ -288,7 +288,7 @@ struct brawlers_guild_encounter_typeAI : public ScriptedAI
 
     SummonList summons;
     EventMap events, nonCombatEvents;
-    uint64 summonerGUID, targetGUID;
+    ObjectGuid summonerGUID, targetGUID;
     uint64 challengeCardGUID;
     bool hasTele, hasYell;
 
@@ -572,8 +572,8 @@ struct npc_brawlers_guild_bizmo : public ScriptedAI
     EventMap berserkerEvents;
     std::vector<uint32> playersInQueue;
     std::vector<uint64> challengeCardGUIDs;
-    uint64 currentChampionGUID;
-    uint64 currentEncounterGUID;
+    ObjectGuid currentChampionGUID;
+    ObjectGuid currentEncounterGUID;
     bool hasQueueStarted;
 
     void InitializeAI() override
@@ -605,7 +605,7 @@ struct npc_brawlers_guild_bizmo : public ScriptedAI
         me->SetUInt32Value(UNIT_FIELD_MOUNT_DISPLAY_ID, 44634);
         playersInQueue.clear();
         challengeCardGUIDs.clear();
-        currentChampionGUID = 0;
+        currentChampionGUID = ObjectGuid::Empty;
         hasQueueStarted = false;
         berserkerEvents.Reset();
     }
@@ -729,12 +729,12 @@ struct npc_brawlers_guild_bizmo : public ScriptedAI
 
         if (type == TYPE_QUEUE_NEXT) // send new one join to arena
         {
-            currentChampionGUID = 0;
+            currentChampionGUID = ObjectGuid::Empty;
 
             for (auto&& itr : playersInQueue)
             {
                 // try found new challenger
-                if (Player* target = ObjectAccessor::GetPlayer(*me, MAKE_NEW_GUID(itr, 0, HighGuid::Player)))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, ObjectGuid(HighGuid::Player, itr)))
                 {
                     currentChampionGUID = target->GetGUID();
 
@@ -878,13 +878,13 @@ class npc_brawlers_guild_brawlgar_arena_grunt : public CreatureScript
                     player->CastSpell(player, SPELL_QUEUED_FOR_BRAWL, true);
 
                     if (Creature* arenaHolder = player->FindNearestCreature(creature->GetMapId() == 1043 ? NPC_BOSS_BAZZELFLANGE : NPC_BIZMO, 100.0f, true))
-                        arenaHolder->AI()->SetData(TYPE_IN_QUEUE, player->GetGUIDLow());
+                        arenaHolder->AI()->SetData(TYPE_IN_QUEUE, player->GetGUID().GetCounter());
                     break;
                 case GOSSIP_ACTION_INFO_DEF + 2:
                     // Get our Position in queue
                     if (Creature* arenaHolder = player->FindNearestCreature(creature->GetMapId() == 1043 ? NPC_BOSS_BAZZELFLANGE : NPC_BIZMO, 100.0f, true))
                     {
-                        uint32 queuePos = (uint32)arenaHolder->AI()->GetGUID(player->GetGUIDLow());
+                        uint32 queuePos = (uint32)arenaHolder->AI()->GetGUID(player->GetGUID().GetCounter());
                         uint32 queueText = queuePos > 9 ? 724016 : queueGossipType.find(queuePos)->second;
                         player->SEND_GOSSIP_MENU(queueText, creature->GetGUID());
                         return false;
@@ -898,7 +898,7 @@ class npc_brawlers_guild_brawlgar_arena_grunt : public CreatureScript
                     if (Creature* arenaHolder = player->FindNearestCreature(creature->GetMapId() == 1043 ? NPC_BOSS_BAZZELFLANGE : NPC_BIZMO, 100.0f, true))
                     {
                         arenaHolder->AI()->SetGUID(player->GetGUID(), TYPE_CHALLENGE_CARD);
-                        arenaHolder->AI()->SetData(TYPE_IN_QUEUE, player->GetGUIDLow());
+                        arenaHolder->AI()->SetData(TYPE_IN_QUEUE, player->GetGUID().GetCounter());
                     }
                     break;
             }
@@ -913,7 +913,7 @@ class npc_brawlers_guild_brawlgar_arena_grunt : public CreatureScript
             // if player in queue - send gossip with queue sequence, if not - queue to arena
             if (Creature* arenaHolder = player->FindNearestCreature(creature->GetMapId() == 1043 ? NPC_BOSS_BAZZELFLANGE : NPC_BIZMO, 100.0f, true))
             {
-                if (!arenaHolder->AI()->GetData(player->GetGUIDLow()))
+                if (!arenaHolder->AI()->GetData(player->GetGUID().GetCounter()))
                 {
                     player->ADD_GOSSIP_ITEM_DB(player->GetDefaultGossipMenuForSource(creature), 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -995,8 +995,8 @@ struct npc_brawlers_guild_boss_bazzelflange : public ScriptedAI
     EventMap berserkerEvents;
     std::vector<uint32> playersInQueue;
     std::vector<uint64> challengeCardGUIDs;
-    uint64 currentChampionGUID;
-    uint64 currentEncounterGUID;
+    ObjectGuid currentChampionGUID;
+    ObjectGuid currentEncounterGUID;
     bool hasQueueStarted;
 
     void InitializeAI() override
@@ -1029,7 +1029,7 @@ struct npc_brawlers_guild_boss_bazzelflange : public ScriptedAI
     {
         playersInQueue.clear();
         challengeCardGUIDs.clear();
-        currentChampionGUID = 0;
+        currentChampionGUID = ObjectGuid::Empty;
         hasQueueStarted = false;
         berserkerEvents.Reset();
     }
@@ -1153,12 +1153,12 @@ struct npc_brawlers_guild_boss_bazzelflange : public ScriptedAI
 
         if (type == TYPE_QUEUE_NEXT) // send new one join to arena
         {
-            currentChampionGUID = 0;
+            currentChampionGUID = ObjectGuid::Empty;
 
             for (auto&& itr : playersInQueue)
             {
                 // try found new challenger
-                if (Player* target = ObjectAccessor::GetPlayer(*me, MAKE_NEW_GUID(itr, 0, HighGuid::Player)))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, ObjectGuid(HighGuid::Player, itr)))
                 {
                     currentChampionGUID = target->GetGUID();
 
@@ -1285,7 +1285,7 @@ struct npc_brawlers_guild_bruce : public brawlers_guild_encounter_typeAI
     void Reset() override
     {
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -1576,14 +1576,14 @@ struct npc_brawlers_guild_goredome : public brawlers_guild_encounter_typeAI
 {
     npc_brawlers_guild_goredome(Creature* creature) : brawlers_guild_encounter_typeAI(creature) { }
 
-    uint64 prevLumberingGUID;
+    ObjectGuid prevLumberingGUID;
     uint32 prevLumberingLow;
 
     void Reset() override
     {
         events.Reset();
-        prevLumberingGUID = 0;
-        targetGUID = 0;
+        prevLumberingGUID = ObjectGuid::Empty;
+        targetGUID = ObjectGuid::Empty;
         prevLumberingLow = 0;
     }
 
@@ -1658,7 +1658,7 @@ struct npc_brawlers_guild_goredome : public brawlers_guild_encounter_typeAI
                     if (Unit* LumberingTarget = me->SummonCreature(NPC_LUMBERING_CHARGE_TARGET, *vict, TEMPSUMMON_MANUAL_DESPAWN))
                     {
                         prevLumberingGUID = LumberingTarget->GetGUID();
-                        prevLumberingLow = LumberingTarget->GetGUIDLow();
+                        prevLumberingLow = LumberingTarget->GetGUID().GetCounter();
                         targetGUID = vict->GetGUID();
                         me->PrepareChanneledCast(me->GetAngle(LumberingTarget), SPELL_LUMBERING_CHARGE);
                     }
@@ -2040,7 +2040,7 @@ struct npc_brawlers_guild_riddoh : public brawlers_miscAI
     npc_brawlers_guild_riddoh(Creature* creature) : brawlers_miscAI(creature) { }
 
     EventMap events;
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2410,7 +2410,7 @@ struct npc_brawlers_guild_ixx : public brawlers_guild_encounter_typeAI
     void Reset() override
     {
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         me->setRegeneratingHealth(false);
     }
 
@@ -2535,7 +2535,7 @@ struct npc_brawlers_guild_crush : public brawlers_guild_encounter_typeAI
     void Reset() override
     {
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         notAllowCollisionCast = 1;
     }
 
@@ -3302,7 +3302,7 @@ struct npc_brawlers_guild_lepregnomes : public brawlers_guild_encounter_typeAI
         }
         else if (Creature* queazy = me->FindNearestCreature(NPC_QUEAZY, 100.0f, true))
         {
-            targetGUID = queazy->AI()->GetGUID();
+            targetGUID.Set(queazy->AI()->GetGUID());
             summonerGUID = targetGUID;
         }
     }
@@ -4011,7 +4011,7 @@ struct npc_brawlers_guild_tormented_ghost : public CreatureAI
 {
     npc_brawlers_guild_tormented_ghost(Creature* creature) : CreatureAI(creature) { }
 
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -4044,7 +4044,7 @@ struct npc_brawlers_guild_battletron : public brawlers_guild_encounter_typeAI
 {
     npc_brawlers_guild_battletron(Creature* creature) : brawlers_guild_encounter_typeAI(creature) { }
 
-    std::vector<uint64> BattleMinesGUIDs;
+    std::vector<ObjectGuid> BattleMinesGUIDs;
     uint32 mDeathCount;
 
     void Reset() override
@@ -4140,39 +4140,39 @@ struct npc_brawlers_guild_battletron : public brawlers_guild_encounter_typeAI
     }
 };
 
-// current range to Ertan
-float GetCirclePathAround(uint64 casterGUID, uint64 BattleTronGUID)
-{
-    if (Unit* m_caster = ObjectAccessor::FindUnit(casterGUID))
-        if (Unit* BattleTron = ObjectAccessor::FindUnit(BattleTronGUID))
-            return m_caster->GetExactDist2d(BattleTron);
-
-    return 0.0f;
-}
+//// current range to Ertan
+//float GetCirclePathAround(uint64 casterGUID, uint64 BattleTronGUID)
+//{
+//    if (Unit* m_caster = ObjectAccessor::GetUnit(casterGUID))
+//        if (Unit* BattleTron = ObjectAccessor::GetUnit(BattleTronGUID))
+//            return m_caster->GetExactDist2d(BattleTron);
+//
+//    return 0.0f;
+//}
 
 // Approximate this
-Position GetBattleMineSpawnPos(float m_ori, uint64 casterGUID, float m_dist = 3.5f)
-{
-    Unit* caster = ObjectAccessor::FindUnit(casterGUID);
-
-    if (!caster)
-        return{ 0.0f, 0.0f, 0.0f, 0.0f };
-
-    float x, y;
-    GetPositionWithDistInOrientation(caster, m_dist, m_ori, x, y);
-
-    Position pos = { x, y, caster->GetPositionZ(), 0.0f };
-
-    // At spawn vortex should look at Battletron
-    return{ x, y, caster->GetPositionZ(), pos.GetAngle(caster) };
-}
+//Position GetBattleMineSpawnPos(float m_ori, uint64 casterGUID, float m_dist = 3.5f)
+//{
+//    Unit* caster = ObjectAccessor::FindUnit(casterGUID);
+//
+//    if (!caster)
+//        return{ 0.0f, 0.0f, 0.0f, 0.0f };
+//
+//    float x, y;
+//    GetPositionWithDistInOrientation(caster, m_dist, m_ori, x, y);
+//
+//    Position pos = { x, y, caster->GetPositionZ(), 0.0f };
+//
+//    // At spawn vortex should look at Battletron
+//    return{ x, y, caster->GetPositionZ(), pos.GetAngle(caster) };
+//}
 
 // Unstable Mine 67422
 struct npc_brawlers_guild_unstable_mine : public CreatureAI
 {
     npc_brawlers_guild_unstable_mine(Creature* creature) : CreatureAI(creature) { }
 
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     EventMap events;
     float x, y;
 
@@ -4316,7 +4316,7 @@ struct npc_brawlers_guild_mecha_bruce : public brawlers_guild_encounter_typeAI
     {
         DoCast(me, SPELL_MECHA_ARMOR_ALPHA);
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -4407,7 +4407,7 @@ struct npc_brawlers_guild_grandpa_grumplefloot : public brawlers_guild_encounter
     void Reset() override
     {
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -4786,7 +4786,7 @@ class spell_brawlers_guild_lumbering_charge : public AuraScript
     {
         if (GetCaster() && GetCaster()->ToCreature())
             if (uint32 lumberingLow = GetCaster()->ToCreature()->AI()->GetData(TYPE_LUMBERING))
-                if (Unit* lumbering = ObjectAccessor::GetUnit(*GetCaster(), MAKE_NEW_GUID(lumberingLow, NPC_LUMBERING_CHARGE_TARGET, HighGuid::Unit)))
+                if (Unit* lumbering = ObjectAccessor::GetUnit(*GetCaster(), ObjectGuid(HighGuid::Unit, NPC_LUMBERING_CHARGE_TARGET, lumberingLow)))
                     GetCaster()->GetMotionMaster()->MoveCharge(lumbering->GetPositionX(), lumbering->GetPositionY(), lumbering->GetPositionZ(), 20.0f, EVENT_CHARGE);
     }
 
@@ -4964,7 +4964,7 @@ class spell_brawlers_guild_goblin_rocket_barrage : public AuraScript
     void OnTrigger(AuraEffect const* /*aurEff*/)
     {
         if (Unit* owner = GetOwner()->ToUnit())
-            if (uint64 targetGUID = owner->GetTarget())
+            if (ObjectGuid targetGUID = owner->GetTarget())
                 if (Unit* target = ObjectAccessor::GetUnit(*owner, targetGUID))
                     owner->CastSpell(target, SPELL_GOBLIN_ROCKET_BARRAGE_MISSLE, true);
     }

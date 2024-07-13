@@ -318,7 +318,7 @@ public:
                 {
                     if (who->HasAura(SPELL_SUBDUED_LITHE_STALKER))
                         {
-                            owner->ToPlayer()->KilledMonsterCredit(NPC_GEIST_RETURN_BUNNY_KC, 0);
+                            owner->ToPlayer()->KilledMonsterCredit(NPC_GEIST_RETURN_BUNNY_KC, ObjectGuid::Empty);
                             who->ToCreature()->DisappearAndDie();
 
                     }

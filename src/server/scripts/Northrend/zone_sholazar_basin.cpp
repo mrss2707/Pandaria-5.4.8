@@ -624,7 +624,7 @@ public:
                 if (player->GetQuestObjectiveCounter(objective.ID) != 0)
                     continue;
 
-                player->KilledMonsterCredit(me->GetEntry(), 0);
+                player->KilledMonsterCredit(me->GetEntry(), ObjectGuid::Empty);
                 player->Say(SAY_OFFER, LANG_UNIVERSAL);
                 sayStep = 1;
                 break;
@@ -918,7 +918,7 @@ public:
                     apple->CastSpell(apple, SPELL_APPLE_FALL);
                     wilhelm->AI()->Talk(SAY_WILHELM_HIT);
                     if (Player* player = shooter->ToPlayer())
-                        player->KilledMonsterCredit(NPC_APPLE, 0);
+                        player->KilledMonsterCredit(NPC_APPLE, ObjectGuid::Empty);
                     apple->DespawnOrUnsummon();
 
                     break;

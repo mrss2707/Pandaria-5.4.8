@@ -208,7 +208,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
 
                                 instance->SummonCreature(NPC_CHROMIE_3, ChromieExitSummonPos);
                                 for (auto&& ref : instance->GetPlayers())
-                                    ref.GetSource()->KilledMonsterCredit(31006, 0);
+                                    ref.GetSource()->KilledMonsterCredit(31006, ObjectGuid::Empty);
                                 break;
                         }
                         break;
@@ -259,7 +259,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                         if (_crateCount == 5)
                         {
                             for (auto&& ref : instance->GetPlayers())
-                                ref.GetSource()->KilledMonsterCredit(30996, 0);
+                                ref.GetSource()->KilledMonsterCredit(30996, ObjectGuid::Empty);
 
                             // Summon Chromie and global whisper
                             if (Creature* chromie = instance->SummonCreature(NPC_CHROMIE_2, ChromieEntranceSummonPos))

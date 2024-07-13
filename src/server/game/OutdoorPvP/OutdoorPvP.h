@@ -131,7 +131,7 @@ class OPvPCapturePoint
 
         virtual void DeleteSpawns();
 
-        uint32 m_capturePointGUID;
+        ObjectGuid m_capturePointGUID;
 
         GameObject* m_capturePoint;
 

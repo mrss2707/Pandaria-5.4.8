@@ -81,7 +81,7 @@ void LFGPlayerScript::OnLogin(Player* player)
         return;
 
     // Temporal: Trying to determine when group data and LFG data gets desynched
-    uint64 guid = player->GetGUID();
+    ObjectGuid guid = player->GetGUID();
 
     sLFGMgr->InitializeLockedDungeons(player);
     sLFGMgr->SetTeam(player->GetGUID(), player->GetTeam());

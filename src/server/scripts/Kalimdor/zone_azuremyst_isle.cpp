@@ -526,7 +526,7 @@ public:
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 if ((*itr)->GetQuestStatus(QUEST_TREES_COMPANY) == QUEST_STATUS_INCOMPLETE && (*itr)->HasAura(SPELL_TREE_DISGUISE))
-                    (*itr)->KilledMonsterCredit(NPC_SPARK, 0);
+                    (*itr)->KilledMonsterCredit(NPC_SPARK, ObjectGuid::Empty);
         }
 
         void DespawnNagaFlag(bool despawn)

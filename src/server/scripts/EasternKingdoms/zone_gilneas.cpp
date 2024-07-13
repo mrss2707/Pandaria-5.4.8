@@ -1502,7 +1502,7 @@ public:
                         if (Unit* passenger = vehicle->GetPassenger(0))
                             if (Player* player = passenger->ToPlayer())
                             {
-                                player->KilledMonsterCredit(NPC_KRENNAN_ARANAS_KILL_CREDIT, 0);
+                                player->KilledMonsterCredit(NPC_KRENNAN_ARANAS_KILL_CREDIT, ObjectGuid::Empty);
 
                                 if (Unit* passenger_2 = vehicle->GetPassenger(1))
                                     if (Creature* aranas = passenger_2->ToCreature())
@@ -1615,7 +1615,7 @@ class npc_gilneas_children : public CreatureScript
                         if (bct)
                             baseText = bct->GetText(loc_idx, player->GetGender());
                             player->Say(baseText, LANG_UNIVERSAL);
-                        player->KilledMonsterCredit(me->GetEntry(), 0);
+                        player->KilledMonsterCredit(me->GetEntry(), ObjectGuid::Empty);
                         me->RemoveFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                         events.ScheduleEvent(EVENT_TALK_TO_PLAYER, 3s + 500ms);
                     }

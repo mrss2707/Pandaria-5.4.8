@@ -828,7 +828,7 @@ struct npc_start_stink_bombs_away : public ScriptedAI
         player->CastSpell(player, stinkBombsAwaySummonBroom[team]);
         Creature* broom = GetClosestCreatureWithEntry(me, stinkBombsAwayBroom[team], 50.0f, true);
         Creature* starter = broom->SummonCreature(me->GetEntry(), me->GetPosition(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000);
-        uint64 guid = player->GetGUID();
+        ObjectGuid guid = player->GetGUID();
         if (broom && starter && guid)
         {
             player->EnterVehicle(broom, 1);
@@ -1118,7 +1118,7 @@ class spell_stink_bombs_away_aura : public AuraScript
 
             uint8 team = player->GetTeamId();
             Creature* starter = GetClosestCreatureWithEntry(player, stinkBombsAwayStarter[team], 50.0f, true);
-            uint64 guid = player->GetGUID();
+            ObjectGuid guid = player->GetGUID();
 
             if (broom && starter)
             {
@@ -1202,7 +1202,7 @@ class at_shopping_around : public AreaTriggerScript
             {
                 Creature* delian = player->FindNearestCreature(54146, 50.0f);
                 Creature* dran = player->FindNearestCreature(6986, 50.0f);
-                uint64 guid = player->GetGUID();
+                ObjectGuid guid = player->GetGUID();
                 if (delian && dran && !dran->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
                 {
                     dran->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED); // just for prevent multiple triggering
@@ -1228,7 +1228,7 @@ class at_shopping_around : public AreaTriggerScript
             {
                 Creature* hudson = player->FindNearestCreature(54021, 50.0f);
                 Creature* quincy = player->FindNearestCreature(53991, 50.0f);
-                uint64 guid = player->GetGUID();
+                ObjectGuid guid = player->GetGUID();
                 if (hudson && quincy && !quincy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
                 {
                     quincy->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED); // just for prevent multiple triggering
@@ -1265,7 +1265,7 @@ class at_the_collectors_agent : public AreaTriggerScript
             {
                 if (Creature* sanath = player->FindNearestCreature(54072, 50.0f))
                 {
-                    uint64 guid = player->GetGUID();
+                    ObjectGuid guid = player->GetGUID();
                     if (!sanath->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
                     {
                         sanath->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED); // just for prevent multiple triggering

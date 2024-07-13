@@ -426,6 +426,8 @@ class InstanceScript : public ZoneScript
 
         ObjectGuid GetGUID() const { return instanceGuid; }
 
+        virtual ObjectGuid GetGuidData(uint32 type) const override;
+
         // Scenarios
         void SendScenarioState(ScenarioData data, Player* player = nullptr);
         void SendScenarioProgressUpdate(CriteriaProgressData data, Player* player = nullptr);
@@ -458,7 +460,7 @@ class InstanceScript : public ZoneScript
         uint32 GetBeginingTime() const { return beginningTime; }
         uint32 GetChallengeTime() const { return challengeTime; }
 
-        void GameObjectRemoved(GameObject* go);
+        void GameObjectRemoved(GameObject* go) override;
 
         void UpdateDynamicHealth(ObjectGuid single = ObjectGuid::Empty);
         void AddFlexCreature(ObjectGuid guid) { flexCreatures.push_back(guid); }

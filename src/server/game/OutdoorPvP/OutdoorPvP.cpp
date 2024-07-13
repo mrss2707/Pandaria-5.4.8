@@ -30,7 +30,7 @@
 #include "CellImpl.h"
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp):
-    m_capturePointGUID(0), m_capturePoint(NULL), m_maxValue(0.0f), m_minValue(0.0f), m_maxSpeed(0),
+    m_capturePointGUID(), m_capturePoint(NULL), m_maxValue(0.0f), m_minValue(0.0f), m_maxSpeed(0),
     m_value(0), m_team(TEAM_NEUTRAL), m_OldState(OBJECTIVESTATE_NEUTRAL),
     m_State(OBJECTIVESTATE_NEUTRAL), m_neutralValuePct(0), m_PvP(pvp)
 { }
@@ -126,7 +126,7 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, fl
         return false;
     }
 
-    m_capturePointGUID = sObjectMgr->AddGOData(entry, map, { x, y, z, o }, 0, { rotation0, rotation1, rotation2, rotation3 });
+    m_capturePointGUID = ObjectGuid(HighGuid::GameObject, sObjectMgr->AddGOData(entry, map, { x, y, z, o }, 0, { rotation0, rotation1, rotation2, rotation3 }));
     if (!m_capturePointGUID)
         return false;
 
@@ -201,7 +201,7 @@ bool OPvPCapturePoint::DelObject(uint32 type)
 bool OPvPCapturePoint::DelCapturePoint()
 {
     sObjectMgr->DeleteGOData(m_capturePointGUID);
-    m_capturePointGUID = 0;
+    m_capturePointGUID.Clear();
 
     if (m_capturePoint)
     {

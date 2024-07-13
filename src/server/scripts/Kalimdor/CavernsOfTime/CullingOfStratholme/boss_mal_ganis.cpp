@@ -221,7 +221,7 @@ class boss_mal_ganis : public CreatureScript
                                         if (!PlList.isEmpty())
                                             for (auto&& ref : PlList)
                                                 if (Player* player = ref.GetSource())
-                                                    player->KilledMonsterCredit(NPC_MALGANIS_KILL_CREDIT, 0);
+                                                    player->KilledMonsterCredit(NPC_MALGANIS_KILL_CREDIT, ObjectGuid::Empty);
                                     }
                                     me->SetVisible(false);
                                     me->Kill(me);

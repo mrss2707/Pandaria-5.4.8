@@ -367,7 +367,7 @@ class npc_zarjira : public CreatureScript
             std::list<Player*> playerList;
             GetPlayerListInGrid(playerList, me, 50.0f);
             for (auto&& player : playerList)
-                player->KilledMonsterCredit(NPC_ZARJIRA, 0);
+                player->KilledMonsterCredit(NPC_ZARJIRA, ObjectGuid::Empty);
         }
 
         void JustEngagedWith(Unit *) override
