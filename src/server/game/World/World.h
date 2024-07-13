@@ -27,6 +27,7 @@
 #include "SharedDefines.h"
 #include "ByteBuffer.h"
 #include "LockedQueue.h"
+#include "ObjectGuid.h"
 #include "AsyncCallbackProcessor.h"
 #include "DatabaseEnvFwd.h"
 #include "Realm.h"

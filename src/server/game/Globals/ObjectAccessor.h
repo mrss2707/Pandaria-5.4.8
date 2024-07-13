@@ -37,7 +37,6 @@ class DynamicObject;
 class WorldObject;
 class Vehicle;
 class Map;
-class WorldRunnable;
 class Transport;
 
 template <class T>

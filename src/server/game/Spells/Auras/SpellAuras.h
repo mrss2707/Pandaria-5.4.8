@@ -67,7 +67,7 @@ struct ControlInfo
 struct AuraData
 {
     uint32 Id;
-    uint64 CasterGuid;
+    ObjectGuid CasterGuid;
     uint32 EffectMask;
     int32 Duration;
     int32 MaxDuration;

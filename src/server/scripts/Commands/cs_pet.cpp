@@ -123,7 +123,7 @@ public:
         CharacterDatabase.CommitTransaction(trans);
         player->PetSpellInitialize();
 
-        player->GetSession()->SendPetList(0, PET_SLOT_ACTIVE_FIRST, PET_SLOT_ACTIVE_LAST);
+        player->GetSession()->SendPetList(ObjectGuid::Empty, PET_SLOT_ACTIVE_FIRST, PET_SLOT_ACTIVE_LAST);
 
         return true;
     }

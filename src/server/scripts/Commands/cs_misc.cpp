@@ -544,7 +544,7 @@ public:
         if (target)
         {
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
                 return false;
 
             std::string chrNameLink = handler->playerLink(targetName);
@@ -687,7 +687,7 @@ public:
         {
             std::string nameLink = handler->playerLink(targetName);
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
                 return false;
 
             if (target->IsBeingTeleported())
@@ -1001,7 +1001,7 @@ public:
             return false;
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
         if (target->IsBeingTeleported())
@@ -1069,7 +1069,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
@@ -1819,7 +1819,7 @@ public:
         if (target)
         {
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
                 return false;
 
             accId             = target->GetSession()->GetAccountId();
@@ -3035,7 +3035,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
         target->CombatStop();
@@ -3050,7 +3050,7 @@ public:
             return false;
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
         // Repair items

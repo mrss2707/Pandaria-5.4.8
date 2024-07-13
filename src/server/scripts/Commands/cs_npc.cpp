@@ -280,7 +280,7 @@ public:
         }
 
         Creature* creature = new Creature();
-        if (!creature->Create(sObjectMgr->GenerateLowGuid(HighGuid::Unit), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
         {
             delete creature;
             return false;
@@ -525,7 +525,7 @@ public:
                 return false;
 
             if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(lowguid))
-                unit = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(lowguid, cr_data->id, HighGuid::Unit));
+                unit = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(ObjectGuid(HighGuid::Unit, cr_data->id, lowguid));
         }
         else
             unit = handler->getSelectedCreature();
@@ -691,7 +691,7 @@ public:
 
         creature->AI()->SetData(data_1, data_2);
         std::string AIorScript = creature->GetAIName() != "" ? "AI type: " + creature->GetAIName() : (creature->GetScriptName() != "" ? "Script Name: " + creature->GetScriptName() : "No AI or Script Name Set");
-        handler->PSendSysMessage(LANG_NPC_SETDATA, creature->GetGUID(), creature->GetEntry(), creature->GetName().c_str(), data_1, data_2, AIorScript.c_str());
+        handler->PSendSysMessage(LANG_NPC_SETDATA, creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str(), data_1, data_2, AIorScript.c_str());
         return true;
     }
 
@@ -742,7 +742,7 @@ public:
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
         std::string defRespawnDelayMaxStr = target->GetRespawnDelayMax() ? secsToTimeString(target->GetRespawnDelayMax(), true) : defRespawnDelayStr;
 
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetDBTableGUIDLow(), target->GetGUIDLow(), faction, npcflags, Entry, displayid, nativeid);
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetDBTableGUIDLow(), target->GetGUID().GetCounter(), faction, npcflags, Entry, displayid, nativeid);
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->GetLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
         handler->PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
@@ -1402,11 +1402,11 @@ public:
         if (!creature || !receiver_str || !text)
             return false;
 
-        uint64 receiver_guid = atol(receiver_str);
+        ObjectGuid receiver_guid = ObjectGuid(HighGuid::Player, uint32(atol(receiver_str)));
 
         // check online security
         Player* receiver = ObjectAccessor::FindPlayer(receiver_guid);
-        if (handler->HasLowerSecurity(receiver, 0))
+        if (handler->HasLowerSecurity(receiver, ObjectGuid::Empty))
             return false;
 
         creature->MonsterWhisper(text, receiver);
@@ -1533,7 +1533,7 @@ public:
         CharacterDatabase.CommitTransaction(trans);
         player->PetSpellInitialize();
 
-        player->GetSession()->SendPetList(0, PET_SLOT_ACTIVE_FIRST, PET_SLOT_ACTIVE_LAST);
+        player->GetSession()->SendPetList(ObjectGuid::Empty, PET_SLOT_ACTIVE_FIRST, PET_SLOT_ACTIVE_LAST);
 
         return true;
     }
@@ -1607,7 +1607,7 @@ public:
 
         if (!creature->GetDBTableGUIDLow())
         {
-            handler->PSendSysMessage("Selected creature %u isn't in creature table", creature->GetGUIDLow());
+            handler->PSendSysMessage("Selected creature %u isn't in creature table", creature->GetGUID().GetCounter());
             handler->SetSentErrorMessage(true);
             return false;
         }

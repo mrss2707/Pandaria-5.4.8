@@ -1231,7 +1231,7 @@ std::string ChatHandler::extractPlayerNameFromLink(char* text)
     return name;
 }
 
-bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid player_guid /*=NULL*/, std::string* player_name /*= NULL*/)
+bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* player_guid /*=NULL*/, std::string* player_name /*= NULL*/)
 {
     if (args && *args)
     {
@@ -1250,11 +1250,11 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid pl
             *player = pl;
 
         // if need guid value from DB (in name case for check player existence)
-        ObjectGuid guid = !pl && (!player_guid.IsEmpty() || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : ObjectGuid::Empty;
+        ObjectGuid guid = !pl && (player_guid || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : ObjectGuid::Empty;
 
         // if allowed player guid (if no then only online players allowed)
-        if (!player_guid.IsEmpty())
-            player_guid = pl ? pl->GetGUID() : guid;
+        if (player_guid)
+            *player_guid = pl ? pl->GetGUID() : guid;
 
         if (player_name)
             *player_name = pl || guid ? name : "";
@@ -1266,15 +1266,15 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid pl
         if (player)
             *player = pl;
         // if allowed player guid (if no then only online players allowed)
-        if (!player_guid.IsEmpty())
-            player_guid = pl ? pl->GetGUID() : ObjectGuid::Empty;
+        if (player_guid)
+            *player_guid = pl ? pl->GetGUID() : ObjectGuid::Empty;
 
         if (player_name)
             *player_name = pl ? pl->GetName() : "";
     }
 
     // some from req. data must be provided (note: name is empty if player not exist)
-    if ((!player || !*player) && (!player_guid || player_guid.IsEmpty()) && (!player_name || player_name->empty()))
+    if ((!player || !*player) && (!player_guid || !*player_guid) && (!player_name || player_name->empty()))
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);

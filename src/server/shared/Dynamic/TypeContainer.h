@@ -25,6 +25,7 @@
 
 #include <map>
 #include <vector>
+#include <unordered_map>
 #include "Define.h"
 #include "Dynamic/TypeList.h"
 #include "GridRefManager.h"
