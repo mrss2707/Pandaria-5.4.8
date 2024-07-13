@@ -519,7 +519,7 @@ class npc_neferset_enforcer_quest : public CreatureScript
 
                     if (uint32 targetLOW = summoner->ToCreature()->AI()->GetData(TYPE_NEFERSET_PRISON_PLAYER))
                     {
-                        if (Player* pPlayer = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(targetLOW, 0, HIGHGUID_PLAYER)))
+                        if (Player* pPlayer = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(targetLOW, 0, HighGuid::Player)))
                         {
                             me->GetMotionMaster()->MoveChase(pPlayer);
                             me->Attack(pPlayer, true);
@@ -717,7 +717,7 @@ class npc_krokolisks_quest : public CreatureScript
 
                 if (uint32 targetLOW = summoner->ToCreature()->AI()->GetData(TYPE_PIT_MASTER_PLAYER))
                 {
-                    if (Player* pPlayer = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(targetLOW, 0, HIGHGUID_PLAYER)))
+                    if (Player* pPlayer = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(targetLOW, 0, HighGuid::Player)))
                     {
                         me->GetMotionMaster()->MoveChase(pPlayer);
                         me->Attack(pPlayer, true);

@@ -278,8 +278,8 @@ void ServiceMgr::RemoveOldSkillsFromDB(uint32 guid, uint8 classID)
     {
         if (iter->flag == 15)
         {
-            trans->PAppend("DELETE FROM character_spell WHERE guid = %u AND spell = %u;", GUID_LOPART(guid), iter->entry);
-            trans->PAppend("DELETE FROM character_skills WHERE guid = %u and skill = %u;", GUID_LOPART(guid), iter->data);
+            trans->PAppend("DELETE FROM character_spell WHERE guid = %u AND spell = %u;", guid, iter->entry);
+            trans->PAppend("DELETE FROM character_skills WHERE guid = %u and skill = %u;", guid, iter->data);
         }
     }
     CharacterDatabase.CommitTransaction(trans);
@@ -590,7 +590,7 @@ void ServiceMgr::_LoadPremium()
             {
                 Field* fields = result->Fetch();
                 uint32 guid = fields[0].GetUInt32();
-                _aucGUIDs[i].push_back(MAKE_NEW_GUID(guid, auctioneers[i][j++], HighGuid::Unit));
+                _aucGUIDs[i].push_back(ObjectGuid(HighGuid::Unit, auctioneers[i][j++], guid));
             }
         }
     }
@@ -612,7 +612,7 @@ Creature* ServiceMgr::GetPremiumAuc(Player *player)
     for (auto&& guid : _aucGUIDs[faction])
     {
         // generally, on x2 first list member always should be aviable
-        creature = sObjectAccessor->GetObjectInWorld(guid, creature);
+        creature = ObjectAccessor::GetCreature(*player, guid);
         if (creature) // it's may be dead or removed from world, then check next (list contain all game auctioneers for faction)
             break;
     }
@@ -776,7 +776,7 @@ void ServiceMgr::DeletedItemNotify(uint32 guidLow, Item* item, uint8 type)
         return;
 
     CharacterDatabase.PQuery("INSERT INTO item_deleted (owner_guid, old_item_guid, item_entry, item_count, delete_date, delete_type) VALUES ('%u', '%u', '%u', '%u', '%u', '%u')",
-        guidLow, item->GetGUIDLow(), item->GetEntry(), item->GetCount(), uint32(time(NULL)), uint32(type));
+        guidLow, item->GetGUID().GetCounter(), item->GetEntry(), item->GetCount(), uint32(time(NULL)), uint32(type));
 
     item->SetHasDeletedItemRecord(true); // If the player will buy this item back after being saved - it will be removed from item_deleted table
 }

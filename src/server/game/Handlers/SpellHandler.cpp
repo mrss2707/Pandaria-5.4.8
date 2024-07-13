@@ -1138,7 +1138,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             spellInfo = actualSpellInfo;
     }
 
-    Spell* spell = new Spell(caster, spellInfo, TRIGGERED_NONE, 0, false);
+    Spell* spell = new Spell(caster, spellInfo, TRIGGERED_NONE, ObjectGuid::Empty, false);
     spell->m_cast_count = castCount;                       // set count of casts
     spell->m_glyphIndex = glyphIndex;
 
@@ -1242,7 +1242,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     }
 
     // maybe should only remove one buff when there are multiple?
-    _player->RemoveOwnedAura(spellId, 0, 0, AURA_REMOVE_BY_CANCEL);
+    _player->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
 void WorldSession::HandleCancelModSpeedNoControlAuras(WorldPacket& recvPacket)
@@ -1340,7 +1340,7 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    pet->RemoveOwnedAura(spellId, 0, 0, AURA_REMOVE_BY_CANCEL);
+    pet->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
 
     pet->AddCreatureSpellCooldown(spellId);
 }

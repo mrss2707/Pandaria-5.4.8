@@ -83,7 +83,7 @@ public:
     void AddTicket(BugTicket* ticket);
 
     template<typename T> void RemoveTicket(uint32 ticketId);
-    template<typename T> void CloseTicket(uint32 ticketId, int64 closedBy);
+    template<typename T> void CloseTicket(uint32 ticketId, ObjectGuid closedBy);
     template<typename T> void ResetTickets();
     template<typename T> void ShowList(ChatHandler& handler) const;
     template<typename T> void ShowList(ChatHandler& handler, bool onlineOnly) const;

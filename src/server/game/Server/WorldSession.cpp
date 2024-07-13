@@ -627,8 +627,8 @@ void WorldSession::LogoutPlayer(bool save)
         }
 
         //! Broadcast a logout message to the player's friends
-        sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUID().GetCounter(), true);
-        sSocialMgr->RemovePlayerSocial(_player->GetGUID().GetCounter());
+        sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUID(), true);
+        sSocialMgr->RemovePlayerSocial(_player->GetGUID());
 
         // forfiet any pet battles in progress
         sPetBattleSystem->ForfietBattle(_player->GetGUID());
@@ -651,7 +651,7 @@ void WorldSession::LogoutPlayer(bool save)
         //! Send the 'logout complete' packet to the client
         //! Client will respond by sending 3x CMSG_CANCEL_TRADE, which we currently dont handle
         WorldPacket data(SMSG_LOGOUT_COMPLETE);
-        ObjectGuid guid = 0; // Autolog guid - 0 for logout
+        ObjectGuid guid = ObjectGuid::Empty; // Autolog guid - 0 for logout
 
         data.WriteBit(true);
 
@@ -1132,8 +1132,8 @@ void WorldSession::SendTimezoneInformation()
     data.WriteBits(strlen(timezoneString), 7);
     data.WriteBits(strlen(timezoneString), 7);
     data.FlushBits();
-    data.WriteString(timezoneString);
-    data.WriteString(timezoneString);
+    data.WriteString(std::string_view(timezoneString));
+    data.WriteString(std::string_view(timezoneString));
     SendPacket(&data);
 }
 

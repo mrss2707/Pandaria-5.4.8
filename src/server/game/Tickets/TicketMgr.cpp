@@ -203,7 +203,7 @@ template<> void TicketMgr::RemoveTicket<BugTicket>(uint32 ticketId)
     }
 }
 
-template<> void TicketMgr::CloseTicket<GmTicket>(uint32 ticketId, int64 closedBy)
+template<> void TicketMgr::CloseTicket<GmTicket>(uint32 ticketId, ObjectGuid closedBy)
 {
     if (GmTicket* ticket = GetTicket<GmTicket>(ticketId))
     {
@@ -216,7 +216,7 @@ template<> void TicketMgr::CloseTicket<GmTicket>(uint32 ticketId, int64 closedBy
     }
 }
 
-template<> void TicketMgr::CloseTicket<BugTicket>(uint32 ticketId, int64 closedBy)
+template<> void TicketMgr::CloseTicket<BugTicket>(uint32 ticketId, ObjectGuid closedBy)
 {
     if (BugTicket* ticket = GetTicket<BugTicket>(ticketId))
     {

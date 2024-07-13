@@ -65,7 +65,7 @@ class OutdoorPvPMgr
         bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
         // handle custom go if registered
-        bool HandleOpenGo(Player* player, uint64 guid);
+        bool HandleOpenGo(Player* player, ObjectGuid guid);
 
         ZoneScript* GetZoneScript(uint32 zoneId);
 

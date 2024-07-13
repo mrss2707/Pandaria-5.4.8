@@ -1897,7 +1897,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // The player was ported to another map and loses the duel immediately.
     // We have to perform this check before the teleport, otherwise the
     // ObjectAccessor won't find the flag.
-    if (duel && GetMapId() != mapid && GetMap()->GetGameObject(GetUInt64Value(PLAYER_FIELD_DUEL_ARBITER)))
+    if (duel && GetMapId() != mapid && GetMap()->GetGameObject(GetGuidValue(PLAYER_FIELD_DUEL_ARBITER)))
         DuelComplete(DUEL_FLED);
 
     if (GetMapId() == mapid && !m_forcedTeleportFar)
@@ -8047,7 +8047,7 @@ void Player::CheckDuelDistance(time_t currTime)
     if (!duel)
         return;
 
-    uint64 duelFlagGUID = GetUInt64Value(PLAYER_FIELD_DUEL_ARBITER);
+    ObjectGuid duelFlagGUID = GetGuidValue(PLAYER_FIELD_DUEL_ARBITER);
     GameObject* obj = GetMap()->GetGameObject(duelFlagGUID);
     if (!obj)
         return;
@@ -8156,7 +8156,7 @@ void Player::DuelComplete(DuelCompleteType type)
         duel->opponent->CastSpell(duel->opponent, 52852, true);
 
     //Remove Duel Flag object
-    GameObject* obj = GetMap()->GetGameObject(GetUInt64Value(PLAYER_FIELD_DUEL_ARBITER));
+    GameObject* obj = GetMap()->GetGameObject(GetGuidValue(PLAYER_FIELD_DUEL_ARBITER));
     if (obj)
         duel->initiator->RemoveGameObject(obj, true);
 
@@ -8193,9 +8193,9 @@ void Player::DuelComplete(DuelCompleteType type)
         duel->opponent->ClearComboPoints();
 
     //cleanups
-    SetUInt64Value(PLAYER_FIELD_DUEL_ARBITER, 0);
+    SetGuidValue(PLAYER_FIELD_DUEL_ARBITER, ObjectGuid::Empty);
     SetUInt32Value(PLAYER_FIELD_DUEL_TEAM, 0);
-    duel->opponent->SetUInt64Value(PLAYER_FIELD_DUEL_ARBITER, 0);
+    duel->opponent->SetGuidValue(PLAYER_FIELD_DUEL_ARBITER, ObjectGuid::Empty);
     duel->opponent->SetUInt32Value(PLAYER_FIELD_DUEL_TEAM, 0);
 
     delete duel->opponent->duel;
@@ -19004,7 +19004,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     ClearInCombat();
 
     // make sure the unit is considered not in duel for proper loading
-    SetUInt64Value(PLAYER_FIELD_DUEL_ARBITER, 0);
+    SetGuidValue(PLAYER_FIELD_DUEL_ARBITER, ObjectGuid::Empty);
     SetUInt32Value(PLAYER_FIELD_DUEL_TEAM, 0);
 
     // reset stats before loading any modifiers

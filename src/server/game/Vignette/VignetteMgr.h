@@ -53,7 +53,7 @@ namespace Vignette
             * @param position : Position of the vignette
             * @param sourceGuid : Source of the vignette if any (can be gameobject or creature), the vignette will follow the position of the source
             */
-            Entity* CreateAndAddVignette(VignetteEntry const* vignetteEntry, uint32 const mapId, Type const vignetteType, G3D::Vector3 const position, ObjectGuid const sourceGuid = ObjectGuid::Empty);
+            Entity* CreateAndAddVignette(VignetteEntry const* vignetteEntry, Map* map, uint32 const mapId, Type const vignetteType, G3D::Vector3 const position, ObjectGuid const sourceGuid = ObjectGuid::Empty);
 
             /*
             * Remove the vignettes of the manager if they are of the same ID as specified, and destroy them

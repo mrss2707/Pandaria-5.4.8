@@ -58,7 +58,7 @@ void ScenarioMgr::SendScenarioState(Player* player, uint32 map, int32 step, uint
         criteriaTreeId = miscCriteriaTreeId;
 
     ObjectGuid playerGuid = player->GetGUID();
-    ObjectGuid unkGuid = 0;
+    ObjectGuid unkGuid = ObjectGuid::Empty;
 
     ByteBuffer bytesData;
 

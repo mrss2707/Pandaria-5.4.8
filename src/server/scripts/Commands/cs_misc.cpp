@@ -1713,7 +1713,7 @@ public:
         std::string targetName;
 
         // To make sure we get a target, we convert our guid to an omniversal...
-        uint32 parseGUID = MAKE_NEW_GUID(atol((char*)args), 0, HIGHGUID_PLAYER);
+        uint32 parseGUID = MAKE_NEW_GUID(atol((char*)args), 0, HighGuid::Player);
 
         // ... and make sure we get a target, somehow.
         if (sObjectMgr->GetPlayerNameByGUID(parseGUID, targetName))
@@ -4126,7 +4126,7 @@ public:
             info.inventory_slot = fields[i++].GetUInt8();
         }
 
-        uint64 ownerGuid = MAKE_NEW_GUID(info.owner_guid, 0, HIGHGUID_PLAYER);
+        uint64 ownerGuid = MAKE_NEW_GUID(info.owner_guid, 0, HighGuid::Player);
         if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerGuid))
         {
             handler->PSendSysMessage("Item owner %s (GUID: %u) is currently online.", player->GetName().c_str(), info.owner_guid);
@@ -4458,7 +4458,7 @@ public:
             if (Item* item = Item::CreateItem(itemEntry, itemCount))
             {
                 itemStorage.push_back(item);
-                item->SetOwnerGUID(MAKE_NEW_GUID(GUID_LOPART(guid), 0, HIGHGUID_PLAYER));
+                item->SetOwnerGUID(MAKE_NEW_GUID(GUID_LOPART(guid), 0, HighGuid::Player));
                 item->SetBinding(true);
                 item->SaveToDB(trans);                               // save for prevent lost at next mail load, if send fail then item will deleted
                 restoredItems << itemEntry << " ";

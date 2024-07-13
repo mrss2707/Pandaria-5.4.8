@@ -35,7 +35,7 @@ namespace Vignette
             delete itr.second;
     }
 
-    Entity* Manager::CreateAndAddVignette(VignetteEntry const* vignetteEntry, uint32 const mapId, Type const vignetteType, G3D::Vector3 const position, ObjectGuid const sourceGuid)
+    Entity* Manager::CreateAndAddVignette(VignetteEntry const* vignetteEntry, Map* map, uint32 const mapId, Type const vignetteType, G3D::Vector3 const position, ObjectGuid const sourceGuid)
     {
         // Check for duplicated vignettes
         for (auto&& vignette : m_Vignettes)
@@ -46,7 +46,7 @@ namespace Vignette
         }
 
         Entity* vignette = new Entity(vignetteEntry, mapId);
-        vignette->Create(vignetteType, position, sourceGuid);
+        vignette->Create(map, vignetteType, position, sourceGuid);
 
         m_Vignettes.insert(std::make_pair(vignette->GetGuid(), vignette));
         m_AddedVignette.insert(vignette->GetGuid());
@@ -302,7 +302,7 @@ objectUpdateBuffer.WriteByteSeq(objectGUID[7]);
             type = GetTrackingVignetteTypeFromWorldObject(target);
         }
 
-        CreateAndAddVignette(vignetteEntry, target->GetMapId(), type, G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), target->GetGUID());
+        CreateAndAddVignette(vignetteEntry, target->GetMap(), target->GetMapId(), type, G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), target->GetGUID());
     }
 
     template <class T>

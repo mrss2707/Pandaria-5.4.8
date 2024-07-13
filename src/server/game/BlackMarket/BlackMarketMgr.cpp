@@ -363,7 +363,7 @@ std::string BlackMarketAuction::BuildAuctionMailBody(ObjectGuid::LowType lowGuid
 {
     std::ostringstream strm;
     strm.width(16);
-    strm << std::right << std::hex << ObjectGuid(HighGuid::Player, lowGuid); // HIGHGUID_PLAYER always present, even for empty guids
+    strm << std::right << std::hex << ObjectGuid(HighGuid::Player, lowGuid); // HighGuid::Player always present, even for empty guids
     strm << std::dec << ':' << GetCurrentBid() << ':' << 0;
     strm << ':' << 0 << ':' << 0;
     return strm.str();

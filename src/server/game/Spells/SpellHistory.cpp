@@ -45,7 +45,7 @@ void SpellHistory::LoadFromDB(PreparedQueryResult&& result, PreparedQueryResult&
             if (!spellInfo)
             {
                 TC_LOG_ERROR("entities.player.loading", "%s %u has unknown spell %u in `character_spell_cooldown`, skipping.",
-                    _owner->GetTypeId() == TYPEID_PLAYER ? "Player" : "Pet", _owner->GetGUIDLow(), spellId);
+                    _owner->GetTypeId() == TYPEID_PLAYER ? "Player" : "Pet", _owner->GetGUID().GetCounter(), spellId);
                 continue;
             }
 
@@ -90,7 +90,7 @@ template <>
 void SpellHistory::SaveToDB<Player>(CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_COOLDOWN);
-    stmt->setUInt32(0, _owner->GetGUIDLow());
+    stmt->setUInt32(0, _owner->GetGUID().GetCounter());
     trans->Append(stmt);
 
     TimeValue now = TimeValue::Now();
@@ -106,7 +106,7 @@ void SpellHistory::SaveToDB<Player>(CharacterDatabaseTransaction trans)
             if (!entry.OnHold)
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SPELL_COOLDOWN);
-                stmt->setUInt32(0, _owner->GetGUIDLow());
+                stmt->setUInt32(0, _owner->GetGUID().GetCounter());
                 stmt->setUInt32(1, entry.SpellId);
                 stmt->setUInt32(2, entry.ItemId);
                 stmt->setUInt64(3, entry.CooldownEnd.ToMilliseconds());
@@ -118,7 +118,7 @@ void SpellHistory::SaveToDB<Player>(CharacterDatabaseTransaction trans)
     }
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_CHARGES);
-    stmt->setUInt32(0, _owner->GetGUIDLow());
+    stmt->setUInt32(0, _owner->GetGUID().GetCounter());
     trans->Append(stmt);
 
     UpdateCharges();
@@ -126,7 +126,7 @@ void SpellHistory::SaveToDB<Player>(CharacterDatabaseTransaction trans)
     for (auto&& itr : _spellCharges)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SPELL_CHARGES);
-        stmt->setUInt32(0, _owner->GetGUIDLow());
+        stmt->setUInt32(0, _owner->GetGUID().GetCounter());
         stmt->setUInt32(1, itr.first);
         stmt->setUInt64(2, itr.second.CurrentResetTime.ToMilliseconds());
         stmt->setUInt32(3, itr.second.ConsumedCharges);

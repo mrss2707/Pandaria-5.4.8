@@ -57,6 +57,36 @@ namespace Trinity
         return Count(elements._TailElements, fake);
     }
 
+    // non-const insert functions
+    template<class SPECIFIC_TYPE>
+    SPECIFIC_TYPE* Insert(ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* obj)
+    {
+        //elements._element[hdl] = obj;
+        obj->AddToGrid(elements._element);
+        return obj;
+    }
+
+    template<class SPECIFIC_TYPE>
+    SPECIFIC_TYPE* Insert(ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return nullptr;
+    }
+
+    // this is a missed
+    template<class SPECIFIC_TYPE, class T>
+    SPECIFIC_TYPE* Insert(ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return nullptr;                                        // a missed
+    }
+
+    // Recursion
+    template<class SPECIFIC_TYPE, class H, class T>
+    SPECIFIC_TYPE* Insert(ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* obj)
+    {
+        SPECIFIC_TYPE* t = Insert(elements._elements, obj);
+        return (t != nullptr ? t : Insert(elements._TailElements, obj));
+    }
+
     // Helpers
     // Insert helpers
     template<class SPECIFIC_TYPE, class KEY_TYPE>

@@ -75,7 +75,7 @@ void OPvPCapturePoint::AddGO(uint32 type, uint32 guid, uint32 entry)
             return;
         entry = data->id;
     }
-    m_Objects[type] = MAKE_NEW_GUID(guid, entry, HighGuid::GameObject);
+    m_Objects[type] = ObjectGuid(HighGuid::GameObject, entry, guid);
     m_ObjectTypes[m_Objects[type]]=type;
 }
 
@@ -88,7 +88,7 @@ void OPvPCapturePoint::AddCre(uint32 type, uint32 guid, uint32 entry)
             return;
         entry = data->id;
     }
-    m_Creatures[type] = MAKE_NEW_GUID(guid, entry, HighGuid::Unit);
+    m_Creatures[type] = ObjectGuid(HighGuid::Unit, entry, guid);
     m_CreatureTypes[m_Creatures[type]] = type;
 }
 
@@ -151,7 +151,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     if (!cr)
     {
         // can happen when closing the core
-        m_Creatures[type] = 0;
+        m_Creatures[type].Clear();
         return false;
     }
     TC_LOG_DEBUG("outdoorpvp", "deleting opvp creature type %u", type);
@@ -174,7 +174,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     cr->AddObjectToRemoveList();
     sObjectMgr->DeleteCreatureData(guid);
     m_CreatureTypes[m_Creatures[type]] = 0;
-    m_Creatures[type] = 0;
+    m_Creatures[type].Clear();
     return true;
 }
 
@@ -186,7 +186,7 @@ bool OPvPCapturePoint::DelObject(uint32 type)
     GameObject* obj = HashMapHolder<GameObject>::Find(m_Objects[type]);
     if (!obj)
     {
-        m_Objects[type] = 0;
+        m_Objects[type].Clear();
         return false;
     }
     uint32 guid = obj->GetDBTableGUIDLow();
@@ -194,7 +194,7 @@ bool OPvPCapturePoint::DelObject(uint32 type)
     obj->Delete();
     sObjectMgr->DeleteGOData(guid);
     m_ObjectTypes[m_Objects[type]] = 0;
-    m_Objects[type] = 0;
+    m_Objects[type].Clear();
     return true;
 }
 
@@ -214,9 +214,9 @@ bool OPvPCapturePoint::DelCapturePoint()
 
 void OPvPCapturePoint::DeleteSpawns()
 {
-    for (std::map<uint32, uint64>::iterator i = m_Objects.begin(); i != m_Objects.end(); ++i)
+    for (std::map<uint32, ObjectGuid>::iterator i = m_Objects.begin(); i != m_Objects.end(); ++i)
         DelObject(i->first);
-    for (std::map<uint32, uint64>::iterator i = m_Creatures.begin(); i != m_Creatures.end(); ++i)
+    for (std::map<uint32, ObjectGuid>::iterator i = m_Creatures.begin(); i != m_Creatures.end(); ++i)
         DelCreature(i->first);
     DelCapturePoint();
 }
@@ -279,7 +279,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
     {
         for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
         {
-            uint64 playerGuid = *itr;
+            ObjectGuid playerGuid = *itr;
             ++itr;
 
             if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
@@ -410,7 +410,7 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
     }
 }
 
-void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
+void OPvPCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
 {
     uint32 team;
     switch (m_State)
@@ -497,7 +497,7 @@ bool OPvPCapturePoint::HandleCustomSpell(Player* player, uint32 /*spellId*/, Gam
     return false;
 }
 
-bool OutdoorPvP::HandleOpenGo(Player* player, uint64 guid)
+bool OutdoorPvP::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         if (itr->second->HandleOpenGo(player, guid) >= 0)
@@ -548,9 +548,9 @@ bool OPvPCapturePoint::HandleDropFlag(Player* /*player*/, uint32 /*id*/)
     return false;
 }
 
-int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, uint64 guid)
+int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, ObjectGuid guid)
 {
-    std::map<uint64, uint32>::iterator itr = m_ObjectTypes.find(guid);
+    std::map<ObjectGuid, uint32>::iterator itr = m_ObjectTypes.find(guid);
     if (itr != m_ObjectTypes.end())
     {
         return itr->second;

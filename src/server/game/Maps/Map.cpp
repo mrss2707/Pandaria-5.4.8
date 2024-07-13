@@ -32,6 +32,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
+#include "PoolMgr.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
@@ -258,6 +259,8 @@ i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
+
+    _poolData = sPoolMgr->InitPoolsForMap(this);
 
     sScriptMgr->OnCreateMap(this);
 }

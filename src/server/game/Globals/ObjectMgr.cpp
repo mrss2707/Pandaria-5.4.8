@@ -1542,7 +1542,7 @@ void ObjectMgr::LoadLinkedRespawn()
         uint32 linkedGuidLow = fields[1].GetUInt32();
         uint8  linkType = fields[2].GetUInt8();
 
-        uint64 guid = 0, linkedGuid = 0;
+        ObjectGuid guid = ObjectGuid::Empty, linkedGuid = ObjectGuid::Empty;
         bool error = false;
         switch (linkType)
         {

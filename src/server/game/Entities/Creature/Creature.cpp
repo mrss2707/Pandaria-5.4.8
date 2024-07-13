@@ -523,7 +523,7 @@ void Creature::Update(uint32 diff)
                 if (!allowed)                                               // Will be rechecked on next Update call
                     break;
 
-                uint64 dbtableHighGuid = ObjectGuid(HighGuid::Unit, GetEntry(), m_DBTableGuid);
+                ObjectGuid dbtableHighGuid = ObjectGuid(HighGuid::Unit, GetEntry(), m_DBTableGuid);
                 time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                 if (!linkedRespawntime)             // Can respawn
                 {
@@ -1667,7 +1667,7 @@ void Creature::Respawn(bool force)
 
         uint32 poolid = GetDBTableGUIDLow() ? sPoolMgr->IsPartOfAPool<Creature>(GetDBTableGUIDLow()) : 0;
         if (poolid)
-            sPoolMgr->UpdatePool<Creature>(poolid, GetDBTableGUIDLow());
+            sPoolMgr->UpdatePool<Creature>(GetMap()->GetPoolData(), poolid, GetDBTableGUIDLow());
 
         //Re-initialize reactstate that could be altered by movementgenerators
         InitializeReactState();

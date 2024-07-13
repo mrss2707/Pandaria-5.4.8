@@ -818,11 +818,12 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
 
     Player* const sender = GetPlayer();
 
-    if (sPoolMgr->IsPartOfAPool<Quest>(questId) && !sPoolMgr->IsSpawnedObject<Quest>(questId))
-    {
-        sender->SendPushToPartyResponse(sender, QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY);
-        return;
-    }
+    // TODO: ObjectGuid
+//    if (sPoolMgr->IsPartOfAPool<Quest>(questId) && !sPoolMgr->IsSpawnedObject<Quest>(questId))
+//    {
+//        sender->SendPushToPartyResponse(sender, QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY);
+//        return;
+//    }
 
     Group* group = sender->GetGroup();
     if (!group)

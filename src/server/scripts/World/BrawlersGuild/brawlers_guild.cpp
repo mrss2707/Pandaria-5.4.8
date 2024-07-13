@@ -734,7 +734,7 @@ struct npc_brawlers_guild_bizmo : public ScriptedAI
             for (auto&& itr : playersInQueue)
             {
                 // try found new challenger
-                if (Player* target = ObjectAccessor::GetPlayer(*me, MAKE_NEW_GUID(itr, 0, HIGHGUID_PLAYER)))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, MAKE_NEW_GUID(itr, 0, HighGuid::Player)))
                 {
                     currentChampionGUID = target->GetGUID();
 
@@ -1158,7 +1158,7 @@ struct npc_brawlers_guild_boss_bazzelflange : public ScriptedAI
             for (auto&& itr : playersInQueue)
             {
                 // try found new challenger
-                if (Player* target = ObjectAccessor::GetPlayer(*me, MAKE_NEW_GUID(itr, 0, HIGHGUID_PLAYER)))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, MAKE_NEW_GUID(itr, 0, HighGuid::Player)))
                 {
                     currentChampionGUID = target->GetGUID();
 

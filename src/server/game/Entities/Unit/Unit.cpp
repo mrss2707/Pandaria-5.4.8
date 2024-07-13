@@ -1119,7 +1119,7 @@ void Unit::CastStop(uint32 except_spellid)
             InterruptSpell(CurrentSpellTypes(i), false);
 }
 
-void Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     if (!spellInfo)
     {
@@ -1139,12 +1139,12 @@ void Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo
     spell->prepare(&targets, triggeredByAura);
 }
 
-void Unit::CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     CastSpell(victim, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags /*= TRIGGER_NONE*/, Item* castItem /*= NULL*/, AuraEffect const* triggeredByAura /*= NULL*/, uint64 originalCaster /*= 0*/)
+void Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags /*= TRIGGER_NONE*/, Item* castItem /*= NULL*/, AuraEffect const* triggeredByAura /*= NULL*/, ObjectGuid originalCaster /*= 0*/)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1156,19 +1156,19 @@ void Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags
     CastSpell(victim, spellInfo, triggerFlags, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, Item* castItem/*= NULL*/, AuraEffect const* triggeredByAura /*= NULL*/, uint64 originalCaster /*= 0*/)
+void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, Item* castItem/*= NULL*/, AuraEffect const* triggeredByAura /*= NULL*/, ObjectGuid originalCaster /*= 0*/)
 {
     CastSpell(victim, spellInfo, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     SpellCastTargets targets;
     targets.SetUnitTarget(victim);
     CastSpell(targets, spellInfo, NULL, triggerFlags, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(Unit* target, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(Unit* target, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     CustomSpellValues values;
     if (bp0)
@@ -1180,7 +1180,7 @@ void Unit::CastCustomSpell(Unit* target, uint32 spellId, int32 const* bp0, int32
     CastCustomSpell(spellId, values, target, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(float x, float y, float z, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, AuraEffect const *triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(float x, float y, float z, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, AuraEffect const *triggeredByAura, ObjectGuid originalCaster)
 {
     CustomSpellValues values;
     if (bp0)
@@ -1192,21 +1192,21 @@ void Unit::CastCustomSpell(float x, float y, float z, uint32 spellId, int32 cons
     CastCustomSpell(x, y, z, spellId, values, triggered, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* target, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* target, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     CustomSpellValues values;
     values.AddSpellMod(mod, value);
     CastCustomSpell(spellId, values, target, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* target, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* target, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     CustomSpellValues values;
     values.AddSpellMod(mod, value);
     CastCustomSpell(spellId, values, target, triggerFlags, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1220,7 +1220,7 @@ void Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit*
     CastSpell(targets, spellInfo, &value, triggerFlags, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(float x, float y, float z, uint32 spellId, CustomSpellValues const& value, bool triggered, Item* castItem, AuraEffect const *triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(float x, float y, float z, uint32 spellId, CustomSpellValues const& value, bool triggered, Item* castItem, AuraEffect const *triggeredByAura, ObjectGuid originalCaster)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1232,7 +1232,7 @@ void Unit::CastCustomSpell(float x, float y, float z, uint32 spellId, CustomSpel
     CastSpell(targets, spellInfo, &value, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1246,7 +1246,7 @@ void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, 
     CastSpell(targets, spellInfo, NULL, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem, AuraEffect* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem, AuraEffect* triggeredByAura, ObjectGuid originalCaster)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1260,7 +1260,7 @@ void Unit::CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castI
     CastSpell(targets, spellInfo, NULL, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(Position const& pos, uint32 spellId, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(Position const& pos, uint32 spellId, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -3739,7 +3739,7 @@ void Unit::DeMorph()
     SetDisplayId(GetNativeDisplayId());
 }
 
-Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint32 effMask, Unit* caster, int32* baseAmount /*= NULL*/, Item* castItem /*= NULL*/, uint64 casterGUID /*= 0*/)
+Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint32 effMask, Unit* caster, int32* baseAmount /*= NULL*/, Item* castItem /*= NULL*/, ObjectGuid casterGUID /*= 0*/)
 {
     ASSERT(casterGUID || caster);
 
@@ -3751,12 +3751,12 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint3
     if (!newAura->IsMultiSlotAura())
     {
         // check if cast item changed
-        uint64 castItemGUID = 0;
+        ObjectGuid castItemGUID = ObjectGuid::Empty;
         if (castItem)
             castItemGUID = castItem->GetGUID();
 
         // find current aura from spell and change it's stackamount, or refresh it's duration
-        if (Aura* foundAura = GetOwnedAura(newAura->Id, casterGUID, (newAura->AttributesCu & SPELL_ATTR0_CU_ENCHANT_PROC) ? castItemGUID : 0, 0))
+        if (Aura* foundAura = GetOwnedAura(newAura->Id, casterGUID, (newAura->AttributesCu & SPELL_ATTR0_CU_ENCHANT_PROC) ? castItemGUID : ObjectGuid::Empty, 0))
         {
             // effect masks do not match
             // extremely rare case
@@ -3798,8 +3798,7 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint3
             // correct cast item guid if needed
             if (castItemGUID != foundAura->GetCastItemGUID())
             {
-                uint64* oldGUID = const_cast<uint64 *>(&foundAura->m_castItemGuid);
-                *oldGUID = castItemGUID;
+                ObjectGuid oldGUID = castItemGUID;
             }
 
             if (foundAura->GetId() == 980)
@@ -4119,7 +4118,7 @@ void Unit::RemoveOwnedAura(AuraMap::iterator &i, AuraRemoveMode removeMode)
     i = m_ownedAuras.begin();
 }
 
-void Unit::RemoveOwnedAura(uint32 spellId, uint64 casterGUID, uint32 reqEffMask, AuraRemoveMode removeMode)
+void Unit::RemoveOwnedAura(uint32 spellId, ObjectGuid casterGUID, uint32 reqEffMask, AuraRemoveMode removeMode)
 {
     for (AuraMap::iterator itr = m_ownedAuras.lower_bound(spellId); itr != m_ownedAuras.upper_bound(spellId);)
         if (((itr->second->GetEffectMask() & reqEffMask) == reqEffMask) && (!casterGUID || itr->second->GetCasterGUID() == casterGUID))
@@ -4153,7 +4152,7 @@ void Unit::RemoveOwnedAura(Aura* aura, AuraRemoveMode removeMode)
     ASSERT(false);
 }
 
-Aura* Unit::GetOwnedAura(uint32 spellId, uint64 casterGUID, uint64 itemCasterGUID, uint32 reqEffMask, Aura* except) const
+Aura* Unit::GetOwnedAura(uint32 spellId, ObjectGuid casterGUID, ObjectGuid itemCasterGUID, uint32 reqEffMask, Aura* except) const
 {
     AuraMapBounds range = m_ownedAuras.equal_range(spellId);
     for (AuraMap::const_iterator itr = range.first; itr != range.second; ++itr)
@@ -6504,7 +6503,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
     // otherwise, it's the triggered_spell_id by default
     Unit* target = victim;
     int32 basepoints0 = 0;
-    uint64 originalCaster = 0;
+    ObjectGuid originalCaster = ObjectGuid::Empty;
 
     switch (dummySpell->SpellFamilyName)
     {
@@ -15806,7 +15805,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
     // aura can be deleted at casts
     SpellInfo const* spellProto = triggeredByAura->GetSpellInfo();
     int32 heal = triggeredByAura->GetAmount();
-    uint64 casterGuid = triggeredByAura->GetCasterGUID();
+    ObjectGuid casterGuid = triggeredByAura->GetCasterGUID();
     Unit* caster = triggeredByAura->GetCaster();
 
     // Currently only Prayer of Mending
@@ -15893,7 +15892,7 @@ bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
             return false;
     }
 
-    uint64 caster_guid = triggeredByAura->GetCasterGUID();
+    ObjectGuid caster_guid = triggeredByAura->GetCasterGUID();
 
     // jumps
     int32 jumps = triggeredByAura->GetBase()->GetCharges() - 1;
@@ -18363,7 +18362,7 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
 
         Unit* caster = (itr->second.castFlags & NPC_CLICK_CAST_CASTER_CLICKER) ? clicker : this;
         Unit* target = (itr->second.castFlags & NPC_CLICK_CAST_TARGET_CLICKER) ? clicker : this;
-        uint64 origCasterGUID = (itr->second.castFlags & NPC_CLICK_CAST_ORIG_CASTER_OWNER) ? GetOwnerGUID() : clicker->GetGUID();
+        ObjectGuid origCasterGUID = (itr->second.castFlags & NPC_CLICK_CAST_ORIG_CASTER_OWNER) ? GetOwnerGUID() : clicker->GetGUID();
 
         SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(itr->second.spellId);
         // if (!spellEntry) should be checked at npc_spellclick load

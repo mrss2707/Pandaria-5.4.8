@@ -45,6 +45,7 @@ class Object;
 class WorldObject;
 class TempSummon;
 class Player;
+class ActivePoolData;
 class CreatureGroup;
 struct ScriptInfo;
 struct ScriptAction;
@@ -59,9 +60,9 @@ namespace VMAP { enum class ModelIgnoreFlags : uint32; }
 
 struct ScriptAction
 {
-    uint64 sourceGUID;
-    uint64 targetGUID;
-    uint64 ownerGUID;                                       ///> owner of source if source is item
+    ObjectGuid sourceGUID;
+    ObjectGuid targetGUID;
+    ObjectGuid ownerGUID;                                   ///> owner of source if source is item
     ScriptInfo const* script;                               ///> pointer to static script data
 };
 
@@ -589,6 +590,9 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
         void SetDebugFlexPlayersCount(uint32 count) { debugFlexPlayersCount = count; }
 
+        ActivePoolData& GetPoolData() { return *_poolData; }
+        ActivePoolData const& GetPoolData() const { return *_poolData; }
+
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);
@@ -751,6 +755,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         }
 
         std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
+        std::unique_ptr<ActivePoolData> _poolData;
         MapStoredObjectTypesContainer _objectsStore;
 
         std::unordered_map<uint32 /*dbGUID*/, time_t> _creatureRespawnTimes;

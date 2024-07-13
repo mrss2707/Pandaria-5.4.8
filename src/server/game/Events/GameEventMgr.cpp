@@ -1323,7 +1323,15 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
     }
 
     for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin(); itr != mGameEventPoolIds[internal_event_id].end(); ++itr)
-        sPoolMgr->SpawnPool(*itr);
+    {
+        if (PoolTemplateData const* poolTemplate = sPoolMgr->GetPoolTemplate(*itr))
+        {
+            sMapMgr->DoForAllMapsWithMapId(poolTemplate->MapId, [&itr](Map* map)
+            {
+                sPoolMgr->SpawnPool(map->GetPoolData(), *itr);
+            });
+        }
+    }
 }
 
 void GameEventMgr::GameEventUnspawn(int16 event_id)
@@ -1381,7 +1389,13 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
 
     for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin(); itr != mGameEventPoolIds[internal_event_id].end(); ++itr)
     {
-        sPoolMgr->DespawnPool(*itr);
+        if (PoolTemplateData const* poolTemplate = sPoolMgr->GetPoolTemplate(*itr))
+        {
+            sMapMgr->DoForAllMapsWithMapId(poolTemplate->MapId, [&itr](Map* map)
+            {
+                sPoolMgr->DespawnPool(map->GetPoolData(), *itr);
+            });
+        }
     }
 }
 

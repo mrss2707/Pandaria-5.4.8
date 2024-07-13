@@ -1901,7 +1901,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     {
         return m_comboPoints;
     }
-    uint64 GetComboTarget() const
+    ObjectGuid GetComboTarget() const
     {
         return m_comboTarget;
     }

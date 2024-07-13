@@ -187,7 +187,7 @@ namespace Vignette
             * @param position: World position of the vignette
             * @param sourceGuid: Guid of the source (can be gameobject or creature)
             */
-            void Create(Type type, G3D::Vector3 position, ObjectGuid sourceGuid);
+            void Create(Map* map, Type type, G3D::Vector3 position, ObjectGuid sourceGuid);
 
             ObjectGuid           m_Guid;                    // Guid of the current vignette (GUID_TYPE_VIGNETTE)
             ObjectGuid           m_SourceGuid;              // Guid of the source if any (can be gameobject or creature)

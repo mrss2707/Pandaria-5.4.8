@@ -31,9 +31,9 @@ typedef void(AuraEffect::*pAuraEffectHandler)(AuraApplication const* aurApp, uin
 class AuraEffect
 {
     friend void Aura::_InitEffects(uint32 effMask, Unit* caster, int32 *baseAmount);
-    friend Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint32 effMask, Unit* caster, int32* baseAmount, Item* castItem, uint64 casterGUID);
+    friend Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint32 effMask, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID);
     friend Aura::~Aura();
-    friend Aura::Aura(SpellInfo const*, WorldObject*, Unit*, Item*, uint64, uint32, int32*);
+    friend Aura::Aura(SpellInfo const*, WorldObject*, Unit*, Item*, ObjectGuid, uint32, int32*);
     friend void Aura::RemoveEffect(uint8 effIndex);
 
     private:

@@ -146,7 +146,7 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
 
         bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
         void Update(uint32 p_time) override;
-        static GameObject* GetGameObject(WorldObject& object, uint64 guid);
+        static GameObject* GetGameObject(WorldObject& object, ObjectGuid guid);
         GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
         GameObjectTemplateAddon const* GetTemplateAddon() const { return m_goTemplateAddon; }
         GameObjectData const* GetGOData() const { return m_goData; }

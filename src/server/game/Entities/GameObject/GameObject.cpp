@@ -502,7 +502,7 @@ void GameObject::Update(uint32 diff)
                                                     // respawn timer
                     uint32 poolid = GetDBTableGUIDLow() ? sPoolMgr->IsPartOfAPool<GameObject>(GetDBTableGUIDLow()) : 0;
                     if (poolid)
-                        sPoolMgr->UpdatePool<GameObject>(poolid, GetDBTableGUIDLow());
+                        sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, GetDBTableGUIDLow());
                     else
                         GetMap()->AddToMap(this);
                 }
@@ -773,7 +773,7 @@ void GameObject::Delete()
 
     uint32 poolid = GetDBTableGUIDLow() ? sPoolMgr->IsPartOfAPool<GameObject>(GetDBTableGUIDLow()) : 0;
     if (poolid)
-        sPoolMgr->UpdatePool<GameObject>(poolid, GetDBTableGUIDLow());
+        sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, GetDBTableGUIDLow());
     else
         AddObjectToRemoveList();
 }
@@ -962,7 +962,7 @@ void GameObject::DeleteFromDB()
     WorldDatabase.Execute(stmt);
 }
 
-GameObject* GameObject::GetGameObject(WorldObject& object, uint64 guid)
+GameObject* GameObject::GetGameObject(WorldObject& object, ObjectGuid guid)
 {
     return object.GetMap()->GetGameObject(guid);
 }
@@ -1927,7 +1927,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
         trigger->SetFaction(14);
         // Set owner guid for target if no owner available - needed by trigger auras
         // - trigger gets despawned and there's no caster avalible (see AuraEffect::TriggerSpell())
-        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : 0);
+        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : ObjectGuid::Empty);
     }
 }
 

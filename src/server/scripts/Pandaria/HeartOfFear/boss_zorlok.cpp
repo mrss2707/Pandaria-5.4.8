@@ -1805,7 +1805,7 @@ class ExhaleTargetFilter
         bool operator()(WorldObject* object) const
         {
             uint32 exhaleLowId = CAST_AI(boss_zorlok::boss_zorlokAI, _caster->GetAI())->GetData(TYPE_EXHALE_TARGET);
-            Player* exhaleTarget = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(exhaleLowId, 0, HIGHGUID_PLAYER));
+            Player* exhaleTarget = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(exhaleLowId, 0, HighGuid::Player));
 
             if (!exhaleTarget)
                 return false;

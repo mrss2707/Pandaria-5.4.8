@@ -360,7 +360,7 @@ public:
         uint64 teamId = std::strtoull(args, nullptr, 10);
         uint64 slot = teamId / 100000000000 - 1;
         uint64 guid = teamId - 100000000000 * (slot + 1);
-        guid = MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER);
+        guid = MAKE_NEW_GUID(guid, 0, HighGuid::Player);
 
         std::string name;
         std::string msg;

@@ -960,7 +960,7 @@ void Pet::_LoadAuras(uint32 timediff)
             damage.fill(0);
             std::array<int32, MAX_SPELL_EFFECTS> baseDamage;
             baseDamage.fill(0);
-            uint64 casterGuid = fields[0].GetUInt64();
+            ObjectGuid casterGuid(fields[0].GetUInt64());
             // null guid stored - pet is the caster of the spell - see Pet::_SaveAuras
             if (!casterGuid)
                 casterGuid = GetGUID();

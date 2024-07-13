@@ -121,6 +121,12 @@ class TC_GAME_API MapManager
 
         MapUpdater * GetMapUpdater() { return &m_updater; }
 
+        template<typename Worker>
+        void DoForAllMaps(Worker&& worker);
+
+        template<typename Worker>
+        void DoForAllMapsWithMapId(uint32 mapId, Worker&& worker);
+
     private:
         typedef std::unordered_map<uint32, Map*> MapMapType;
         typedef std::vector<bool> InstanceIds;
@@ -144,7 +150,7 @@ class TC_GAME_API MapManager
         MapManager(const MapManager &);
         MapManager& operator=(const MapManager &);
 
-        std::mutex Lock;
+        mutable std::shared_mutex _mapsLock;
         uint32 i_gridCleanUpDelay;
         MapMapType i_maps;
         IntervalTimer i_timer;
@@ -153,5 +159,27 @@ class TC_GAME_API MapManager
         uint32 _nextInstanceId;
         MapUpdater m_updater;
 };
+
+template<typename Worker>
+inline void MapManager::DoForAllMaps(Worker&& worker)
+{
+    std::shared_lock<std::shared_mutex> lock(_mapsLock);
+
+    for (auto const& [key, map] : i_maps)
+        worker(map);
+}
+
+template<typename Worker>
+void MapManager::DoForAllMapsWithMapId(uint32 mapId, Worker&& worker)
+{
+    // TODO: ObjectGuid; we don't actually have more than one map per id?
+    std::shared_lock<std::shared_mutex> lock(_mapsLock);
+
+    auto map = i_maps[mapId];
+    if (map)
+        worker(map);
+}
+
 #define sMapMgr MapManager::instance()
+
 #endif

@@ -85,7 +85,7 @@ class boss_adarogg : public CreatureScript
             {
                 if (pointId == EVENT_CHARGE)
                     if (uint32 m_inferno = GetData(TYPE_TARGET_ID))
-                        if (Player* InfernoTarget = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(m_inferno, 0, HIGHGUID_PLAYER)))
+                        if (Player* InfernoTarget = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(m_inferno, 0, HighGuid::Player)))
                             DoCast(InfernoTarget, SPELL_INFERNO_CHARGE_EFF);
             }
 
@@ -168,7 +168,7 @@ class spell_ragefire_inferno_charge : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                     if (caster->ToCreature() && caster->ToCreature()->AI())
                         if (uint32 m_inferno = caster->ToCreature()->AI()->GetData(TYPE_TARGET_ID))
-                            if (Player* InfernoTarget = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(m_inferno, 0, HIGHGUID_PLAYER)))
+                            if (Player* InfernoTarget = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(m_inferno, 0, HighGuid::Player)))
                                 caster->GetMotionMaster()->MoveCharge(InfernoTarget->GetPositionX(), InfernoTarget->GetPositionY(), InfernoTarget->GetPositionZ(), 42.0f, EVENT_CHARGE);
             }
 

@@ -187,7 +187,7 @@ ZoneScript* OutdoorPvPMgr::GetZoneScript(uint32 zoneId)
         return NULL;
 }
 
-bool OutdoorPvPMgr::HandleOpenGo(Player* player, uint64 guid)
+bool OutdoorPvPMgr::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     for (OutdoorPvPSet::iterator itr = m_OutdoorPvPSet.begin(); itr != m_OutdoorPvPSet.end(); ++itr)
     {
