@@ -57,30 +57,41 @@ namespace Trinity
         return Count(elements._TailElements, fake);
     }
 
-    // non-const insert functions
-    template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Insert(ContainerMapList<SPECIFIC_TYPE> &elements, SPECIFIC_TYPE *obj)
+    // Helpers
+    // Insert helpers
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Insert(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* obj)
     {
-        //elements._element[hdl] = obj;
-        obj->AddToGrid(elements._element);
-        return obj;
+        auto i = elements._element.find(handle);
+        if (i == elements._element.end())
+        {
+            elements._element[handle] = obj;
+            return true;
+        }
+        else
+        {
+            ASSERT(i->second == obj, "Object with certain key already in but objects are different!");
+            return false;
+        }
     }
 
-    template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Insert(ContainerMapList<TypeNull> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Insert(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
     {
-        return NULL;
+        return false;
     }
 
-    // this is a missed
-    template<class SPECIFIC_TYPE, class T> SPECIFIC_TYPE* Insert(ContainerMapList<T> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
+    bool Insert(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
     {
-        return NULL;                                        // a missed
+        return false;
     }
 
-    // Recursion
-    template<class SPECIFIC_TYPE, class H, class T> SPECIFIC_TYPE* Insert(ContainerMapList<TypeList<H, T> >&elements, SPECIFIC_TYPE *obj)
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
+    bool Insert(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* obj)
     {
-        SPECIFIC_TYPE* t= Insert(elements._elements, obj);
-        return (t != NULL ? t : Insert(elements._TailElements, obj));
+        bool ret = Insert(elements._elements, handle, obj);
+        return ret ? ret : Insert(elements._tailElements, handle, obj);
     }
 
     // Find helpers

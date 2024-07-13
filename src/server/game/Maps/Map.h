@@ -521,8 +521,8 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         /*
             RESPAWN TIMES
         */
-        time_t GetLinkedRespawnTime(uint64 guid) const;
-        time_t GetCreatureRespawnTime(uint32 dbGuid) const
+        time_t GetLinkedRespawnTime(ObjectGuid guid) const;
+        time_t GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const
         {
             std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
             if (itr != _creatureRespawnTimes.end())
@@ -531,7 +531,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
             return time_t(0);
         }
 
-        time_t GetGORespawnTime(uint32 dbGuid) const
+        time_t GetGORespawnTime(ObjectGuid::LowType dbGuid) const
         {
             std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
             if (itr != _goRespawnTimes.end())

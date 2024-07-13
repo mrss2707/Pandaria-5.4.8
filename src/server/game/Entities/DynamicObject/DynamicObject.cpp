@@ -54,7 +54,7 @@ void DynamicObject::AddToWorld()
     ///- Register the dynamicObject for guid lookup and for caster
     if (!IsInWorld())
     {
-        ObjectAccessor::AddObject(this);
+        GetMap()->GetObjectsStore().Insert<DynamicObject>(GetGUID(), this);
         WorldObject::AddToWorld();
 
         if (GetType() != DYNAMIC_OBJECT_RAID_MARKER)
@@ -81,7 +81,7 @@ void DynamicObject::RemoveFromWorld()
             UnbindFromCaster();
 
         WorldObject::RemoveFromWorld();
-        ObjectAccessor::RemoveObject(this);
+        GetMap()->GetObjectsStore().Remove<DynamicObject>(GetGUID());
     }
 }
 

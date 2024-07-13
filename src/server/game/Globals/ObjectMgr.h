@@ -482,7 +482,7 @@ struct TrinityStringLocale
     std::vector<std::string> Content;
 };
 
-typedef std::map<uint64, uint64> LinkedRespawnContainer;
+typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
 typedef std::unordered_map<uint32, CreatureData> CreatureDataContainer;
 typedef std::unordered_map<uint32, GameObjectData> GameObjectDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
@@ -1482,10 +1482,10 @@ class ObjectMgr
         }
         CreatureData& NewOrExistCreatureData(uint32 guid) { return _creatureDataStore[guid]; }
         void DeleteCreatureData(uint32 guid);
-        uint64 GetLinkedRespawnGuid(uint64 guid) const
+        ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
         {
             LinkedRespawnContainer::const_iterator itr = _linkedRespawnStore.find(guid);
-            if (itr == _linkedRespawnStore.end()) return 0;
+            if (itr == _linkedRespawnStore.end()) return ObjectGuid::Empty;
             return itr->second;
         }
         CreatureLocale const* GetCreatureLocale(uint32 entry) const

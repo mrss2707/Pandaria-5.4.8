@@ -226,7 +226,7 @@ void AreaTrigger::AddToWorld()
     ///- Register the AreaTrigger for guid lookup and for caster
     if (!IsInWorld())
     {
-        ObjectAccessor::AddObject(this);
+        GetMap()->GetObjectsStore().Insert<AreaTrigger>(GetGUID(), this);
         WorldObject::AddToWorld();
         BindToCaster();
 
@@ -248,7 +248,7 @@ void AreaTrigger::RemoveFromWorld()
 
         UnbindFromCaster();
         WorldObject::RemoveFromWorld();
-        ObjectAccessor::RemoveObject(this);
+        GetMap()->GetObjectsStore().Remove<AreaTrigger>(GetGUID());
     }
 }
 

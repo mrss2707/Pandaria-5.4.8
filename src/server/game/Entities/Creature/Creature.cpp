@@ -184,7 +184,7 @@ void Creature::AddToWorld()
     ///- Register the creature for guid lookup
     if (!IsInWorld())
     {
-        ObjectAccessor::AddObject(this);
+        GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
         Unit::AddToWorld();
         SearchFormation();
         AIM_Initialize();
@@ -210,7 +210,7 @@ void Creature::RemoveFromWorld()
         if (m_formation)
             sFormationMgr->RemoveCreatureFromGroup(m_formation, this);
         Unit::RemoveFromWorld();
-        ObjectAccessor::RemoveObject(this);
+        GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
     }
 }
 

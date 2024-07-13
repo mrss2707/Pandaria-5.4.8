@@ -3464,7 +3464,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                     InstanceGroupBind* groupBind = group->GetBoundInstance(this);
                     if (playerBind && playerBind->save != mapSave)
                     {
-                        TC_LOG_ERROR("maps", "InstanceMap::Add: player %s(%d) is being put into instance %s %d, %d, %d, %d, %d, %d but he is in group %d and is bound to instance %d, %d, %d, %d, %d, %d!", player->GetName().c_str(), player->GetGUID().GetCounter(), GetMapName(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->GetPlayerCount(), mapSave->GetGroupCount(), mapSave->CanReset(), GUID_LOPART(group->GetLeaderGUID()), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(), playerBind->save->GetPlayerCount(), playerBind->save->GetGroupCount(), playerBind->save->CanReset());
+                        TC_LOG_ERROR("maps", "InstanceMap::Add: player %s(%d) is being put into instance %s %d, %d, %d, %d, %d, %d but he is in group %d and is bound to instance %d, %d, %d, %d, %d, %d!", player->GetName().c_str(), player->GetGUID().GetCounter(), GetMapName(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->GetPlayerCount(), mapSave->GetGroupCount(), mapSave->CanReset(), group->GetLeaderGUID().GetCounter(), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(), playerBind->save->GetPlayerCount(), playerBind->save->GetGroupCount(), playerBind->save->CanReset());
                         if (groupBind)
                             TC_LOG_ERROR("maps", "InstanceMap::Add: the group is bound to the instance %s %d, %d, %d, %d, %d, %d", GetMapName(), groupBind->save->GetMapId(), groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty(), groupBind->save->GetPlayerCount(), groupBind->save->GetGroupCount(), groupBind->save->CanReset());
                         //ASSERT(false);
@@ -3478,7 +3478,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                         // cannot jump to a different instance without resetting it
                         if (groupBind->save != mapSave)
                         {
-                            TC_LOG_ERROR("maps", "InstanceMap::Add: player %s(%d) is being put into instance %d, %d, %d but he is in group %d which is bound to instance %d, %d, %d!", player->GetName().c_str(), player->GetGUID().GetCounter(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), GUID_LOPART(group->GetLeaderGUID()), groupBind->save->GetMapId(), groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty());
+                            TC_LOG_ERROR("maps", "InstanceMap::Add: player %s(%d) is being put into instance %d, %d, %d but he is in group %d which is bound to instance %d, %d, %d!", player->GetName().c_str(), player->GetGUID().GetCounter(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), group->GetLeaderGUID().GetCounter(), groupBind->save->GetMapId(), groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty());
                             TC_LOG_ERROR("maps", "MapSave players: %d, group count: %d", mapSave->GetPlayerCount(), mapSave->GetGroupCount());
                             if (groupBind->save)
                                 TC_LOG_ERROR("maps", "GroupBind save players: %d, group count: %d", groupBind->save->GetPlayerCount(), groupBind->save->GetGroupCount());
@@ -3836,26 +3836,26 @@ Player* Map::GetPlayer(ObjectGuid guid)
 
 Creature* Map::GetCreature(ObjectGuid guid)
 {
-    return ObjectAccessor::GetCreature(this, guid);
+    return _objectsStore.Find<Creature>(guid);
 }
 
 GameObject* Map::GetGameObject(ObjectGuid guid)
 {
-    return ObjectAccessor::GetGameObject(this, guid);
+    return _objectsStore.Find<GameObject>(guid);
 }
 
 Transport* Map::GetTransport(ObjectGuid guid)
 {
-    if (guid.GetHigh() != HIGHGUID_TRANSPORT && guid.GetHigh() != HIGHGUID_MO_TRANSPORT)
+    if (!guid.IsMOTransport())
         return nullptr;
 
     GameObject* go = GetGameObject(guid);
     return go ? go->ToTransport() : nullptr;
 }
 
-DynamicObject* Map::GetDynamicObject(uint64 guid)
+DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)NULL);
+    return _objectsStore.Find<DynamicObject>(guid);
 }
 
 void Map::UpdateIteratorBack(Player* player)
@@ -3979,16 +3979,16 @@ void Map::DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId)
     CharacterDatabase.Execute(stmt);
 }
 
-time_t Map::GetLinkedRespawnTime(uint64 guid) const
+time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
 {
-    uint64 linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
+    ObjectGuid linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
 
-    switch (GUID_HIPART(linkedGuid))
+    switch (linkedGuid.GetHigh())
     {
         case HighGuid::Unit:
-            return GetCreatureRespawnTime(GUID_LOPART(linkedGuid));
+            return GetCreatureRespawnTime(linkedGuid.GetCounter());
         case HighGuid::GameObject:
-            return GetGORespawnTime(GUID_LOPART(linkedGuid));
+            return GetGORespawnTime(linkedGuid.GetCounter());
         default:
             break;
     }

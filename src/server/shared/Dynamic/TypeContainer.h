@@ -55,6 +55,18 @@ struct ContainerUnorderedMap
     std::unordered_map<KEY_TYPE, OBJECT*> _element;
 };
 
+template<class KEY_TYPE>
+struct ContainerUnorderedMap<TypeNull, KEY_TYPE>
+{
+};
+
+template<class H, class T, class KEY_TYPE>
+struct ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>
+{
+    ContainerUnorderedMap<H, KEY_TYPE> _elements;
+    ContainerUnorderedMap<T, KEY_TYPE> _tailElements;
+};
+
 /*
  * @class ContaierArrayList is a multi-type container for
  * array of elements.

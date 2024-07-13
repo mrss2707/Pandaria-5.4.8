@@ -149,7 +149,7 @@ void GameObject::AddToWorld()
         if (m_zoneScript)
             m_zoneScript->OnGameObjectCreate(this);
 
-        ObjectAccessor::AddObject(this);
+        GetMap()->GetObjectsStore().Insert<GameObject>(GetGUID(), this);
         if (m_model)
         {
             if (Transport* trans = ToTransport())
@@ -176,7 +176,7 @@ void GameObject::RemoveFromWorld()
             if (GetMap()->ContainsGameObjectModel(*m_model))
                 GetMap()->RemoveGameObjectModel(*m_model);
         WorldObject::RemoveFromWorld();
-        ObjectAccessor::RemoveObject(this);
+        GetMap()->GetObjectsStore().Remove<GameObject>(GetGUID());
     }
 }
 
@@ -643,7 +643,7 @@ void GameObject::Update(uint32 diff)
                         if (m_groupLootTimer <= diff)
                         {
                             uint32 gguid = lootingGroupLowGUID;
-                            uint64 goguid = GetGUID();
+                            ObjectGuid goguid = GetGUID();
                             // TaskMgr::Default()->ScheduleInvocation([=]
                             // {
                             //     if (GameObject* go = ObjectAccessor::FindGameObject(goguid))
