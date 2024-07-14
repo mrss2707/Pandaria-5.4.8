@@ -259,10 +259,10 @@ class boss_jin_qin_xi : public CreatureScript
 
             int sumCourage, comboArc;
             uint8 maxCombo, janHitCount, qinHitCount, devastatingComboPhase;
-            uint64 victimWithMagneticArmor, ArcDevastVictimGUID, TerracotaBossGUID;
+            ObjectGuid victimWithMagneticArmor, ArcDevastVictimGUID, TerracotaBossGUID;
             float moveTurn, moveWalk, moveRun, spellOri;
             bool isActive, achievement, nonArc;
-            std::list<uint64> playerList;
+            std::list<ObjectGuid> playerList;
             Position homePos;
             std::map<uint32, float> ArcComboAnim;
             uint32 prevSpellId, spellAnim;
@@ -298,7 +298,7 @@ class boss_jin_qin_xi : public CreatureScript
                 moveRun  = me->GetSpeed(MOVE_RUN);
                 homePos  = me->GetHomePosition();
 
-                victimWithMagneticArmor = 0;
+                victimWithMagneticArmor = ObjectGuid::Empty;
 
                 if (instance)
                 {
@@ -502,7 +502,7 @@ class boss_jin_qin_xi : public CreatureScript
                 if (spell->Id != SPELL_DEVAST_ARC && spell->Id != SPELL_STOMP)
                     return;
 
-                for (uint64 guid : playerList)
+                for (ObjectGuid guid : playerList)
                 {
                     Player* player = me->GetPlayer(*me, guid);
                     if (player && player->GetGUID() == target->GetGUID())
@@ -516,7 +516,7 @@ class boss_jin_qin_xi : public CreatureScript
             Creature* getOtherBoss()
             {
                 if (instance)
-                    return instance->instance->GetCreature(instance->GetData64(me->GetEntry() == NPC_QIN_XI ? NPC_JAN_XI: NPC_QIN_XI));
+                    return instance->instance->GetCreature(instance->GetGuidData(me->GetEntry() == NPC_QIN_XI ? NPC_JAN_XI: NPC_QIN_XI));
                 else
                     return NULL;
             }
@@ -825,7 +825,7 @@ class boss_jin_qin_xi : public CreatureScript
             }
 
             private:
-                uint64 GetAnyAlivePlayerInRange()
+                ObjectGuid GetAnyAlivePlayerInRange()
                 {
                     std::list<Player*> pList;
                     GetPlayerListInGrid(pList, me, 99.0f);
@@ -833,7 +833,7 @@ class boss_jin_qin_xi : public CreatureScript
                     pList.remove_if([=](Player* target) { return (target && !target->IsAlive()) || (target && target->IsGameMaster()); });
 
                     if (pList.empty())
-                        return 0;
+                        return ObjectGuid::Empty;
 
                     return Trinity::Containers::SelectRandomContainerElement(pList)->GetGUID();
 
@@ -861,7 +861,7 @@ class npc_woe_add_generic : public CreatureScript
             ObjectGuid targetGuid;
             EventMap events, nonCombatEvents;
             InstanceScript* instance;
-            uint64 targetGUID, smashTriggerGUID;
+            ObjectGuid targetGUID, smashTriggerGUID;
 
             void InitializeAI() override
             {
@@ -1320,7 +1320,7 @@ class npc_woe_titan_spark : public CreatureScript
             }
 
             private:
-                uint64 GetTargetGUID()
+                ObjectGuid GetTargetGUID()
                 {
                     std::list<Player*> pList;
                     GetPlayerListInGrid(pList, me, 300.0f);
@@ -1332,7 +1332,7 @@ class npc_woe_titan_spark : public CreatureScript
                         if (Player* itr = me->FindNearestPlayer(300.0f))
                             return itr->GetGUID();
 
-                        return 0;
+                        return ObjectGuid::Empty;
                     }
 
                     return Trinity::Containers::SelectRandomContainerElement(pList)->GetGUID();
@@ -1496,10 +1496,10 @@ class npc_ancient_mogu_machine : public CreatureScript
                             {
                                 Reset();
                         
-                                if (Creature* jan_xi = instance->instance->GetCreature(me->GetInstanceScript()->GetData64(NPC_JAN_XI)))
+                                if (Creature* jan_xi = instance->instance->GetCreature(me->GetInstanceScript()->GetGuidData(NPC_JAN_XI)))
                                     jan_xi->AI()->DoAction(ACTION_WIPE);
                         
-                                if (Creature* qin_xi = instance->instance->GetCreature(me->GetInstanceScript()->GetData64(NPC_QIN_XI)))
+                                if (Creature* qin_xi = instance->instance->GetCreature(me->GetInstanceScript()->GetGuidData(NPC_QIN_XI)))
                                     qin_xi->AI()->DoAction(ACTION_WIPE);
                         
                                 break;
@@ -2028,15 +2028,15 @@ class spell_woe_stomp final : public SpellScript
             GetPlayerListInGrid(pList, caster, 16.0f);
 
             for (auto&& pItrPot : pList)
-                if (!HasPlayerGotHit(pItrPot->GetGUID(), targets))
+                if (!HasPlayerGotHit(caster, pItrPot->GetGUID(), targets))
                     pItrPot->CastSpell(pItrPot, SPELL_GROWING_OPPORTUNITY, true);
         }
     }
 
     private:
-        bool HasPlayerGotHit(uint64 targetGUID, std::list<WorldObject*>& pTargets)
+        bool HasPlayerGotHit(Unit* me, ObjectGuid targetGUID, std::list<WorldObject*>& pTargets)
         {
-            if (Unit* target = ObjectAccessor::FindUnit(targetGUID))
+            if (Unit* target = ObjectAccessor::GetUnit(*me, targetGUID))
             {
                 for (auto&& pItr : pTargets)
                     if (pItr->GetGUID() == target->GetGUID())
@@ -2120,15 +2120,15 @@ class spell_devastating_arc_eff : public SpellScript
             GetPlayerListInGrid(pList, caster, 16.0f);
 
             for (auto&& pItrPot : pList)
-                if (!HasPlayerGotHit(pItrPot->GetGUID(), targets))
+                if (!HasPlayerGotHit(caster, pItrPot->GetGUID(), targets))
                     pItrPot->CastSpell(pItrPot, SPELL_GROWING_OPPORTUNITY, true);
         }
     }
 
     private:
-        bool HasPlayerGotHit(uint64 targetGUID, std::list<WorldObject*>& pTargets)
+        bool HasPlayerGotHit(Unit* me, ObjectGuid targetGUID, std::list<WorldObject*>& pTargets)
         {
-            if (Unit* target = ObjectAccessor::FindUnit(targetGUID))
+            if (Unit* target = ObjectAccessor::GetUnit(*me, targetGUID))
             {
                 for (auto&& pItr : pTargets)
                     if (pItr->GetGUID() == target->GetGUID())

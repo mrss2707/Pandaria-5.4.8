@@ -170,7 +170,7 @@ class boss_devourer_of_souls : public CreatureScript
                 events.Reset();
                 summons.DespawnAll();
 
-                uiMirroredSoulTarget = 0;
+                uiMirroredSoulTarget = ObjectGuid::Empty;
                 wasCasting = false;
 
                 if (instance)
@@ -209,7 +209,7 @@ class boss_devourer_of_souls : public CreatureScript
                             //me->DealDamage(player, (damage * 45)/100, 0, SPELL_DIRECT_DAMAGE, SPELL_SCHOOL_MASK_SHADOW);
                         }
                         else
-                            uiMirroredSoulTarget = 0;
+                            uiMirroredSoulTarget = ObjectGuid::Empty;
                     }
                 }
             }

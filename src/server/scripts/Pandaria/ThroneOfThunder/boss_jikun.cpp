@@ -555,7 +555,7 @@ struct npc_jikun_incubator : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         me->SetDisableGravity(true);
@@ -590,7 +590,7 @@ struct npc_young_hatchling_jikun : public ScriptedAI
     {
         instance = me->GetInstanceScript();
 
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         me->setRegeneratingHealth(false);
@@ -706,7 +706,7 @@ struct npc_juvenile : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         me->SetInCombatWithZone();
@@ -774,7 +774,7 @@ struct npc_egg_of_jikun : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         if (me->GetEntry() == NPC_FLEDGLING_EGG_JIKUN)
@@ -862,7 +862,7 @@ struct npc_fall_catcher_jikun : public ScriptedAI
             {
                 passenger->ExitVehicle();
                 
-                if (Creature* jikun = ObjectAccessor::GetCreature(*me, passenger->GetInstanceScript() ? passenger->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+                if (Creature* jikun = ObjectAccessor::GetCreature(*me, passenger->GetInstanceScript() ? passenger->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
                 {
                     GetPositionWithDistInOrientation(jikun, 38.0f, jikun->GetAngle(passenger), x, y);
                     passenger->CastSpell(x, y, jikunJumpPos.GetPositionZ(), SPELL_JUMP_TO_PLATFORM, true);
@@ -893,7 +893,7 @@ struct npc_jikun_feed : public ScriptedAI
         slimedGUIDs.clear();
         me->SetDisplayId(me->GetCreatureTemplate()->Modelid2);
 
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         scheduler
@@ -971,7 +971,7 @@ struct npc_pool_of_feed_effect : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         DoCast(me, SPELL_FEED_POOL_VISUAL, true);
@@ -1011,7 +1011,7 @@ struct npc_pool_of_feed_hatchling_effect : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         DoCast(me, SPELL_FEED_POOL_VISUAL_HATCHLING, true);
@@ -1053,7 +1053,7 @@ struct npc_nest_guardian : public ScriptedAI
         targetGUID = ObjectGuid::Empty;
         instance = me->GetInstanceScript();
 
-        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+        if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
             jiKun->AI()->JustSummoned(me);
 
         me->setRegeneratingHealth(false);
@@ -1600,7 +1600,7 @@ class spell_jikun_gentle_yet_firm : public AuraScript
     {
         if (Player* owner = GetOwner()->ToPlayer())
         {
-            if (Creature* jikun = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+            if (Creature* jikun = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
                 jikun->AI()->SetData(TYPE_SOFT_HANDS, 1);
 
             // Remove Daedalian Wings from catcher
@@ -1611,7 +1611,7 @@ class spell_jikun_gentle_yet_firm : public AuraScript
     void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* owner = GetOwner()->ToPlayer())
-            if (Creature* jikun = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))
+            if (Creature* jikun = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(DATA_JI_KUN) : ObjectGuid::Empty))
                 jikun->AI()->SetData(TYPE_SOFT_HANDS, 0);
     }
 

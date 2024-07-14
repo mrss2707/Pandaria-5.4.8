@@ -454,13 +454,13 @@ class boss_frostlord_ahune : public CreatureScript
 
             }
 
-            void PlayerSay(uint64 playerGUID, uint8 sayText) // TODO: should be CHAT_MSG_SAY, not CHAT_MSG_ADDON
+            void PlayerSay(ObjectGuid playerGUID, uint8 sayText) // TODO: should be CHAT_MSG_SAY, not CHAT_MSG_ADDON
             {
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                     sCreatureTextMgr->SendChat(me, sayText, 0, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, player);
             }
 
-            void EarthenAttack(uint64 totemGUID, uint64 flamecallerGUID)
+            void EarthenAttack(ObjectGuid totemGUID, ObjectGuid flamecallerGUID)
             {
                 if (Creature* flamecaller = ObjectAccessor::GetCreature(*me, flamecallerGUID))
                 {

@@ -323,7 +323,7 @@ class boss_feng : public CreatureScript
                     availablePos[i - 1] = i;
 
                 // Desactivate old statue
-                if (GameObject* oldStatue = instance->instance->GetGameObject(instance->GetData64(statueEntryInOrder[actualPhase - 1])))
+                if (GameObject* oldStatue = instance->instance->GetGameObject(instance->GetGuidData(statueEntryInOrder[actualPhase - 1])))
                 {
                     oldStatue->SetLootState(GO_READY);
                     oldStatue->UseDoorOrButton();
@@ -450,14 +450,14 @@ class boss_feng : public CreatureScript
                 if (actualPhase != PHASE_NONE)
                 {
                     // Desactivate old statue and enable the new one
-                    if (GameObject* oldStatue = instance->instance->GetGameObject(instance->GetData64(statueEntryInOrder[actualPhase - 1])))
+                    if (GameObject* oldStatue = instance->instance->GetGameObject(instance->GetGuidData(statueEntryInOrder[actualPhase - 1])))
                     {
                         oldStatue->SetLootState(GO_READY);
                         oldStatue->UseDoorOrButton();
                     }
                 }
 
-                if (GameObject* newStatue = instance->instance->GetGameObject(instance->GetData64(statueEntryInOrder[newPhase - 1])))
+                if (GameObject* newStatue = instance->instance->GetGameObject(instance->GetGuidData(statueEntryInOrder[newPhase - 1])))
                 {
                     newStatue->SetLootState(GO_READY);
                     newStatue->UseDoorOrButton();

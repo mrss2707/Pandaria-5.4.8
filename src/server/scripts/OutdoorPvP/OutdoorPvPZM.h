@@ -215,7 +215,7 @@ class OPvPCapturePointZM_GraveYard : public OPvPCapturePoint
 
         void SetBeaconState(uint32 controlling_team); // not good atm
 
-        bool HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid);
+        bool HandleGossipOption(Player* player, Creature* creature, uint32 gossipid);
 
         bool HandleDropFlag(Player* player, uint32 spellId);
 

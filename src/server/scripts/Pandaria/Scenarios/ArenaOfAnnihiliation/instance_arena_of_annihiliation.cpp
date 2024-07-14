@@ -31,9 +31,9 @@ class instance_arena_of_annihiliation : public InstanceMapScript
             instance_arena_of_annihiliation_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
             EventMap events;
-            uint64 gongGUID, templeDoorGUID;
+            ObjectGuid gongGUID, templeDoorGUID;
             uint32 m_auiEncounter[CHAPTERS];
-            std::map<uint32, uint64> m_ArenaEncounters;
+            std::map<uint32, ObjectGuid> m_ArenaEncounters;
             std::map<uint32, uint32> m_GurthockDefeats;
             ObjectGuid makiGUID;
             bool hasAssassinActivated;
@@ -177,7 +177,7 @@ class instance_arena_of_annihiliation : public InstanceMapScript
                         {
                             Gurghock->AI()->Talk(TALK_ASSASSIN_INTRO);
 
-                            if (Creature* assassin = instance->GetCreature(GetData64(assassinChallenger)))
+                            if (Creature* assassin = instance->GetCreature(GetGuidData(assassinChallenger)))
                                 assassin->AI()->DoAction(ACTION_INTRO);
                             else if (Creature* maki = Gurghock->SummonCreature(assassinChallenger, makiSpawnPos, TEMPSUMMON_MANUAL_DESPAWN)) // in case if maki was select
                                 maki->AI()->DoAction(ACTION_INTRO);
@@ -216,7 +216,7 @@ class instance_arena_of_annihiliation : public InstanceMapScript
                         return makiGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

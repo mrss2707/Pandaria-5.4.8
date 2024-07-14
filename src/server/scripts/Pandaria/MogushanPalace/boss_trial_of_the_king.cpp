@@ -1342,7 +1342,7 @@ class npc_glintrok_scout : public CreatureScript
                 Creature* creature = NULL;
 
                 if (instance)
-                    creature = ObjectAccessor::GetCreature(*me, (instance->GetData64(type)));
+                    creature = ObjectAccessor::GetCreature(*me, (instance->GetGuidData(type)));
 
                 return creature;
             }

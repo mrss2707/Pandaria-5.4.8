@@ -122,7 +122,7 @@ class instance_the_stonecore : public InstanceMapScript
                         {
                             Corborus->GetMotionMaster()->MoveCharge(ManaStormPathEvent[3].GetPositionX(), ManaStormPathEvent[3].GetPositionY(), ManaStormPathEvent[3].GetPositionZ(), 38.0f, EVENT_CHARGE);
 
-                            if (GameObject* breakWall = ObjectAccessor::GetGameObject(*Corborus, GetData64(GO_ROCKDOOR_BREAK)))
+                            if (GameObject* breakWall = ObjectAccessor::GetGameObject(*Corborus, GetGuidData(GO_ROCKDOOR_BREAK)))
                                 breakWall->UseDoorOrButton();
 
                             if (Creature* Milhouse = instance->GetCreature(GetGuidData(NPC_MILLHOUSE_MANASTORM)))
@@ -157,7 +157,7 @@ class instance_the_stonecore : public InstanceMapScript
                     case NPC_MILLHOUSE_MANASTORM:
                         return ManstormGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

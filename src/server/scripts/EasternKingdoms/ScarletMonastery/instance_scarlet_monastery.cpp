@@ -173,7 +173,7 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case NPC_HOODED_CRUSADER_OUTRO:
                         return HoodedGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

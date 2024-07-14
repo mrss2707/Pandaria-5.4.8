@@ -31,9 +31,9 @@ class instance_brewmoon_festival : public InstanceMapScript
             instance_brewmoon_festival_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
             uint32 m_auiEncounter[CHAPTERS];
-            std::map<uint32, uint64> m_BrewmoonEncounters;
+            std::map<uint32, ObjectGuid> m_BrewmoonEncounters;
             std::map<uint64, uint32> m_ScoutsType;
-            std::list<uint64> m_vilmanGuids, m_waterspiritGuids, m_yaungolAttack;
+            std::list<ObjectGuid> m_vilmanGuids, m_waterspiritGuids, m_yaungolAttack;
             uint32 chapterOne, chapterTwo, chapterThree, chapterFour, m_cBridge, m_cWest, m_cCarvens, s1_chapterTwo, s2_chapterTwo, s3_chapterTwo, m_currentType;
             EventMap m_mEvents;
 
@@ -109,7 +109,7 @@ class instance_brewmoon_festival : public InstanceMapScript
                     switch (unit->GetEntry())
                     {
                         case NPC_HUNGRY_VIRMEN:
-                            for (std::list<uint64>::iterator it = m_vilmanGuids.begin(); it != m_vilmanGuids.end(); ++it)
+                            for (std::list<ObjectGuid>::iterator it = m_vilmanGuids.begin(); it != m_vilmanGuids.end(); ++it)
                             {
                                 if (*it == unit->GetGUID())
                                 {
@@ -130,7 +130,7 @@ class instance_brewmoon_festival : public InstanceMapScript
                                     Kieu->AI()->DoAction(ACTION_INTRO);
                             break;
                         case NPC_WATER_SPIRIT:
-                            for (std::list<uint64>::iterator it = m_waterspiritGuids.begin(); it != m_waterspiritGuids.end(); ++it)
+                            for (std::list<ObjectGuid>::iterator it = m_waterspiritGuids.begin(); it != m_waterspiritGuids.end(); ++it)
                             {
                                 if (*it == unit->GetGUID())
                                 {
@@ -173,7 +173,7 @@ class instance_brewmoon_festival : public InstanceMapScript
                             break;
                         case NPC_BATAARI_FLAMECALLER:
                         case NPC_BATAARI_OUTRUNNER:
-                            for (std::list<uint64>::iterator it = m_yaungolAttack.begin(); it != m_yaungolAttack.end(); ++it)
+                            for (std::list<ObjectGuid>::iterator it = m_yaungolAttack.begin(); it != m_yaungolAttack.end(); ++it)
                             {
                                 if (*it == unit->GetGUID())
                                 {
@@ -403,7 +403,7 @@ class instance_brewmoon_festival : public InstanceMapScript
                         return m_BrewmoonEncounters.find(type)->second;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

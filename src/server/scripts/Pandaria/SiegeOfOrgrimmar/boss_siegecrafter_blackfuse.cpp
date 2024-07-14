@@ -230,9 +230,9 @@ const std::map<uint32, uint32> invSelectWeaponType =
 
 // Missle should hit only on edge of platform. Nearest by Encounter.
 // Main idea check angle our encounter to helper and invert him (helper has middle of platform pos).
-Position CalculateMissleThrowPosition(uint64 m_ownerGUID, uint32 count = 0)
+Position CalculateMissleThrowPosition(Unit* me, ObjectGuid m_ownerGUID, uint32 count = 0)
 {
-    Unit* m_owner = ObjectAccessor::FindUnit(m_ownerGUID);
+    Unit* m_owner = ObjectAccessor::GetUnit(*me, m_ownerGUID);
     float x, y;
 
     if (!m_owner)
@@ -532,7 +532,7 @@ class boss_siegecrafter_blackfuse : public CreatureScript
                         itr->AI()->DoAction(ACTION_CONVEYOR_RESET);
                 }
 
-                uint64 getOverchargeWeaponGUID()
+                ObjectGuid getOverchargeWeaponGUID()
                 {
                     if (Creature* helper = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_HELPER) : ObjectGuid::Empty))
                     {
@@ -545,15 +545,15 @@ class boss_siegecrafter_blackfuse : public CreatureScript
                         weaponList.remove_if([=](Creature* target) { return target && target->AI()->GetData(TYPE_NOT_IN_CONVEYOR_LINE); });
 
                         if (weaponList.empty())
-                            return 0;
+                            return ObjectGuid::Empty;
 
                         return Trinity::Containers::SelectRandomContainerElement(weaponList)->GetGUID();
                     }
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
 
-                uint64 getSawbladeTargetGUID()
+                ObjectGuid getSawbladeTargetGUID()
                 {
                     ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
                     std::list<Unit*> targetList, tempTargetList;
@@ -588,7 +588,7 @@ class boss_siegecrafter_blackfuse : public CreatureScript
                     if (targetList.size() > 1)
                         return Trinity::Containers::SelectRandomContainerElement(targetList)->GetGUID();
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
         };
 
@@ -806,7 +806,7 @@ struct npc_soo_siegecrafter_helper : public ScriptedAI
     uint32 hasWeaponDestroyed;
     uint32 prevOvercharged;
     std::vector<uint32> m_deactivatedCombo, m_activatedCombo;
-    std::vector<uint64> m_dGUID;
+    std::vector<ObjectGuid> m_dGUID;
     std::vector<uint32> tempOvercharged;
     std::map <uint32, uint32> ActivatedConveyorDict;
     bool hasEvade;
@@ -1050,7 +1050,7 @@ struct npc_soo_siegecrafter_helper : public ScriptedAI
                         for (auto&& itr : waveBeams)
                             itr->AI()->DoAction(ACTION_CONVEYOR_RESET); // disable all before run
 
-                        uint64 launcherBunnyGUID = 0;
+                        ObjectGuid launcherBunnyGUID = ObjectGuid::Empty;
 
                         if (!waveBeams.empty())
                             launcherBunnyGUID = Trinity::Containers::SelectRandomContainerElement(waveBeams)->GetGUID();
@@ -1466,7 +1466,7 @@ struct npc_soo_activated_weapons : public ScriptedAI
                         DoCast(me, SPELL_DEATHDEALER_TURRET_CONTROL_PERIODIC);
 
                         // Also launch shockwave Missle
-                        if (TempSummon* shockwaveMissle = me->SummonCreature(NPC_SHOCKWAVE_MISSLE_CASTER_STALKER, CalculateMissleThrowPosition(me->GetGUID()), TEMPSUMMON_MANUAL_DESPAWN))
+                        if (TempSummon* shockwaveMissle = me->SummonCreature(NPC_SHOCKWAVE_MISSLE_CASTER_STALKER, CalculateMissleThrowPosition(me, me->GetGUID()), TEMPSUMMON_MANUAL_DESPAWN))
                             me->CastSpell(shockwaveMissle->GetPositionX(), shockwaveMissle->GetPositionY(), shockwaveMissle->GetPositionZ(), SPELL_SHOCKWAVE_MISSLE, false);
                     }
 
@@ -1548,7 +1548,7 @@ struct npc_soo_activated_weapons_type : public ScriptedAI
         summonerEntry = summoner->GetEntry();
         summonerGUID = summoner->GetGUID();
 
-        if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SIEGECRAFTER_BLACKFUSE) : 0))
+        if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SIEGECRAFTER_BLACKFUSE) : ObjectGuid::Empty))
             siegeCrafter->AI()->JustSummoned(me);
 
         if (summoner->GetEntry() == NPC_SIEGECRAFTER_CRAWLER_MINE)
@@ -1616,7 +1616,7 @@ struct npc_soo_activated_weapons_type : public ScriptedAI
                 me->DespawnOrUnsummon();
                 break;
             case ACTION_SIEGECRAFTER_MINE_LAUNCH:
-                if (Creature* controller = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SIEGECRAFTER_HELPER) : 0))
+                if (Creature* controller = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SIEGECRAFTER_HELPER) : ObjectGuid::Empty))
                 {
                     GetPositionWithDistInOrientation(me, 40.0f, me->GetAngle(controller), x, y);
 
@@ -1848,7 +1848,7 @@ struct npc_soo_activated_weapons_type : public ScriptedAI
                         }
                         case NPC_ACTIVATED_MISSLE_TURRET:
                         {
-                            if (TempSummon* shockwaveMissle = me->SummonCreature(NPC_SHOCKWAVE_MISSLE_CASTER_STALKER, CalculateMissleThrowPosition(me->GetGUID(), launchedCount), TEMPSUMMON_MANUAL_DESPAWN))
+                            if (TempSummon* shockwaveMissle = me->SummonCreature(NPC_SHOCKWAVE_MISSLE_CASTER_STALKER, CalculateMissleThrowPosition(me, me->GetGUID(), launchedCount), TEMPSUMMON_MANUAL_DESPAWN))
                                 me->CastSpell(shockwaveMissle->GetPositionX(), shockwaveMissle->GetPositionY(), shockwaveMissle->GetPositionZ(), me->HasAura(SPELL_OVERCHARGED_WEAPON_VISUAL) ? SPELL_SHOCKWAVE_MISSLE_LAUNCH_HC : SPELL_SHOCKWAVE_MISSLE, false);
 
                             if (me->HasAura(SPELL_OVERCHARGED_WEAPON_VISUAL) && ++launchedCount < 4)
@@ -1905,10 +1905,10 @@ struct npc_soo_laser_target_bunny : public ScriptedAI
     {
         if (me->GetInstanceScript() && me->GetInstanceScript()->GetBossState(DATA_SIEGECRAFTER_BLACKFUSE) == IN_PROGRESS)
         {
-            if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SIEGECRAFTER_BLACKFUSE) : 0))
+            if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SIEGECRAFTER_BLACKFUSE) : ObjectGuid::Empty))
                 siegeCrafter->AI()->JustSummoned(me);
         }
-        else if (Creature* shanna = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SHANNA_SPARKFIZZ) : 0))
+        else if (Creature* shanna = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SHANNA_SPARKFIZZ) : ObjectGuid::Empty))
             shanna->AI()->JustSummoned(me);
 
         targetGUID = summoner->GetGUID();
@@ -1935,7 +1935,7 @@ struct npc_soo_laser_target_bunny : public ScriptedAI
         }
         else
         {
-            if (Creature* shanna = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SHANNA_SPARKFIZZ) : 0))
+            if (Creature* shanna = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SHANNA_SPARKFIZZ) : ObjectGuid::Empty))
                 shanna->CastSpell(me, SPELL_DISINTEGRATION_LASER, false);
         }
 
@@ -1958,7 +1958,7 @@ struct npc_soo_laser_target_bunny : public ScriptedAI
                 if (Creature* lasserTurret = ObjectAccessor::GetCreature(*me, targetGUID))
                     me->CastSpell(lasserTurret, SPELL_DISINTEGRATION_LASER, true);
 
-                if (Creature* siegecrafterHelper = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SIEGECRAFTER_HELPER) : 0))
+                if (Creature* siegecrafterHelper = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SIEGECRAFTER_HELPER) : ObjectGuid::Empty))
                 {
                     float dist = me->GetExactDist2d(siegecrafterHelper);
                     if (dist < 0.5f)
@@ -2013,7 +2013,7 @@ struct npc_soo_laser_target_bunny : public ScriptedAI
             {
                 if (target->IsAlive())
                     me->GetMotionMaster()->MoveFollow(target, 0.0f, me->GetAngle(target));
-                else if (Creature* owner = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(me->GetInstanceScript()->GetBossState(DATA_SIEGECRAFTER_BLACKFUSE) != IN_PROGRESS ? DATA_SHANNA_SPARKFIZZ : DATA_SIEGECRAFTER_BLACKFUSE) : 0))
+                else if (Creature* owner = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(me->GetInstanceScript()->GetBossState(DATA_SIEGECRAFTER_BLACKFUSE) != IN_PROGRESS ? DATA_SHANNA_SPARKFIZZ : DATA_SIEGECRAFTER_BLACKFUSE) : ObjectGuid::Empty))
                 {
                     // Select new target by owner
                     if (Unit* newTarget = owner->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, CasterSpecTargetSelector(SPELL_ON_CONVEYOR)))
@@ -2056,14 +2056,14 @@ struct npc_soo_laser_target_bunny : public ScriptedAI
     }
 
     private:
-        uint64 getLasserTurretGUID()
+        ObjectGuid getLasserTurretGUID()
         {
             std::list<Creature*> lasserTurretsList;
             GetCreatureListWithEntryInGrid(lasserTurretsList, me, NPC_ACTIVATED_LASER_TURRET, 300.0f);
             lasserTurretsList.remove_if([=](Creature* target) { return target && (target->AI()->GetData(TYPE_LASSER_TURRET_USING) || target->HasAura(SPELL_OVERCHARGED_WEAPON_VISUAL)); });
 
             if (lasserTurretsList.empty())
-                return 0;
+                return ObjectGuid::Empty;
 
             return Trinity::Containers::SelectRandomContainerElement(lasserTurretsList)->GetGUID();
         }
@@ -2126,7 +2126,7 @@ struct npc_soo_shockwave_missle : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SIEGECRAFTER_BLACKFUSE) : 0))
+        if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SIEGECRAFTER_BLACKFUSE) : ObjectGuid::Empty))
             siegeCrafter->AI()->JustSummoned(me);
     }
 
@@ -2153,7 +2153,7 @@ struct npc_soo_shockwave_missle : public ScriptedAI
             DoCast(me, SPELL_SHOCKWAVE_INNER_CIRCLE);
         });
 
-        if (Creature* helper = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SIEGECRAFTER_HELPER) : 0))
+        if (Creature* helper = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SIEGECRAFTER_HELPER) : ObjectGuid::Empty))
             me->PrepareChanneledCast(me->GetAngle(helper)); // required
     }
 
@@ -2176,7 +2176,7 @@ struct npc_siegecrafter_shockwave_missle_trigger : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SIEGECRAFTER_BLACKFUSE) : 0))
+        if (Creature* siegeCrafter = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SIEGECRAFTER_BLACKFUSE) : ObjectGuid::Empty))
             siegeCrafter->AI()->JustSummoned(me);
     }
 
@@ -2536,7 +2536,7 @@ class spell_siegecrafter_energized_defensive_matrix : public SpellScript
     void HandleOnMatrixHit(SpellEffIndex effIdx)
     {
         // Not apply this aura if any weapon on conveyor was destroyed
-        if (Creature* helper = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetData64(NPC_SIEGECRAFTER_HELPER) : 0))
+        if (Creature* helper = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(NPC_SIEGECRAFTER_HELPER) : ObjectGuid::Empty))
             if (helper->AI()->GetData(TYPE_CONVEYOR_WEAPON_DESTROYED) || GetCaster() && GetCaster()->GetInstanceScript() && GetCaster()->GetInstanceScript()->GetData(DATA_LFR) && !GetCaster()->GetInstanceScript()->GetData(DATA_FLEX))
                 PreventHitAura();
     }
@@ -2960,7 +2960,7 @@ class spell_siegecrafter_overcharge_weapon : public SpellScript
             }
 
             // Speical Announce about overcharged weapon
-            if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(NPC_SIEGECRAFTER_BLACKFUSE_1) : 0))
+            if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : ObjectGuid::Empty))
             {
                 switch (replaceEntry)
                 {
@@ -3077,7 +3077,7 @@ class spell_siegecrafter_magnetic_crush_pull_saw : public SpellScript
                 target->AI()->SetGUID(GetCaster()->GetGUID());
 
             // Calculate Pull Pos
-            if (Creature* helper = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(NPC_SIEGECRAFTER_HELPER) : 0))
+            if (Creature* helper = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(NPC_SIEGECRAFTER_HELPER) : ObjectGuid::Empty))
             {
                 uint32 tempCount = target->AI()->GetData(TYPE_SAW_TRAJ) == 100 ? useCount : target->AI()->GetData(TYPE_SAW_TRAJ);
                 // Calculate Arc position depend of this will form traj in next time at pull
@@ -3281,7 +3281,7 @@ class AreaTrigger_at_soo_pipelines_down : public AreaTriggerScript
             player->Kill(player);
 
             // Teleport corpse to center of area for rebirth possibility
-            if (Creature* helper = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetData64(NPC_SIEGECRAFTER_HELPER) : 0))
+            if (Creature* helper = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetGuidData(NPC_SIEGECRAFTER_HELPER) : ObjectGuid::Empty))
                 player->NearTeleportTo(helper->GetPositionX(), helper->GetPositionY(), helper->GetPositionZ(), helper->GetOrientation());
 
             return false;

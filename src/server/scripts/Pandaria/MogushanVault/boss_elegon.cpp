@@ -230,14 +230,14 @@ enum AchievementWorldStates
 
 
 // Set values in reset of mob_empyreal_focus
-uint64 empyrealFocus[6] =
+ObjectGuid empyrealFocus[6] =
 {
-    0, // South-West
-    0, // North-West
-    0, // South
-    0, // North
-    0, // South-East
-    0  // North-East
+    ObjectGuid::Empty, // South-West
+    ObjectGuid::Empty, // North-West
+    ObjectGuid::Empty, // South
+    ObjectGuid::Empty, // North
+    ObjectGuid::Empty, // South-East
+    ObjectGuid::Empty  // North-East
 };
 // Elegon - 60410
 class boss_elegon : public CreatureScript
@@ -1408,7 +1408,7 @@ class npc_energy_charge : public CreatureScript
                 {
                     case POINT_EMPYEREAN_FOCUS:
                     {
-                        if (Unit* focus = ObjectAccessor::FindUnit(me->GetUInt64Value(UNIT_FIELD_TARGET)))
+                        if (Unit* focus = ObjectAccessor::GetUnit(*me, me->GetGuidValue(UNIT_FIELD_TARGET)))
                         {
                             Position pos = focus->GetPosition();
 
@@ -1427,7 +1427,7 @@ class npc_energy_charge : public CreatureScript
                 {
                     case ACTION_ENERGIZE_EMPYREAL_FOCUS:
                     {
-                        if (Unit* focus = ObjectAccessor::FindUnit(me->GetUInt64Value(UNIT_FIELD_TARGET)))
+                        if (Unit* focus = ObjectAccessor::GetUnit(*me, me->GetGuidValue(UNIT_FIELD_TARGET)))
                             if (focus->GetAI())
                                 focus->GetAI()->DoAction(ACTION_ACTIVATE_EMPYREAL_FOCUS);
 

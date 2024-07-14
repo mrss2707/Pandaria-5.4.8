@@ -32,7 +32,7 @@ class instance_fall_of_theramore_alliance : public InstanceMapScript
             instance_fall_of_theramore_alliance_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
             uint32 m_auiEncounter[CHAPTERS];
-            std::list<uint64> beachPhaseGUIDs, ruinsPhaseGUIDs;
+            std::list<ObjectGuid> beachPhaseGUIDs, ruinsPhaseGUIDs;
             ObjectGuid jainaGUID;
             uint32 wCaptainsSlain, wBarrelsExploded, wCaptainsSlain1, wTrashSlain1, wWyvernSlain, wGashnulSlain, wStolenStandards, wGateCrusherSlain, chapterOne, chapterTwo, chapterThree, chapterFour, chapterFive, chapterSix;
 
@@ -177,7 +177,7 @@ class instance_fall_of_theramore_alliance : public InstanceMapScript
             }
 
             // Thx blizzard :/
-            void HandleActivateSpawnRegion(std::vector<uint32> guardsEntry, std::list<uint64> guardGUIDs)
+            void HandleActivateSpawnRegion(std::vector<uint32> guardsEntry, std::list<ObjectGuid> guardGUIDs)
             {
                 for (auto&& guardItr : guardGUIDs)
                 {
@@ -319,7 +319,7 @@ class instance_fall_of_theramore_alliance : public InstanceMapScript
                 if (type == NPC_JAINA_PROUDMOORE)
                     return jainaGUID;
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

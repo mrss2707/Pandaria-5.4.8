@@ -162,7 +162,7 @@ class instance_proving_grounds : public InstanceMapScript
                                             break;
                                     }
 
-                                    if (Player* trialOwner = ObjectAccessor::FindPlayer(GetData64(PLAYER_DATA)))
+                                    if (Player* trialOwner = ObjectAccessor::FindPlayer(GetGuidData(PLAYER_DATA)))
                                     {
                                         if (trialEntry < TRIAL_DD_ENDLESS)
                                         {
@@ -276,7 +276,7 @@ class instance_proving_grounds : public InstanceMapScript
                         return kavanGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Update(uint32 diff) override

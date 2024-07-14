@@ -246,12 +246,15 @@ void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, uint32 guid)
 template<>
 void PoolGroup<Creature>::Despawn1Object(ActivePoolData& spawns, ObjectGuid::LowType guid)
 {
-    if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
+    auto creatureBounds = spawns.GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
+    for (auto itr = creatureBounds.first; itr != creatureBounds.second;)
     {
-        sObjectMgr->RemoveCreatureFromGrid(guid, data);
-
-        if (Creature* creature = spawns.GetMap()->GetCreature(ObjectGuid::Create<HighGuid::Unit>(data->id, guid)))
-            creature->AddObjectToRemoveList();
+        Creature* creature = itr->second;
+        ++itr;
+//        // For dynamic spawns, save respawn time here
+//        if (saveRespawnTime && !creature->GetRespawnCompatibilityMode())
+//            creature->SaveRespawnTime();
+        creature->AddObjectToRemoveList();
     }
 }
 
@@ -259,12 +262,16 @@ void PoolGroup<Creature>::Despawn1Object(ActivePoolData& spawns, ObjectGuid::Low
 template<>
 void PoolGroup<GameObject>::Despawn1Object(ActivePoolData& spawns, ObjectGuid::LowType guid)
 {
-    if (GameObjectData const* data = sObjectMgr->GetGOData(guid))
+    auto gameobjectBounds = spawns.GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
+    for (auto itr = gameobjectBounds.first; itr != gameobjectBounds.second;)
     {
-        sObjectMgr->RemoveGameobjectFromGrid(guid, data);
+        GameObject* go = itr->second;
+        ++itr;
 
-        if (GameObject* pGameobject = spawns.GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(data->id, guid)))
-            pGameobject->AddObjectToRemoveList();
+//        // For dynamic spawns, save respawn time here
+//        if (saveRespawnTime && !go->GetRespawnCompatibilityMode())
+//            go->SaveRespawnTime();
+        go->AddObjectToRemoveList();
     }
 }
 
@@ -996,7 +1003,9 @@ void PoolMgr::LoadFromDB()
             TC_LOG_ERROR("sql.sql", "Pool Id %u is empty (has no creatures and no gameobects and either no child pools or child pools are all empty. The pool will not be spawned", poolId);
             continue;
         }
-        ASSERT(templateData.MapId != -1);
+
+        // TODO: GameObject: what does this break?
+        //ASSERT(templateData.MapId != -1);
     }
 
     // The initialize method will spawn all pools not in an event and not in another pool, this is why there is 2 left joins with 2 null checks

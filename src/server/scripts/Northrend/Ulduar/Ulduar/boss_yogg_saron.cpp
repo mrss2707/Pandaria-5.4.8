@@ -817,13 +817,13 @@ class boss_sara : public CreatureScript
         {
             boss_saraAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()) { }
 
-            uint64 GetLinkedPlayerGUID(uint64 guid) const
+            ObjectGuid GetLinkedPlayerGUID(ObjectGuid guid) const
             {
-                std::map<uint64, uint64>::const_iterator itr = _linkData.find(guid);
+                std::map<ObjectGuid, ObjectGuid>::const_iterator itr = _linkData.find(guid);
                 if (itr != _linkData.end())
                     return itr->second;
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void CloudHandling(bool start = false)
@@ -839,14 +839,14 @@ class boss_sara : public CreatureScript
                 }
             }
 
-            void SetLinkBetween(uint64 player1, uint64 player2)
+            void SetLinkBetween(ObjectGuid player1, ObjectGuid player2)
             {
                 _linkData[player1] = player2;
                 _linkData[player2] = player1;
             }
 
             // called once for each target on aura remove
-            void RemoveLinkFrom(uint64 player1)
+            void RemoveLinkFrom(ObjectGuid player1)
             {
                 _linkData.erase(player1);
             }
@@ -1042,7 +1042,7 @@ class boss_sara : public CreatureScript
             private:
                 EventMap _events;
                 InstanceScript* instance;
-                std::map<uint64, uint64> _linkData;
+                std::map<ObjectGuid, ObjectGuid> _linkData;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
@@ -1326,7 +1326,7 @@ class boss_brain_of_yogg_saron : public CreatureScript
 
                         // make sure doors won't be opened
                         for (uint32 i = GO_BRAIN_ROOM_DOOR_1; i <= GO_BRAIN_ROOM_DOOR_3; ++i)
-                            instance->HandleGameObject(instance->GetData64(i), false);
+                            instance->HandleGameObject(instance->GetGuidData(i), false);
 
                         DoCastAOE(SPELL_INDUCE_MADNESS);
                         break;

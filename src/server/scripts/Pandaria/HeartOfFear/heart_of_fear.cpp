@@ -258,7 +258,7 @@ class npc_wind_lord_meljarak_intro : public CreatureScript
                 me->DespawnOrUnsummon();
             }
 
-            void GetNewPositionMove(uint64 owner, uint32 point = 1, float range = 50.0f)
+            void GetNewPositionMove(ObjectGuid owner, uint32 point = 1, float range = 50.0f)
             {
                 float x = 0, y = 0;
                 if (Unit* MeljarakSwarm = ObjectAccessor::GetUnit(*me, owner))
@@ -1023,9 +1023,9 @@ class npc_set_thik_gale_slicer : public CreatureScript
         }
 };
 
-void CallForHelpMyStudients(uint64 instructorGUID)
+void CallForHelpMyStudients(Creature* me, ObjectGuid instructorGUID)
 {
-    Unit* InstructorType = ObjectAccessor::FindUnit(instructorGUID);
+    Unit* InstructorType = ObjectAccessor::GetUnit(*me, instructorGUID);
 
     if (!InstructorType)
         return;
@@ -1093,7 +1093,7 @@ class npc_instructor_kli_thak : public CreatureScript
                 events.ScheduleEvent(EVENT_WIND_STEP, 7000);
                 events.ScheduleEvent(EVENT_WIND_STEP_2, 15000);
 
-                CallForHelpMyStudients(me->GetGUID());
+                CallForHelpMyStudients(me, me->GetGUID());
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -1191,7 +1191,7 @@ class npc_instructor_tak_thok : public CreatureScript
             {
                 events.ScheduleEvent(EVENT_OVERWHELMING_ASSAULT, 4000);
 
-                CallForHelpMyStudients(me->GetGUID());
+                CallForHelpMyStudients(me, me->GetGUID());
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -1263,7 +1263,7 @@ class npc_instructor_maltik : public CreatureScript
             npc_instructor_maltikAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
-            uint64 unseenTank, unseenTarget;
+            ObjectGuid unseenTank, unseenTarget;
             bool unseenReturn, evadeModeEnabled;
             uint32 delay;
             InstanceScript* instance;
@@ -1280,8 +1280,8 @@ class npc_instructor_maltik : public CreatureScript
                 events.Reset();
                 unseenReturn     = false;
                 evadeModeEnabled = false;
-                unseenTank       = 0;
-                unseenTarget     = 0;
+                unseenTank       = ObjectGuid::Empty;
+                unseenTarget     = ObjectGuid::Empty;
                 me->setRegeneratingHealth(true);
             }
 
@@ -1290,7 +1290,7 @@ class npc_instructor_maltik : public CreatureScript
                 me->setRegeneratingHealth(false);
                 events.ScheduleEvent(EVENT_UNSEEN_STRIKE, urand(18500, 21500));
                 evadeModeEnabled = true;
-                CallForHelpMyStudients(me->GetGUID());
+                CallForHelpMyStudients(me, me->GetGUID());
             }
 
             void EnterEvadeMode() override
@@ -1344,7 +1344,7 @@ class npc_instructor_maltik : public CreatureScript
                     {
                         case EVENT_UNSEEN_STRIKE:
                         {
-                            unseenTank = me->GetVictim() ? me->GetVictim()->GetGUID() : 0;
+                            unseenTank = me->GetVictim() ? me->GetVictim()->GetGUID() : ObjectGuid::Empty;
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankSpecTargetSelector()))
                             {
                                 me->CastSpell(target, SPELL_UNSEEN_STRIKE_TR, true);
@@ -1433,7 +1433,7 @@ class npc_instructor_zarik : public CreatureScript
             {
                 events.ScheduleEvent(EVENT_TEMPEST_SLASH, urand(9500, 11000));
 
-                CallForHelpMyStudients(me->GetGUID());
+                CallForHelpMyStudients(me, me->GetGUID());
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -1776,18 +1776,18 @@ class npc_coagulated_amber : public CreatureScript
                 events.ScheduleEvent(EVENT_BURST, 4000);
             }
 
-            uint64 NextAmberPoolStalkerPath()
+            ObjectGuid NextAmberPoolStalkerPath()
             {
                 std::list<Creature*> AmberPoolStalker;
                 GetCreatureListWithEntryInGrid(AmberPoolStalker, me, NPC_AMBER_POOL_STALKER, 200.0f);
 
                 if (AmberPoolStalker.empty())
-                    return 0;
+                    return ObjectGuid::Empty;
 
                 if (Creature* m_stalker = Trinity::Containers::SelectRandomContainerElement(AmberPoolStalker))
                     return m_stalker->GetGUID();
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void DoAction(int32 actionId) override
@@ -2101,7 +2101,7 @@ class npc_amber_ridden_mushan : public CreatureScript
             npc_amber_ridden_mushanAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
-            std::list<uint64> amber;
+            std::list<ObjectGuid> amber;
             uint32 VehPos;
 
             void Reset() override

@@ -496,7 +496,7 @@ struct npc_crawler_mine : public ScriptedAI
         explosionGUID = ObjectGuid::Empty;
         hasPassenger = false;
 
-        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
             juggernaut->AI()->JustSummoned(me);
 
         scheduler
@@ -506,7 +506,7 @@ struct npc_crawler_mine : public ScriptedAI
 
             if (Unit* target = ObjectAccessor::GetUnit(*me, ownerGUID))
                 me->GetMotionMaster()->MovePoint(0, *target);
-            else if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+            else if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
                 if (Unit* target = juggernaut->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0.0f, 200.0f, true))
                     me->GetMotionMaster()->MovePoint(0, *target);
 
@@ -568,7 +568,7 @@ struct npc_crawler_mine : public ScriptedAI
             // Achiev
             if (me->HasAura(SPELL_SUPERHEATED_CRAWLER_MINE))
             {
-                if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+                if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
                     ironJuggernaut->AI()->SetData(TYPE_SUPERHEATED_MINE_STOMP, 1);
             }
 
@@ -589,7 +589,7 @@ struct npc_juggernaut_crawler_mine_clicker : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override 
     {
-        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
             juggernaut->AI()->JustSummoned(me);
 
         me->SetDisplayId(me->GetCreatureTemplate()->Modelid1);
@@ -610,7 +610,7 @@ struct npc_borer_drill : public ScriptedAI
     {
         ownerGUID = summoner->GetGUID();
 
-        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
             juggernaut->AI()->JustSummoned(me);
 
         me->SetSpeed(MOVE_WALK, 0.64f);
@@ -629,7 +629,7 @@ struct npc_borer_drill : public ScriptedAI
             {
                 if (target->IsAlive())
                     me->GetMotionMaster()->MoveFollow(target, 0.0f, me->GetAngle(target));
-                else if (Creature* owner = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT):0))
+                else if (Creature* owner = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT):ObjectGuid::Empty))
                 {
                     // Select new target by owner
                     if (Unit* newTarget = owner->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, CasterSpecTargetSelector()))
@@ -696,7 +696,7 @@ struct npc_juggernaut_cutter_laser : public ScriptedAI
     {
         me->SetDisplayId(me->GetCreatureTemplate()->Modelid1);
 
-        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+        if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
             juggernaut->AI()->JustSummoned(me);
 
         laserActive = 0;
@@ -743,7 +743,7 @@ struct npc_juggernaut_cutter_laser : public ScriptedAI
                 {
                     if (target->IsAlive())
                         me->GetMotionMaster()->MoveFollow(target, 0.0f, me->GetAngle(target));
-                    else if (Creature* owner = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+                    else if (Creature* owner = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
                     {
                         // Select new target by owner
                         if (Unit* newTarget = owner->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, CasterSpecTargetSelector()))
@@ -786,7 +786,7 @@ struct npc_juggernaut_sawblade : public ScriptedAI
             secondTargetGUID = ObjectGuid::Empty;
             hasLaunched = false;
 
-            if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+            if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
             {
                 me->ExitVehicle();
 
@@ -828,7 +828,7 @@ struct npc_juggernaut_sawblade : public ScriptedAI
                 {
                     hasLaunched = false;
 
-                    if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+                    if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
                         ironJuggernaut->CastSpell(ironJuggernaut, SPELL_RICOCHET_REMOVE, true);
 
                     return;
@@ -871,7 +871,7 @@ struct npc_juggernaut_sawblade : public ScriptedAI
                             {
                                 hasLaunched = false;
 
-                                if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+                                if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
                                     ironJuggernaut->CastSpell(ironJuggernaut, SPELL_RICOCHET_REMOVE, true);
                             });
                         });
@@ -891,7 +891,7 @@ struct npc_juggernaut_sawblade : public ScriptedAI
                             {
                                 hasLaunched = false;
 
-                                if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+                                if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
                                     ironJuggernaut->CastSpell(ironJuggernaut, SPELL_RICOCHET_REMOVE, true);
                             });
                         });
@@ -1479,7 +1479,7 @@ class spell_juggernaut_ricochet_transform : public AuraScript
             owner->SetObjectScale(1.0f);
             owner->RemoveAurasDueToSpell(SPELL_RICOCHET_AT);
 
-            if (Creature* juggernaut = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
+            if (Creature* juggernaut = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(DATA_IRON_JUGGERNAUT) : ObjectGuid::Empty))
                 owner->EnterVehicle(juggernaut, 1);
         }
     }

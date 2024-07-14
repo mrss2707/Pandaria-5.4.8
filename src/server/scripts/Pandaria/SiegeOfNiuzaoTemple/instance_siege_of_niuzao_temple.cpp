@@ -43,9 +43,9 @@ class instance_siege_of_niuzao_temple : public InstanceMapScript
 
             void Initialize() override
             {
-                invisDoorGUID[0] = 0;
-                invisDoorGUID[1] = 0;
-                vojakDoor = 0;
+                invisDoorGUID[0] = ObjectGuid::Empty;
+                invisDoorGUID[1] = ObjectGuid::Empty;
+                vojakDoor = ObjectGuid::Empty;
                 vojakDoorGUID = ObjectGuid::Empty;
                 jinbakDoorGUID = ObjectGuid::Empty;
                 SetBossNumber(TOTAL_ENCOUNTERS);
@@ -202,7 +202,7 @@ class instance_siege_of_niuzao_temple : public InstanceMapScript
             }
 
         private:
-            uint64 vojakDoor;
+            ObjectGuid vojakDoor;
             ObjectGuid vojakDoorGUID;
             ObjectGuid jinbakDoorGUID;
             ObjectGuid invisDoorGUID[2];

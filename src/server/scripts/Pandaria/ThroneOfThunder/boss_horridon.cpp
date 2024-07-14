@@ -364,7 +364,7 @@ class boss_horridon : public CreatureScript
             EventMap m_mBerserkEvents;
             std::map <uint32, uint32> tribeDoorData;
             uint32 majorCount, uPhase, direhornPhase;
-            uint64 targetGUID, chargeGUID;
+            ObjectGuid targetGUID, chargeGUID;
             bool bJalakCalled;
             bool hasInCharge;
 
@@ -528,7 +528,7 @@ class boss_horridon : public CreatureScript
                     case MOTION_HORRIDON_DOOR_CHARGE:
                         DoCast(me, SPELL_HEADACHE, true);
 
-                        if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GetDoorIdByPhase(eTrashPhases(uPhase))) : 0))
+                        if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GetDoorIdByPhase(eTrashPhases(uPhase))) : ObjectGuid::Empty))
                             curTribalDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
 
                         uPhase++;
@@ -630,7 +630,7 @@ class boss_horridon : public CreatureScript
                             .SetValidator([this] { return instance && instance->GetBossState(DATA_HORRIDON) == IN_PROGRESS; })
                             .Schedule(Seconds(5), [this](TaskContext context)
                         {
-                            if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GetDoorIdByPhase(eTrashPhases(uPhase))) : 0))
+                            if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GetDoorIdByPhase(eTrashPhases(uPhase))) : ObjectGuid::Empty))
                             {
                                 me->GetMotionMaster()->MovementExpired();
                                 me->GetMotionMaster()->MoveCharge(invTribalDoorType.find(curTribalDoor->GetEntry())->second.GetPositionX(), invTribalDoorType.find(curTribalDoor->GetEntry())->second.GetPositionY(), invTribalDoorType.find(curTribalDoor->GetEntry())->second.GetPositionZ(), 42.0f, MOTION_HORRIDON_DOOR_CHARGE);
@@ -783,7 +783,7 @@ class boss_horridon : public CreatureScript
                 void HandleSummonMinorTribes()
                 {
                     // We should open the gates each time when summon minors
-                    if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GetDoorIdByPhase(eTrashPhases(uPhase))) : 0))
+                    if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GetDoorIdByPhase(eTrashPhases(uPhase))) : ObjectGuid::Empty))
                         curTribalDoor->UseDoorOrButton();
 
                     std::list<Creature*> minorsList;
@@ -920,7 +920,7 @@ class boss_horridon : public CreatureScript
 
                     // Also reset Tribals Door if it was destroyed
                     for (uint32 i = GO_TRIBAL_DOOR_GURUBASHI; i < GO_TRIBAL_DOOR_AMANI + 1; i++)
-                        if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(i) : 0))
+                        if (GameObject* curTribalDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(i) : ObjectGuid::Empty))
                             curTribalDoor->SetGoState(GO_STATE_READY);
                 }
 
@@ -1066,7 +1066,7 @@ class npc_war_god_jalak : public CreatureScript
                             if (GameObject *pDoor = me->FindNearestGameObject(GO_HORRIDON_PRISON_DOOR, 50000.0f))
                                 pDoor->SetGoState(GO_STATE_ACTIVE);
 
-                            if (Creature* horridon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON): 0))
+                            if (Creature* horridon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON): ObjectGuid::Empty))
                                 horridon->HandleEmoteStateCommand(EMOTE_STATE_ATTACK_UNARMED);
                         });
 
@@ -1142,11 +1142,11 @@ class npc_war_god_jalak : public CreatureScript
 
             void JustDied(Unit* killer) override
             {
-                if (ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):0) && ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):0)->isDead())
+                if (ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):ObjectGuid::Empty) && ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):ObjectGuid::Empty)->isDead())
                     instance->SetBossState(DATA_HORRIDON, DONE);
                 else 
                 {
-                    if (Creature* pHorridon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):0))
+                    if (Creature* pHorridon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):ObjectGuid::Empty))
                         pHorridon->AddAura(SPELL_RAMPAGE, pHorridon);
                 }
 
@@ -1928,7 +1928,7 @@ class npc_amani_shi_warbear : public CreatureScript
                         if (pKit->GetPassenger(0) && pKit->GetPassenger(0)->ToCreature())
                             pKit->GetPassenger(0)->ToCreature()->AI()->DoAction(ACTION_AMANI_SHAMAN);
 
-                    if (Creature* pHorridon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):0))
+                    if (Creature* pHorridon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_HORRIDON):ObjectGuid::Empty))
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankSpecTargetSelector()))
                         {
@@ -2090,7 +2090,7 @@ class spell_control_horridon : public SpellScriptLoader
             void HandleApply(AuraEffect const* pAuraEffect, AuraEffectHandleModes eMode)
             {
                 if (WorldObject *pOwner = GetOwner())
-                    if (Creature* horridon = ObjectAccessor::GetCreature(*pOwner, pOwner->GetInstanceScript() ? pOwner->GetInstanceScript()->GetData64(DATA_HORRIDON) : 0))
+                    if (Creature* horridon = ObjectAccessor::GetCreature(*pOwner, pOwner->GetInstanceScript() ? pOwner->GetInstanceScript()->GetGuidData(DATA_HORRIDON) : ObjectGuid::Empty))
                         horridon->AI()->DoAction(ACTION_PREPARE_TRANSITION);
             }
 

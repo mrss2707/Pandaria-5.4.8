@@ -1260,7 +1260,7 @@ class boss_the_lich_king : public CreatureScript
                             events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, _transitionNumber == 1 ? urand(22000, 23000) : urand(17000, 19000), 0, PHASE_TRANSITION);
                             break;
                         case EVENT_RESUME_RAGING_SPIRITS:
-                            for (uint64 guid : summons)
+                            for (ObjectGuid guid : summons)
                                 if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                                     if (summon->GetEntry() == NPC_RAGING_SPIRIT && summon->IsAIEnabled)
                                         summon->AI()->DoAction(ACTION_RESUME_RAGING_SPIRIT);
@@ -1315,7 +1315,7 @@ class boss_the_lich_king : public CreatureScript
                             events.ScheduleEvent(EVENT_START_ATTACK, 49000);
                             events.ScheduleEvent(EVENT_FROSTMOURNE_HEROIC, 6500);
                             DelayVileSpirits(50000 + 6500);
-                            for (uint64 guid : summons)
+                            for (ObjectGuid guid : summons)
                                 if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                                     if (summon->GetEntry() == NPC_RAGING_SPIRIT && summon->IsAIEnabled)
                                         summon->AI()->DoAction(ACTION_PAUSE_RAGING_SPIRIT);
@@ -1490,7 +1490,7 @@ class boss_the_lich_king : public CreatureScript
                 if (_playersToCheckForMapEditExploit.empty())
                     return;
 
-                for (std::map<uint64, uint32>::iterator itr = _playersToCheckForMapEditExploit.begin(); itr != _playersToCheckForMapEditExploit.end();)
+                for (std::map<ObjectGuid, uint32>::iterator itr = _playersToCheckForMapEditExploit.begin(); itr != _playersToCheckForMapEditExploit.end();)
                 {
                     Player* player = ObjectAccessor::GetPlayer(*me, itr->first);
 
@@ -1538,8 +1538,8 @@ class boss_the_lich_king : public CreatureScript
             uint32 _vileSpiritExplosions;
             uint32 _transitionNumber;
             bool _harvestSoulsActive;
-            std::map<uint64, uint32> _playersToCheckForMapEditExploit;
-            std::set<uint64> _grabbedPlayers;
+            std::map<ObjectGuid, uint32> _playersToCheckForMapEditExploit;
+            std::set<ObjectGuid> _grabbedPlayers;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
@@ -1912,7 +1912,7 @@ class npc_valkyr_shadowguard : public CreatureScript
 
         struct npc_valkyr_shadowguardAI : public ScriptedAI
         {
-            npc_valkyr_shadowguardAI(Creature* creature) : ScriptedAI(creature), _grabbedPlayer(0), _instance(creature->GetInstanceScript()) { }
+            npc_valkyr_shadowguardAI(Creature* creature) : ScriptedAI(creature), _grabbedPlayer(), _instance(creature->GetInstanceScript()) { }
 
             //EventMap events;
 
@@ -1959,7 +1959,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                     }
 
                     DoCastAOE(SPELL_EJECT_ALL_PASSENGERS);
-                    _grabbedPlayer = 0;
+                    _grabbedPlayer = ObjectGuid::Empty;
 
                     damage = 0;
 
@@ -1988,7 +1988,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                     }
                 }
 
-                _grabbedPlayer = 0;
+                _grabbedPlayer = ObjectGuid::Empty;
             }
 
             void AttackStart(Unit* /*victim*/) override { }
@@ -2020,7 +2020,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                                 }*/
                             }
 
-                            _grabbedPlayer = 0;
+                            _grabbedPlayer = ObjectGuid::Empty;
 
                             if (IsHeroic())
                                 ReturnHome();
@@ -2125,7 +2125,7 @@ class npc_valkyr_shadowguard : public CreatureScript
         private:
             EventMap _events;
             Position _dropPoint;
-            uint64 _grabbedPlayer;
+            ObjectGuid _grabbedPlayer;
             InstanceScript* _instance;
             bool _returningHome;
             bool _movementWasStopped;
@@ -3627,7 +3627,7 @@ class spell_the_lich_king_harvest_soul : public SpellScriptLoader
             {
                 // m_originalCaster to allow stacking from different casters, meh
                 if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH && GetTarget()->GetInstanceScript() && GetTarget()->GetMapId() == 631)
-                    GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetData64(DATA_THE_LICH_KING));
+                    GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetGuidData(DATA_THE_LICH_KING));
             }
 
             void Register() override
@@ -3783,7 +3783,7 @@ class spell_the_lich_king_in_frostmourne_room : public SpellScriptLoader
             {
                 // m_originalCaster to allow stacking from different casters, meh
                 if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH && GetTarget()->GetInstanceScript() && GetTarget()->GetMapId() == 631)
-                    GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetData64(DATA_THE_LICH_KING));
+                    GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetGuidData(DATA_THE_LICH_KING));
             }
 
             void Register() override

@@ -283,7 +283,7 @@ class boss_spirit_kings_controller : public CreatureScript
                 nextSpirit = 0;
 
                 for (uint8 i = 0; i < MAX_FLANKING_MOGU; ++i)
-                    flankingGuid[i] = 0;
+                    flankingGuid[i] = ObjectGuid::Empty;
 
                 me->SetReactState(REACT_PASSIVE);
                 instance->DoRemoveBloodLustDebuffSpellOnPlayers();
@@ -336,7 +336,7 @@ class boss_spirit_kings_controller : public CreatureScript
                         for (uint32 i = 1; i < 4; ++i)
                             spiritKingsEntry[i] = instance->GetData(DATA_SPIRIT_KINGS_STATE + i);
 
-                        if (Creature* incomingSpirit = instance->instance->GetCreature(instance->GetData64(spiritKingsEntry[1])))
+                        if (Creature* incomingSpirit = instance->instance->GetCreature(instance->GetGuidData(spiritKingsEntry[1])))
                             me->AddAura(SPELL_ACTIVATION_VISUAL, incomingSpirit);
 
                         fightInProgress = true;
@@ -368,7 +368,7 @@ class boss_spirit_kings_controller : public CreatureScript
                                 GetPositionWithDistInOrientation(flankingMogu, 80.0f, orientation, x, y);
 
                                 uint32 delay = 0;
-                                uint64 moguGUID = flankingMogu->GetGUID();
+                                ObjectGuid moguGUID = flankingMogu->GetGUID();
 
                                 me->m_Events.Schedule(delay += 2000, 20, [this, moguGUID, x, y]()
                                 {
@@ -407,7 +407,7 @@ class boss_spirit_kings_controller : public CreatureScript
                                 {
                                     nextSpirit++;
 
-                                    if (Creature* incomingSpirit = instance->instance->GetCreature(instance->GetData64(spiritKingsEntry[nextSpirit])))
+                                    if (Creature* incomingSpirit = instance->instance->GetCreature(instance->GetGuidData(spiritKingsEntry[nextSpirit])))
                                         me->AddAura(SPELL_ACTIVATION_VISUAL, incomingSpirit);
                                 }
                             }
@@ -433,7 +433,7 @@ class boss_spirit_kings_controller : public CreatureScript
 
                             for (auto&& entry : spiritKingsEntry)
                             {
-                                if (Creature* spirit = instance->instance->GetCreature(instance->GetData64(entry)))
+                                if (Creature* spirit = instance->instance->GetCreature(instance->GetGuidData(entry)))
                                 {
                                     spirit->LowerPlayerDamageReq(spirit->GetMaxHealth());
                                     spirit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -463,7 +463,7 @@ class boss_spirit_kings_controller : public CreatureScript
                         if (vanquishedCount > 2)
                             break;
 
-                        if (Creature* incomingSpirit = instance->instance->GetCreature(instance->GetData64(spiritKingsEntry[vanquishedCount + 1])))
+                        if (Creature* incomingSpirit = instance->instance->GetCreature(instance->GetGuidData(spiritKingsEntry[vanquishedCount + 1])))
                         {
                             switch (incomingSpirit->GetEntry())
                             {

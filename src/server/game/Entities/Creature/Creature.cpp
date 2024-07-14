@@ -31,6 +31,7 @@
 #include "Group.h"
 #include "GroupMgr.h"
 #include "InstanceScript.h"
+#include "IteratorPair.h"
 #include "Log.h"
 #include "LootMgr.h"
 #include "MapManager.h"
@@ -185,6 +186,9 @@ void Creature::AddToWorld()
     if (!IsInWorld())
     {
         GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
+        if (m_DBTableGuid) // m_spawnId
+            GetMap()->GetCreatureBySpawnIdStore().insert(std::make_pair(m_DBTableGuid, this));
+
         Unit::AddToWorld();
         SearchFormation();
         AIM_Initialize();
@@ -209,7 +213,12 @@ void Creature::RemoveFromWorld()
         
         if (m_formation)
             sFormationMgr->RemoveCreatureFromGroup(m_formation, this);
+
         Unit::RemoveFromWorld();
+
+        if (m_DBTableGuid) // m_spawnId
+            Trinity::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_DBTableGuid, this);
+
         GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
     }
 }
@@ -1423,34 +1432,52 @@ bool Creature::hasInvolvedQuest(uint32 quest_id) const
 
 void Creature::DeleteFromDB()
 {
+    CreatureData const* data = sObjectMgr->GetCreatureData(m_DBTableGuid);
+    if (!data)
+        return;
+
     if (!m_DBTableGuid)
     {
         TC_LOG_ERROR("entities.unit", "Trying to delete not saved creature! LowGUID: %u, Entry: %u", GetGUID().GetCounter(), GetEntry());
         return;
     }
 
-    GetMap()->RemoveCreatureRespawnTime(m_DBTableGuid);
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    sMapMgr->DoForAllMapsWithMapId(data->mapId,
+       [this, trans](Map* map) -> void
+       {
+           // despawn all active creatures, and remove their respawns
+           std::vector<Creature*> toUnload;
+           for (auto const& pair : Trinity::Containers::MapEqualRange(map->GetCreatureBySpawnIdStore(), m_DBTableGuid))
+               toUnload.push_back(pair.second);
+           for (Creature* creature : toUnload)
+               map->AddObjectToRemoveList(creature);
+           map->RemoveCreatureRespawnTime(m_DBTableGuid);
+       }
+    );
+
     sObjectMgr->DeleteCreatureData(m_DBTableGuid);
 
-    WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
+    WorldDatabaseTransaction trans2 = WorldDatabase.BeginTransaction();
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
     stmt->setUInt32(0, m_DBTableGuid);
-    trans->Append(stmt);
+    trans2->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_ADDON);
     stmt->setUInt32(0, m_DBTableGuid);
-    trans->Append(stmt);
+    trans2->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAME_EVENT_CREATURE);
     stmt->setUInt32(0, m_DBTableGuid);
-    trans->Append(stmt);
+    trans2->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAME_EVENT_MODEL_EQUIP);
     stmt->setUInt32(0, m_DBTableGuid);
-    trans->Append(stmt);
+    trans2->Append(stmt);
 
-    WorldDatabase.CommitTransaction(trans);
+    WorldDatabase.CommitTransaction(trans2);
 }
 
 bool Creature::IsInvisibleDueToDespawn() const

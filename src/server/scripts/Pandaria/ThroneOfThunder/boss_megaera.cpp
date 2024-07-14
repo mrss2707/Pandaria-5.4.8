@@ -627,7 +627,7 @@ class boss_megaera : public CreatureScript
                     // We Should Check instance mod
                     instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, NPC_MEGAERA, me);
 
-                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetData64(IsHeroic() ? GO_MEGAERA_CHEST_HEROIC : GO_MEGAERA_CHEST_NORMAL)))
+                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(IsHeroic() ? GO_MEGAERA_CHEST_HEROIC : GO_MEGAERA_CHEST_NORMAL)))
                         instance->DoRespawnGameObject(go->GetGUID(), 7 * DAY);
                 }
 
@@ -1457,7 +1457,7 @@ struct npc_nether_wyrm_megaera : public ScriptedAI
 
     void IsSummonedBy(Unit* /*summoner*/) override
     {
-        if (Creature* megaera = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_MEGAERA) : 0))
+        if (Creature* megaera = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_MEGAERA) : ObjectGuid::Empty))
             megaera->AI()->JustSummoned(me);
 
         DoZoneInCombat(me, 150.0f);
@@ -1607,7 +1607,7 @@ class spell_cinders_megaera : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
-            if (Creature* announcer = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(NPC_SLG_GENERIC_MOP) : 0))
+            if (Creature* announcer = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(NPC_SLG_GENERIC_MOP) : ObjectGuid::Empty))
                 announcer->AI()->Talk(ANN_BURNING_CINDERS, target);
     }
 
@@ -1807,7 +1807,7 @@ class spell_acid_rain_summon : public SpellScript
         // In Heroic 3 Globules
         if (caster->GetMap()->IsHeroic())
         {
-            if (Creature* announcer = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(NPC_SLG_GENERIC_MOP) : 0))
+            if (Creature* announcer = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(NPC_SLG_GENERIC_MOP) : ObjectGuid::Empty))
             {
                 for (uint8 i = 0; i < 2; i++)
                 {

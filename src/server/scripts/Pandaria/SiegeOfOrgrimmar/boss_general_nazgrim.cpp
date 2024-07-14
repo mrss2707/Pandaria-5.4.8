@@ -237,7 +237,7 @@ class boss_general_nazgrim : public CreatureScript
                         return shockwaveTargetGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void JustReachedHome() override
@@ -909,7 +909,7 @@ struct npc_nazgrim_korkron_warshaman : public ScriptedAI
             DoCast(me, SPELL_FIRE_CHANNELING);
     }
 
-    uint64 GetLowestFriendGUID()
+    ObjectGuid GetLowestFriendGUID()
     {
         std::list<Creature*> tmpTargets;
 
@@ -922,14 +922,14 @@ struct npc_nazgrim_korkron_warshaman : public ScriptedAI
         tmpTargets.remove_if([=](Creature* target) { return target && !target->IsAlive(); });
 
         if (tmpTargets.empty())
-            return 0;
+            return ObjectGuid::Empty;
 
         tmpTargets.sort(Trinity::HealthPctOrderPred());
 
         if (Creature* lowestTarget = tmpTargets.front())
             return lowestTarget->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -1117,7 +1117,7 @@ struct npc_nazgrim_korkron_healing_tide_totem : public ScriptedAI
     {
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
 
-        if (Creature* nazgrim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_GENERAL_NAZGRIM) : 0))
+        if (Creature* nazgrim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_GENERAL_NAZGRIM) : ObjectGuid::Empty))
             nazgrim->AI()->JustSummoned(me);
 
         me->SetReactState(REACT_PASSIVE);
@@ -1144,7 +1144,7 @@ struct npc_nazgrim_heroic_shockwave : public ScriptedAI
         scheduler
             .Schedule(Milliseconds(500), [this](TaskContext context)
         {
-            if (Creature* nazgrim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_GENERAL_NAZGRIM) : 0))
+            if (Creature* nazgrim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_GENERAL_NAZGRIM) : ObjectGuid::Empty))
             {
                 nazgrim->AI()->JustSummoned(me);
 
@@ -1181,7 +1181,7 @@ struct npc_nazgrim_ravager : public ScriptedAI
                 hasLaunch = true;
 
                 // If found launcher target
-                if (Creature* nazgrim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_GENERAL_NAZGRIM) : 0))
+                if (Creature* nazgrim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_GENERAL_NAZGRIM) : ObjectGuid::Empty))
                 {
                     if (Unit* target = ObjectAccessor::GetUnit(*me, nazgrim->AI()->GetGUID(GUID_TYPE_RAVAGER)))
                     {
@@ -1710,7 +1710,7 @@ class AreaTrigger_at_soo_leftside_nazgrim : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
         {
-            if (Creature* nazgrim = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetData64(DATA_GENERAL_NAZGRIM) : 0))
+            if (Creature* nazgrim = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetGuidData(DATA_GENERAL_NAZGRIM) : ObjectGuid::Empty))
                 nazgrim->AI()->DoAction(ACTION_START_INTRO);
 
             return true;

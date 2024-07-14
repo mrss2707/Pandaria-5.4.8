@@ -33,7 +33,7 @@ class AreaTrigger_at_mandori : public AreaTriggerScript
            if (player->GetQuestStatus(29792) != QUEST_STATUS_INCOMPLETE)
                return true;
 
-           uint64 playerGuid = player->GetGUID();
+           ObjectGuid playerGuid = player->GetGUID();
 
             auto const aysa = player->SummonCreature(59986, 698.04f, 3601.79f, 142.82f, 3.254830f, TEMPSUMMON_MANUAL_DESPAWN, 0); // Aysa
             auto const ji   = player->SummonCreature(59988, 698.06f, 3599.34f, 142.62f, 2.668790f, TEMPSUMMON_MANUAL_DESPAWN, 0); // Ji

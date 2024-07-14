@@ -1001,7 +1001,7 @@ struct npc_image_of_wrathion : public ScriptedAI
         me->DespawnOrUnsummon(15 * IN_MILLISECONDS);
     }
 
-    uint32 DoFindRunestoneIndex(int n, uint64 ownerGUID)
+    uint32 DoFindRunestoneIndex(int n, ObjectGuid ownerGUID)
     {
         if (n < 1)
             return 0;

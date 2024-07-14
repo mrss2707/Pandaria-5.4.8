@@ -30,10 +30,10 @@ class instance_unga_ingoo : public InstanceMapScript
         {
             instance_unga_ingoo_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-            uint64 gongGUID, templeDoorGUID;
+            ObjectGuid gongGUID, templeDoorGUID;
             uint32 m_auiEncounter[CHAPTERS];
-            std::list<uint64> m_UngaObjects, m_PastObjects, m_firstPirates;
-            std::list<uint64> ungaBosses;
+            std::list<ObjectGuid> m_UngaObjects, m_PastObjects, m_firstPirates;
+            std::list<ObjectGuid> ungaBosses;
             uint32 chapterOne;
             uint32 chapterTwo;
             uint32 chapterThree;
@@ -431,7 +431,7 @@ class instance_unga_ingoo : public InstanceMapScript
                         return brewKegGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

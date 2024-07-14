@@ -1447,14 +1447,14 @@ struct npc_general_temuja : public ScriptedAI
     npc_general_temuja(Creature* creature) : ScriptedAI(creature) { }
 
     EventMap events;
-    std::vector<uint64> minions;
+    std::vector<ObjectGuid> minions;
 
     void Reset() override
     {
         events.Reset();
 
         for (auto&& guid : minions)
-            if (Creature* minion = sObjectAccessor->GetCreature(*me, guid))
+            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
                 minion->DespawnOrUnsummon();
         minions.clear();
 
@@ -1473,7 +1473,7 @@ struct npc_general_temuja : public ScriptedAI
     void JustEngagedWith(Unit* who) override
     {
         for (auto&& guid : minions)
-            if (Creature* minion = sObjectAccessor->GetCreature(*me, guid))
+            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
                 minion->AI()->AttackStart(who);
     }
 
@@ -1482,7 +1482,7 @@ struct npc_general_temuja : public ScriptedAI
         DoCast(126262);
 
         for (auto&& guid : minions)
-            if (Creature* minion = sObjectAccessor->GetCreature(*me, guid))
+            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
                 minion->DespawnOrUnsummon();
         minions.clear();
     }

@@ -383,7 +383,7 @@ class npc_mantid_catapult : public CreatureScript
             }
         private:
             EventMap events;
-            std::list<uint64> soldierList;
+            std::list<ObjectGuid> soldierList;
         };
 
         CreatureAI* GetAI(Creature* creature) const override

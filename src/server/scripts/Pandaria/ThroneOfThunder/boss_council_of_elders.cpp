@@ -316,13 +316,13 @@ static Creature* GetBossByEntry(uint32 entry, WorldObject* source)
     switch (entry)
     {
         case NPC_COUNCIL_FROST_KING_MALAKK:
-            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetData64(NPC_COUNCIL_FROST_KING_MALAKK) : 0);
+            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetGuidData(NPC_COUNCIL_FROST_KING_MALAKK) : ObjectGuid::Empty);
         case NPC_COUNCIL_KAZRAJIN:
-            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetData64(NPC_COUNCIL_KAZRAJIN) : 0);
+            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetGuidData(NPC_COUNCIL_KAZRAJIN) : ObjectGuid::Empty);
         case NPC_COUNCIL_SUL_THE_SANDCRAWLER:
-            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetData64(NPC_COUNCIL_SUL_THE_SANDCRAWLER) : 0);;
+            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetGuidData(NPC_COUNCIL_SUL_THE_SANDCRAWLER) : ObjectGuid::Empty);;
         case NPC_COUNCIL_HIGH_PRIESTESS_MARLI:
-            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetData64(NPC_COUNCIL_HIGH_PRIESTESS_MARLI) : 0);;
+            return ObjectAccessor::GetCreature(*source, source->GetInstanceScript() ? source->GetInstanceScript()->GetGuidData(NPC_COUNCIL_HIGH_PRIESTESS_MARLI) : ObjectGuid::Empty);;
         default:
             return NULL;
     }
@@ -1238,24 +1238,24 @@ class boss_high_priestess_marli : public CreatureScript
             }
 
             // Override function to return the GUIDs of the targets for the Loa Spirits.
-            uint64 GetGUID(int32 iIndex) const override
+            ObjectGuid GetGUID(int32 iIndex) const override
             {
                 switch (iIndex)
                 {
                     case DATA_BLESSED_LOA_SPIRIT_TARGET_GUID:
                         if (uiBlessedLoaSpiritBossGUIDs.empty())
-                            return 0;
+                            return ObjectGuid::Empty;
                         else
                             return uiBlessedLoaSpiritBossGUIDs.back();
                         break;
                     case DATA_SHADOWED_LOA_SPIRIT_TARGET_GUID:
                         if (uiShadowedSpiritPlayerGUIDs.empty())
-                            return 0;
+                            return ObjectGuid::Empty;
                         else
                             return uiShadowedSpiritPlayerGUIDs.back();
                         break;
                     default:
-                        return 0;
+                        return ObjectGuid::Empty;
                 }
             }
 
@@ -1263,12 +1263,12 @@ class boss_high_priestess_marli : public CreatureScript
             // GUIDs of the players that will be chased by a Shadowed Loa Spirit
             // Always select the last in the list when a Shadowed Loa Spirit
             // is summoned.
-            std::list<uint64> uiShadowedSpiritPlayerGUIDs;
+            std::list<ObjectGuid> uiShadowedSpiritPlayerGUIDs;
 
             // GUIDS of the boss that will be chased by a Blessed Loa Spirit.
             // Like above, select the last in the list when a Blessed Loa Spirit
             // is summoned.
-            std::list<uint64> uiBlessedLoaSpiritBossGUIDs;
+            std::list<ObjectGuid> uiBlessedLoaSpiritBossGUIDs;
 
             void InitStandartEvents() override
             {
@@ -1317,7 +1317,7 @@ class npc_garajal : public CreatureScript
             }
 
             TaskScheduler scheduler;
-            std::list<uint64> m_lBossGuids;
+            std::list<ObjectGuid> m_lBossGuids;
             uint32 m_uiDeadCouncillors;
             bool introDone, atEvade;
             bool allowAchiev;
@@ -1397,7 +1397,7 @@ class npc_garajal : public CreatureScript
 
                 for (auto&& entry : uiBossEntries)
                 {
-                    if (Creature* councillor = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(entry) : 0))
+                    if (Creature* councillor = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(entry) : ObjectGuid::Empty))
                     {
                         councillor->LowerPlayerDamageReq(councillor->GetMaxHealth());
                         councillor->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
@@ -1445,7 +1445,7 @@ class npc_garajal : public CreatureScript
                 DespawnCreatures();
             }
 
-            void FillBossGuids(std::list<uint64>&list)
+            void FillBossGuids(std::list<ObjectGuid>&list)
             {
                 m_uiDeadCouncillors = 0;
 
@@ -1474,7 +1474,7 @@ class npc_garajal : public CreatureScript
 
                 FillBossGuids(m_lBossGuids);
 
-                for (const uint64 uiGuid : m_lBossGuids)
+                for (const ObjectGuid uiGuid : m_lBossGuids)
                 {
                     if (Creature* pBoss = ObjectAccessor::GetCreature(*me, uiGuid))
                     {
@@ -1633,7 +1633,7 @@ struct npc_council_reckless_charge : public ScriptedAI
     {
         me->SetDisplayId(me->GetCreatureTemplate()->Modelid2);
 
-        if (Creature* kazrajin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_COUNCIL_KAZRAJIN) : 0))
+        if (Creature* kazrajin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_COUNCIL_KAZRAJIN) : ObjectGuid::Empty))
         {
             me->SetFacingTo(me->GetAngle(kazrajin));
 
@@ -1732,7 +1732,7 @@ struct npc_garajals_soul : public ScriptedAI
             possessedTargets.pop_front();
         }
 
-        if (Creature* councillor = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(prevCouncillor) : 0))
+        if (Creature* councillor = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(prevCouncillor) : ObjectGuid::Empty))
             Possess(councillor);
     }
 
@@ -2046,7 +2046,7 @@ struct npc_blessed_loa_spirit : public ScriptedAI
 // Shadowed Loa Spirit 69548
 struct npc_shadowed_loa_spirit : public ScriptedAI
 {
-    npc_shadowed_loa_spirit(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()), uiTargetGuid(0)
+    npc_shadowed_loa_spirit(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()), uiTargetGuid()
     {
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
         me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
@@ -3418,12 +3418,12 @@ class sat_reckless_charge : public IAreaTriggerAura
         {
             if (Unit* caster = GetCaster())
             {
-                if (Creature* kazrajin = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(NPC_COUNCIL_KAZRAJIN) : 0))
+                if (Creature* kazrajin = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(NPC_COUNCIL_KAZRAJIN) : ObjectGuid::Empty))
                 {
                     // Prevent twice damage
-                    if (kazrajin->AI()->GetData(target->GetGUIDLow() + 10))
+                    if (kazrajin->AI()->GetData(target->GetGUID().GetCounter() + 10))
                     {
-                        kazrajin->AI()->SetData(DATA_RECKLESS_CHARGE_HIT, target->GetGUIDLow() + 10);
+                        kazrajin->AI()->SetData(DATA_RECKLESS_CHARGE_HIT, target->GetGUID().GetCounter() + 10);
                         caster->CastSpell(target, SPELL_RECKLESS_CHARGE_UNIQUE_DAMAGES, true);
                     }
                 }

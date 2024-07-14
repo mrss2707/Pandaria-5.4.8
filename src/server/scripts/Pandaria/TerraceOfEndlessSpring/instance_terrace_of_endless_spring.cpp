@@ -44,9 +44,9 @@ class instance_terrace_of_endless_spring : public InstanceMapScript
             std::string strSaveData;
 
             std::list<Unit*> protectorList;
-            std::vector<uint64> animatedList;
-            std::vector<uint64> returnTerraceList;
-            std::unordered_map<uint32, uint64> m_mGoEntryGuidMap;
+            std::vector<ObjectGuid> animatedList;
+            std::vector<ObjectGuid> returnTerraceList;
+            std::unordered_map<uint32, ObjectGuid> m_mGoEntryGuidMap;
 
             bool ritualOfPurification;
             bool introDone;
@@ -59,7 +59,7 @@ class instance_terrace_of_endless_spring : public InstanceMapScript
 
             // Tsulong
             ObjectGuid tsulongGuid;
-            uint64 enchantedPlantGuid = 0;
+            ObjectGuid enchantedPlantGuid;
 
             // Lei Shi
             ObjectGuid leiShiGuid;
@@ -185,7 +185,7 @@ class instance_terrace_of_endless_spring : public InstanceMapScript
             {
                 GameObject* go = NULL;
 
-                std::unordered_map<uint32, uint64>::iterator find = m_mGoEntryGuidMap.find(uiEntry);
+                std::unordered_map<uint32, ObjectGuid>::iterator find = m_mGoEntryGuidMap.find(uiEntry);
 
                 if (find != m_mGoEntryGuidMap.cend())
                     go = instance->GetGameObject(find->second);
@@ -321,7 +321,7 @@ class instance_terrace_of_endless_spring : public InstanceMapScript
                             }
                             break;
                         case 4: // Make Lei Shi accessible
-                            if (Creature* c = instance->GetCreature(GetData64(leiShiGuid)))
+                            if (Creature* c = instance->GetCreature(GetGuidData(leiShiGuid)))
                             {
                                 instance->LoadGrid(c->GetPositionX(), c->GetPositionY());
                                 c->AI()->DoAction(ACTION_LEISHI_INTRO);
@@ -656,7 +656,7 @@ class instance_terrace_of_endless_spring : public InstanceMapScript
                         break;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

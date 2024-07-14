@@ -27,6 +27,7 @@
 #include "GroupMgr.h"
 #include "InstanceSaveMgr.h"
 #include "Language.h"
+#include "MapManager.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -3722,9 +3723,10 @@ public:
                 handler->PSendSysMessage("%u - %s: visibility distance set to default", target->GetEntry(), target->GetNameForLocaleIdx((LocaleConstant)handler->GetSessionDbLocaleIndex()).c_str());
             }
 
-            for (auto&& creature : ObjectAccessor::GetCreatures())
-                if (creature.second->GetEntry() == entry)
-                    creature.second->LoadCustomVisibility();
+            if (Map* map = target->FindMap())
+                for (auto creature : map->GetCreatureBySpawnIdStore())
+                    if (creature.second->GetEntry() == entry)
+                        creature.second->LoadCustomVisibility();
 
             return true;
         }
@@ -3788,9 +3790,10 @@ public:
                 handler->PSendSysMessage("%u - %s: visibility distance set to default", target->GetEntry(), target->GetNameForLocaleIdx((LocaleConstant)handler->GetSessionDbLocaleIndex()).c_str());
             }
 
-            for (auto&& go : ObjectAccessor::GetGameObjects())
-                if (go.second->GetEntry() == entry)
-                    go.second->LoadCustomVisibility();
+            if (Map* map = target->FindMap())
+                for (auto creature : map->GetGameObjectBySpawnIdStore())
+                    if (creature.second->GetEntry() == entry)
+                        creature.second->LoadCustomVisibility();
 
             return true;
         }
@@ -3808,14 +3811,15 @@ public:
             handler->PSendSysMessage("%u - %s: visibility settings reloaded", target->GetEntry(), target->GetNameForLocaleIdx((LocaleConstant)handler->GetSessionDbLocaleIndex()).c_str());
 
             uint32 count = 0;
-            for (auto&& creature : ObjectAccessor::GetCreatures())
-            {
-                if (creature.second->GetEntry() == entry)
+            if (Map* map = target->FindMap())
+                for (auto&& creature : map->GetCreatureBySpawnIdStore())
                 {
-                    creature.second->LoadCustomVisibility();
-                    ++count;
+                    if (creature.second->GetEntry() == entry)
+                    {
+                        creature.second->LoadCustomVisibility();
+                        ++count;
+                    }
                 }
-            }
             handler->PSendSysMessage("Updated %u spawned Creatures", count);
 
             return true;
@@ -3834,14 +3838,15 @@ public:
             handler->PSendSysMessage("%u - %s: visibility settings reloaded", target->GetEntry(), target->GetNameForLocaleIdx((LocaleConstant)handler->GetSessionDbLocaleIndex()).c_str());
 
             uint32 count = 0;
-            for (auto&& go : ObjectAccessor::GetGameObjects())
-            {
-                if (go.second->GetEntry() == entry)
-                {
-                    go.second->LoadCustomVisibility();
-                    ++count;
-                }
-            }
+
+            if (Map* map = target->FindMap())
+                for (auto go : map->GetGameObjectBySpawnIdStore())
+                    if (go.second->GetEntry() == entry)
+                    {
+                        go.second->LoadCustomVisibility();
+                        ++count;
+                    }
+
             handler->PSendSysMessage("Updated %u spawned GameObjects", count);
 
             return true;
@@ -3871,25 +3876,32 @@ public:
 
         // Update all entries that either previously had or currently have settings
         uint32 count = 0;
-        for (auto&& creature : ObjectAccessor::GetCreatures())
+        sMapMgr->DoForAllMaps([&count,&objects](Map* map)
         {
-            if (objects[CustomVisibility::Type::Creature].find(creature.second->GetEntry()) != objects[CustomVisibility::Type::Creature].end())
+            for (auto creature : map->GetCreatureBySpawnIdStore())
             {
-                creature.second->LoadCustomVisibility();
-                ++count;
+                if (objects[CustomVisibility::Type::Creature].find(creature.second->GetEntry()) != objects[CustomVisibility::Type::Creature].end())
+                {
+                    creature.second->LoadCustomVisibility();
+                    ++count;
+                }
             }
-        }
+        });
+
         handler->PSendSysMessage("Updated %u spawned Creatures", count);
 
         count = 0;
-        for (auto&& go : ObjectAccessor::GetGameObjects())
+        sMapMgr->DoForAllMaps([&count,&objects](Map* map)
         {
-            if (objects[CustomVisibility::Type::GameObject].find(go.second->GetEntry()) != objects[CustomVisibility::Type::GameObject].end())
+            for (auto go : map->GetGameObjectBySpawnIdStore())
             {
-                go.second->LoadCustomVisibility();
-                ++count;
+                if (objects[CustomVisibility::Type::GameObject].find(go.second->GetEntry()) != objects[CustomVisibility::Type::GameObject].end())
+                {
+                    go.second->LoadCustomVisibility();
+                    ++count;
+                }
             }
-        }
+        });
         handler->PSendSysMessage("Updated %u spawned GameObjects", count);
 
         return true;

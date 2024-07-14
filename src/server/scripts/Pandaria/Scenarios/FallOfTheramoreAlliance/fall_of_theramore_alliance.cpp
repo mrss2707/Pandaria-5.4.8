@@ -158,14 +158,14 @@ struct theramore_invader_typeAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_ROKNAH_SKRIMISHER, 80.0f);
 
         if (tmpTargets.empty())
-            return 0;
+            return ObjectGuid::Empty;
 
         tmpTargets.sort(Trinity::HealthPctOrderPred());
 
         if (Creature* lowestTarget = tmpTargets.front())
             return lowestTarget->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 };
 
@@ -1378,7 +1378,7 @@ class npc_theramore_gatecrusher : public CreatureScript
             }
 
         private:
-            uint64 GetNextFixateTarget()
+            ObjectGuid GetNextFixateTarget()
             {
                 std::list<Player*> pList;
                 GetPlayerListInGrid(pList, me, 150.0f);
@@ -1389,7 +1389,7 @@ class npc_theramore_gatecrusher : public CreatureScript
                 if (!pList.empty())
                     return Trinity::Containers::SelectRandomContainerElement(pList)->GetGUID();
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
         };

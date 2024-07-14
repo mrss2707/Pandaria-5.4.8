@@ -299,7 +299,7 @@ class instance_dagger_in_the_dark : public InstanceMapScript
                         return bloodrazorCaveGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

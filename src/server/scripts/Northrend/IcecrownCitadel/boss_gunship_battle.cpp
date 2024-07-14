@@ -1719,7 +1719,7 @@ class npc_gunship_cannon : public CreatureScript
 
             void DamageTaken(Unit* attacker, uint32& damage) override
             {
-                if (Creature* boss = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(me->GetEntry() == NPC_GB_ALLIANCE_CANNON ? DATA_SKYBREAKER_BOSS : DATA_ORGRIMMAR_HAMMER_BOSS)))
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(me->GetEntry() == NPC_GB_ALLIANCE_CANNON ? DATA_SKYBREAKER_BOSS : DATA_ORGRIMMAR_HAMMER_BOSS)))
                     attacker->DealDamage(boss, damage);
             }
 

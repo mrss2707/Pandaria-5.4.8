@@ -2212,7 +2212,7 @@ struct npc_shanze_soulripper : public customCreatureAI
         events.ScheduleEvent(EVENT_STORM_SHIELD, 8.5 * IN_MILLISECONDS);
     }
 
-    uint64 GetLowestFriendGUID() override
+    ObjectGuid GetLowestFriendGUID() override
     {
         std::list<Creature*> tmpTargets;
 
@@ -2222,14 +2222,14 @@ struct npc_shanze_soulripper : public customCreatureAI
         GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_ANCIENT_STONE_CONQUEROR, 80.0f);
 
         if (tmpTargets.empty())
-            return 0;
+            return ObjectGuid::Empty;
 
         tmpTargets.sort(Trinity::HealthPctOrderPred());
 
         if (Creature* lowestTarget = tmpTargets.front())
             return lowestTarget->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 
     void UpdateAI(uint32 diff) override
@@ -3329,9 +3329,9 @@ struct npc_puzzle_controller_bunny : public ScriptedAI
     npc_puzzle_controller_bunny(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    std::list<uint64> puzzleSequenceGUIDs;
-    std::list<uint64> puzzleList;
-    std::list<uint64> copyPuzzleList;
+    std::list<ObjectGuid> puzzleSequenceGUIDs;
+    std::list<ObjectGuid> puzzleList;
+    std::list<ObjectGuid> copyPuzzleList;
 
     void Reset() override
     {
@@ -3864,21 +3864,21 @@ class spell_reverberating_smash : public SpellScript
     {
         if (Unit* caster = GetCaster())
         {
-            uint64 casterGUID = caster->GetGUID();
+            ObjectGuid casterGUID = caster->GetGUID();
             float x = caster->GetPositionX();
             float y = caster->GetPositionY();
             float z = caster->GetPositionZ();
 
             caster->CastSpell(x, y, z, SPELL_REVERBERATING_SMASH_RING, true);
 
-            caster->m_Events.Schedule(500, [casterGUID, x, y, z]()
+            caster->m_Events.Schedule(500, [caster, casterGUID, x, y, z]()
             {
-                if (Unit* m_caster = ObjectAccessor::FindUnit(casterGUID))
+                if (Unit* m_caster = ObjectAccessor::GetUnit(*caster, casterGUID))
                     m_caster->CastSpell(x, y, z, SPELL_REVERBERATING_SMASH_INNER, true);
             });
-            caster->m_Events.Schedule(1000, [casterGUID, x, y, z]()
+            caster->m_Events.Schedule(1000, [caster, casterGUID, x, y, z]()
             {
-                if (Unit* m_caster = ObjectAccessor::FindUnit(casterGUID))
+                if (Unit* m_caster = ObjectAccessor::GetUnit(*caster, casterGUID))
                     m_caster->CastSpell(x, y, z, SPELL_REVERBERATING_SMASH_OUT, true);
             });
         }

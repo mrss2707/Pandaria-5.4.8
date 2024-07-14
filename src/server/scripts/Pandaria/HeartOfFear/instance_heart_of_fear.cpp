@@ -354,7 +354,7 @@ class instance_heart_of_fear : public InstanceMapScript
                         break;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

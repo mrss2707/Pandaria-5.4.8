@@ -204,7 +204,7 @@ class instance_secrets_of_ragefire : public InstanceMapScript
                         // Activate items for investigate
                         for (auto&& itr : investigatedItems)
                         {
-                            if (Creature* exploreItem = instance->GetCreature(GetData64(itr.first)))
+                            if (Creature* exploreItem = instance->GetCreature(GetGuidData(itr.first)))
                             {
                                 exploreItem->SetVisible(true);
                                 exploreItem->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
@@ -353,7 +353,7 @@ class instance_secrets_of_ragefire : public InstanceMapScript
                         return mantidTargetGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Update(uint32 diff) override

@@ -77,9 +77,9 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
                 rimokGuid = ObjectGuid::Empty;
                 raigonnGuid = ObjectGuid::Empty;
                 raigonWeakGuid = ObjectGuid::Empty;
-                explosionTarget1GUID  = 0;
-                explosionTarget2GUID  = 0;
-                explosionTarget3GUID  = 0;
+                explosionTarget1GUID  = ObjectGuid::Empty;
+                explosionTarget2GUID  = ObjectGuid::Empty;
+                explosionTarget3GUID  = ObjectGuid::Empty;
                 firstDoorGuid = ObjectGuid::Empty;
                 wallCGuid = ObjectGuid::Empty;
                 wallAGUID = ObjectGuid::Empty;
@@ -89,7 +89,7 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
                 traineeGUID = ObjectGuid::Empty;
                 fireSignalGuid = ObjectGuid::Empty;
                 greatDoorGUID = ObjectGuid::Empty;
-                greatDoor2GUID        = 0;
+                greatDoor2GUID        = ObjectGuid::Empty;
 
                 bombarderGuids.clear();
                 fallDefendersGUIDS.clear();
@@ -227,7 +227,7 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
             {
                 if (creature->GetEntry() == NPC_KRITHUK_BOMBARDER)
                 {
-                    for (std::list<uint64>::iterator it = bombarderGuids.begin(); it != bombarderGuids.end(); ++it)
+                    for (std::list<ObjectGuid>::iterator it = bombarderGuids.begin(); it != bombarderGuids.end(); ++it)
                     {
                         if (*it == creature->GetGUID())
                         {
@@ -577,7 +577,7 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
                              return guid;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override
@@ -653,9 +653,9 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
             ObjectGuid rimokGuid;
             ObjectGuid raigonnGuid;
             ObjectGuid raigonWeakGuid;
-            uint64 explosionTarget1GUID;
-            uint64 explosionTarget2GUID;
-            uint64 explosionTarget3GUID;
+            ObjectGuid explosionTarget1GUID;
+            ObjectGuid explosionTarget2GUID;
+            ObjectGuid explosionTarget3GUID;
             ObjectGuid firstDoorGuid;
             ObjectGuid fireSignalGuid;
             ObjectGuid wallAGUID;
@@ -665,18 +665,18 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
             ObjectGuid defenderAGUID;
             ObjectGuid defenderBGUID;
             ObjectGuid greatDoorGUID;
-            uint64 greatDoor2GUID;
+            ObjectGuid greatDoor2GUID;
             ObjectGuid elevatorGUID;
             uint32 dataStorage[MAX_DATA];
-            std::list<uint64> bombarderGuids;
-            std::list<uint64> fallDefendersGUIDS;
-            std::list<uint64> bombStalkerGuids;
-            std::list<uint64> mantidBombsGUIDs;
-            std::list<uint64> rimokAddGenetarorsGUIDs;
-            std::list<uint64> artilleryGUIDs;
-            std::list<uint64> artilleryToWallGUIDs;
-            std::list<uint64> ropeGUIDs;
-            std::list<uint64> spawnerTargetGUIDs;
+            std::list<ObjectGuid> bombarderGuids;
+            std::list<ObjectGuid> fallDefendersGUIDS;
+            std::list<ObjectGuid> bombStalkerGuids;
+            std::list<ObjectGuid> mantidBombsGUIDs;
+            std::list<ObjectGuid> rimokAddGenetarorsGUIDs;
+            std::list<ObjectGuid> artilleryGUIDs;
+            std::list<ObjectGuid> artilleryToWallGUIDs;
+            std::list<ObjectGuid> ropeGUIDs;
+            std::list<ObjectGuid> spawnerTargetGUIDs;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override

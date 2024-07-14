@@ -195,7 +195,7 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                         if (data == IN_PROGRESS)
                         {
                             // Allow to use Zipline
-                            if (GameObject* rope = instance->GetGameObject(GetData64(GO_ROPE_PILE_TO_ALLIANCE_SHIP)))
+                            if (GameObject* rope = instance->GetGameObject(GetGuidData(GO_ROPE_PILE_TO_ALLIANCE_SHIP)))
                                 rope->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND);
 
                             // Set barrels selectable for spell (idk why it not selectable at start)
@@ -237,7 +237,7 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                                 hordeCaptain->AI()->DoAction(ACTION_EXPLOSIVE_SHIP);
 
                                 // Allow to use rope on this ship
-                                if (GameObject* rope = instance->GetGameObject(GetData64(GO_ROPE_PILE_TO_HORDE_SHIP)))
+                                if (GameObject* rope = instance->GetGameObject(GetGuidData(GO_ROPE_PILE_TO_HORDE_SHIP)))
                                     rope->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND);
                             }
                         }
@@ -349,7 +349,7 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                         return allianceRopeGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Update(uint32 diff) override

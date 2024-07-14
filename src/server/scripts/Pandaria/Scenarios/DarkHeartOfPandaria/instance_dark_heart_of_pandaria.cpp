@@ -298,7 +298,7 @@ class instance_dark_heart_of_pandaria : public InstanceMapScript
                         return additGrizzleGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
     
             bool IsWipe(float range, Unit* source) override

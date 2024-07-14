@@ -251,7 +251,7 @@ class boss_stone_guard_controller : public CreatureScript
                     {
                         for (uint32 entry : guardiansEntry)
                         {
-                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetData64(entry)))
+                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetGuidData(entry)))
                             {
                                 if (guardian->IsAlive())
                                 {
@@ -286,7 +286,7 @@ class boss_stone_guard_controller : public CreatureScript
                         RewardPlayers();
 
                         for (uint32 entry: guardiansEntry)
-                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetData64(entry)))
+                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetGuidData(entry)))
                                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, guardian);
 
                         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TOTALY_PETRIFIED);
@@ -318,7 +318,7 @@ class boss_stone_guard_controller : public CreatureScript
                     {
                         for (uint32 entry : guardiansEntry)
                         {
-                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetData64(entry)))
+                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetGuidData(entry)))
                             {
                                 if (powDownCount)
                                 {
@@ -354,7 +354,7 @@ class boss_stone_guard_controller : public CreatureScript
                     case ACTION_EVADE:
                     {
                         for (uint32 entry : guardiansEntry)
-                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetData64(entry)))
+                            if (Creature* guardian = me->GetMap()->GetCreature(instance->GetGuidData(entry)))
                                 if (guardian->AI())
                                     guardian->AI()->EnterEvadeMode();
 
@@ -494,7 +494,7 @@ class boss_stone_guard_controller : public CreatureScript
                     {
                         ActivateTilesTriggers();
                         for (uint8 i = 0; i < 4; ++i)
-                            if (uint64 stoneGuardGuid = instance->GetData64(guardiansEntry[i]))
+                            if (ObjectGuid stoneGuardGuid = instance->GetGuidData(guardiansEntry[i]))
                                 if (Creature* stoneGuard = instance->instance->GetCreature(stoneGuardGuid))
                                     if (stoneGuard->IsAlive())
                                     {
@@ -634,7 +634,7 @@ class boss_generic_guardian : public CreatureScript
                 me->CastSpell(me, SPELL_ANIM_SIT,    true);
                 me->CastSpell(me, SPELL_ZERO_ENERGY, true);
 
-                if (Creature* stoneGuardController = me->GetMap()->GetCreature(GetData(NPC_STONE_GUARD_CONTROLLER)))
+                if (Creature* stoneGuardController = me->GetMap()->GetCreature(instance->GetGuidData(NPC_STONE_GUARD_CONTROLLER)))
                     stoneGuardController->AI()->Reset();
 
                 instance->DoRemoveBloodLustDebuffSpellOnPlayers();
@@ -719,7 +719,7 @@ class boss_generic_guardian : public CreatureScript
                 {
                     if (instance)
                     {
-                        if (Creature* gardian = me->GetMap()->GetCreature(instance->GetData64(entry)))
+                        if (Creature* gardian = me->GetMap()->GetCreature(instance->GetGuidData(entry)))
                         {
                             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, gardian);
                             gardian->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
@@ -776,7 +776,7 @@ class boss_generic_guardian : public CreatureScript
 
                         for (uint32 entry : guardiansEntry)
                         {
-                            if (Creature* gardian = controller->GetMap()->GetCreature(instance->GetData64(entry)))
+                            if (Creature* gardian = controller->GetMap()->GetCreature(instance->GetGuidData(entry)))
                             {
                                 if (gardian != me)
                                 {
@@ -794,7 +794,7 @@ class boss_generic_guardian : public CreatureScript
                     }
 
                     for (uint32 entry: guardiansEntry)
-                        if (Creature* gardian = controller->GetMap()->GetCreature(instance->GetData64(entry)))
+                        if (Creature* gardian = controller->GetMap()->GetCreature(instance->GetGuidData(entry)))
                             if (gardian->GetGUID() != me->GetGUID() && damage < gardian->GetHealth())
                                 gardian->ModifyHealth(-int32(damage));
 
@@ -869,7 +869,7 @@ class boss_generic_guardian : public CreatureScript
                     if (me->GetEntry() == entry)
                         continue;
 
-                    if (Creature* guardian = me->GetMap()->GetCreature(instance->GetData64(entry)))
+                    if (Creature* guardian = me->GetMap()->GetCreature(instance->GetGuidData(entry)))
                         if (!guardian->IsInCombat() && guardian->IsAlive())
                             return false;
                 }
@@ -1207,7 +1207,7 @@ class spell_jasper_chains : public SpellScriptLoader
                 return true;
             }
 
-            void SetGuid(uint32 /*type*/, uint64 guid) override
+            void SetGuid(uint32 /*type*/, ObjectGuid guid) override
             {
                 playerLinkedGuid = guid;
             }
@@ -1217,7 +1217,7 @@ class spell_jasper_chains : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 Unit* target = GetTarget();
                 const SpellInfo* spell = GetSpellInfo();
-                Player* linkedPlayer = sObjectAccessor->GetPlayer(*target, playerLinkedGuid);
+                Player* linkedPlayer = ObjectAccessor::GetPlayer(*target, playerLinkedGuid);
 
                 if (!caster || !target || !spell || !linkedPlayer || !linkedPlayer->IsAlive() || !linkedPlayer->HasAura(spell->Id))
                 {

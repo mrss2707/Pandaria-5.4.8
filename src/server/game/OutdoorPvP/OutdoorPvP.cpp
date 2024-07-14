@@ -147,7 +147,11 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         return false;
     }
 
-    Creature* cr = HashMapHolder<Creature>::Find(m_Creatures[type]);
+    Map* map = sMapMgr->FindBaseMap(m_capturePoint->m_mapId);
+    if (!map)
+        return false;
+
+    Creature* cr = map->GetCreature(m_Creatures[type]);
     if (!cr)
     {
         // can happen when closing the core
@@ -175,6 +179,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     sObjectMgr->DeleteCreatureData(guid);
     m_CreatureTypes[m_Creatures[type]] = 0;
     m_Creatures[type].Clear();
+
     return true;
 }
 
@@ -183,7 +188,11 @@ bool OPvPCapturePoint::DelObject(uint32 type)
     if (!m_Objects[type])
         return false;
 
-    GameObject* obj = HashMapHolder<GameObject>::Find(m_Objects[type]);
+    Map* map = sMapMgr->FindBaseMap(m_capturePoint->m_mapId);
+    if (!map)
+        return false;
+
+    GameObject* obj = map->GetGameObject(m_Objects[type]);
     if (!obj)
     {
         m_Objects[type].Clear();
@@ -506,10 +515,10 @@ bool OutdoorPvP::HandleOpenGo(Player* player, ObjectGuid guid)
     return false;
 }
 
-bool OutdoorPvP::HandleGossipOption(Player* player, uint64 guid, uint32 id)
+bool OutdoorPvP::HandleGossipOption(Player* player, Creature* creature, uint32 id)
 {
     for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->second->HandleGossipOption(player, guid, id))
+        if (itr->second->HandleGossipOption(player, creature, id))
             return true;
 
     return false;
@@ -533,7 +542,7 @@ bool OutdoorPvP::HandleDropFlag(Player* player, uint32 id)
     return false;
 }
 
-bool OPvPCapturePoint::HandleGossipOption(Player* /*player*/, uint64 /*guid*/, uint32 /*id*/)
+bool OPvPCapturePoint::HandleGossipOption(Player* /*player*/, Creature* /*guid*/, uint32 /*id*/)
 {
     return false;
 }

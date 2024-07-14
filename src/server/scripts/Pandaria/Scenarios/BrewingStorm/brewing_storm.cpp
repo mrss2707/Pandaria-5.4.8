@@ -453,13 +453,13 @@ class npc_brewmaster_blanche : public CreatureScript
                 return false;
             }
 
-            uint64 SelectAnyStalkerGUID(uint32 npc_entry)
+            ObjectGuid SelectAnyStalkerGUID(uint32 npc_entry)
             {
                 std::list<Creature*> StalkerList;
                 GetCreatureListWithEntryInGrid(StalkerList, me, npc_entry, 30.0f);
 
                 if (StalkerList.empty())
-                    return 0;
+                    return ObjectGuid::Empty;
 
                 return Trinity::Containers::SelectRandomContainerElement(StalkerList)->GetGUID();
             }
@@ -598,7 +598,7 @@ struct npc_viletongue_stalker : public ScriptedAI
             case ACTION_VILETONGUE_AT_GROUND:
                 for (uint8 i = 0; i < 2; i++)
                 {
-                    if (Creature* blanche = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_BREWMASTER_BLANCHE) : 0))
+                    if (Creature* blanche = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_BREWMASTER_BLANCHE) : ObjectGuid::Empty))
                         if (Creature* raider = blanche->SummonCreature(NPC_VILETONGUE_RAIDER, me->GetPositionX() + frand(-3.0f, 5.0f), me->GetPositionY() + frand(-2.0f, 3.0f), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
                             raider->SetInCombatWithZone();
                 }
@@ -606,7 +606,7 @@ struct npc_viletongue_stalker : public ScriptedAI
             case ACTION_VILETONGUE_AT_HILL:
                 for (uint8 i = 0; i < 2; i++)
                 {
-                    if (Creature* blanche = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_BREWMASTER_BLANCHE) : 0))
+                    if (Creature* blanche = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_BREWMASTER_BLANCHE) : ObjectGuid::Empty))
                     {
                         if (Creature* skirmisher = blanche->SummonCreature(NPC_VILETONGUE_SKIRMISHER, me->GetPositionX() + frand(-2.0f, 2.0f), me->GetPositionY() + frand(-1.0f, 1.0f), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
                         {
@@ -625,7 +625,7 @@ struct npc_viletongue_stalker : public ScriptedAI
         Position pos;
         // Main method for calculate position for jump into ground from hill
         // diff between stalker that`ll spawn creature and current location around 7-8y
-        Position CalculateGroundPos(Position cur, uint64 viletongueGUID)
+        Position CalculateGroundPos(Position cur, ObjectGuid viletongueGUID)
         {
             float x = 0, y = 0, z = 4.5f, o = cur.GetOrientation();
 
@@ -819,11 +819,11 @@ class spell_brewing_storm_lightning_impact : public SpellScript
         {
             target->CastSpell(target, SPELL_ON_FIRE, true);
 
-            if (Creature* Blanche = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetData64(NPC_BREWMASTER_BLANCHE) : 0))
+            if (Creature* Blanche = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(NPC_BREWMASTER_BLANCHE) : ObjectGuid::Empty))
                 Blanche->GetAI()->DoAction(ACTION_BREW_POWER);
         }
         else if (Player* target = GetHitPlayer())
-            if (Creature* blanche = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(NPC_BREWMASTER_BLANCHE) : 0))
+            if (Creature* blanche = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(NPC_BREWMASTER_BLANCHE) : ObjectGuid::Empty))
                 blanche->AI()->SetData(TYPE_HIT_BY_ROAD, 0);
     }
 

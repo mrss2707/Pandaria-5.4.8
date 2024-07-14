@@ -552,18 +552,18 @@ class boss_striker_gadok : public CreatureScript
 };
 
 // curent range to pos
-float GetCirclePlatformPath(uint64 casterGUID, Position pos)
+float GetCirclePlatformPath(Creature* me, ObjectGuid casterGUID, Position pos)
 {
-    if (Unit* m_caster = ObjectAccessor::FindUnit(casterGUID))
+    if (Unit* m_caster = ObjectAccessor::GetUnit(*me, casterGUID))
         return m_caster->GetExactDist2d(&pos);
 
     return 0.0f;
 }
 
 // Approximate this by tangential
-Position GetPlatformPathPoint(float m_ori, uint64 casterGUID, float m_dist = 40.0f)
+Position GetPlatformPathPoint(Creature* me, float m_ori, ObjectGuid casterGUID, float m_dist = 40.0f)
 {
-    Unit* caster = ObjectAccessor::FindUnit(casterGUID);
+    Unit* caster = ObjectAccessor::GetUnit(*me, casterGUID);
 
     if (!caster)
         return{ 0.0f, 0.0f, 0.0f, 0.0f };

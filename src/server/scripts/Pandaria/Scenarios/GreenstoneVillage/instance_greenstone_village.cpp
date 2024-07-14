@@ -35,9 +35,9 @@ class instance_greenstone_village : public InstanceMapScript
             uint32 chapterOne, chapterTwo, chapterThree, chapterFour, chapterFive;
             uint32 tempCount, m_tempType;
             uint32 m_auiEncounter[CHAPTERS];
-            uint64 HuiGUID, TzuGUID;
-            std::map<uint32, uint64> VillageOwners;
-            std::list<uint64> m_uiBarrels;
+            ObjectGuid HuiGUID, TzuGUID;
+            std::map<uint32, ObjectGuid> VillageOwners;
+            std::list<ObjectGuid> m_uiBarrels;
 
             void Initialize() override
             {
@@ -247,7 +247,7 @@ class instance_greenstone_village : public InstanceMapScript
                         return VillageOwners.find(type)->second;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

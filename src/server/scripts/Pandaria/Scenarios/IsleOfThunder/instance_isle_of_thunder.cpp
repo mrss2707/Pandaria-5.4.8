@@ -105,17 +105,17 @@ class instance_isle_of_thunder : public InstanceMapScript
             uint32 roleId;
             uint32 _scenarioId;
 
-            std::list<uint64> covenantHyppoGUIDs;
-            std::list<uint64> seekerGUIDs;
-            std::list<uint64> bloodhawkGUIDs;
-            std::list<uint64> barricadeGUIDs;
-            std::list<uint64> portalGUIDs;
-            std::list<uint64> teardownAssaultGUIDs;
-            std::list<uint64> teardownAssaultEnemyGUIDs;
-            std::list<uint64> forgeAssaultGUIDs;
-            std::list<uint64> shanbuAssaultGUIDs;
-            std::list<uint64> zandalariTrapGUIDs;
-            std::list<uint64> palaceGuardGUIDs;
+            std::list<ObjectGuid> covenantHyppoGUIDs;
+            std::list<ObjectGuid> seekerGUIDs;
+            std::list<ObjectGuid> bloodhawkGUIDs;
+            std::list<ObjectGuid> barricadeGUIDs;
+            std::list<ObjectGuid> portalGUIDs;
+            std::list<ObjectGuid> teardownAssaultGUIDs;
+            std::list<ObjectGuid> teardownAssaultEnemyGUIDs;
+            std::list<ObjectGuid> forgeAssaultGUIDs;
+            std::list<ObjectGuid> shanbuAssaultGUIDs;
+            std::list<ObjectGuid> zandalariTrapGUIDs;
+            std::list<ObjectGuid> palaceGuardGUIDs;
     
             void Initialize() override
             {
@@ -226,7 +226,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                             case LFG_DUNGEON_TO_SKIES_H:
                                 sScenarioMgr->SendScenarioState(player, 1126, 0, 0, CRITERIA_TREE_ID_iN_THE_SKY_1, SCENARIO_ID_IN_THE_SKY);
 
-                                if (GetData64(FACTION_DATA))
+                                if (GetGuidData(FACTION_DATA))
                                 {
                                     instance->SummonCreature(NPC_LORTHEMAR_THRON_IN_SKY, toSkiesHordeSummPos[0]);
                                     instance->SummonCreature(NPC_THUNDERWING, toSkiesHordeSummPos[1]);
@@ -252,7 +252,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                                 phaseId = SCENARIO_FALL_OF_SHANBU;
                                 sScenarioMgr->SendScenarioState(player, 1126, 0, 0, CRITERIA_TREE_ID_FALL_OF_SHANBU_1, SCENARIO_ID_FALL_OF_SHANBU);
 
-                                if (GetData64(FACTION_DATA))
+                                if (GetGuidData(FACTION_DATA))
                                 {
                                     instance->SummonCreature(NPC_SHANBU_LORTHEMAR, HordeShanbuIntro[1]);
                                     instance->SummonCreature(NPC_SHANBU_ELSIA, HordeShanbuIntro[0]);
@@ -365,7 +365,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         }
                         break;
                     case NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA:
-                        if (!GetData64(FACTION_DATA))
+                        if (!GetGuidData(FACTION_DATA))
                             creature->UpdateEntry(NPC_TEARDOWN_VEREESA_WINDRUNNER, ALLIANCE);
 
                         if (creature->GetDBTableGUIDLow())
@@ -382,7 +382,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                     case NPC_TEARDOWN_SUNREAVER_SPELLBLADE:
                     case NPC_TEARDOWN_SUNREAVER_ASSASSIN:
                     case NPC_TEARDOWN_SUNREAVER_ASSASSIN_2:
-                        if (!GetData64(FACTION_DATA))
+                        if (!GetGuidData(FACTION_DATA))
                             creature->UpdateEntry(invAssaulterType.find(creature->GetEntry())->second, ALLIANCE);
 
                         teardownAssaultGUIDs.push_back(creature->GetGUID());
@@ -404,7 +404,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         }
                         break;
                     case NPC_TEARDOWN_LORTHEMAR_THERONE:
-                        if (!GetData64(FACTION_DATA))
+                        if (!GetGuidData(FACTION_DATA))
                             creature->UpdateEntry(NPC_TEARDOWN_JAINA_PROUDMOORE, ALLIANCE);
 
                         teardownAssaultGUIDs.push_back(creature->GetGUID());
@@ -437,7 +437,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                     case NPC_SUNREAVER_RANGER_FORGE:
                         if (creature->GetDBTableGUIDLow())
                         {
-                            if (!GetData64(FACTION_DATA))
+                            if (!GetGuidData(FACTION_DATA))
                                 creature->UpdateEntry(invForgeType.find(creature->GetEntry())->second, ALLIANCE);
 
                             creature->SetVisible(false);
@@ -468,7 +468,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         shanbuStormseaGUID = creature->GetGUID();
                         break;
                     case NPC_SILVER_COVENANT_SPELLBLADE_ST:
-                        if (GetData64(FACTION_DATA))
+                        if (GetGuidData(FACTION_DATA))
                             creature->UpdateEntry(NPC_SUNREAVER_MAGUS, ALLIANCE);
                         break;
                     case NPC_YALIAS_TIGER:
@@ -650,22 +650,22 @@ class instance_isle_of_thunder : public InstanceMapScript
                     case STEP_MEET_WITH_RANGER:
                         if (data == IN_PROGRESS)
                         {
-                            for (auto&& itr : GetData64(FACTION_DATA) ? bloodhawkGUIDs : covenantHyppoGUIDs)
+                            for (auto&& itr : GetGuidData(FACTION_DATA) ? bloodhawkGUIDs : covenantHyppoGUIDs)
                                 if (Creature* hippogryph = instance->GetCreature(itr))
                                     hippogryph->AI()->DoAction(ACTION_START_INTRO);
 
-                            if (Creature* vereesa = instance->GetCreature(GetData64(GetData64(FACTION_DATA) ? NPC_SCOUT_CAPTAIN_ELSIA : NPC_VEREESA_WINDRUNNER)))
+                            if (Creature* vereesa = instance->GetCreature(GetGuidData(GetGuidData(FACTION_DATA) ? NPC_SCOUT_CAPTAIN_ELSIA : NPC_VEREESA_WINDRUNNER)))
                                 vereesa->AI()->DoAction(ACTION_START_INTRO);
                         }
                         else // on finish
                         {
-                            for (auto&& itr : GetData64(FACTION_DATA) ? bloodhawkGUIDs : covenantHyppoGUIDs)
+                            for (auto&& itr : GetGuidData(FACTION_DATA) ? bloodhawkGUIDs : covenantHyppoGUIDs)
                                 if (Creature* hippogryph = instance->GetCreature(itr))
                                     hippogryph->DisappearAndDie();
 
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())
-                                    sScenarioMgr->SendScenarioState(player, 1126, 1, 0, GetData64(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_2 : CRITERIA_TREE_ID_SHAOLMARA_2, GetData64(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
+                                    sScenarioMgr->SendScenarioState(player, 1126, 1, 0, GetGuidData(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_2 : CRITERIA_TREE_ID_SHAOLMARA_2, GetGuidData(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
                         }
                     
                         step1 = data;
@@ -673,20 +673,20 @@ class instance_isle_of_thunder : public InstanceMapScript
                     case STEP_SURVIVE_THE_AMBUSH:
                         if (data == IN_PROGRESS)
                         {
-                            if (Creature* vereesa = instance->GetCreature(GetData64(GetData64(FACTION_DATA) ? NPC_SCOUT_CAPTAIN_ELSIA : NPC_VEREESA_WINDRUNNER)))
+                            if (Creature* vereesa = instance->GetCreature(GetGuidData(GetGuidData(FACTION_DATA) ? NPC_SCOUT_CAPTAIN_ELSIA : NPC_VEREESA_WINDRUNNER)))
                             {
-                                for (auto&& itr : GetData64(FACTION_DATA) ? hordeAmbusherSpawnPos : ambusherSpawnPos)
+                                for (auto&& itr : GetGuidData(FACTION_DATA) ? hordeAmbusherSpawnPos : ambusherSpawnPos)
                                     vereesa->SummonCreature(NPC_SHAOL_MARA_BEASTCALLER, itr, TEMPSUMMON_MANUAL_DESPAWN);
 
                                 // Summon Mara`kah or Tulachek
-                                vereesa->SummonCreature(GetData64(FACTION_DATA) ? NPC_ARCANITAL_TULACHEK : NPC_ARCANITAL_MARAKAH, GetData64(FACTION_DATA) ? hordeAmbusherSpawnPos[0] : ambusherSpawnPos[0], TEMPSUMMON_MANUAL_DESPAWN);
+                                vereesa->SummonCreature(GetGuidData(FACTION_DATA) ? NPC_ARCANITAL_TULACHEK : NPC_ARCANITAL_MARAKAH, GetGuidData(FACTION_DATA) ? hordeAmbusherSpawnPos[0] : ambusherSpawnPos[0], TEMPSUMMON_MANUAL_DESPAWN);
                             }
                         }
                         else if (data == DONE)
                         {
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())
-                                    sScenarioMgr->SendScenarioState(player, 1126, 2, 0, GetData64(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_3 : CRITERIA_TREE_ID_SHAOLMARA_3, GetData64(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
+                                    sScenarioMgr->SendScenarioState(player, 1126, 2, 0, GetGuidData(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_3 : CRITERIA_TREE_ID_SHAOLMARA_3, GetGuidData(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
                         }
 
                         step2 = data;
@@ -700,12 +700,12 @@ class instance_isle_of_thunder : public InstanceMapScript
                         }
                         else // on finish
                         {
-                            if (Creature* vereesa = instance->GetCreature(GetData64(GetData64(FACTION_DATA) ? NPC_SCOUT_CAPTAIN_ELSIA : NPC_VEREESA_WINDRUNNER)))
+                            if (Creature* vereesa = instance->GetCreature(GetGuidData(GetGuidData(FACTION_DATA) ? NPC_SCOUT_CAPTAIN_ELSIA : NPC_VEREESA_WINDRUNNER)))
                                 vereesa->AI()->DoAction(ACTION_BEHIND_ANKI);
 
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())
-                                    sScenarioMgr->SendScenarioState(player, 1126, 3, 0, GetData64(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_4 : CRITERIA_TREE_ID_SHAOLMARA_4, GetData64(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
+                                    sScenarioMgr->SendScenarioState(player, 1126, 3, 0, GetGuidData(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_4 : CRITERIA_TREE_ID_SHAOLMARA_4, GetGuidData(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
                         }
 
                         step3 = data;
@@ -715,12 +715,12 @@ class instance_isle_of_thunder : public InstanceMapScript
 
                         for (auto&& itr : instance->GetPlayers())
                             if (Player* player = itr.GetSource())
-                                sScenarioMgr->SendScenarioState(player, 1126, 4, 0, GetData64(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_5 : CRITERIA_TREE_ID_SHAOLMARA_5, GetData64(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
+                                sScenarioMgr->SendScenarioState(player, 1126, 4, 0, GetGuidData(FACTION_DATA) ? CRITERIA_TREE_ID_ZEBTULA_5 : CRITERIA_TREE_ID_SHAOLMARA_5, GetGuidData(FACTION_DATA) ? SCENARIO_ID_ZEBTULA : SCENARIO_ID_SHAOLMARA);
                         break;
                     case STEP_KILL_ARCANITAL:
                         step5 = data;
 
-                        if (data == DONE && GetData64(FACTION_DATA))
+                        if (data == DONE && GetGuidData(FACTION_DATA))
                         {
                             for (auto&& itr : seekerGUIDs)
                             {
@@ -735,7 +735,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                                 DoRespawnGameObject(itr, 7 * DAY);
                         }
 
-                        DoFinishLFGDungeon(GetData64(FACTION_DATA) ? 604 : 617);
+                        DoFinishLFGDungeon(GetGuidData(FACTION_DATA) ? 604 : 617);
                         for (auto&& itr : instance->GetPlayers())
                             if (Player* player = itr.GetSource())
                             {
@@ -753,7 +753,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         {
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())
-                                    sScenarioMgr->SendScenarioState(player, 1126, 1, 0, GetData64(FACTION_DATA) ? CRITERIA_TREE_ID_TEAR_DOWN_H_2 : CRITERIA_TREE_ID_TEAR_DOWN_A_2, GetData64(FACTION_DATA) ? SCENARIO_ID_TEAR_DOWN_HORDE : SCENARIO_ID_TEAR_DOWN_ALLIANCE);
+                                    sScenarioMgr->SendScenarioState(player, 1126, 1, 0, GetGuidData(FACTION_DATA) ? CRITERIA_TREE_ID_TEAR_DOWN_H_2 : CRITERIA_TREE_ID_TEAR_DOWN_A_2, GetGuidData(FACTION_DATA) ? SCENARIO_ID_TEAR_DOWN_HORDE : SCENARIO_ID_TEAR_DOWN_ALLIANCE);
 
                             for (auto&& itr : teardownAssaultGUIDs)
                             {
@@ -764,13 +764,13 @@ class instance_isle_of_thunder : public InstanceMapScript
                                 }
                             }
 
-                            instance->SummonCreature(GetData64(FACTION_DATA) ? NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA : NPC_TEARDOWN_VEREESA_WINDRUNNER, elsiaSummPos);
+                            instance->SummonCreature(GetGuidData(FACTION_DATA) ? NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA : NPC_TEARDOWN_VEREESA_WINDRUNNER, elsiaSummPos);
                         }
                         break;
                     case STEP_SEND_EXPLOSIVE:
                         for (auto&& itr : instance->GetPlayers())
                             if (Player* player = itr.GetSource())
-                                sScenarioMgr->SendScenarioState(player, 1126, 2, 0, GetData64(FACTION_DATA) ? CRITERIA_TREE_ID_TEAR_DOWN_H_3 : CRITERIA_TREE_ID_TEAR_DOWN_A_3, GetData64(FACTION_DATA) ? SCENARIO_ID_TEAR_DOWN_HORDE : SCENARIO_ID_TEAR_DOWN_ALLIANCE);
+                                sScenarioMgr->SendScenarioState(player, 1126, 2, 0, GetGuidData(FACTION_DATA) ? CRITERIA_TREE_ID_TEAR_DOWN_H_3 : CRITERIA_TREE_ID_TEAR_DOWN_A_3, GetGuidData(FACTION_DATA) ? SCENARIO_ID_TEAR_DOWN_HORDE : SCENARIO_ID_TEAR_DOWN_ALLIANCE);
 
                         step2 = data;
                         break;
@@ -783,7 +783,7 @@ class instance_isle_of_thunder : public InstanceMapScript
 
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())
-                                    sScenarioMgr->SendScenarioState(player, 1126, 3, 0, GetData64(FACTION_DATA) ? CRITERIA_TREE_ID_TEAR_DOWN_H_4 : CRITERIA_TREE_ID_TEAR_DOWN_A_4, GetData64(FACTION_DATA) ? SCENARIO_ID_TEAR_DOWN_HORDE : SCENARIO_ID_TEAR_DOWN_ALLIANCE);
+                                    sScenarioMgr->SendScenarioState(player, 1126, 3, 0, GetGuidData(FACTION_DATA) ? CRITERIA_TREE_ID_TEAR_DOWN_H_4 : CRITERIA_TREE_ID_TEAR_DOWN_A_4, GetGuidData(FACTION_DATA) ? SCENARIO_ID_TEAR_DOWN_HORDE : SCENARIO_ID_TEAR_DOWN_ALLIANCE);
                         }
 
                         step3 = data;
@@ -808,8 +808,8 @@ class instance_isle_of_thunder : public InstanceMapScript
                             /*for (auto&& itr : portalGUIDs)
                                 DoRespawnGameObject(itr, 7 * DAY);*/
 
-                            instance->SummonCreature(GetData64(FACTION_DATA) ? NPC_TEARDOWN_LORTHEMAR_THERONE : NPC_TEARDOWN_JAINA_PROUDMOORE, elsiaAlchuklaPath[5]);
-                            DoFinishLFGDungeon(GetData64(FACTION_DATA) ? 608 : 602);
+                            instance->SummonCreature(GetGuidData(FACTION_DATA) ? NPC_TEARDOWN_LORTHEMAR_THERONE : NPC_TEARDOWN_JAINA_PROUDMOORE, elsiaAlchuklaPath[5]);
+                            DoFinishLFGDungeon(GetGuidData(FACTION_DATA) ? 608 : 602);
                         }
                         break;
                     case STEP_IN_SKY:
@@ -863,7 +863,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         if (Creature* taoshi = instance->GetCreature(GetGuidData(NPC_TAOSHI)))
                             taoshi->AI()->Talk(5);
 
-                        if (GameObject* door = instance->GetGameObject(GetData64(GO_MOGU_DOOR)))
+                        if (GameObject* door = instance->GetGameObject(GetGuidData(GO_MOGU_DOOR)))
                             door->UseDoorOrButton();
 
                         for (auto&& itr : forgeAssaultGUIDs)
@@ -880,7 +880,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                             }
                         }
 
-                        DoFinishLFGDungeon(GetData64(FACTION_DATA) ? 606 : 618);
+                        DoFinishLFGDungeon(GetGuidData(FACTION_DATA) ? 606 : 618);
                         break;
                     case STEP_BLENDING_IN:
                         step1 = data;
@@ -921,7 +921,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         if (Creature* taoshi = instance->GetCreature(GetGuidData(NPC_TAOSHI_STORMSEA_SHIP)))
                             taoshi->AI()->DoAction(ACTION_LEAVE_SHIP);
 
-                        HandleGameObject(GetData64(GO_HUSENG_COLLISION), true, NULL);
+                        HandleGameObject(GetGuidData(GO_HUSENG_COLLISION), true, NULL);
 
                         for (auto&& itr : instance->GetPlayers())
                             if (Player* player = itr.GetSource())
@@ -954,11 +954,11 @@ class instance_isle_of_thunder : public InstanceMapScript
 
                             // Despawn Temp Creatures
                             for (auto&& itr : tempShanbuCreatures)
-                                if (Creature* temp = instance->GetCreature(GetData64(itr)))
+                                if (Creature* temp = instance->GetCreature(GetGuidData(itr)))
                                     temp->DespawnOrUnsummon();
 
                             // Open Center Door and Start Event
-                            HandleGameObject(GetData64(GO_MOGU_GATES_CENTER), true, NULL);
+                            HandleGameObject(GetGuidData(GO_MOGU_GATES_CENTER), true, NULL);
                         }
                         else if (++zandalariCount >= 8 && GetData(STEP_BLOODY_CROSSROAD) != DONE)
                         {
@@ -1004,7 +1004,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         break;
                     case STEP_DEFEAT_SHAN_BU:
                         step4 = data;
-                        DoFinishLFGDungeon(GetData64(FACTION_DATA) ? 621 : 607);
+                        DoFinishLFGDungeon(GetGuidData(FACTION_DATA) ? 621 : 607);
 
                         if (Creature* taranZhu = instance->GetCreature(GetGuidData(NPC_SHANBU_TARAN_ZHU)))
                             taranZhu->AI()->DoAction(ACTION_SHANBU_DEFEATED);
@@ -1147,7 +1147,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                     case NPC_SCOUT_CAPTAIN_ELSIA:
                         return elsiaGUID;
                     case FACTION_DATA:
-                        return teamInstance == HORDE ? 1 : 0;
+                        return teamInstance == HORDE ? ObjectGuid(uint64(1)) : ObjectGuid::Empty;
                     case NPC_ARCANITAL_TULACHEK:
                         return tulachekGUID;
                     case GO_TEAR_DOWN_DESTRUCT_WALL:
@@ -1223,7 +1223,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                     case NPC_NALAK:
                         return nalakGUID;
                     case PHASE_DATA:
-                        return phaseId;
+                        return ObjectGuid(uint64(phaseId));
                     case GO_MOGU_CRUCIBLE:
                         return moguCrucibleGUID;
                     case NPC_WRATHION:
@@ -1242,7 +1242,7 @@ class instance_isle_of_thunder : public InstanceMapScript
                         return celestialDefenderGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

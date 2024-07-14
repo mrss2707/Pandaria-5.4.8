@@ -438,9 +438,9 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
             void Reset() override
             {
                 _events.Reset();
-                _theLichKing = 0;
-                _bolvarFordragon = 0;
-                _factionNPC = 0;
+                _theLichKing = ObjectGuid::Empty;
+                _bolvarFordragon = ObjectGuid::Empty;
+                _factionNPC = ObjectGuid::Empty;
                 _damnedKills = 0;
             }
 
@@ -625,9 +625,9 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
         private:
             EventMap _events;
             InstanceScript* const _instance;
-            uint64 _theLichKing;
-            uint64 _bolvarFordragon;
-            uint64 _factionNPC;
+            ObjectGuid _theLichKing;
+            ObjectGuid _bolvarFordragon;
+            ObjectGuid _factionNPC;
             uint16 _damnedKills;
         };
 
@@ -3194,7 +3194,7 @@ class npc_putricide_trap : public CreatureScript
         private:
             InstanceScript* instance;
             EventMap events;
-            uint64 spawnerGuids[4];
+            ObjectGuid spawnerGuids[4];
         };
 
         CreatureAI* GetAI(Creature* creature) const override
@@ -3470,10 +3470,10 @@ class npc_icc_empowering_orb_controller : public CreatureScript
         private:
             InstanceScript* instance;
             EventMap events;
-            uint64 trashGuids[6];
-            uint64 visualGuid = 0;
-            uint64 orbGuid = 0;
-            uint64 channelerGuid = 0;
+            ObjectGuid trashGuids[6];
+            ObjectGuid visualGuid = ObjectGuid::Empty;
+            ObjectGuid orbGuid = ObjectGuid::Empty;
+            ObjectGuid channelerGuid = ObjectGuid::Empty;
         };
 
         CreatureAI* GetAI(Creature* creature) const override

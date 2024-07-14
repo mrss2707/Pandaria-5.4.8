@@ -180,7 +180,7 @@ class boss_garajal : public CreatureScript
         {
             boss_garajalAI(Creature* creature) : BossAI(creature, DATA_GARAJAL) { }
 
-            std::vector<uint64> voodooTargets;
+            std::vector<ObjectGuid> voodooTargets;
             std::list<uint32> shadowySpells;
             bool intro;
             uint32 banishmentCount;
@@ -495,7 +495,7 @@ class boss_garajal : public CreatureScript
                                 pItr->AddAura(SPELL_VOODOO_DOLL_VISUAL, pItr);
                             }
 
-                            if (Unit* tank = sObjectAccessor->GetPlayer(*me, voodooTargets[0]))
+                            if (Unit* tank = ObjectAccessor::GetPlayer(*me, voodooTargets[0]))
                                 me->CastSpell(tank, SPELL_VOODOO_DOLL_SHARE, true);
 
                             break;

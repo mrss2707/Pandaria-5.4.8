@@ -49,15 +49,15 @@ class instance_shadopan_monastery : public InstanceMapScript
     {
         instance_shadopan_monastery_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        std::list<uint64> firstArcherySet;
-        std::list<uint64> secondArcherySet;
-        std::list<uint64> archeryTargetGuids;
-        std::list<uint64> minibossPositionsGuid;
-        std::list<uint64> minibossPositionsGuidSave;
-        std::list<uint64> firstDefeatedNovicePositionsGuid;
-        std::list<uint64> secondDefeatedNovicePositionsGuid;
-        std::list<uint64> firstDefeatedNovicePositionsGuidSave;
-        std::list<uint64> secondDefeatedNovicePositionsGuidSave;
+        std::list<ObjectGuid> firstArcherySet;
+        std::list<ObjectGuid> secondArcherySet;
+        std::list<ObjectGuid> archeryTargetGuids;
+        std::list<ObjectGuid> minibossPositionsGuid;
+        std::list<ObjectGuid> minibossPositionsGuidSave;
+        std::list<ObjectGuid> firstDefeatedNovicePositionsGuid;
+        std::list<ObjectGuid> secondDefeatedNovicePositionsGuid;
+        std::list<ObjectGuid> firstDefeatedNovicePositionsGuidSave;
+        std::list<ObjectGuid> secondDefeatedNovicePositionsGuidSave;
 
         uint8 aliveNoviceCount;
         uint8 aliveMinibossCount;
@@ -71,16 +71,16 @@ class instance_shadopan_monastery : public InstanceMapScript
         ObjectGuid taranZhuGuid;
         ObjectGuid azureSerpentGUID;
         ObjectGuid snowdriftRefereeGUID;
-        uint64 taranZhuCache;
-        uint64 snowdriftPossesions;
-        uint64 taranZhuCacheH;
-        uint64 snowdriftPossesionsH;
+        ObjectGuid taranZhuCache;
+        ObjectGuid snowdriftPossesions;
+        ObjectGuid taranZhuCacheH;
+        ObjectGuid snowdriftPossesionsH;
         ObjectGuid masterSnowdriftOutroGUID;
-        uint64 shadowriftEntance;
-        uint64 shadowriftFireWall;
-        uint64 shaPrison1GUID;
-        uint64 shaPrison2GUID;
-        uint64 shaPrison3GUID;
+        ObjectGuid shadowriftEntance;
+        ObjectGuid shadowriftFireWall;
+        ObjectGuid shaPrison1GUID;
+        ObjectGuid shaPrison2GUID;
+        ObjectGuid shaPrison3GUID;
         ObjectGuid containOverrideGUID;
 
         void Initialize() override
@@ -99,16 +99,16 @@ class instance_shadopan_monastery : public InstanceMapScript
             taranZhuGuid = ObjectGuid::Empty;
             azureSerpentGUID = ObjectGuid::Empty;
             snowdriftRefereeGUID = ObjectGuid::Empty;
-            taranZhuCache            = 0;
-            snowdriftPossesions      = 0;
-            taranZhuCacheH           = 0;
-            snowdriftPossesionsH     = 0;
+            taranZhuCache            = ObjectGuid::Empty;
+            snowdriftPossesions      = ObjectGuid::Empty;
+            taranZhuCacheH           = ObjectGuid::Empty;
+            snowdriftPossesionsH     = ObjectGuid::Empty;
             masterSnowdriftOutroGUID = ObjectGuid::Empty;
-            shadowriftEntance        = 0;
-            shadowriftFireWall       = 0;
-            shaPrison1GUID           = 0;
-            shaPrison2GUID           = 0;
-            shaPrison3GUID           = 0;
+            shadowriftEntance        = ObjectGuid::Empty;
+            shadowriftFireWall       = ObjectGuid::Empty;
+            shaPrison1GUID           = ObjectGuid::Empty;
+            shaPrison2GUID           = ObjectGuid::Empty;
+            shaPrison3GUID           = ObjectGuid::Empty;
             containOverrideGUID = ObjectGuid::Empty;
             firstArcherySet.clear();
             secondArcherySet.clear();
@@ -481,9 +481,9 @@ class instance_shadopan_monastery : public InstanceMapScript
                 case DATA_RANDOM_FIRST_POS:
                 {
                     if (firstDefeatedNovicePositionsGuid.empty())
-                        return 0;
+                        return ObjectGuid::Empty;
 
-                    if (uint64 guid = Trinity::Containers::SelectRandomContainerElement(firstDefeatedNovicePositionsGuid))
+                    if (ObjectGuid guid = Trinity::Containers::SelectRandomContainerElement(firstDefeatedNovicePositionsGuid))
                     {
                         const_cast<instance_shadopan_monastery_InstanceMapScript*>(this)->firstDefeatedNovicePositionsGuid.remove(guid);
                         return guid;
@@ -493,9 +493,9 @@ class instance_shadopan_monastery : public InstanceMapScript
                 case DATA_RANDOM_SECOND_POS:
                 {
                      if (secondDefeatedNovicePositionsGuid.empty())
-                        return 0;
+                        return ObjectGuid::Empty;
 
-                     if (uint64 guid = Trinity::Containers::SelectRandomContainerElement(secondDefeatedNovicePositionsGuid))
+                     if (ObjectGuid guid = Trinity::Containers::SelectRandomContainerElement(secondDefeatedNovicePositionsGuid))
                      {
                          const_cast<instance_shadopan_monastery_InstanceMapScript*>(this)->secondDefeatedNovicePositionsGuid.remove(guid);
                          return guid;
@@ -505,9 +505,9 @@ class instance_shadopan_monastery : public InstanceMapScript
                 case DATA_RANDOM_MINIBOSS_POS:
                 {
                     if (minibossPositionsGuid.empty())
-                       return 0;
+                       return ObjectGuid::Empty;
 
-                    if (uint64 guid = Trinity::Containers::SelectRandomContainerElement(minibossPositionsGuid))
+                    if (ObjectGuid guid = Trinity::Containers::SelectRandomContainerElement(minibossPositionsGuid))
                     {
                         const_cast<instance_shadopan_monastery_InstanceMapScript*>(this)->minibossPositionsGuid.remove(guid);
                         return guid;
@@ -524,7 +524,7 @@ class instance_shadopan_monastery : public InstanceMapScript
                     return containOverrideGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

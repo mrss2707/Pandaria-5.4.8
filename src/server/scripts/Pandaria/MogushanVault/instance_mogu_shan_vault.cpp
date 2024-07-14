@@ -59,8 +59,8 @@ class instance_mogu_shan_vault : public InstanceMapScript
             uint32 stoneGuardiansState;
             uint32 actualPetrifierEntry;
 
-            uint64 cursedMogu1Guid;
-            uint64 cursedMogu2Guid;
+            ObjectGuid cursedMogu1Guid;
+            ObjectGuid cursedMogu2Guid;
             ObjectGuid ghostEssenceGuid;
 
             ObjectGuid stoneGuardControllerGuid;
@@ -72,7 +72,7 @@ class instance_mogu_shan_vault : public InstanceMapScript
             ObjectGuid GarajalGuid;
 
             ObjectGuid inversionGobGuid;
-            uint64 stoneGuardExit;
+            ObjectGuid stoneGuardExit;
             ObjectGuid cancelGobGuid;
             ObjectGuid ancientMoguDoorGuid;
             ObjectGuid emperorsDoorGuid;
@@ -98,7 +98,7 @@ class instance_mogu_shan_vault : public InstanceMapScript
             std::vector<ObjectGuid> titanCirclesGuids;
             std::vector<uint32> achievementGuids;
             std::vector<uint32> m_spiritKingsSeq;
-            std::list<uint64> SkullChargerGuids;
+            std::list<ObjectGuid> SkullChargerGuids;
 
             bool isLfr;
             bool lfrSectionFound;
@@ -108,25 +108,25 @@ class instance_mogu_shan_vault : public InstanceMapScript
             {
                 SetBossNumber(ENCOUNTERS);
                 LoadDoorData(doorData);
-                stoneGuardiansState             = NOT_STARTED;
-                stoneGuardControllerGuid = ObjectGuid::Empty;
-                fengGuid = ObjectGuid::Empty;
-                siphonShieldGuid = ObjectGuid::Empty;
-                inversionGobGuid = ObjectGuid::Empty;
-                cancelGobGuid = ObjectGuid::Empty;
-                ancientMoguDoorGuid = ObjectGuid::Empty;
-                emperorsDoorGuid = ObjectGuid::Empty;
-                celestialCommandGuid = ObjectGuid::Empty;
-                energyPlatformGuid = ObjectGuid::Empty;
-                titanDiskGuid = ObjectGuid::Empty;
-                cursedMogu1Guid                 = 0;
-                cursedMogu2Guid                 = 0;
-                ghostEssenceGuid = ObjectGuid::Empty;
+                stoneGuardiansState       = NOT_STARTED;
+                stoneGuardControllerGuid  = ObjectGuid::Empty;
+                fengGuid                  = ObjectGuid::Empty;
+                siphonShieldGuid          = ObjectGuid::Empty;
+                inversionGobGuid          = ObjectGuid::Empty;
+                cancelGobGuid             = ObjectGuid::Empty;
+                ancientMoguDoorGuid       = ObjectGuid::Empty;
+                emperorsDoorGuid          = ObjectGuid::Empty;
+                celestialCommandGuid      = ObjectGuid::Empty;
+                energyPlatformGuid        = ObjectGuid::Empty;
+                titanDiskGuid             = ObjectGuid::Empty;
+                cursedMogu1Guid           = ObjectGuid::Empty;
+                cursedMogu2Guid           = ObjectGuid::Empty;
+                ghostEssenceGuid          = ObjectGuid::Empty;
                 spiritKingsControllerGuid = ObjectGuid::Empty;
-                qinxiGuid = ObjectGuid::Empty;
-                janxiGuid = ObjectGuid::Empty;
-                ancienControlCondoleGUID = ObjectGuid::Empty;
-                GarajalGuid = ObjectGuid::Empty;
+                qinxiGuid                 = ObjectGuid::Empty;
+                janxiGuid                 = ObjectGuid::Empty;
+                ancienControlCondoleGUID  = ObjectGuid::Empty;
+                GarajalGuid               = ObjectGuid::Empty;
                 FrenzyDiff = instance->Is25ManRaid() ? 2 : 1;
 
                 stoneGuardGUIDs.clear();
@@ -267,7 +267,7 @@ class instance_mogu_shan_vault : public InstanceMapScript
                             if (result)
                                 toDespawnEntry = (*result)[0].GetUInt64();
 
-                            uint64 toDespawn = creature->GetEntry() == toDespawnEntry ? creature->GetGUID() : this->GetData64(toDespawnEntry);
+                            ObjectGuid toDespawn = creature->GetEntry() == toDespawnEntry ? creature->GetGUID() : this->GetGuidData(toDespawnEntry);
                             Creature* stoneGuard = (toDespawn != creature->GetGUID())
                                     ? instance->GetCreature(toDespawn)
                                     : creature;
@@ -715,7 +715,7 @@ class instance_mogu_shan_vault : public InstanceMapScript
                         return ancienControlCondoleGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

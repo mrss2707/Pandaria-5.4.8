@@ -345,31 +345,32 @@ bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, Gossip
     return false;
 }
 
-bool OPvPCapturePointZM_GraveYard::HandleGossipOption(Player* player, ObjectGuid guid, uint32 /*gossipid*/)
+bool OPvPCapturePointZM_GraveYard::HandleGossipOption(Player* player, Creature* creature, uint32 /*gossipid*/)
 {
-    std::map<ObjectGuid, uint32>::iterator itr = m_CreatureTypes.find(guid);
-    if (itr != m_CreatureTypes.end())
+    switch (creature->GetEntry())
     {
-        Creature* cr = HashMapHolder<Creature>::Find(guid);
-        if (!cr)
-            return true;
-        // if the flag is already taken, then return
-        if (m_FlagCarrierGUID)
-            return true;
-        if (itr->second == ZM_ALLIANCE_FIELD_SCOUT)
-        {
-            cr->CastSpell(player, ZM_BATTLE_STANDARD_A, true);
+        case ZM_ALLIANCE_FIELD_SCOUT:
+            // if the flag is already taken, then return
+            if (m_FlagCarrierGUID)
+                return true;
+            creature->CastSpell(player, ZM_BATTLE_STANDARD_A, true);
             m_FlagCarrierGUID = player->GetGUID();
-        }
-        else if (itr->second == ZM_HORDE_FIELD_SCOUT)
-        {
-            cr->CastSpell(player, ZM_BATTLE_STANDARD_H, true);
+            UpdateTowerState();
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        case ZM_HORDE_FIELD_SCOUT:
+            // if the flag is already taken, then return
+            if (m_FlagCarrierGUID)
+                return true;
+            creature->CastSpell(player, ZM_BATTLE_STANDARD_H, true);
             m_FlagCarrierGUID = player->GetGUID();
-        }
-        UpdateTowerState();
-        player->PlayerTalkClass->SendCloseGossip();
-        return true;
+            UpdateTowerState();
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        default:
+            break;
     }
+
     return false;
 }
 

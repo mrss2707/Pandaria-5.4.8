@@ -152,12 +152,12 @@ class boss_tayak : public CreatureScript
         {
             boss_tayakAI(Creature* creature) : BossAI(creature, DATA_TAYAK) { }
 
-            uint64 unseenTank, unseenTarget, currentTank, targetGUID;
+            ObjectGuid unseenTank, unseenTarget, currentTank, targetGUID;
             bool entranceDone, introDone, storm1Done, unseenReturn, evadeModeEnabled, m_rightSide;
             uint8 Phase;    // 0 - Phase 1 | 1 - TP Players | 2 - Players have been TP
             uint32 delay;
             uint32 braziersCount;
-            std::list<uint64> playerGuids;
+            std::list<ObjectGuid> playerGuids;
             uint32 PrevSideTornado, spellTornado;
             std::map<uint32, uint32> m_TornadoType;
 
@@ -192,11 +192,11 @@ class boss_tayak : public CreatureScript
                     instance->DoRemoveBloodLustDebuffSpellOnPlayers();
                 }
 
-                unseenTank       = 0;
+                unseenTank       = ObjectGuid::Empty;
                 PrevSideTornado  = 0;
                 spellTornado     = 0;
-                currentTank      = 0;
-                targetGUID = ObjectGuid::Empty;
+                currentTank      = ObjectGuid::Empty;
+                targetGUID       = ObjectGuid::Empty;
                 braziersCount    = 0;
                 storm1Done       = false;
                 unseenReturn     = false;
@@ -564,7 +564,7 @@ class boss_tayak : public CreatureScript
                                 break;
 
                             // Blizzard pls don`t make anymore these spells with cone proc
-                            unseenTank = me->GetVictim() ? me->GetVictim()->GetGUID() : 0;
+                            unseenTank = me->GetVictim() ? me->GetVictim()->GetGUID() : ObjectGuid::Empty;
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankSpecTargetSelector()))
                             {
                                 Talk(ANN_UNSEEN, target);
@@ -1203,7 +1203,7 @@ struct npc_achiev_brazier : public ScriptedAI
             hasLaunched = true;
             DoCast(me, SPELL_BRAZIER_FIRE, true);
 
-            if (Creature* tayak = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_TAYAK) : 0))
+            if (Creature* tayak = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                 tayak->AI()->SetData(TYPE_BRAZIERS, 1);
         }
     }
@@ -1225,11 +1225,11 @@ class spell_tayak_wind_step : public SpellScriptLoader
             {
                 if (Unit* caster = GetCaster())
                 {
-                    uint64 casterGUID = caster->GetGUID();
+                    ObjectGuid casterGUID = caster->GetGUID();
                     uint32 delay = 0;
-                    caster->m_Events.Schedule(delay += 200, 20, [this, casterGUID]()
+                    caster->m_Events.Schedule(delay += 200, 20, [caster, casterGUID]()
                     {
-                        if (Unit* m_caster = ObjectAccessor::FindUnit(casterGUID))
+                        if (Unit* m_caster = ObjectAccessor::GetUnit(*caster, casterGUID))
                             m_caster->CastSpell(m_caster, SPELL_WIND_STEP_EFF, false);
                     });
                 }
@@ -1572,14 +1572,14 @@ class spell_su_vehicle_apply : public SpellScriptLoader
 
                 // Not pull same target again
                 if (uint32 stormLowId = caster->GetAI()->GetData(TYPE_TARGET_ID))
-                    if (stormLowId == target->GetGUIDLow())
+                    if (stormLowId == target->GetGUID().GetCounter())
                         return;
 
                 // Pull only if we haven`t anyone already in us
                 if (!target->IsOnVehicle() && caster->GetVehicleKit() && !caster->GetVehicleKit()->GetPassenger(0))
                 {
                     target->CastSpell(caster, SPELL_SU_RV, true);
-                    caster->GetAI()->SetData(TYPE_TARGET_ID, target->GetGUIDLow());
+                    caster->GetAI()->SetData(TYPE_TARGET_ID, target->GetGUID().GetCounter());
                 }
             }
 

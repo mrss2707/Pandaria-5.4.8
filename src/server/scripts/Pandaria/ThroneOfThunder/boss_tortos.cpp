@@ -870,7 +870,7 @@ class spell_shell_concussion : public SpellScript
             if (turtle->GetEntry() != NPC_WHIRL_TURTLE)
                 return;
 
-            if (Creature* tortos = ObjectAccessor::GetCreature(*turtle, turtle->GetInstanceScript() ? turtle->GetInstanceScript()->GetData64(DATA_TORTOS) : 0))
+            if (Creature* tortos = ObjectAccessor::GetCreature(*turtle, turtle->GetInstanceScript() ? turtle->GetInstanceScript()->GetGuidData(DATA_TORTOS) : ObjectGuid::Empty))
                 tortos->AI()->SetData(TYPE_ONE_UP, 1);
         }
     }

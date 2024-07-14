@@ -101,16 +101,16 @@ class instance_throne_of_thunder : public InstanceMapScript
             ObjectGuid garajalHelperGUID;
             ObjectGuid preDoorJinrokhGUID;
             ObjectGuid preHorridonDoorGUID;
-            uint64 preCouncilDoor1GUID;
-            uint64 preCouncilDoor2GUID;
+            ObjectGuid preCouncilDoor1GUID;
+            ObjectGuid preCouncilDoor2GUID;
             ObjectGuid garajalSoulGUID;
             ObjectGuid introLeiShenGUID;
             ObjectGuid tortosBridgeGUID;
             ObjectGuid tortosDeathCollisionGuid;
             ObjectGuid rushingWindsControllerGUID;
-            uint64 twinConsortPhaseController_1;
-            uint64 twinConsortPhaseController_2;
-            uint64 twinConsortController; // not real
+            ObjectGuid twinConsortPhaseController_1;
+            ObjectGuid twinConsortPhaseController_2;
+            ObjectGuid twinConsortController; // not real
             ObjectGuid diffusionChainConduitGUID;
             ObjectGuid staticShockConduitGUID;
             ObjectGuid bouncingBoltConduitGUID;
@@ -146,8 +146,8 @@ class instance_throne_of_thunder : public InstanceMapScript
             ObjectGuid fadedHuenGUID;
 
             uint32 m_auiEncounter[MAX_EVENT_DATA - MAX_DATA - 1];
-            std::list<uint64> m_lMoguBellGuids, windBunnysList, thunderTrapGuids, ritualistGuids, animusGolemGuids, largeAnimusGuids, featherGuids;
-            std::map<uint32, uint64> ironPets, tribesDoor;
+            std::list<ObjectGuid> m_lMoguBellGuids, windBunnysList, thunderTrapGuids, ritualistGuids, animusGolemGuids, largeAnimusGuids, featherGuids;
+            std::map<uint32, ObjectGuid> ironPets, tribesDoor;
 
             bool isLfr;
             bool lfrSectionFound;
@@ -201,45 +201,45 @@ class instance_throne_of_thunder : public InstanceMapScript
                 largeAnimusGuids.clear();
                 featherGuids.clear();
 
-                jalakGUID = ObjectGuid::Empty;
-                garajalHelperGUID = ObjectGuid::Empty;
-                introLeiShenGUID = ObjectGuid::Empty;
-                tortosBridgeGUID = ObjectGuid::Empty;
-                tortosDeathCollisionGuid = ObjectGuid::Empty;
-                rushingWindsControllerGUID = ObjectGuid::Empty;
-                twinConsortPhaseController_1 = 0;
-                twinConsortPhaseController_2 = 0;
-                twinConsortController        = 0;
-                diffusionChainConduitGUID = ObjectGuid::Empty;
-                staticShockConduitGUID = ObjectGuid::Empty;
-                bouncingBoltConduitGUID = ObjectGuid::Empty;
-                overchargeConduitGUID = ObjectGuid::Empty;
-                chargingStationGUID = ObjectGuid::Empty;
-                northFloorGUID = ObjectGuid::Empty;
-                southFloorGUID = ObjectGuid::Empty;
-                westFloorGUID = ObjectGuid::Empty;
-                eastFloorGUID = ObjectGuid::Empty;
-                northPillarGUID = ObjectGuid::Empty;
-                southPillarGUID = ObjectGuid::Empty;
-                eastPillarGUID = ObjectGuid::Empty;
-                westPillarGUID = ObjectGuid::Empty;
-                windSEGUID = ObjectGuid::Empty;
-                windNEGUID = ObjectGuid::Empty;
-                windSWGUID = ObjectGuid::Empty;
-                windNWGUID = ObjectGuid::Empty;
-                windowSEGUID = ObjectGuid::Empty;
-                windowNEGUID = ObjectGuid::Empty;
-                windowSWGUID = ObjectGuid::Empty;
-                windowNWGUID = ObjectGuid::Empty;
-                megaeraAnnouncerGUID = ObjectGuid::Empty;
-                animusEntranceDoorGUID = ObjectGuid::Empty;
-                ironQonDoorGUID = ObjectGuid::Empty;
-                megaeraChestGUID = ObjectGuid::Empty;
-                megaeraHeroicChestGUID = ObjectGuid::Empty;
-                fadedChijiGUID = ObjectGuid::Empty;
-                fadedHuenGUID = ObjectGuid::Empty;
-                fadedNuzaoGUID = ObjectGuid::Empty;
-                fadedYulonGUID = ObjectGuid::Empty;
+                jalakGUID                    = ObjectGuid::Empty;
+                garajalHelperGUID            = ObjectGuid::Empty;
+                introLeiShenGUID             = ObjectGuid::Empty;
+                tortosBridgeGUID             = ObjectGuid::Empty;
+                tortosDeathCollisionGuid     = ObjectGuid::Empty;
+                rushingWindsControllerGUID   = ObjectGuid::Empty;
+                twinConsortPhaseController_1 = ObjectGuid::Empty;
+                twinConsortPhaseController_2 = ObjectGuid::Empty;
+                twinConsortController        = ObjectGuid::Empty;
+                diffusionChainConduitGUID    = ObjectGuid::Empty;
+                staticShockConduitGUID       = ObjectGuid::Empty;
+                bouncingBoltConduitGUID      = ObjectGuid::Empty;
+                overchargeConduitGUID        = ObjectGuid::Empty;
+                chargingStationGUID          = ObjectGuid::Empty;
+                northFloorGUID               = ObjectGuid::Empty;
+                southFloorGUID               = ObjectGuid::Empty;
+                westFloorGUID                = ObjectGuid::Empty;
+                eastFloorGUID                = ObjectGuid::Empty;
+                northPillarGUID              = ObjectGuid::Empty;
+                southPillarGUID              = ObjectGuid::Empty;
+                eastPillarGUID               = ObjectGuid::Empty;
+                westPillarGUID               = ObjectGuid::Empty;
+                windSEGUID                   = ObjectGuid::Empty;
+                windNEGUID                   = ObjectGuid::Empty;
+                windSWGUID                   = ObjectGuid::Empty;
+                windNWGUID                   = ObjectGuid::Empty;
+                windowSEGUID                 = ObjectGuid::Empty;
+                windowNEGUID                 = ObjectGuid::Empty;
+                windowSWGUID                 = ObjectGuid::Empty;
+                windowNWGUID                 = ObjectGuid::Empty;
+                megaeraAnnouncerGUID         = ObjectGuid::Empty;
+                animusEntranceDoorGUID       = ObjectGuid::Empty;
+                ironQonDoorGUID              = ObjectGuid::Empty;
+                megaeraChestGUID             = ObjectGuid::Empty;
+                megaeraHeroicChestGUID       = ObjectGuid::Empty;
+                fadedChijiGUID               = ObjectGuid::Empty;
+                fadedHuenGUID                = ObjectGuid::Empty;
+                fadedNuzaoGUID               = ObjectGuid::Empty;
+                fadedYulonGUID               = ObjectGuid::Empty;
 
                 memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -733,18 +733,18 @@ class instance_throne_of_thunder : public InstanceMapScript
                 {
                     case DATA_JINROKH_EVENT:
                         hasJinrokhEventDone = data;           
-                        HandleGameObject(GetData64(GO_JIN_ROKH_PREDOOR), true, NULL);
+                        HandleGameObject(GetGuidData(GO_JIN_ROKH_PREDOOR), true, NULL);
                         break;
                     case DATA_HORIDON_EVENT:
                         hasHoridonEventDone = data;
                         break;
                     case DATA_PRE_COUNCIL_EVENT_1:
                         hasPreGarajalEvent1Done = data;
-                        HandleGameObject(GetData64(GO_COUNCIL_TRASH_DOOR_ONE), true, NULL);
+                        HandleGameObject(GetGuidData(GO_COUNCIL_TRASH_DOOR_ONE), true, NULL);
                         break;
                     case DATA_PRE_COUNCIL_EVENT_2:
                         hasPreGarajalEvent2Done = data;
-                        HandleGameObject(GetData64(GO_COUNCIL_TRASH_DOOR_TWO), true, NULL);
+                        HandleGameObject(GetGuidData(GO_COUNCIL_TRASH_DOOR_TWO), true, NULL);
                         break;
                     case DATA_COUNCIL_EVENT:
                         hasgarajalEventDone = data;
@@ -815,7 +815,7 @@ class instance_throne_of_thunder : public InstanceMapScript
                             case DONE:
                                 DoRemoveAurasDueToSpellOnPlayers(139485);
 
-                                if (GameObject* preDoor = instance->GetGameObject(GetData64(GO_HORRIDON_ENTRANCE)))
+                                if (GameObject* preDoor = instance->GetGameObject(GetGuidData(GO_HORRIDON_ENTRANCE)))
                                     preDoor->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND);
 
                                 for (auto&& itr : windBunnysList)
@@ -1037,7 +1037,7 @@ class instance_throne_of_thunder : public InstanceMapScript
                         return fadedYulonGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override
@@ -1165,7 +1165,7 @@ class instance_throne_of_thunder : public InstanceMapScript
                     switch (eventId)
                     {
                         case EVENT_JINROKH_DOOR:
-                            HandleGameObject(GetData64(GO_JIN_ROKH_PREDOOR), true);
+                            HandleGameObject(GetGuidData(GO_JIN_ROKH_PREDOOR), true);
                             break;
                         case EVENT_PRIMORDIUS_INTRO:
                             if (Creature* pBoss = instance->GetCreature(GetGuidData(DATA_PRIMORDIUS)))

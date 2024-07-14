@@ -1706,7 +1706,7 @@ class npc_xuen_celestial_experience : public CreatureScript
 
             ObjectGuid summonerGUID;
             uint32 delay;
-            std::vector<uint64> cList;
+            std::vector<ObjectGuid> cList;
 
             void IsSummonedBy(Unit* summoner) override
             {
@@ -1912,7 +1912,7 @@ struct celestial_experience_sha : public ScriptedAI
     celestial_experience_sha(Creature* creature) : ScriptedAI(creature) { }
 
     EventMap events;
-    uint64 summonerGUID, victimGUID;
+    ObjectGuid summonerGUID, victimGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2136,10 +2136,10 @@ struct npc_kota_kon : public VehicleAI
 {
     npc_kota_kon(Creature* creature) : VehicleAI(creature)
     {
-        guid = 0;
+        guid = ObjectGuid::Empty;
     }
 
-    uint64 guid;
+    ObjectGuid guid;
 
     bool OnGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
     {
@@ -2155,7 +2155,7 @@ struct npc_kota_kon : public VehicleAI
         summon->CastSpell(summon, SPELL_HEAVY_HANDED, true);
         summon->SetPhaseMask(2, true);
 
-        if (Player* player = sObjectAccessor->GetPlayer(*me, guid))
+        if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
         {
             player->SetPhaseMask(2, true);
             player->EnterVehicle(summon, 0);

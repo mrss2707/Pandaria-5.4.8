@@ -68,10 +68,10 @@ class instance_stormstout_brewery : public InstanceMapScript
 
             EventMap events;
             std::unordered_map<uint32, uint32> yanzhuAuraMap;
-            std::vector<uint64> hozenGuidsVector;
-            std::vector<uint64> bouncerGuidsVector;
+            std::vector<ObjectGuid> hozenGuidsVector;
+            std::vector<ObjectGuid> bouncerGuidsVector;
             std::list<Player*> payersInList;
-            uint64 okOokGUID, hoptallusGUID, yanzhuGUID, ookOokDoorGUID, uncleGaoGUID, chenYanzhuGUID;
+            ObjectGuid okOokGUID, hoptallusGUID, yanzhuGUID, ookOokDoorGUID, uncleGaoGUID, chenYanzhuGUID;
             uint32 hozenSlain;
 
             void Initialize() override
@@ -191,7 +191,7 @@ class instance_stormstout_brewery : public InstanceMapScript
                         creature->RemoveAurasDueToSpell(128571);
 
                         uint32 delay = 0;
-                        uint64 creatureGUID = creature->GetGUID();
+                        ObjectGuid creatureGUID = creature->GetGUID();
                         creature->m_Events.Schedule(delay += 1500, 1, [this, creatureGUID]()
                         {
                             if (Creature* trigger = instance->GetCreature(creatureGUID))
@@ -385,7 +385,7 @@ class instance_stormstout_brewery : public InstanceMapScript
                         return chenYanzhuGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override
@@ -397,12 +397,12 @@ class instance_stormstout_brewery : public InstanceMapScript
                 {
                     if (state == DONE)
                     {
-                        if (GameObject* go = instance->GetGameObject(GetData64(GO_OOK_DOOR)))
+                        if (GameObject* go = instance->GetGameObject(GetGuidData(GO_OOK_DOOR)))
                             go->AddObjectToRemoveList();
                     }
                     else
                     {
-                        if (!instance->GetGameObject(GetData64(GO_OOK_DOOR)))
+                        if (!instance->GetGameObject(GetGuidData(GO_OOK_DOOR)))
                         {
                             if (Creature* ookOok = instance->GetCreature(GetGuidData(DATA_OOK_OOK)))
                                 if (GameObject* go = ookOok->SummonGameObject(GO_OOK_DOOR, ookOokDoorPos.GetPositionX(), ookOokDoorPos.GetPositionY(), ookOokDoorPos.GetPositionZ(), ookOokDoorPos.GetOrientation(), { }, 14400))

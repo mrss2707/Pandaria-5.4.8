@@ -164,7 +164,7 @@ class npc_cursed_mogu_sculpture : public CreatureScript
             InstanceScript* instance;
             EventMap events;
             bool activationDone;
-            uint64 playerActivate;
+            ObjectGuid playerActivate;
 
             void InitializeAI() override
             {
@@ -182,7 +182,7 @@ class npc_cursed_mogu_sculpture : public CreatureScript
 
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_PASSIVE);
-                playerActivate = 0;
+                playerActivate = ObjectGuid::Empty;
                 activationDone = false;
             }
 
@@ -191,7 +191,7 @@ class npc_cursed_mogu_sculpture : public CreatureScript
                 events.Reset();
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_PASSIVE);
-                playerActivate = 0;
+                playerActivate = ObjectGuid::Empty;
                 activationDone = false;
             }
 

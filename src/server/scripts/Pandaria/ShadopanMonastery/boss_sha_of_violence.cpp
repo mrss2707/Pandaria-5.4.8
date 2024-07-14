@@ -298,7 +298,7 @@ struct npc_achiev_prisoned_sha : public ScriptedAI
         if (me->GetDBTableGUIDLow())
             return;
 
-        if (Creature* shaOfViolence = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SHA_VIOLENCE) : 0))
+        if (Creature* shaOfViolence = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SHA_VIOLENCE) : ObjectGuid::Empty))
             shaOfViolence->AI()->SetData(TYPE_OBVIOUS_SOLUTION, 1);
     }
 
@@ -431,17 +431,17 @@ class go_containment_override : public GameObjectScript
             if (state != GO_STATE_ACTIVE)
                 return;
 
-            if (GameObject* prison1 = ObjectAccessor::GetGameObject(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(DATA_SHA_PRISON_1) : 0))
+            if (GameObject* prison1 = ObjectAccessor::GetGameObject(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(DATA_SHA_PRISON_1) : ObjectGuid::Empty))
                 prison1->SetGoState(GO_STATE_ACTIVE);
 
-            if (GameObject* prison2 = ObjectAccessor::GetGameObject(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(DATA_SHA_PRISON_2) : 0))
+            if (GameObject* prison2 = ObjectAccessor::GetGameObject(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(DATA_SHA_PRISON_2) : ObjectGuid::Empty))
                 prison2->SetGoState(GO_STATE_ACTIVE);
 
-            if (GameObject* prison3 = ObjectAccessor::GetGameObject(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(DATA_SHA_PRISON_3) : 0))
+            if (GameObject* prison3 = ObjectAccessor::GetGameObject(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(DATA_SHA_PRISON_3) : ObjectGuid::Empty))
                 prison3->SetGoState(GO_STATE_ACTIVE);
 
             // Force sha to attack players
-            if (Creature* shaOfViolence = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(NPC_SHA_VIOLENCE) : 0))
+            if (Creature* shaOfViolence = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(NPC_SHA_VIOLENCE) : ObjectGuid::Empty))
                 shaOfViolence->AI()->DoAction(0);
         }
 };

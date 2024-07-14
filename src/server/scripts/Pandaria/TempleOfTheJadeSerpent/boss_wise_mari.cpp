@@ -125,7 +125,7 @@ class boss_wase_mari : public CreatureScript
             bool fightWon, canDead;
             uint8 phase, foutainCount;
             uint32 hydrolancePhase;
-            uint64 foutainTrigger[4];
+            ObjectGuid foutainTrigger[4];
 
             EventMap cosmeticEvents;
 

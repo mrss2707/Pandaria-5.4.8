@@ -1185,7 +1185,7 @@ class npc_dread_spawn : public CreatureScript
                 events.ScheduleEvent(EVENT_SPEED, 8 * IN_MILLISECONDS);
             }
 
-            uint64 LightTargetGUID()
+            ObjectGuid LightTargetGUID()
             {
                 std::list<Player*> m_players;
                 GetPlayerListInGrid(m_players, me, 300.0f);
@@ -1194,7 +1194,7 @@ class npc_dread_spawn : public CreatureScript
                     if (itr->HasAura(SPELL_CHAMPION_OF_THE_LIGHT))
                         return itr->GetGUID();
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void DoAction(int32 actionId) override
@@ -1961,7 +1961,7 @@ class spell_dread_spray : public SpellScriptLoader
             {
                 if (Unit*  owner = GetUnitOwner())
                 {
-                    owner->SetTarget(0);
+                    owner->SetTarget(ObjectGuid::Empty);
                     float ori = float(rand_norm())*static_cast<float>(2 * M_PI);
                     owner->SetOrientation(ori);
                     owner->SetFacingTo(ori);

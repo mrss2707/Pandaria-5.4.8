@@ -268,18 +268,11 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
 
 inline GameObject* Map::_FindGameObject(WorldObject* searchObject, uint32 guid) const
 {
-    GameObject* gameobject = NULL;
+    auto bounds = searchObject->GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
+    if (bounds.first == bounds.second)
+        return nullptr;
 
-    CellCoord p(Trinity::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-    Cell cell(p);
-
-    Trinity::GameObjectWithDbGUIDCheck goCheck(*searchObject, guid);
-    Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck> checker(searchObject, gameobject, goCheck);
-
-    TypeContainerVisitor<Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
-    cell.Visit(p, objectChecker, *searchObject->GetMap(), *searchObject, searchObject->GetGridActivationRange());
-
-    return gameobject;
+    return bounds.first->second;
 }
 
 /// Process queued scripts

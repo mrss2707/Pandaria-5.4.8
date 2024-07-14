@@ -31,10 +31,10 @@ class instance_assault_on_zanvess : public InstanceMapScript
             instance_assault_on_zanvess_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
             EventMap events;
-            uint64 gongGUID, templeDoorGUID;
+            ObjectGuid gongGUID, templeDoorGUID;
             uint32 m_auiEncounter[CHAPTERS];
-            std::map<uint32, uint64> AssaultEncounters;
-            std::vector<uint64> gyroGUIDs, NalleyGUIDs;
+            std::map<uint32, ObjectGuid> AssaultEncounters;
+            std::vector<ObjectGuid> gyroGUIDs, NalleyGUIDs;
             uint32 chapterOne, chapterTwo, chapterThird, chapterFour;
             uint32 sonicTowerCount;
             uint32 alterTowerCount;
@@ -266,7 +266,7 @@ class instance_assault_on_zanvess : public InstanceMapScript
                         return AssaultEncounters.find(type)->second;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

@@ -104,7 +104,7 @@ class instance_secret_ingridient : public InstanceMapScript
                     case DATA_AVAILABLE_COOK_WHOLE:
                         availableCookWhole = data;
 
-                        if (Player* target = ObjectAccessor::FindPlayer(GetData64(DATA_PLAYER)))
+                        if (Player* target = ObjectAccessor::FindPlayer(GetGuidData(DATA_PLAYER)))
                             sScenarioMgr->SendScenarioState(target, 1157, DATA_NOODLE_TIME, 0);
                         break;
                     case DATA_EATEN_COUNT:
@@ -114,7 +114,7 @@ class instance_secret_ingridient : public InstanceMapScript
                         {
                             DoFinishLFGDungeon(745);
 
-                            if (Player* target = ObjectAccessor::FindPlayer(GetData64(DATA_PLAYER)))
+                            if (Player* target = ObjectAccessor::FindPlayer(GetGuidData(DATA_PLAYER)))
                                 target->KilledMonsterCredit(NPC_INGRIDIENT_CREDIT);
                         }
                         break;
@@ -151,7 +151,7 @@ class instance_secret_ingridient : public InstanceMapScript
                         return noodleStandGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Update(uint32 diff) override

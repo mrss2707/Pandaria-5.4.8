@@ -322,7 +322,7 @@ class instance_little_patience : public InstanceMapScript
                         return brownstoneGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

@@ -15688,7 +15688,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             break;
         }
         case GOSSIP_OPTION_OUTDOORPVP:
-            sOutdoorPvPMgr->HandleGossipOption(this, source->GetGUID(), gossipListId);
+            sOutdoorPvPMgr->HandleGossipOption(this, source->ToCreature(), gossipListId);
             break;
         case GOSSIP_OPTION_SPIRITHEALER:
             if (isDead())
@@ -18817,7 +18817,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
         ObjectGuid transGUID(HighGuid::Mo_Transport, transLowGUID);
 
         Transport* transport = nullptr;
-        if (GameObject* go = HashMapHolder<GameObject>::Find(transGUID))
+        if (GameObject* go = GetMap()->GetGameObject(transGUID))
             transport = go->ToTransport();
 
         if (transport)
@@ -26211,7 +26211,7 @@ void Player::UpdateForQuestWorldObjects()
     {
         if ((*itr).IsGameObject())
         {
-            if (GameObject* obj = HashMapHolder<GameObject>::Find(*itr))
+            if (GameObject* obj = GetMap()->GetGameObject(*itr))
                 obj->BuildValuesUpdateBlockForPlayer(&udata, this);
         }
         else if ((*itr).IsCreatureOrVehicle())

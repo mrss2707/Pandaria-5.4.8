@@ -167,15 +167,15 @@ const std::vector<uint32> protectorsEntry=
     NPC_ANCIENT_REGAIL
 };
 
-bool ProtectorsInCombat(uint32 entry, uint64 casterGUID)
+bool ProtectorsInCombat(Unit* me, uint32 entry, ObjectGuid casterGUID)
 {
     for (auto&& itr : protectorsEntry)
     {
         if (itr == entry)
             continue;
 
-        if (Unit* caster = ObjectAccessor::FindUnit(casterGUID))
-            if (Creature* protector = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(entry) : 0))
+        if (Unit* caster = ObjectAccessor::GetUnit(*me, casterGUID))
+            if (Creature* protector = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(entry) : ObjectGuid::Empty))
                 if (!protector->IsInCombat() && protector->IsAlive())
                     return false;
     }
@@ -592,7 +592,7 @@ class boss_ancient_regail : public CreatureScript
                 events.Update(diff);
 
                 // Misdirection exploit
-                if (CombatDelayDone && !ProtectorsInCombat(me->GetEntry(), me->GetGUID()))
+                if (CombatDelayDone && !ProtectorsInCombat(me, me->GetEntry(), me->GetGUID()))
                     EnterEvadeMode();
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -917,7 +917,7 @@ class boss_ancient_asani : public CreatureScript
                     return;
 
                 // Misdirection exploit
-                if (CombatDelayDone && !ProtectorsInCombat(me->GetEntry(), me->GetGUID()))
+                if (CombatDelayDone && !ProtectorsInCombat(me, me->GetEntry(), me->GetGUID()))
                     EnterEvadeMode();
 
                 events.Update(diff);
@@ -995,14 +995,14 @@ class boss_ancient_asani : public CreatureScript
                     tmpTargets.remove_if([=](Creature* target) { return !target->IsAlive(); });
 
                     if (tmpTargets.empty())
-                        return 0;
+                        return ObjectGuid::Empty;
 
                     tmpTargets.sort(Trinity::HealthPctOrderPred());
 
                     if (Creature* lowestTarget = tmpTargets.front())
                         return lowestTarget->GetGUID();
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
 
                 bool HandleRescheduleEventsIfCastAny(uint32 eventId)
@@ -1251,7 +1251,7 @@ class boss_protector_kaolan : public CreatureScript
                     return;
 
                 // Misdirection exploit
-                if (CombatDelayDone && !ProtectorsInCombat(me->GetEntry(), me->GetGUID()))
+                if (CombatDelayDone && !ProtectorsInCombat(me, me->GetEntry(), me->GetGUID()))
                     EnterEvadeMode();
 
                 events.Update(diff);

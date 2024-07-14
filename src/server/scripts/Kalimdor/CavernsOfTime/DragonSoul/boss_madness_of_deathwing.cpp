@@ -636,13 +636,13 @@ class boss_madness_of_deathwing : public CreatureScript
                             break;
                         case EVENT_SPAWN_LIMBS_2:
                             for (uint8 i = 0; i < 4; ++i)
-                                if (Creature* pLimb = sObjectAccessor->GetCreature(*me, limbsGuids[i]))
+                                if (Creature* pLimb = ObjectAccessor::GetCreature(*me, limbsGuids[i]))
                                     pLimb->CastSpell(pLimb, SPELL_LIMB_EMERGE_VISUAL, true);
                             events.ScheduleEvent(EVENT_SPAWN_LIMBS_3, 500);
                             break;
                         case EVENT_SPAWN_LIMBS_3:
                             for (uint8 i = 0; i < 4; ++i)
-                                if (Creature* pLimb = sObjectAccessor->GetCreature(*me, limbsGuids[i]))
+                                if (Creature* pLimb = ObjectAccessor::GetCreature(*me, limbsGuids[i]))
                                     pLimb->SendPlaySpellVisualKit(22446, 0, 0);
                             events.ScheduleEvent(EVENT_ASSAULT_ASPECTS, 2000);
                             break;
@@ -658,7 +658,7 @@ class boss_madness_of_deathwing : public CreatureScript
                             switch (m_current_platform)
                             {
                                 case 1:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                         pAspect->AI()->Talk(SAY_ALEXSTRASZA_PLATFORM);
                                     if (!m_chromaticChampionCreditCriteria)
                                     {
@@ -668,7 +668,7 @@ class boss_madness_of_deathwing : public CreatureScript
                                     Talk(ANN_ATTACK_ALEXSTRASZA);
                                     break;
                                 case 2:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                         pAspect->AI()->Talk(SAY_NOZDORMU_PLATFORM);
                                     if (!m_chromaticChampionCreditCriteria)
                                     {
@@ -678,7 +678,7 @@ class boss_madness_of_deathwing : public CreatureScript
                                     Talk(ANN_ATTACK_NOZDORMU);
                                     break;
                                 case 3:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                         pAspect->AI()->Talk(SAY_YSERA_PLATFORM);
                                     if (!m_chromaticChampionCreditCriteria)
                                     {
@@ -688,7 +688,7 @@ class boss_madness_of_deathwing : public CreatureScript
                                      Talk(ANN_ATTACK_YSERA);
                                     break;
                                 case 4:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                         pAspect->AI()->Talk(SAY_KALECGOS_PLATFORM);
                                     if (!m_chromaticChampionCreditCriteria)
                                     {
@@ -702,7 +702,7 @@ class boss_madness_of_deathwing : public CreatureScript
                             if (Creature* pLimb = this->GetLimbTentacleAtPlatform(m_current_platform))
                                 pLimb->AI()->DoAction(m_isFirst ? ACTION_ASSAULT_ASPECTS_FIRST : ACTION_ASSAULT_ASPECTS);
 
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 pAspect->AI()->DoAction(ACTION_TIME_ZONE);
 
                             events.ScheduleEvent(EVENT_ELEMENTIUM_BOLT, m_isFirst ? (40500 - 10000) : (55500 - 10000));
@@ -726,7 +726,7 @@ class boss_madness_of_deathwing : public CreatureScript
                             switch (m_current_platform)
                             {
                                 case 1:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                     {
                                         pAspect->AI()->Talk(SAY_ALEXSTRASZA_CATACLYSM);
                                         if (pLimb)
@@ -734,7 +734,7 @@ class boss_madness_of_deathwing : public CreatureScript
                                     }
                                     break;
                                 case 2:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                     {
                                         pAspect->AI()->Talk(SAY_NOZDORMU_CATACLYSM);
                                         if (pLimb)
@@ -742,7 +742,7 @@ class boss_madness_of_deathwing : public CreatureScript
                                     }
                                     break;
                                 case 3:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                     {
                                         pAspect->AI()->Talk(SAY_YSERA_CATACLYSM);
                                         if (pLimb)
@@ -750,7 +750,7 @@ class boss_madness_of_deathwing : public CreatureScript
                                     }
                                     break;
                                 case 4:
-                                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                     {
                                         pAspect->AI()->Talk(SAY_KALECGOS_CATACLYSM);
                                         if (pLimb)
@@ -765,7 +765,7 @@ class boss_madness_of_deathwing : public CreatureScript
                             Talk(SAY_DEATHWING_PHASE);
                             Talk(ANN_SECOND_PHASE);
                             DoCast(SPELL_SLUMP_1);
-                            if (Creature* pThrall = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_THRALL_MADNESS)))
+                            if (Creature* pThrall = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THRALL_MADNESS)))
                                 pThrall->AI()->DoAction(ACTION_SECOND_PHASE);
                             events.ScheduleEvent(EVENT_SLUMP_2, 700);
                             break;
@@ -809,7 +809,7 @@ class boss_madness_of_deathwing : public CreatureScript
             }
 
         private:
-            uint64 limbsGuids[4];
+            ObjectGuid limbsGuids[4];
             uint8 m_current_platform;
             uint8 m_destroyed_platform;
             bool m_isFirst;
@@ -979,13 +979,13 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_ASPECTS_FACING:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->SetFacingTo(5.06145f);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 pAspect->SetFacingTo(5.42797f);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                 pAspect->SetFacingTo(5.75959f);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                 pAspect->SetFacingTo(5.84685f);
                             break;
                         case EVENT_TAKE_DRAGON_SOUL:
@@ -1002,17 +1002,17 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                             events.ScheduleEvent(EVENT_ALEXTRASZA_INTRO_1, 10000);
                             break;
                         case EVENT_ALEXTRASZA_INTRO_1:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->AI()->Talk(SAY_ALEXSTRASZA_INTRO_1);
                             events.ScheduleEvent(EVENT_ALEXTRASZA_INTRO_2, 8000);
                             break;
                         case EVENT_ALEXTRASZA_INTRO_2:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->AI()->Talk(SAY_ALEXSTRASZA_INTRO_2);
                             events.ScheduleEvent(EVENT_NOZDORMU_INTRO, 11000);
                             break;
                         case EVENT_NOZDORMU_INTRO:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 pAspect->AI()->Talk(SAY_NOZDORMU_INTRO);
                             break;
                         case EVENT_MOVE_THRALL:
@@ -1042,25 +1042,25 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                             }
                             break;
                         case EVENT_ASPECTS_MOVE:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                             {
                                 pAspect->InterruptNonMeleeSpells(true);
                                 pAspect->GetMotionMaster()->MovePoint(0, aspectsMadness[0]);
                                 pAspect->SetHomePosition(aspectsMadness[0]);
                             }
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                             {
                                 pAspect->InterruptNonMeleeSpells(true);
                                 pAspect->GetMotionMaster()->MovePoint(0, aspectsMadness[1]);
                                 pAspect->SetHomePosition(aspectsMadness[1]);
                             }
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                             {
                                 pAspect->InterruptNonMeleeSpells(true);
                                 pAspect->GetMotionMaster()->MovePoint(0, aspectsMadness[2]);
                                 pAspect->SetHomePosition(aspectsMadness[2]);
                             }
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                             {
                                 pAspect->InterruptNonMeleeSpells(true);
                                 pAspect->GetMotionMaster()->MovePoint(0, aspectsMadness[3]);
@@ -1069,22 +1069,22 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                             events.ScheduleEvent(RAND(EVENT_ALEXTRASZA_PHASE_TWO,EVENT_NOZDORMU_SECOND_PHASE,EVENT_YSERA_SECOND_PHASE,EVENT_KALECGOS_SECOND_PHASE), 16000);
                             break;
                         case EVENT_ALEXTRASZA_PHASE_TWO:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->AI()->Talk(SAY_ALEXSTRASZA_PHASE_TWO);
                             events.ScheduleEvent(EVENT_THRALL_SECOND_PHASE, 16000);
                             break;
                         case EVENT_NOZDORMU_SECOND_PHASE:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 pAspect->AI()->Talk(SAY_NOZDORMU_SECOND_PHASE);
                             events.ScheduleEvent(EVENT_THRALL_SECOND_PHASE, 16000);
                             break;
                         case EVENT_YSERA_SECOND_PHASE:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                 pAspect->AI()->Talk(SAY_YSERA_SECOND_PHASE);
                             events.ScheduleEvent(EVENT_THRALL_SECOND_PHASE, 16000);
                             break;
                         case EVENT_KALECGOS_SECOND_PHASE:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                 pAspect->AI()->Talk(SAY_KALECGOS_SECOND_PHASE);
                             events.ScheduleEvent(EVENT_THRALL_SECOND_PHASE, 16000);
                             break;
@@ -1095,25 +1095,25 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                         case EVENT_END_BATTLE:
                             ResetBattle(true);
                             DoCastAOE(SPELL_THRALL_HOVER);
-                            if (Creature* pDeathwing = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_DEATHWING)))
+                            if (Creature* pDeathwing = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DEATHWING)))
                                 pDeathwing->CastSpell(pDeathwing, SPELL_SLUMP_2);
                             events.ScheduleEvent(EVENT_THRALL_JUMP, 3000);
                             events.ScheduleEvent(RAND(EVENT_ALEXTRASZA_OUTRO,EVENT_NOZDORMU_OUTRO,EVENT_YSERA_OUTRO,EVENT_KALECGOS_OUTRO), 3000);
                             break;
                         case EVENT_ALEXTRASZA_OUTRO:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->AI()->Talk(SAY_ALEXSTRASZA_OUTRO);
                             break;
                         case EVENT_NOZDORMU_OUTRO:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 pAspect->AI()->Talk(SAY_NOZDORMU_OUTRO);
                             break;
                         case EVENT_YSERA_OUTRO:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                 pAspect->AI()->Talk(SAY_YSERA_OUTRO);
                             break;
                         case EVENT_KALECGOS_OUTRO:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                 pAspect->AI()->Talk(SAY_KALECGOS_OUTRO);
                             break;
                         case EVENT_THRALL_JUMP:
@@ -1130,29 +1130,29 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                             events.ScheduleEvent(EVENT_DS_CHARGING_2, 2000);
                             break;
                         case EVENT_DS_CHARGING_2:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->CastSpell(me, SPELL_CHARDE_DRAGON_SOUL_RED);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 pAspect->CastSpell(me, SPELL_CHARDE_DRAGON_SOUL_YELLOW);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                 pAspect->CastSpell(me, SPELL_CHARDE_DRAGON_SOUL_GREEN);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                 pAspect->CastSpell(me, SPELL_CHARDE_DRAGON_SOUL_BLUE);
                             events.ScheduleEvent(EVENT_DS_CHARGING_3, 11000);
                             break;
                         case EVENT_DS_CHARGING_3:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->InterruptNonMeleeSpells(true);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 pAspect->InterruptNonMeleeSpells(true);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                 pAspect->InterruptNonMeleeSpells(true);
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                 pAspect->InterruptNonMeleeSpells(true);
                             events.ScheduleEvent(EVENT_DEATHWING_EXPLOSION, 3500);
                             break;
                         case EVENT_DEATHWING_EXPLOSION:
-                            if (Creature* pDeathwing = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_DEATHWING)))
+                            if (Creature* pDeathwing = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DEATHWING)))
                                 pDeathwing->CastSpell(pDeathwing, SPELL_DEATHWING_DEATH);
                             events.ScheduleEvent(EVENT_DEATHWING_SKYBOX, 5000);
                             break;
@@ -1227,7 +1227,7 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                 if (instance->GetBossState(DATA_MADNESS) != DONE)
                 {
                     events.ScheduleEvent(EVENT_ASPECTS_FACING, 7500);
-                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                     {
                         pAspect->Respawn(true);
                         pAspect->GetMotionMaster()->MovePoint(0, alexstraszaPos);
@@ -1236,7 +1236,7 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                         pAspect->AddAura(52455, pAspect);
                         pAspect->AI()->DoAction(ACTION_RESET_BATTLE);
                     }
-                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                     {
                         pAspect->Respawn(true);
                         pAspect->GetMotionMaster()->MovePoint(0, nozdormuPos);
@@ -1245,7 +1245,7 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                         pAspect->AddAura(52455, pAspect);
                         pAspect->AI()->DoAction(ACTION_RESET_BATTLE);
                     }
-                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                     {
                         pAspect->Respawn(true);
                         pAspect->GetMotionMaster()->MovePoint(0, yseraPos);
@@ -1255,7 +1255,7 @@ class npc_dragon_soul_thrall_1 : public CreatureScript
                         pAspect->AddAura(52455, pAspect);
                         pAspect->AI()->DoAction(ACTION_RESET_BATTLE);
                     }
-                    if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                    if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                     {
                         pAspect->Respawn(true);
                         pAspect->GetMotionMaster()->MovePoint(0, kalecgosPos);
@@ -1426,16 +1426,16 @@ class npc_madness_of_deathwing_mutated_corruption : public CreatureScript
                                             switch (platform)
                                             {
                                                 case 1: 
-                                                    pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON));
+                                                    pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON));
                                                     break;
                                                 case 2: 
-                                                    pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON));
+                                                    pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON));
                                                     break;
                                                 case 3: 
-                                                    pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON));
+                                                    pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON));
                                                     break;
                                                 case 4: 
-                                                    pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON));
+                                                    pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON));
                                                     break;
                                             }
 
@@ -1612,19 +1612,19 @@ class npc_madness_of_deathwing_limb_tentacle : public CreatureScript
                     switch (m_current_platform)
                     {
                         case 1:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 DoCast(pAspect, SPELL_TRIGGER_CONCENTRATION, true);
                             break;
                         case 2:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_NOZDORMU_DRAGON)))
                                 DoCast(pAspect, SPELL_TRIGGER_CONCENTRATION, true);
                             break;
                         case 3:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_YSERA_DRAGON)))
                                 DoCast(pAspect, SPELL_TRIGGER_CONCENTRATION, true);
                             break;
                         case 4:
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KALECGOS_DRAGON)))
                                 DoCast(pAspect, SPELL_TRIGGER_CONCENTRATION, true);
                             break;
                     }
@@ -1661,7 +1661,7 @@ class npc_madness_of_deathwing_limb_tentacle : public CreatureScript
                             me->SummonCreature(NPC_BLISTERING_TENTACLE, blisteringPos[m_current_platform]);
 
                         if (instance)
-                            if (Creature* pAspect = sObjectAccessor->GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
+                            if (Creature* pAspect = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ALEXSTRASZA_DRAGON)))
                                 pAspect->AI()->DoAction(ACTION_CAUTERIZE);
                             
                     }

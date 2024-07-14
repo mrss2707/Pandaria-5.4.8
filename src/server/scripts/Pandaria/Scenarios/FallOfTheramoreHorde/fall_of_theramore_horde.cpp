@@ -194,14 +194,14 @@ struct theramore_guard_typeAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_KNIGHT_OF_THERAMORE, 80.0f);
 
         if (tmpTargets.empty())
-            return 0;
+            return ObjectGuid::Empty;
 
         tmpTargets.sort(Trinity::HealthPctOrderPred());
 
         if (Creature* lowestTarget = tmpTargets.front())
             return lowestTarget->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 };
 
@@ -808,7 +808,7 @@ class npc_big_bessa : public CreatureScript
             }
 
             private:
-                uint64 GetNextFixateTarget()
+                ObjectGuid GetNextFixateTarget()
                 {
                     std::list<Player*> pList;
                     GetPlayerListInGrid(pList, me, 150.0f);
@@ -819,7 +819,7 @@ class npc_big_bessa : public CreatureScript
                     if (!pList.empty())
                         return Trinity::Containers::SelectRandomContainerElement(pList)->GetGUID();
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
 
         };

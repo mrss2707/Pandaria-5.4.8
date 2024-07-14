@@ -31,8 +31,8 @@ class instance_fall_of_theramore_horde : public InstanceMapScript
             instance_fall_of_theramore_horde_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
             uint32 m_auiEncounter[CHAPTERS];
-            std::map<uint32, uint64> TheramoreEncounters;
-            std::list<uint64> guardGUIDs;
+            std::map<uint32, ObjectGuid> TheramoreEncounters;
+            std::list<ObjectGuid> guardGUIDs;
             uint32 chapterOne, chapterTwo, chapterThree, chapterFour, chapterFive, barrelsExplode, gryponsDied, baldrucDied, tanksDestoyed, bigBessaDied, hedricDied;
             uint32 captainsSlain;
             EventMap m_mEvents;
@@ -270,7 +270,7 @@ class instance_fall_of_theramore_horde : public InstanceMapScript
                         return TheramoreEncounters.find(type)->second;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

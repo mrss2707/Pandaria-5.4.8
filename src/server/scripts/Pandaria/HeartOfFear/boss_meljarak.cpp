@@ -147,9 +147,9 @@ enum Misc
     WORLD_STATE_ACHIEVEMENT_LESS_THAN_THREE = 12003,
 };
 
-void SetEncounterUnitForEachGroup(uint64 ownerGUID, InstanceScript* _instance, uint32 type, uint32 diffType = 0)
+void SetEncounterUnitForEachGroup(Creature* me, ObjectGuid ownerGUID, InstanceScript* _instance, uint32 type, uint32 diffType = 0)
 {
-    Unit* owner = ObjectAccessor::FindUnit(ownerGUID);
+    Unit* owner = ObjectAccessor::GetUnit(*me, ownerGUID);
 
     if (!owner)
         return;
@@ -198,7 +198,7 @@ class boss_wind_lord_meljarak : public CreatureScript
             bool WindBomb, HasReck;
             uint32 recklessnessCounter, delay;
             uint32 _checkControlledTimer = 1000;
-            uint64 targetGUID, strikeTargetGUID;
+            ObjectGuid targetGUID, strikeTargetGUID;
             std::map <uint32, uint32> groupDict;
 
             void Reset() override
@@ -213,7 +213,7 @@ class boss_wind_lord_meljarak : public CreatureScript
                 if (instance)
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                    SetEncounterUnitForEachGroup(me->GetGUID(), instance, ENCOUNTER_FRAME_DISENGAGE);
+                    SetEncounterUnitForEachGroup(me, me->GetGUID(), instance, ENCOUNTER_FRAME_DISENGAGE);
                     instance->DoRemoveBloodLustDebuffSpellOnPlayers();
                 }
                 WindBomb            = false;
@@ -250,7 +250,7 @@ class boss_wind_lord_meljarak : public CreatureScript
                 _EnterEvadeMode();
                 BossAI::EnterEvadeMode();
 
-                SetEncounterUnitForEachGroup(me->GetGUID(), instance, ENCOUNTER_FRAME_DISENGAGE);
+                SetEncounterUnitForEachGroup(me, me->GetGUID(), instance, ENCOUNTER_FRAME_DISENGAGE);
                 HandleResetSpears();
                 RemoveTraps();
 
@@ -302,7 +302,7 @@ class boss_wind_lord_meljarak : public CreatureScript
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
                     instance->SetBossState(DATA_MELJARAK, IN_PROGRESS);
-                    SetEncounterUnitForEachGroup(me->GetGUID(), instance, ENCOUNTER_FRAME_ENGAGE);
+                    SetEncounterUnitForEachGroup(me, me->GetGUID(), instance, ENCOUNTER_FRAME_ENGAGE);
                 }
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_WHIRLING_BLADE, 18000);
@@ -407,7 +407,7 @@ class boss_wind_lord_meljarak : public CreatureScript
                 if (instance)
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                    SetEncounterUnitForEachGroup(me->GetGUID(), instance, ENCOUNTER_FRAME_DISENGAGE);
+                    SetEncounterUnitForEachGroup(me, me->GetGUID(), instance, ENCOUNTER_FRAME_DISENGAGE);
                     instance->SetBossState(DATA_MELJARAK, DONE);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_IMP_SPEAR_ABIL);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CORROSIVE_RESIN);
@@ -558,7 +558,7 @@ class boss_wind_lord_meljarak : public CreatureScript
                     }
                 }
 
-                void EliteBattleMastersCastStrike(uint64 targetGUID)
+                void EliteBattleMastersCastStrike(ObjectGuid targetGUID)
                 {
                     Unit* m_target = ObjectAccessor::GetUnit(*me, targetGUID);
 
@@ -1232,7 +1232,7 @@ class npc_swarm_spawner_heroic : public CreatureScript
                             // Send new frame for group
                             if (Creature* Meljarak = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MELJARAK)))
                             {
-                                SetEncounterUnitForEachGroup(Meljarak->GetGUID(), instance, ENCOUNTER_FRAME_ENGAGE, SwarmType);
+                                SetEncounterUnitForEachGroup(me, Meljarak->GetGUID(), instance, ENCOUNTER_FRAME_ENGAGE, SwarmType);
                                 Meljarak->AI()->DoAction(SwarmType + 5);
                             }
                             break;
@@ -1633,10 +1633,10 @@ class WhirlingBladePredicate
         {
             if (object && object->ToPlayer())
             {
-                if (_caster->AI()->GetData(object->ToPlayer()->GetGUIDLow()))
+                if (_caster->AI()->GetData(object->ToPlayer()->GetGUID().GetCounter()))
                     return true;
 
-                _caster->AI()->SetData(TYPE_WHIRLING_BLADE, object->ToPlayer()->GetGUIDLow());
+                _caster->AI()->SetData(TYPE_WHIRLING_BLADE, object->ToPlayer()->GetGUID().GetCounter());
                 return false;
             }
 

@@ -797,7 +797,7 @@ class boss_durumu : public CreatureScript
                     // Yellow Eye
                     if (Creature* eyeStatic = me->SummonCreature(NPC_YELLOW_EYE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
                     {
-                        eyeStatic->AI()->SetGUID(0, 10 * IN_MILLISECONDS);
+                        eyeStatic->AI()->SetGUID(ObjectGuid::Empty, 10 * IN_MILLISECONDS);
 
                         if (Player* target = pList.front())
                         {
@@ -814,7 +814,7 @@ class boss_durumu : public CreatureScript
                     // Red Eye
                     if (Creature* eyeStatic = me->SummonCreature(NPC_RED_EYE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
                     {
-                        eyeStatic->AI()->SetGUID(0, 10 * IN_MILLISECONDS);
+                        eyeStatic->AI()->SetGUID(ObjectGuid::Empty, 10 * IN_MILLISECONDS);
 
                         if (Player* target = pList.front())
                         {
@@ -835,7 +835,7 @@ class boss_durumu : public CreatureScript
                     // Blue Eye
                     if (Creature* eyeStatic = me->SummonCreature(NPC_BLUE_EYE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
                     {
-                        eyeStatic->AI()->SetGUID(0, 10 * IN_MILLISECONDS);
+                        eyeStatic->AI()->SetGUID(ObjectGuid::Empty, 10 * IN_MILLISECONDS);
 
                         if (Player* target = pList.front())
                         {
@@ -897,7 +897,7 @@ class boss_durumu : public CreatureScript
                 void UpdateOrientation()
                 {
                     std::list<Creature*> beamTarList;
-                    uint64 tarGuid = 0;
+                    ObjectGuid tarGuid = ObjectGuid::Empty;
                     if (Unit* Beam = me->GetFirstMinionByEntry(NPC_YELLOW_EYE_MOVER))
                         tarGuid = Beam->GetGUID();
 
@@ -1118,7 +1118,7 @@ struct npc_durumu_fog_achievement : public ScriptedAI
             case ACTION_FOG_ACTIVATE:
                 me->SetVisible(true);
 
-                if (Creature* durumu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_DURUMU_THE_FORGOTTEN) : 0))
+                if (Creature* durumu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : ObjectGuid::Empty))
                     durumu->AI()->DoAction(me->GetEntry());
                 break;
             case ACTION_FOG_DEACTIVATE:
@@ -1141,7 +1141,7 @@ struct npc_eyebeam_target : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* durumu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_DURUMU_THE_FORGOTTEN) : 0))
+        if (Creature* durumu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : ObjectGuid::Empty))
             durumu->AI()->JustSummoned(me);
 
         byDurumu = summoner->GetEntry() == NPC_DURUMU_THE_FORGOTTEN ? true : false;
@@ -1278,7 +1278,7 @@ struct npc_durumu_eye : public ScriptedAI
             me->GetMotionMaster()->MovePoint(0, position);
     }
 
-    uint64 SelectBeamTargetGuid()
+    ObjectGuid SelectBeamTargetGuid()
     {
         if (me->GetEntry() == NPC_YELLOW_EYE)
         {
@@ -1298,7 +1298,7 @@ struct npc_durumu_eye : public ScriptedAI
                     return itr->GetGUID();
         }
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 
     void TrySearchFogs()
@@ -1765,7 +1765,7 @@ class spell_focus_beam_precast : public AuraScript
             {
                 if (caster->ToCreature())
                 {
-                    caster->ToCreature()->AI()->SetGUID(0, aurEff->GetBase()->GetDuration());
+                    caster->ToCreature()->AI()->SetGUID(ObjectGuid::Empty, aurEff->GetBase()->GetDuration());
                     caster->ToCreature()->AI()->DoAction(ACTION_SWITCH_BEAM_TARGET);
                 }
 
@@ -2166,7 +2166,7 @@ class sat_maze : public IAreaTriggerAura
 
         if (AreaTrigger* at = GetAreaTrigger())
         {
-            if (Creature* durumu = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : 0))
+            if (Creature* durumu = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : ObjectGuid::Empty))
             {
                 switch (at->GetEntry())
                 {

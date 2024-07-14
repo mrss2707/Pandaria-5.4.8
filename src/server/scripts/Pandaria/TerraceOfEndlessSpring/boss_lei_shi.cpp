@@ -148,7 +148,7 @@ class boss_lei_shi : public CreatureScript
             uint8 nextAfraidPct;
             uint8 nextProtectPct;
             uint8 endCombatPct;
-            std::list<uint64> animatedProtectors;
+            std::list<ObjectGuid> animatedProtectors;
             bool hidden;
             bool shielded;
             bool getAwayPhase;
@@ -997,7 +997,7 @@ class npc_lei_shi_hidden : public CreatureScript
                             break;
                         }
 
-                        uint64 leiShiGuid = 0;
+                        ObjectGuid leiShiGuid = ObjectGuid::Empty;
 
                         if (instance)
                             leiShiGuid = instance->GetGuidData(NPC_LEI_SHI);
@@ -1078,7 +1078,7 @@ class npc_lei_shi_reflection : public CreatureScript
                             events.ScheduleEvent(EVENT_APPEAR, 10000);
                             break;
                         case EVENT_APPEAR:
-                            if (Creature* pLeiShi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_LEI_SHI) : 0))
+                            if (Creature* pLeiShi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_LEI_SHI) : ObjectGuid::Empty))
                             {
                                 Talk(EMOTE_APPEAR, pLeiShi);
 
@@ -1137,7 +1137,7 @@ struct npc_parasitoid_sha : public ScriptedAI
         {
             DoCast(*players.begin(), SPELL_PARASITIC_CLUTCH);
             if (me->GetInstanceScript())
-                if (Creature* leiShi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData(DATA_LEI_SHI)))
+                if (Creature* leiShi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_LEI_SHI)))
                     if (auto ai = dynamic_cast<boss_lei_shi::boss_lei_shiAI*>(leiShi->AI()))
                         ai->EnforceParasitoidSpawn(spawnLocation);
         }

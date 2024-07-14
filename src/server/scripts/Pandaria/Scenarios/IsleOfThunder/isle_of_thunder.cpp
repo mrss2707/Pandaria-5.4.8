@@ -387,7 +387,7 @@ class npc_shaolmara_lady_jaina : public CreatureScript
                 {
                     // @Todo - complete Scenario credit
 
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                         target->TeleportTo(1064, 6147.86f, 5035.56f, 36.89f, 0.0f, 0);
                 });
             }
@@ -456,7 +456,7 @@ struct npc_shaolmara_player_covenant_hippogryph : public ScriptedAI
                 me->GetVehicleKit()->GetPassenger(0)->ExitVehicle();
 
             // Start next scenario step
-            if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_VEREESA_WINDRUNNER) : 0))
+            if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_VEREESA_WINDRUNNER) : ObjectGuid::Empty))
                 vereesa->AI()->DoAction(ACTION_FLY_FALL);
 
             me->DisappearAndDie();
@@ -575,7 +575,7 @@ struct npc_shaolmara_vereesa_windrunner : public ScriptedAI
             case ACTION_FLY_FALL:
                 scheduler.Schedule(Milliseconds(2000), [this](TaskContext context)
                 {
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                         me->GetMotionMaster()->MovePoint(0, *target);
 
                     Talk(TALK_SPECIAL_8);
@@ -714,7 +714,7 @@ struct npc_shaolmara_vereesa_windrunner : public ScriptedAI
                     me->SummonCreature(NPC_LADY_JAINA_GUNSHIP, jainaSummPoint, TEMPSUMMON_MANUAL_DESPAWN);
                     break;
                 case EVENT_MISC + 3:
-                    if (Creature* arcanital = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_ARCANITAL_MARAKAH) : 0))
+                    if (Creature* arcanital = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_ARCANITAL_MARAKAH) : ObjectGuid::Empty))
                     {
                         arcanital->SetVisible(true);
                         arcanital->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -763,7 +763,7 @@ struct npc_shaolmara_beastcaller : public customCreatureAI
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_PC);
 
-            if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA):0))
+            if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                 SetGazeOn(target);
         });
     }
@@ -833,7 +833,7 @@ struct npc_shaolmara_raptor : public customCreatureAI
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_PC);
 
-            if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+            if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                 SetGazeOn(target);
         });
     }
@@ -898,7 +898,7 @@ struct npc_arcanital_marakah : public customCreatureAI
 
         Talk(TALK_INTRO);
 
-        if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_VEREESA_WINDRUNNER) : 0))
+        if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_VEREESA_WINDRUNNER) : ObjectGuid::Empty))
             vereesa->AI()->DoAction(ACTION_SURPRISED);
 
         scheduler
@@ -918,7 +918,7 @@ struct npc_arcanital_marakah : public customCreatureAI
             if (me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(STEP_SURVIVE_THE_AMBUSH, DONE);
 
-            if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_VEREESA_WINDRUNNER) : 0))
+            if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_VEREESA_WINDRUNNER) : ObjectGuid::Empty))
                 vereesa->AI()->DoAction(ACTION_AMBUSH_PREVENTED);
         });
     }
@@ -946,7 +946,7 @@ struct npc_arcanital_marakah : public customCreatureAI
     {
         me->RemoveAllAreasTrigger();
 
-        if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_VEREESA_WINDRUNNER) : 0))
+        if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_VEREESA_WINDRUNNER) : ObjectGuid::Empty))
             vereesa->AI()->DoAction(ACTION_MARAKAH_DEFEATED);
 
         if (me->GetInstanceScript())
@@ -1056,7 +1056,7 @@ struct npc_shaolmara_beastcaller_pakutesh : public customCreatureAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_VEREESA_WINDRUNNER) : 0))
+        if (Creature* vereesa = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_VEREESA_WINDRUNNER) : ObjectGuid::Empty))
             vereesa->AI()->DoAction(ACTION_ANKI_DEFEAT);
     }
 
@@ -1110,7 +1110,7 @@ struct barricadeBaseAI : public customCreatureAI
                 }
                 break;
             case ACTION_START_ASSAULT:
-                if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+                if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
                     me->GetMotionMaster()->MoveJump(*taranZhu, 20.0f, 15.0f);
                 break;
         }
@@ -1197,7 +1197,7 @@ struct npc_shaolmara_zandalari_barricade : public barricadeBaseAI
         {
             if (eventId == EVENT_LAUNCH_SPEAR)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     DoCast(target, SPELL_LAUNCH_SPEAR);
 
                 events.ScheduleEvent(EVENT_LAUNCH_SPEAR, urand(4 * IN_MILLISECONDS, 8 * IN_MILLISECONDS));
@@ -1349,7 +1349,7 @@ class npc_zebtula_lorthemar_theron : public CreatureScript
                 scheduler.Schedule(Milliseconds(delay += 8000), [this](TaskContext context)
                 {
                     // @Todo - complete Scenario credit
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                         target->TeleportTo(1064, 7171.65f, 6294.49f, 12.46f, 2.09f, 0);
                 });
             }
@@ -1418,7 +1418,7 @@ struct npc_zebtula_player_bloodhawk : public ScriptedAI
                 me->GetVehicleKit()->GetPassenger(0)->ExitVehicle();
 
             // Start next scenario step
-            if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SCOUT_CAPTAIN_ELSIA) : 0))
+            if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SCOUT_CAPTAIN_ELSIA) : ObjectGuid::Empty))
                 elsia->AI()->DoAction(ACTION_FLY_FALL);
 
             me->DisappearAndDie();
@@ -1534,7 +1534,7 @@ struct npc_zebtula_scout_captain_elsia : public ScriptedAI
             {
                 scheduler.Schedule(Milliseconds(2100), [this](TaskContext context)
                 {
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                         me->GetMotionMaster()->MovePoint(0, *target);
 
                     Talk(TALK_SPECIAL_8);
@@ -1680,7 +1680,7 @@ struct npc_zebtula_scout_captain_elsia : public ScriptedAI
                     me->SummonCreature(NPC_LORTHEMAR_THERON, lortemarSummPoint, TEMPSUMMON_MANUAL_DESPAWN);
                     break;
                 case EVENT_MISC + 3:
-                    if (Creature* arcanital = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_ARCANITAL_TULACHEK) : 0))
+                    if (Creature* arcanital = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_ARCANITAL_TULACHEK) : ObjectGuid::Empty))
                     {
                         arcanital->SetVisible(true);
                         arcanital->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -1720,7 +1720,7 @@ struct npc_arcanital_tulachek : public customCreatureAI
 
         Talk(TALK_INTRO);
 
-        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SCOUT_CAPTAIN_ELSIA) : 0))
+        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SCOUT_CAPTAIN_ELSIA) : ObjectGuid::Empty))
             elsia->AI()->DoAction(ACTION_SURPRISED);
 
         scheduler
@@ -1745,7 +1745,7 @@ struct npc_arcanital_tulachek : public customCreatureAI
             if (me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(STEP_SURVIVE_THE_AMBUSH, DONE);
 
-            if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SCOUT_CAPTAIN_ELSIA) : 0))
+            if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SCOUT_CAPTAIN_ELSIA) : ObjectGuid::Empty))
                 elsia->AI()->DoAction(ACTION_AMBUSH_PREVENTED);
         });
     }
@@ -1776,7 +1776,7 @@ struct npc_arcanital_tulachek : public customCreatureAI
 
         Talk(TALK_SPECIAL_5);
 
-        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SCOUT_CAPTAIN_ELSIA) : 0))
+        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SCOUT_CAPTAIN_ELSIA) : ObjectGuid::Empty))
             elsia->AI()->DoAction(ACTION_MARAKAH_DEFEATED);
 
         if (me->GetInstanceScript())
@@ -1813,7 +1813,7 @@ struct npc_zebtula_kresh_the_reaper : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+        if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
             me->GetMotionMaster()->MoveJump(*target, 20.0f, 15.0f);
     }
 
@@ -1829,7 +1829,7 @@ struct npc_zebtula_kresh_the_reaper : public customCreatureAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SCOUT_CAPTAIN_ELSIA) : 0))
+        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SCOUT_CAPTAIN_ELSIA) : ObjectGuid::Empty))
             elsia->AI()->DoAction(ACTION_ANKI_DEFEAT);
     }
 
@@ -1924,7 +1924,7 @@ class npc_teardown_scout_captain_elsia : public CreatureScript
                         if (me->GetInstanceScript())
                             me->GetInstanceScript()->SetData(STEP_SEND_EXPLOSIVE, DONE);
 
-                        if (Creature* alchukla = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_WARGOD_ALCHUKLA + 1) : 0))
+                        if (Creature* alchukla = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_WARGOD_ALCHUKLA + 1) : ObjectGuid::Empty))
                             alchukla->AI()->DoAction(ACTION_START_INTRO);
 
                         scheduler
@@ -1932,7 +1932,7 @@ class npc_teardown_scout_captain_elsia : public CreatureScript
                         {
                             me->SummonCreature(NPC_HEAVY_EXPLOSIVES, *me, TEMPSUMMON_MANUAL_DESPAWN);
 
-                            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                                 me->SetFacingToObject(target);
 
                             Talk(TALK_SPECIAL_2);
@@ -1958,7 +1958,7 @@ class npc_teardown_scout_captain_elsia : public CreatureScript
                         scheduler
                             .Schedule(Milliseconds(me->GetSplineDuration()), [this](TaskContext context)
                         {
-                            if (Creature* alchukla = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_WARGOD_ALCHUKLA) : 0))
+                            if (Creature* alchukla = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_WARGOD_ALCHUKLA) : ObjectGuid::Empty))
                             {
                                 alchukla->SetVisible(true);
                                 alchukla->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -2003,7 +2003,7 @@ struct npc_teardown_heavy_explosives : public ScriptedAI
         scheduler
             .Schedule(Milliseconds(delay), [this](TaskContext context)
         {
-            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                 target->CastSpell(target, SPELL_LAUNCH_WALL_SCENE, true);
         });
 
@@ -2012,7 +2012,7 @@ struct npc_teardown_heavy_explosives : public ScriptedAI
         {
             DoCast(me, SPELL_WALL_EXPLOSIVE, true);
 
-            if (GameObject* wall = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(GO_TEAR_DOWN_DESTRUCT_WALL) : 0))
+            if (GameObject* wall = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(GO_TEAR_DOWN_DESTRUCT_WALL) : ObjectGuid::Empty))
                 wall->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
 
             me->DespawnOrUnsummon();
@@ -2049,7 +2049,7 @@ struct npc_teardown_lorthemar_therone : public ScriptedAI
             scheduler
                 .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
             {
-                if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA + 1) : 0))
+                if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA + 1) : ObjectGuid::Empty))
                     elsia->AI()->Talk(TALK_SPECIAL_5);
             });
 
@@ -2107,7 +2107,7 @@ struct npc_wargod_alchukla : public customCreatureAI
         Talk(TALK_SPECIAL_2);
         events.ScheduleEvent(EVENT_LIGHTNING_POLE, urand(3.5 * IN_MILLISECONDS, 5 * IN_MILLISECONDS));
 
-        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA + 1) : 0))
+        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA + 1) : ObjectGuid::Empty))
             elsia->AI()->Talk(TALK_SPECIAL_4);
     }
 
@@ -2160,7 +2160,7 @@ struct npc_wargod_alchukla : public customCreatureAI
     }
 
     private:
-        uint64 getAnyEnemyGUID()
+        ObjectGuid getAnyEnemyGUID()
         {
             std::list<Creature*> unitList;
             GetCreatureListWithEntryInGrid(unitList, me, NPC_TEARDOWN_SUNREAVER_CAPTAIN, 100.0f);
@@ -2175,7 +2175,7 @@ struct npc_wargod_alchukla : public customCreatureAI
             if (!unitList.empty())
                 return Trinity::Containers::SelectRandomContainerElement(unitList)->GetGUID();
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 };
 
@@ -2412,7 +2412,7 @@ struct npc_slavemaster_shiaxu : public customCreatureAI
         {
             hasTriggered = true;
 
-            if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI) : 0))
+            if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI) : ObjectGuid::Empty))
                 taoshi->AI()->Talk(TALK_SPECIAL_4);
         }
     }
@@ -2621,13 +2621,13 @@ struct npc_beastmaster_horaki : public customCreatureAI
                 Talk(TALK_INTRO);
                 break;
             case ACTION_FLY_FALL:
-                if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     Talk(TALK_SPECIAL_1, target);
 
                 scheduler
                     .Schedule(Seconds(4), [this](TaskContext context)
                 {
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                         Talk(TALK_SPECIAL_2, target);
                 });
 
@@ -2644,7 +2644,7 @@ struct npc_beastmaster_horaki : public customCreatureAI
     {
         me->RemoveAllAreasTrigger();
 
-        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
             Talk(TALK_SPECIAL_3, target);
 
         if (me->GetInstanceScript())
@@ -2720,7 +2720,7 @@ struct npc_lorthemar_therone_to_skies : public customCreatureAI
             scheduler
                 .Schedule(Seconds(7), [this](TaskContext context)
             {
-                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI) : 0))
+                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI) : ObjectGuid::Empty))
                 {
                     taoshi->SetFacingTo(taoshi->GetAngle(me));
                     taoshi->AI()->Talk(me->GetEntry() == NPC_LADY_JAINA_IN_SKY ? TALK_SPECIAL_8 : TALK_SPECIAL_6);
@@ -2745,7 +2745,7 @@ struct npc_lorthemar_therone_to_skies : public customCreatureAI
             scheduler
                 .Schedule(Milliseconds(13500), [this](TaskContext context)
             {
-                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI) : 0))
+                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI) : ObjectGuid::Empty))
                     taoshi->AI()->Talk(me->GetEntry() == NPC_LADY_JAINA_IN_SKY ? TALK_SPECIAL_9 : TALK_SPECIAL_7);
             });
 
@@ -2795,7 +2795,7 @@ struct npc_scout_captain_elsia_to_skies : public customCreatureAI
         {
             Talk(TALK_SPECIAL_1);
 
-            if (Creature* thunderWing = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_THUNDERWING) : 0))
+            if (Creature* thunderWing = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_THUNDERWING) : ObjectGuid::Empty))
                 thunderWing->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
         });
     }
@@ -2817,7 +2817,7 @@ struct npc_scout_captain_elsia_to_skies : public customCreatureAI
             {
                 Talk(TALK_SPECIAL_4);
 
-                if (Creature* thunderWing = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_THUNDERWING) : 0))
+                if (Creature* thunderWing = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_THUNDERWING) : ObjectGuid::Empty))
                     thunderWing->AI()->DoAction(ACTION_START_INTRO);
             });
         }
@@ -2850,7 +2850,7 @@ struct npc_thunderwing_to_skies : public customCreatureAI
         clicker->CastSpell(clicker, SPELL_THUNDER_INNERVATION, true);
         clicker->AddAura(SPELL_RIDE_VEHICLE, clicker);
 
-        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SCOUT_CAPTAIN_ELSIA_IN_SKY) : 0))
+        if (Creature* elsia = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SCOUT_CAPTAIN_ELSIA_IN_SKY) : ObjectGuid::Empty))
             elsia->AI()->DoAction(ACTION_START_INTRO);
     }
 
@@ -2925,7 +2925,7 @@ struct npc_thunderwing_to_skies : public customCreatureAI
             {
                 me->StopMoving();
 
-                if (Creature* Horaki = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_BEASTMASTER_HORAKI) : 0))
+                if (Creature* Horaki = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_BEASTMASTER_HORAKI) : ObjectGuid::Empty))
                     Horaki->AI()->DoAction(ACTION_START_INTRO);
 
                 Movement::MoveSplineInit init(me);
@@ -2940,14 +2940,14 @@ struct npc_thunderwing_to_skies : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(me->GetSplineDuration()), [this](TaskContext context)
                 {
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     {
                         target->RemoveAurasDueToSpell(SPELL_THUNDER_INNERVATION);
                         target->RemoveAurasDueToSpell(SPELL_RIDE_VEHICLE);
                         target->ExitVehicle();
                     }
 
-                    if (Creature* Horaki = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_BEASTMASTER_HORAKI) : 0))
+                    if (Creature* Horaki = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_BEASTMASTER_HORAKI) : ObjectGuid::Empty))
                         Horaki->AI()->DoAction(ACTION_FLY_FALL);
 
                     me->DespawnOrUnsummon();
@@ -2985,7 +2985,7 @@ struct npc_zandalari_pterrorwing_to_skies : public customCreatureAI
         scheduler
             .Schedule(Milliseconds(500), [this](TaskContext context)
         {
-            if (Creature* thunderWing = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_THUNDERWING) : 0))
+            if (Creature* thunderWing = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_THUNDERWING) : ObjectGuid::Empty))
                 me->GetMotionMaster()->MoveFollow(thunderWing, frand(5.0f, 8.0f), me->GetAngle(thunderWing));
 
             context.Repeat(Milliseconds(500));
@@ -3014,7 +3014,7 @@ struct npc_zandlari_beastcaller_to_skies : public customCreatureAI
         scheduler
             .Schedule(Milliseconds(1500), [this](TaskContext context)
         {
-            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                 DoCast(target, SPELL_THROW);
 
             context.Repeat(Milliseconds(2000));
@@ -3123,10 +3123,10 @@ class npc_taoshi_to_skies : public CreatureScript
                     {
                         if (me->GetInstanceScript())
                         {
-                            if (GameObject* cavein = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetData64(GO_CAVEIN)))
+                            if (GameObject* cavein = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(GO_CAVEIN)))
                                 cavein->UseDoorOrButton();
 
-                            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                                 target->CastSpell(target, SPELL_SUMMON_TAOSHI, true);
 
                             me->GetInstanceScript()->SetData(STEP_IN_THE_MINE, DONE);
@@ -3262,7 +3262,7 @@ struct npc_thunderwing_stormsea_landing : public customCreatureAI
 
     void OnSpellClick(Unit* clicker, bool& /*result*/) override
     {
-        if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA) : 0))
+        if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA) : ObjectGuid::Empty))
         {
             if (!taoshi->AI()->GetData(TAOSHI_DATA))
                 return;
@@ -3272,13 +3272,13 @@ struct npc_thunderwing_stormsea_landing : public customCreatureAI
 
             taoshi->AI()->DoAction(ACTION_START_INTRO);
 
-            if (Creature* shanbu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SHAN_BU_STORMSEA) : 0))
+            if (Creature* shanbu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SHAN_BU_STORMSEA) : ObjectGuid::Empty))
             {
                 shanbu->SetVisible(true);
                 shanbu->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            if (Creature* huseng = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_HUSENG_THE_GATEKEEPER) : 0))
+            if (Creature* huseng = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_HUSENG_THE_GATEKEEPER) : ObjectGuid::Empty))
             {
                 huseng->SetVisible(true);
                 huseng->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE);
@@ -3304,10 +3304,10 @@ struct npc_thunderwing_stormsea_landing : public customCreatureAI
             if (me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(STEP_BLENDING_IN, DONE);
 
-            if (Creature* taosi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA) : 0))
+            if (Creature* taosi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA) : ObjectGuid::Empty))
                 taosi->AI()->DoAction(ACTION_FLY_ASSAULT);
 
-            if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+            if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                 target->AddAura(SPELL_SMOKE_BOMB_AVAILABLE, target);
 
             scheduler
@@ -3329,14 +3329,14 @@ struct npc_thunderwing_stormsea_landing : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += me->GetSplineDuration() / 2), [this](TaskContext context)
                 {
-                    if (Creature* shanbu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SHAN_BU_STORMSEA) : 0))
+                    if (Creature* shanbu = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SHAN_BU_STORMSEA) : ObjectGuid::Empty))
                         shanbu->AI()->Talk(TALK_INTRO);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3000), [this](TaskContext context)
                 {
-                    if (Creature* huseng = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_HUSENG_THE_GATEKEEPER) : 0))
+                    if (Creature* huseng = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_HUSENG_THE_GATEKEEPER) : ObjectGuid::Empty))
                     {
                         huseng->AI()->Talk(TALK_INTRO);
                         huseng->RemoveAurasDueToSpell(SPELL_HUSENG_ASLEEP);
@@ -3374,13 +3374,13 @@ struct npc_thunderwing_stormsea_landing : public customCreatureAI
             scheduler
                 .Schedule(Milliseconds(me->GetSplineDuration()), [this](TaskContext context)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     target->ExitVehicle();
 
-                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA) : 0))
+                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA) : ObjectGuid::Empty))
                     taoshi->DespawnOrUnsummon();
 
-                if (Creature* shipTaoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA_SHIP) : 0))
+                if (Creature* shipTaoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA_SHIP) : ObjectGuid::Empty))
                     shipTaoshi->AI()->DoAction(ACTION_START_INTRO);
 
                 me->DespawnOrUnsummon();
@@ -3466,7 +3466,7 @@ struct npc_taoshi_stormsea_landing_ship : public customCreatureAI
                         Talk(TALK_SPECIAL_3);
                         Talk(TALK_SPECIAL_4); // Ann
 
-                        if (Creature* captain = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_CAPTAIN_HALUKAL) : 0))
+                        if (Creature* captain = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_CAPTAIN_HALUKAL) : ObjectGuid::Empty))
                             captain->AI()->DoAction(ACTION_START_INTRO);
                     });
                     break;
@@ -3567,7 +3567,7 @@ struct npc_taoshi_stormsea_landing_ship : public customCreatureAI
                             if (me->GetInstanceScript())
                                 me->GetInstanceScript()->SetData(STEP_KEEP_QUIET, DONE);
 
-                            if (Creature* huseng = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_HUSENG_THE_GATEKEEPER) : 0))
+                            if (Creature* huseng = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_HUSENG_THE_GATEKEEPER) : ObjectGuid::Empty))
                                 huseng->AI()->DoAction(ACTION_START_INTRO);
 
                             me->RemoveAurasDueToSpell(SPELL_INFILT_STORMSEA_LANDING);
@@ -3621,7 +3621,7 @@ struct npc_captain_halukal : public customCreatureAI
             {
                 Talk(TALK_INTRO);
 
-                if (Creature* shipTaoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA_SHIP) : 0))
+                if (Creature* shipTaoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA_SHIP) : ObjectGuid::Empty))
                     shipTaoshi->RemoveAurasDueToSpell(SPELL_INFILT_STORMSEA_LANDING);
             });
 
@@ -3630,7 +3630,7 @@ struct npc_captain_halukal : public customCreatureAI
             {
                 Talk(TALK_SPECIAL_1);
 
-                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     me->RemoveChanneledCast(target->GetGUID());
             });
         }
@@ -3690,7 +3690,7 @@ struct npc_drunken_wingrider : public customCreatureAI
     {
         if (actionId == ACTION_START_INTRO && !hasTriggered)
         {
-            if (Creature* captain = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_CAPTAIN_HALUKAL) : 0))
+            if (Creature* captain = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_CAPTAIN_HALUKAL) : ObjectGuid::Empty))
                 captain->AI()->Talk(TALK_SPECIAL_2);
 
             hasTriggered = true;
@@ -3700,7 +3700,7 @@ struct npc_drunken_wingrider : public customCreatureAI
             scheduler
                 .Schedule(Milliseconds(1500), [this](TaskContext context)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     me->RemoveChanneledCast(target->GetGUID());
             });
 
@@ -3757,7 +3757,7 @@ struct npc_veteran_wingrider : public customCreatureAI
         // safety if someone wanna kill this instead ambush...
         me->RemoveAurasDueToSpell(SPELL_MARK_OF_TAOSHI);
 
-        if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA_SHIP) : 0))
+        if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA_SHIP) : ObjectGuid::Empty))
             taoshi->AI()->DoAction(ACTION_MOVE_TO);
     }
 
@@ -3880,7 +3880,7 @@ struct npc_huseng_gatekeeper : public customCreatureAI
         events.ScheduleEvent(EVENT_EMPOWER_AXE, urand(9.5 * IN_MILLISECONDS, 12 * IN_MILLISECONDS));
         events.ScheduleEvent(EVENT_CEASE, 20 * IN_MILLISECONDS);
 
-        if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA_SHIP) : 0))
+        if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA_SHIP) : ObjectGuid::Empty))
             taoshi->AI()->DoAction(ACTION_HUSENG_COMBAT);
     }
 
@@ -3890,7 +3890,7 @@ struct npc_huseng_gatekeeper : public customCreatureAI
 
         summons.Summon(summon);
 
-        if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+        if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
         {
             summon->SetInCombatWith(target);
             summon->PrepareChanneledCast(summon->GetOrientation());
@@ -3911,7 +3911,7 @@ struct npc_huseng_gatekeeper : public customCreatureAI
             me->SetFacingTo(Position::NormalizeOrientation(me->GetOrientation() - M_PI));
             Talk(TALK_SPECIAL_1);
 
-            if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA_SHIP) : 0))
+            if (Creature* taoshi = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA_SHIP) : ObjectGuid::Empty))
                 taoshi->RemoveAurasDueToSpell(SPELL_INFILTRATING_EFF);
         }
     }
@@ -4169,10 +4169,10 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 5500), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_8);
 
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                         lorthemar->AI()->Talk(TALK_SPECIAL_7);
                 });
 
@@ -4191,70 +4191,70 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                         lorthemar->AI()->Talk(TALK_SPECIAL_8);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1800), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_9);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1800), [this](TaskContext context)
                 {
-                    if (Creature* vereesa = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_VEREESA + 5000) : 0))
+                    if (Creature* vereesa = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_VEREESA + 5000) : ObjectGuid::Empty))
                         vereesa->AI()->Talk(TALK_SPECIAL_4);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1200), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_10);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3000), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_11);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3200), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                         lorthemar->AI()->Talk(TALK_SPECIAL_9);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                         lorthemar->AI()->Talk(TALK_SPECIAL_10);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1500), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_12);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 2000), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_13);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1200), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                         lorthemar->AI()->Talk(TALK_SPECIAL_11);
                 });
 
@@ -4294,7 +4294,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 5000), [this](TaskContext context)
                 {
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                         me->SetFacingToObject(target);
 
                     if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
@@ -4350,7 +4350,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     scheduler
                         .Schedule(Milliseconds(delay += 8000), [this](TaskContext context)
                     {
-                        if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                        if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                             lorthemar->AI()->Talk(TALK_SPECIAL_4);
 
                         // Close Gates
@@ -4374,7 +4374,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     scheduler
                         .Schedule(Milliseconds(delay += 2000), [this](TaskContext context)
                     {
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                             jaina->AI()->Talk(TALK_SPECIAL_4);
                     });
                 }
@@ -4388,7 +4388,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
 
                 bool hasHorde = me->GetInstanceScript() && me->GetInstanceScript()->GetData64(FACTION_DATA);
 
-                if (Creature* factionLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(hasHorde ? NPC_SHANBU_LORTHEMAR : NPC_SHANBU_JAINA) : 0))
+                if (Creature* factionLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(hasHorde ? NPC_SHANBU_LORTHEMAR : NPC_SHANBU_JAINA) : ObjectGuid::Empty))
                     factionLeader->AI()->DoAction(ACTION_BARRICADE_ASSAULT);
                 break;
             }
@@ -4407,7 +4407,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 {
                     bool hasHorde = instance && instance->GetData64(FACTION_DATA);
 
-                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(hasHorde ? NPC_SHANBU_ELSIA : NPC_SHANBU_VEREESA) : 0))
+                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(hasHorde ? NPC_SHANBU_ELSIA : NPC_SHANBU_VEREESA) : ObjectGuid::Empty))
                         scoutLeader->AI()->Talk(TALK_SPECIAL_2);
                 });
 
@@ -4421,14 +4421,14 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                         // Invisible Wall (only horde)
                         instance->HandleGameObject(instance->GetGuidData(GO_SPIRIT_WALL + 1), true, NULL);
 
-                        instance->HandleGameObject(instance->GetData64(instance->GetData64(FACTION_DATA) ? GO_MOGU_GATES_HORDE : GO_MOGU_GATES_STORMSEA), true, NULL);
+                        instance->HandleGameObject(instance->GetGuidData(instance->GetData64(FACTION_DATA) ? GO_MOGU_GATES_HORDE : GO_MOGU_GATES_STORMSEA), true, NULL);
                     }
 
                     DoAction(ACTION_MOVE_TO_BLODY_CROSS);
 
                     bool hasHorde = instance && instance->GetData64(FACTION_DATA);
 
-                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(hasHorde ? NPC_SHANBU_ELSIA : NPC_SHANBU_VEREESA) : 0))
+                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(hasHorde ? NPC_SHANBU_ELSIA : NPC_SHANBU_VEREESA) : ObjectGuid::Empty))
                         scoutLeader->AI()->DoAction(ACTION_MOVE_TO_BLODY_CROSS);
 
                 });
@@ -4480,14 +4480,14 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 4000), [this](TaskContext context)
                 {
-                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_VEREESA + 5000) : 0))
+                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_VEREESA + 5000) : ObjectGuid::Empty))
                         scoutLeader->AI()->Talk(TALK_SPECIAL_3);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 4500), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_5);
                 });
 
@@ -4559,7 +4559,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     Talk(TALK_SPECIAL_4);
 
                     // Attack Player
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                         AttackStart(target);
                 });
                 break;
@@ -4627,28 +4627,28 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += me->GetSplineDuration()), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_6);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 2500), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                         lorthemar->AI()->Talk(TALK_SPECIAL_5);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 4000), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : ObjectGuid::Empty))
                         jaina->AI()->Talk(TALK_SPECIAL_7);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3000), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : ObjectGuid::Empty))
                         lorthemar->AI()->Talk(TALK_SPECIAL_6);
                 });
 
@@ -4788,7 +4788,7 @@ struct npc_shanbu_palace_gatekeeper : public customCreatureAI
             me->RemoveAurasDueToSpell(SPELL_FREEZE_STATE);
 
             // Attack Player
-            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+            if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                 AttackStart(target);
         }
     }
@@ -4897,7 +4897,7 @@ struct npc_shanbu_nalak : public customCreatureAI
             scheduler
                 .Schedule(Milliseconds(me->GetSplineDuration()), [this](TaskContext context)
             {
-                if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     DoCast(target, SPELL_ELECTRICAL_STORM);
 
                 context.Repeat(Seconds(5));
@@ -4993,7 +4993,7 @@ struct npc_shan_bu : public shanbuAssaultBaseAI
             if (Creature* nalak = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_NALAK)))
                 nalak->DespawnOrUnsummon();
 
-            if (Player* target = ObjectAccessor::GetPlayer(*me, instance->GetData64(PLAYER_DATA)))
+            if (Player* target = ObjectAccessor::GetPlayer(*me, instance->GetGuidData(PLAYER_DATA)))
                 target->KilledMonsterCredit(NPC_SHANBU_CREDIT);
         }
     }
@@ -5206,7 +5206,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                         break;
                     case ACTION_MOVE_INNER_FORGE:
                     {
-                        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                             target->RemoveAurasDueToSpell(SPELL_THUNDER_FORGE_CHARGING);
 
                         Talk(TALK_SPECIAL_5);
@@ -5292,7 +5292,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                         });
                         break;
                     case ACTION_SHA_DEFEATED:
-                        if (Player* target = ObjectAccessor::GetPlayer(*me, instance ? instance->GetData64(PLAYER_DATA) : 0))
+                        if (Player* target = ObjectAccessor::GetPlayer(*me, instance ? instance->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                             target->KilledMonsterCredit(NPC_COMPLETE_SCENARIO_CREDIT);
 
                         me->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -5313,7 +5313,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                         {
                             Talk(TALK_SPECIAL_14);
 
-                            if (Player* target = ObjectAccessor::GetPlayer(*me, instance ? instance->GetData64(PLAYER_DATA) : 0))
+                            if (Player* target = ObjectAccessor::GetPlayer(*me, instance ? instance->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                                 target->RemoveAurasDueToSpell(SPELL_THUNDER_FORGE_SMITHING);
                         });
 
@@ -5417,7 +5417,7 @@ struct npc_thunder_forge_shado_pan_warrior : public ScriptedAI
             hasEvade = true;
             Talk(TALK_SPECIAL_1);
 
-            if (Creature* wrathion = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_WRATHION) : 0))
+            if (Creature* wrathion = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_WRATHION) : ObjectGuid::Empty))
                 wrathion->AI()->DoAction(ACTION_FORGE_FIRST_WAVE_DONE);
         }
     }
@@ -5520,7 +5520,7 @@ struct npc_thunder_forge_bunny : public ScriptedAI
             {
                 Talk(TALK_INTRO);
 
-                if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+                if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
                     DoCast(target, SPELL_OVERCHARGE_EFF, true);
 
                 context.Repeat(Seconds(35), Seconds(45));
@@ -5544,7 +5544,7 @@ struct npc_forgemaster_vulkon : public customCreatureAI
         DoCast(me, SPELL_FORGEMASTER_SPAWN, true);
         Reset();
 
-        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
         {
             me->GetMotionMaster()->MoveChase(target, 0, me->GetAngle(target));
             me->Attack(target, true);
@@ -5617,7 +5617,7 @@ struct npc_thunder_forge_shanze_warrior : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
         {
             me->GetMotionMaster()->MoveChase(target, 0, me->GetAngle(target));
             me->Attack(target, true);
@@ -5676,7 +5676,7 @@ struct npc_thunder_forge_shanze_pyromancer : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
         {
             me->GetMotionMaster()->MoveChase(target, 0, me->GetAngle(target));
             me->Attack(target, true);
@@ -5800,7 +5800,7 @@ struct npc_thunder_forge_sha_fiend : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* target = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_CELESTIAL_BLACKSMITH) : 0))
+        if (Creature* target = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_CELESTIAL_BLACKSMITH) : ObjectGuid::Empty))
         {
             me->GetMotionMaster()->MoveChase(target, 0, me->GetAngle(target));
             me->Attack(target, true);
@@ -5856,7 +5856,7 @@ struct npc_sha_almagmation : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
+        if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(PLAYER_DATA) : ObjectGuid::Empty))
         {
             me->GetMotionMaster()->MoveChase(target, 0, me->GetAngle(target));
             me->Attack(target, true);
@@ -5874,7 +5874,7 @@ struct npc_sha_almagmation : public customCreatureAI
         events.ScheduleEvent(EVENT_METEOR_STORM, urand(9.5 * IN_MILLISECONDS, 12 * IN_MILLISECONDS));
         events.ScheduleEvent(EVENT_SHADOW_CRASH, urand(3.5 * IN_MILLISECONDS, 6 * IN_MILLISECONDS));
 
-        if (Creature* anvil = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_THUNDER_FORGE_2) : 0))
+        if (Creature* anvil = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_THUNDER_FORGE_2) : ObjectGuid::Empty))
             anvil->AI()->Talk(TALK_SPECIAL_1);
     }
 
@@ -6016,7 +6016,7 @@ struct npc_thunder_forge_celestial_blacksmith : public ScriptedAI
                 if (GameObject* nearAnvil = me->FindNearestGameObject(GO_THUNDER_ANVIL, 20.0f))
                     nearAnvil->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
-                if (Creature* anvil = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_THUNDER_FORGE_2) : 0))
+                if (Creature* anvil = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_THUNDER_FORGE_2) : ObjectGuid::Empty))
                     anvil->AI()->Talk(TALK_INTRO);
             }
             else
@@ -6028,7 +6028,7 @@ struct npc_thunder_forge_celestial_blacksmith : public ScriptedAI
 
             scheduler.Schedule(Milliseconds(me->GetSplineDuration()), [this](TaskContext context)
             {
-                if (Creature* anvil = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_THUNDER_FORGE_2) : 0))
+                if (Creature* anvil = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_THUNDER_FORGE_2) : ObjectGuid::Empty))
                     me->SetFacingToObject(anvil);
 
                 me->HandleEmoteStateCommand(EMOTE_STATE_WORK);
@@ -6099,7 +6099,7 @@ class go_thunder_forge_anvil : public GameObjectScript
             {
                 go->SetFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
-                if (Creature* anvil = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(NPC_THUNDER_FORGE_2) : 0))
+                if (Creature* anvil = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(NPC_THUNDER_FORGE_2) : ObjectGuid::Empty))
                     anvil->CastSpell(anvil, SPELL_THUNDER_SURGE, true);
             }
     
@@ -6262,7 +6262,7 @@ class spell_stormsea_landing_mark_of_taoshi_eff : public AuraScript
         {
             owner->RemoveAurasDueToSpell(SPELL_MARK_OF_TAOSHI);
 
-            if (Creature* taoshi = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA_SHIP) : 0))
+            if (Creature* taoshi = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA_SHIP) : ObjectGuid::Empty))
                 taoshi->AI()->DoAction(ACTION_MOVE_TO);
         }
     }
@@ -6302,10 +6302,10 @@ class spell_stormsea_landing_gatekeepers_orb : public SpellScript
         {
             caster->KilledMonsterCredit(NPC_GATE_BUNNY_CREDIT);
 
-            if (GameObject* moguGate = ObjectAccessor::GetGameObject(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(GO_MOGU_GATES_STORMSEA) : 0))
+            if (GameObject* moguGate = ObjectAccessor::GetGameObject(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(GO_MOGU_GATES_STORMSEA) : ObjectGuid::Empty))
                 moguGate->SetGoState(GO_STATE_ACTIVE);
 
-            if (Creature* taoshi = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(NPC_TAOSHI_STORMSEA_SHIP) : 0))
+            if (Creature* taoshi = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(NPC_TAOSHI_STORMSEA_SHIP) : ObjectGuid::Empty))
                 taoshi->AI()->Talk(TALK_SPECIAL_11);
         }
     }
@@ -6593,13 +6593,13 @@ class scene_isle_of_thunder_tear_down_wall_intro : public SceneScript
     
         void OnSceneComplete(Player* player, uint32 /*sceneInstanceID*/, SceneTemplate const* /*sceneTemplate*/) override
         {
-            if (Creature* elsia = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetData64(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA) : 0))
+            if (Creature* elsia = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetGuidData(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA) : ObjectGuid::Empty))
                 elsia->AI()->DoAction(ACTION_START_INTRO);
         }
     
         void OnSceneCancel(Player* player, uint32 /*sceneInstanceID*/, SceneTemplate const* /*sceneTemplate*/) override
         {
-            if (Creature* elsia = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetData64(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA) : 0))
+            if (Creature* elsia = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetGuidData(NPC_TEARDOWN_SCOUT_CAPTAIN_ELSIA) : ObjectGuid::Empty))
                 elsia->AI()->DoAction(ACTION_START_INTRO);
         }
 };

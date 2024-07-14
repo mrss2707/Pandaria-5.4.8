@@ -160,7 +160,7 @@ class instance_brewing_storm : public InstanceMapScript
                     return borakhulaGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool IsWipe(float range, Unit* source) override

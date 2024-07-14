@@ -44,12 +44,12 @@ class instance_temple_of_jade_serpent : public InstanceMapScript
         {
             instance_temple_of_jade_serpent_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-            std::list<uint64> corruptedCreatures;
-            std::list<uint64> sunfires;
-            std::list<uint64> suns;
-            std::list<uint64> sunTriggers;
-            std::list<uint64> shaSummoned;
-            std::unordered_map<uint32, uint64> m_mGoEntryGuidMap;
+            std::list<ObjectGuid> corruptedCreatures;
+            std::list<ObjectGuid> sunfires;
+            std::list<ObjectGuid> suns;
+            std::list<ObjectGuid> sunTriggers;
+            std::list<ObjectGuid> shaSummoned;
+            std::unordered_map<uint32, ObjectGuid> m_mGoEntryGuidMap;
 
             uint8 eventChoosen;
             uint32 dataStorage[MAX_DATA];
@@ -132,7 +132,7 @@ class instance_temple_of_jade_serpent : public InstanceMapScript
             {
                 GameObject* go = NULL;
 
-                std::unordered_map<uint32, uint64>::iterator find = m_mGoEntryGuidMap.find(uiEntry);
+                std::unordered_map<uint32, ObjectGuid>::iterator find = m_mGoEntryGuidMap.find(uiEntry);
 
                 if (find != m_mGoEntryGuidMap.cend())
                     go = instance->GetGameObject(find->second);
@@ -668,7 +668,7 @@ class instance_temple_of_jade_serpent : public InstanceMapScript
                         return lorewalkerGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

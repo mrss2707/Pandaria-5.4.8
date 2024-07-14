@@ -47,9 +47,9 @@ static const Position barrelPos[] =
     { -777.73f, 1357.66f, 147.79f, 1.64f }
 };
 
-bool CheckIfAgainstUnit(uint64 casterGUID)
+bool CheckIfAgainstUnit(Unit* me, ObjectGuid casterGUID)
 {
-    Unit* owner = ObjectAccessor::FindUnit(casterGUID);
+    Unit* owner = ObjectAccessor::GetUnit(*me, casterGUID);
 
     if (!owner)
         return false;
@@ -328,7 +328,7 @@ class npc_barrel : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (CheckIfAgainstUnit(me->GetGUID()) && initiate)
+                if (CheckIfAgainstUnit(me, me->GetGUID()) && initiate)
                     DoExplode();
 
                 events.Update(diff);
@@ -579,7 +579,7 @@ class spell_brew_barrel_ride : public SpellScriptLoader
             void OnTrigger(AuraEffect const* /*aurEff*/)
             {
                 if (Unit* caster = GetOwner()->ToUnit())
-                    if (CheckIfAgainstUnit(caster->GetGUID()))
+                    if (CheckIfAgainstUnit(caster, caster->GetGUID()))
                     {
                         caster->CastSpell(caster, SPELL_BARREL_EXPLOSION_HOSTILE, false);
                         caster->CastSpell(caster, SPELL_BARREL_EXPLOSION_PLAYER, false);

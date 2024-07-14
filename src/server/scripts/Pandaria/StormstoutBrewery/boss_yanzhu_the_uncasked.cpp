@@ -99,14 +99,14 @@ class AliveCheck
     public:
         AliveCheck(Creature* creature) : _creature(creature) { }
 
-        bool operator()(uint64 guid)
+        bool operator()(ObjectGuid guid)
         {
             return (GetAffectedCreature(guid) && !GetAffectedCreature(guid)->IsAlive());
         }
 
     private:
         Creature* _creature;
-        Creature* GetAffectedCreature(uint64 guid)
+        Creature* GetAffectedCreature(ObjectGuid guid)
         {
             Creature* creature = ObjectAccessor::GetCreature(*_creature, guid);
             return creature ? creature : nullptr;
@@ -191,7 +191,7 @@ class npc_uncle_gao : public CreatureScript
             uint32 encounterStage;
             uint32 waypoint;
             uint32 addStore[3];
-            std::list<uint64> currentStageGuidList;
+            std::list<ObjectGuid> currentStageGuidList;
             EventMap events;
             InstanceScript* instance;
 
@@ -747,7 +747,7 @@ class boss_yanzhu : public CreatureScript
         {
             boss_yanzhuAI(Creature* creature) : BossAI(creature, DATA_YAN_ZHU) { }
 
-            std::vector<uint64> guidsVector;
+            std::vector<ObjectGuid> guidsVector;
             float bubleFacing;
             uint32 largeEventType, lowEventType;
 
@@ -827,7 +827,7 @@ class boss_yanzhu : public CreatureScript
                 }
             }
 
-            bool SudsyInCenterQuadr(uint64 playerGUID)
+            bool SudsyInCenterQuadr(ObjectGuid playerGUID)
             {
                 Player* itr = ObjectAccessor::FindPlayer(playerGUID);
                 if (!itr)
@@ -1520,7 +1520,7 @@ class npc_bubbling_alemental : public CreatureScript
         {
             npc_bubbling_alementalAI(Creature* creature) : ScriptedAI(creature) { }
 
-            std::vector<uint64> guidsVector;
+            std::vector<ObjectGuid> guidsVector;
             EventMap events, cosmeticEvents;
             uint32 wp;
 

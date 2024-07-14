@@ -119,6 +119,19 @@ void InstanceScript::GameObjectRemoved(GameObject* go)
     OnGameObjectRemove(go);
 }
 
+ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
+{
+    ObjectGuidMap::const_iterator i = _objectGuids.find(type);
+    if (i != _objectGuids.end())
+        return i->second;
+    return ObjectGuid::Empty;
+}
+
+ObjectGuid InstanceScript::GetGuidData(uint32 type) const
+{
+    return GetObjectGuid(type);
+}
+
 void InstanceScript::SetBossNumber(uint32 number)
 {
     bosses.resize(number);

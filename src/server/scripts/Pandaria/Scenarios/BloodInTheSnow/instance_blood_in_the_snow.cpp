@@ -309,7 +309,7 @@ class instance_blood_in_the_snow : public InstanceMapScript
                         return farastuGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Update(uint32 diff) override

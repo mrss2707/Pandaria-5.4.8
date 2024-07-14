@@ -484,7 +484,7 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                         // Init new events depends of devour
                         DoCast(me, key->second[4]);
 
-                        if (Creature* helper = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(actionId) : 0))
+                        if (Creature* helper = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(actionId) : ObjectGuid::Empty))
                         {
                             DoCast(helper, SPELL_CREATURE_FIXATE);
                             me->GetMotionMaster()->MovePoint(1, *helper);
@@ -562,7 +562,7 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
                     me->RemoveAurasDueToSpell(SPELL_FIXATE_IMMUNE);
 
-                    if (Creature* helper = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(eatHelperEntry) : 0))
+                    if (Creature* helper = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(eatHelperEntry) : ObjectGuid::Empty))
                     {
                         if (helper->GetEntry() == NPC_AKOLIK)
                             helper->AI()->Talk(TALK_SPECIAL_2);
@@ -1128,7 +1128,7 @@ struct npc_thok_ice_tomb : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* thok = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_THOK_THE_BLOODTHIRSTY) : 0))
+        if (Creature* thok = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : ObjectGuid::Empty))
             thok->AI()->JustSummoned(me);
 
         me->SetDisplayId(me->GetCreatureTemplate()->Modelid2);
@@ -1363,7 +1363,7 @@ struct npc_thok_monstrous_gastropod : public ScriptedAI
             for (auto&& itr : gastropodPath)
                 init.Path().push_back(G3D::Vector3(itr.GetPositionX(), itr.GetPositionY(), itr.GetPositionZ()));
 
-            if (Creature* thok = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_THOK_THE_BLOODTHIRSTY) : 0))
+            if (Creature* thok = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : ObjectGuid::Empty))
                 init.Path().push_back(G3D::Vector3(thok->GetPositionX(), thok->GetPositionY(), thok->GetPositionZ()));
 
             init.SetUncompressed();
@@ -1408,7 +1408,7 @@ class go_thok_third_locked_cage : public GameObjectScript
         {
             if (player->HasAura(SPELL_SKELETON_KEY) && go->GetInstanceScript() && go->GetInstanceScript()->GetBossState(DATA_THOK_THE_BLOODTHIRSTY) == IN_PROGRESS)
             {
-                if (Creature* thok = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetData64(DATA_THOK_THE_BLOODTHIRSTY) : 0))
+                if (Creature* thok = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : ObjectGuid::Empty))
                 {
                     thok->AI()->SetData(TYPE_GIANT_SNAIL_LOCKED_COUNT, 1);
 
@@ -1646,7 +1646,7 @@ class spell_thok_clump_check : public SpellScript
 
         // second phase
         if (m_targets.size() >= targetCount)
-            if (Creature* thok = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : 0))
+            if (Creature* thok = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : ObjectGuid::Empty))
                 thok->AI()->DoAction(ACTION_FRENZY);
     }
 
@@ -2161,7 +2161,7 @@ class spell_thok_skeleton_key : public AuraScript
                 return;
 
             // Summon Jailer
-            if (Creature* thok = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(DATA_THOK_THE_BLOODTHIRSTY) : 0))
+            if (Creature* thok = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : ObjectGuid::Empty))
                 thok->SummonCreature(NPC_KORKRON_JAILER, jailerEntrancePos, TEMPSUMMON_MANUAL_DESPAWN);
         }
     }
@@ -2202,7 +2202,7 @@ class spell_thok_unlocking : public SpellScript
 
             if (GameObject* go = GetHitGObj())
             {
-                if (Creature* prisoner = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(invCageType.find(go->GetEntry())->second) : 0))
+                if (Creature* prisoner = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(invCageType.find(go->GetEntry())->second) : ObjectGuid::Empty))
                 {
                     if (!prisoner->IsAlive()) // cage has a twice sectors
                     {
@@ -2225,7 +2225,7 @@ class spell_thok_unlocking : public SpellScript
     {
         if (GetCaster() && GetCaster()->ToPlayer() && GetCaster()->HasAura(SPELL_SKELETON_KEY) && GetCaster()->ToPlayer()->HasItemCount(ITEM_SKELETON_KEY, 1) && GetCaster()->GetInstanceScript() && GetCaster()->GetInstanceScript()->GetBossState(DATA_THOK_THE_BLOODTHIRSTY) == IN_PROGRESS && GetHitGObj() && GetHitGObj()->GetEntry() != GO_THRICE_LOCKED_CAGE)
         {
-            if (Creature* prisoner = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetData64(invCageType.find(GetHitGObj()->GetEntry())->second) : 0))
+            if (Creature* prisoner = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(invCageType.find(GetHitGObj()->GetEntry())->second) : ObjectGuid::Empty))
             {
                 if (!prisoner->IsAlive()) // cage has a twice sectors
                 {
@@ -2350,7 +2350,7 @@ class spell_thok_wrecking_ball : public SpellScript
 
             if (Creature* bunny = GetCaster()->SummonCreature(NPC_GENERAL_FLY_BUNNY, x, y, z, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
             {
-                if (Creature* thok = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(DATA_THOK_THE_BLOODTHIRSTY) : 0))
+                if (Creature* thok = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : ObjectGuid::Empty))
                     thok->AI()->JustSummoned(bunny);
 
                 bunny->CastSpell(bunny, SPELL_WRECKING_BALL_VISUAL, true);

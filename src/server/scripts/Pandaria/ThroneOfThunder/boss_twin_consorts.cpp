@@ -415,7 +415,7 @@ class boss_suen : public CreatureScript
                         }
 
                         // Visible Star Sky
-                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
+                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : ObjectGuid::Empty))
                         {
                             worldTrigger_2->SetObjectScale(0.1f);
                             worldTrigger_2->CastSpell(worldTrigger_2, SPELL_STARY_SKY_DARKNESS, true);
@@ -455,7 +455,7 @@ class boss_suen : public CreatureScript
                         }
 
                         // Visible Star Sky
-                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
+                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : ObjectGuid::Empty))
                         {
                             worldTrigger_2->RemoveAurasDueToSpell(SPELL_STARY_SKY_DARKNESS);
                             worldTrigger_2->RemoveAurasDueToSpell(SPELL_STARY_SKY);
@@ -523,7 +523,7 @@ class boss_suen : public CreatureScript
                         if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                             worldTrigger_1->RemoveAurasDueToSpell(SPELL_SUNNY_SKY);
 
-                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
+                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : ObjectGuid::Empty))
                         {
                             worldTrigger_2->SetObjectScale(1.0f);
                             worldTrigger_2->CastSpell(worldTrigger_2, SPELL_STARY_SKY_DARKNESS, true);
@@ -688,7 +688,7 @@ class boss_suen : public CreatureScript
                 if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                     worldTrigger_1->RemoveAllAuras();
 
-                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
+                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : ObjectGuid::Empty))
                     worldTrigger_2->RemoveAllAuras();
 
                 if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
@@ -748,7 +748,7 @@ class boss_suen : public CreatureScript
                 if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                     worldTrigger_1->RemoveAllAuras();
 
-                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
+                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : ObjectGuid::Empty))
                     worldTrigger_2->RemoveAllAuras();
 
                 HandleInactivityCreatures();
@@ -808,7 +808,7 @@ class boss_suen : public CreatureScript
                             if (Unit* vict = me->GetVictim())
                             {
                                 targetGUID = vict->GetGUID();
-                                targetLowGUID = vict->GetGUIDLow();
+                                targetLowGUID = vict->GetGUID().GetCounter();
                             }
 
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, CasterSpecTargetSelector()))
@@ -1254,7 +1254,7 @@ struct npc_faded_image_of_celestial : public ScriptedAI
                     clickerGUID = ObjectGuid::Empty;
 
                     // Reset Drawing Seq
-                    if (Creature* sulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+                    if (Creature* sulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                         sulin->AI()->DoAction(ACTION_CELESTIAL_DRAWING_DONE);
                 }
                 break;
@@ -1264,7 +1264,7 @@ struct npc_faded_image_of_celestial : public ScriptedAI
                 if (Unit* clicker = ObjectAccessor::GetUnit(*me, clickerGUID))
                     clicker->RemoveAurasDueToSpell(invCelestialsType.find(me->GetEntry())->second);
 
-                if (Creature* worldTrigger = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_WORLD_TRIGGER) : 0))
+                if (Creature* worldTrigger = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                     worldTrigger->CastSpell(worldTrigger, celestialsList.find(me->GetEntry())->second, true);
 
                 me->SetVisible(false);
@@ -1291,7 +1291,7 @@ struct npc_faded_image_of_celestial : public ScriptedAI
 
     void OnSpellClick(Unit* clicker, bool& /*result*/) override
     {
-        if (Creature* sulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+        if (Creature* sulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
             sulin->AI()->SetData(TYPE_SELECTED_CELESTIAL, me->GetEntry());
 
         DoCast(me, SPELL_UNINTERACTABLE, true);
@@ -1397,7 +1397,7 @@ struct npc_celestial_star : public ScriptedAI
             DoCast(me, SPELL_STAR_STATE_INACTIVE, true);
 
             // Reset counter of right lines
-            if (Creature* sulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+            if (Creature* sulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                 sulin->AI()->DoAction(ACTION_CELESTIAL_DRAWING_WRONG);
         }
     }
@@ -1414,7 +1414,7 @@ struct npc_moon_lotus_wave : public ScriptedAI
 
     void Reset() override
     {
-        if (Creature* lulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_LULIN) : 0))
+        if (Creature* lulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
             lulin->AI()->JustSummoned(me);
 
         me->SetSpeed(MOVE_RUN, 0.35f);
@@ -1477,7 +1477,7 @@ struct npc_beast_of_nightmares : public ScriptedAI
         DoCast(me, SPELL_BEAST_OF_NIGHTMATRES_AURA);
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-        if (Creature* lulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_LULIN) : 0))
+        if (Creature* lulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
             lulin->AI()->JustSummoned(me);
 
         me->ClearUnitState(UNIT_STATE_CASTING);
@@ -1525,7 +1525,7 @@ struct npc_ice_comet : public ScriptedAI
         if (GameObject* tomb = me->SummonGameObject(GO_ICE_TOMB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), { }, 0))
             tombGUID = tomb->GetGUID();
 
-        if (Creature* suen = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+        if (Creature* suen = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
             DoCast(suen, SPELL_ICE_COMET_FACE_SUEN);
 
         // Areatrigger have some issue with low duration and LoS
@@ -1534,7 +1534,7 @@ struct npc_ice_comet : public ScriptedAI
             std::list<Player*> pList;
             GetPlayerListInGrid(pList, me, 10.0f);
 
-            if (Creature* suen = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+            if (Creature* suen = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
             {
                 for (auto&& itr : pList)
                     if (me->GetExactDist2d(itr) < 5.5f && !itr->IsWithinLOS(suen->GetPositionX(), suen->GetPositionY(), suen->GetPositionZ()))
@@ -1568,7 +1568,7 @@ struct npc_lurker_in_the_night : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* lulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_LULIN) : 0))
+        if (Creature* lulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
             lulin->AI()->JustSummoned(me);
 
         DoCast(me, SPELL_INVIS, true);
@@ -2290,7 +2290,7 @@ class spell_tidal_force : public SpellScript
     {
         if (Unit* caster = GetCaster())
         {
-            if (Creature* lulin = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(NPC_LULIN) : 0))
+            if (Creature* lulin = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
             {
                 // Prevent Trigger Proc if Lulin has dead state
                 if (lulin->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
@@ -2541,7 +2541,7 @@ class StarSequencePredicate
     
         bool operator()(WorldObject* object)
         {
-            if (Creature* sulin = ObjectAccessor::GetCreature(*_caster, object->GetInstanceScript() ? object->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+            if (Creature* sulin = ObjectAccessor::GetCreature(*_caster, object->GetInstanceScript() ? object->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
             {
                 switch (sulin->AI()->GetData(TYPE_SELECTED_CELESTIAL))
                 {
@@ -2746,7 +2746,7 @@ class sat_icy_shadows : public IAreaTriggerAura
     bool CheckTriggering(WorldObject* triggering) override
     {
         if (Player* itr = triggering->ToPlayer())
-            if (Creature* suen = ObjectAccessor::GetCreature(*itr, itr->GetInstanceScript() ? itr->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+            if (Creature* suen = ObjectAccessor::GetCreature(*itr, itr->GetInstanceScript() ? itr->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                 if (!itr->IsWithinLOS(suen->GetPositionX(), suen->GetPositionY(), suen->GetPositionZ()))
                     return true;
 
@@ -2813,7 +2813,7 @@ class sat_celestial_star : public IAreaTriggerAura
                     caster->CastSpell(caster, SPELL_STAR_STATE_ACTIVE, true);
                 }
 
-                if (Creature* sulin = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
+                if (Creature* sulin = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                 {
                     if (sulin->AI()->GetData(TYPE_SELECTED_CELESTIAL) != NPC_FADED_IMAGE_OF_NIUZAO && sulin->AI()->GetData(TYPE_SELECTED_CELESTIAL) != NPC_FADED_IMAGE_OF_YULON && caster->AI()->GetData(TYPE_STAR_IN_SEQ) == 7)
                         return;
@@ -2822,7 +2822,7 @@ class sat_celestial_star : public IAreaTriggerAura
 
                     if (sulin->AI()->GetData(TYPE_ACTIVE_STAR_COUNTER) >= 5)
                     {
-                        if (Creature* selectedCelestial = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript()->GetData64(sulin->AI()->GetData(TYPE_SELECTED_CELESTIAL))))
+                        if (Creature* selectedCelestial = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript()->GetGuidData(sulin->AI()->GetData(TYPE_SELECTED_CELESTIAL))))
                             selectedCelestial->AI()->DoAction(ACTION_CELESTIAL_DRAWING_DONE);
 
                         sulin->AI()->DoAction(ACTION_CELESTIAL_DRAWING_DONE);

@@ -282,10 +282,10 @@ class instance_oculus : public InstanceMapScript
                         break;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
-            bool IsPlayerEligibleForCache(uint64 playerGuid) const override
+            bool IsPlayerEligibleForCache(ObjectGuid playerGuid) const override
             {
                 return playersEligibleForCache.find(playerGuid) != playersEligibleForCache.end();
             }
@@ -333,7 +333,7 @@ class instance_oculus : public InstanceMapScript
 
             void GreaterWhelps()
             {
-                for (uint64 guid : GreaterWhelpList)
+                for (ObjectGuid guid : GreaterWhelpList)
                     if (Creature* gwhelp = instance->GetCreature(guid))
                         gwhelp->SetPhaseMask(1, true);
             }
@@ -401,8 +401,8 @@ class instance_oculus : public InstanceMapScript
 
             std::string str_data;
 
-            std::list<uint64> GreaterWhelpList;
-            std::set<uint64> playersEligibleForCache;
+            std::list<ObjectGuid> GreaterWhelpList;
+            std::set<ObjectGuid> playersEligibleForCache;
 
             EventMap events;
         };

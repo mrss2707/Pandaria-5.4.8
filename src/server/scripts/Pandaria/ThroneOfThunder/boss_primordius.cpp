@@ -1311,7 +1311,7 @@ class AreaTrigger_at_primordius_intro : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
         {
-            if (Creature* primordius = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetData64(DATA_PRIMORDIUS) : 0))
+            if (Creature* primordius = ObjectAccessor::GetCreature(*player, player->GetInstanceScript() ? player->GetInstanceScript()->GetGuidData(DATA_PRIMORDIUS) : ObjectGuid::Empty))
                 primordius->AI()->DoAction(ACTION_START_INTRO);
 
             return true;

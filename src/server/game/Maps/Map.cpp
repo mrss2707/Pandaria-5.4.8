@@ -3837,6 +3837,16 @@ Player* Map::GetPlayer(ObjectGuid guid)
     return ObjectAccessor::GetPlayer(this, guid);
 }
 
+AreaTrigger* Map::GetAreaTrigger(ObjectGuid const& guid)
+{
+    return _objectsStore.Find<AreaTrigger>(guid);
+}
+
+Corpse* Map::GetCorpse(ObjectGuid const& guid)
+{
+    return _objectsStore.Find<Corpse>(guid);
+}
+
 Creature* Map::GetCreature(ObjectGuid guid)
 {
     return _objectsStore.Find<Creature>(guid);
@@ -3859,6 +3869,39 @@ Transport* Map::GetTransport(ObjectGuid guid)
 DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
 {
     return _objectsStore.Find<DynamicObject>(guid);
+}
+
+Creature* Map::GetCreatureBySpawnId(ObjectGuid::LowType spawnId) const
+{
+    auto const bounds = GetCreatureBySpawnIdStore().equal_range(spawnId);
+    if (bounds.first == bounds.second)
+        return nullptr;
+
+    std::unordered_multimap<uint32, Creature*>::const_iterator creatureItr = std::find_if(bounds.first, bounds.second, [](Map::CreatureBySpawnIdContainer::value_type const& pair)
+    {
+        return pair.second->IsAlive();
+    });
+
+    return creatureItr != bounds.second ? creatureItr->second : bounds.first->second;
+}
+
+GameObject* Map::GetGameObjectBySpawnId(ObjectGuid::LowType spawnId) const
+{
+    auto const bounds = GetGameObjectBySpawnIdStore().equal_range(spawnId);
+    if (bounds.first == bounds.second)
+        return nullptr;
+
+    std::unordered_multimap<uint32, GameObject*>::const_iterator creatureItr = std::find_if(bounds.first, bounds.second, [](Map::GameObjectBySpawnIdContainer::value_type const& pair)
+    {
+        return pair.second->isSpawned();
+    });
+
+    return creatureItr != bounds.second ? creatureItr->second : bounds.first->second;
+}
+
+Pet* Map::GetPet(ObjectGuid const& guid)
+{
+    return _objectsStore.Find<Pet>(guid);
 }
 
 void Map::UpdateIteratorBack(Player* player)

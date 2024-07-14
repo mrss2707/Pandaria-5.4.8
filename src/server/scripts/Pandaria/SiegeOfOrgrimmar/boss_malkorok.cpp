@@ -875,7 +875,7 @@ class spell_malkorok_arcing_smash_controll : public SpellScript
     void HandleHit(SpellEffIndex effIndex)
     {
         if (Creature* caster = GetCaster()->ToCreature())
-            if (Creature* controller = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(NPC_MALKOROK_CONTROLLER) : 0))
+            if (Creature* controller = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(NPC_MALKOROK_CONTROLLER) : ObjectGuid::Empty))
                 controller->AI()->DoAction(ACTION_INIT_ARCING_SEQ);
     }
 
@@ -1013,7 +1013,7 @@ class spell_malkorok_ancient_miasma_heal_absorb : public AuraScript
             {
                 int32 bp = absorb > owner->GetMaxHealth() ? owner->GetMaxHealth() : (int32)absorb;
 
-                if (Creature* controller = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(NPC_MALKOROK_CONTROLLER) : 0))
+                if (Creature* controller = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(NPC_MALKOROK_CONTROLLER) : ObjectGuid::Empty))
                     controller->CastCustomSpell(owner, SPELL_ANCIENT_BARRIER, &bp, NULL, NULL, true);
             }
         }

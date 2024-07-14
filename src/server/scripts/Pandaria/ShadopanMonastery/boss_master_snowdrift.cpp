@@ -850,7 +850,7 @@ class npc_snowdrift_novice : public CreatureScript
                     {
                         if (auto const targetGUID = instance->GetGuidData(DATA_RANDOM_SECOND_POS))
                         {
-                            if (auto const target = ObjectAccessor::FindUnit(targetGUID))
+                            if (auto const target = ObjectAccessor::GetUnit(*me, targetGUID))
                             {
                                 me->AddUnitState(UNIT_STATE_ROOT | UNIT_STATE_CANNOT_TURN);
                                 me->CastSpell(target, SPELL_JUMP, false);
@@ -928,7 +928,7 @@ class npc_snowdrift_novice : public CreatureScript
                             {
                                 if (auto const targetGUID = instance->GetGuidData(DATA_RANDOM_FIRST_POS))
                                 {
-                                    if (auto const target = ObjectAccessor::FindUnit(targetGUID))
+                                    if (auto const target = ObjectAccessor::GetUnit(*me, targetGUID))
                                     {
                                         me->AddUnitState(UNIT_STATE_ROOT | UNIT_STATE_CANNOT_TURN);
                                         me->CastSpell(target, SPELL_JUMP, false);
@@ -1104,7 +1104,7 @@ class npc_snowdrift_miniboss : public CreatureScript
                             {
                                if (ObjectGuid targetGUID = instance->GetGuidData(DATA_RANDOM_MINIBOSS_POS))
                                {
-                                   if (Unit* target = ObjectAccessor::FindUnit(targetGUID))
+                                   if (Unit* target = ObjectAccessor::GetUnit(*me, targetGUID))
                                    {
                                        me->AddUnitState(UNIT_STATE_ROOT | UNIT_STATE_CANNOT_TURN);
                                        me->CastSpell(target, SPELL_JUMP, false);

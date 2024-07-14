@@ -2522,7 +2522,7 @@ class npc_hisek_the_swarmkeeper : public CreatureScript
             if (quest->GetQuestId() == 31441)
             {
                 Position pos = creature->GetPosition();
-                uint64 playerGUID = player->GetGUID();
+                ObjectGuid playerGUID = player->GetGUID();
                 if (auto qgiver = creature->SummonCreature(64705, pos))
                 {
                     qgiver->SetExplicitSeerGuid(playerGUID);
@@ -3398,7 +3398,7 @@ class spell_dread_waster_gather_shade : public SpellScript
     {
         if (Player* target = GetHitPlayer())
             if (target->GetQuestStatus(QUEST_BOUND_WITH_SHADES) == QUEST_STATUS_INCOMPLETE)
-                target->KilledMonsterCredit(NPC_SHADE_CREDIT, 0, GetSpellInfo()->Effects[effIndex].BasePoints);
+                target->KilledMonsterCredit(NPC_SHADE_CREDIT, ObjectGuid::Empty, GetSpellInfo()->Effects[effIndex].BasePoints);
     }
 
     void Register() override

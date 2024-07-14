@@ -839,7 +839,7 @@ class go_sikthik_cage : public GameObjectScript
             {
                 if (Creature* leng = player->SummonCreature(NPC_RESTLESS_LENG, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000))
                 {
-                    uint64 playerGuid = player->GetGUID();
+                    ObjectGuid playerGuid = player->GetGUID();
 
                     uint32 delay = 0;
                     leng->m_Events.Schedule(delay += 2000, [leng]()             { leng->AI()->Talk(0); });
@@ -850,7 +850,7 @@ class go_sikthik_cage : public GameObjectScript
                 player->KilledMonsterCredit(NPC_RESTLESS_LENG);
             }
 
-            uint64 goGuid = go->GetGUID();
+            ObjectGuid goGuid = go->GetGUID();
             uint32 delay = 0;
             player->m_Events.Schedule(delay += 8000, [player, goGuid]()
             {
@@ -1493,7 +1493,7 @@ class cond_burn_mantid_corpse : public ConditionScript
             if (!player)
                 return false;
 
-            Unit* unit = sObjectAccessor->GetUnit(*player, player->GetTarget());
+            Unit* unit = ObjectAccessor::GetUnit(*player, player->GetTarget());
             if (!unit)
                 return false;
 

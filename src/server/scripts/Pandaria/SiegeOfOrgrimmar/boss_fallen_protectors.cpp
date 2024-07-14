@@ -473,7 +473,7 @@ class boss_rook_stonetoe : public CreatureScript
 
                 // Evade Encounter
                 for (auto&& itr : protectorsList)
-                    if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(itr) : 0))
+                    if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(itr) : ObjectGuid::Empty))
                         fallenProtector->AI()->EnterEvadeMode();
 
                 _EnterEvadeMode();
@@ -637,7 +637,7 @@ class boss_rook_stonetoe : public CreatureScript
                 bool hasProtectorsEncounterDone()
                 {
                     for (auto&& itr : protectorsList)
-                        if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(itr) : 0))
+                        if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(itr) : ObjectGuid::Empty))
                             if (!fallenProtector->AI()->GetData(TYPE_BOND_OF_LOTUS))
                                 return false;
 
@@ -649,7 +649,7 @@ class boss_rook_stonetoe : public CreatureScript
                     if (Player* target = me->FindNearestPlayer(200.0f))
                     {
                         for (auto&& itr : protectorsList)
-                            if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(itr) : 0))
+                            if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(itr) : ObjectGuid::Empty))
                                 target->Kill(fallenProtector);
 
                         JustDied(target);
@@ -666,11 +666,11 @@ class boss_rook_stonetoe : public CreatureScript
                     if (IsHeroic())
                         return false;
 
-                    if (Creature* he = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_HE_SOFTFOOT) : 0))
+                    if (Creature* he = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_HE_SOFTFOOT) : ObjectGuid::Empty))
                         if (he->HasAura(SPELL_MARK_OF_ANGUISH_VISUAL))
                             return true;
 
-                    if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+                    if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                         if (sun->HasAura(SPELL_DARK_MEDITATION_VISUAL))
                             return true;
 
@@ -904,7 +904,7 @@ class boss_he_softfoot : public CreatureScript
 
                 // Evade Encounter
                 for (auto&& itr : protectorsList)
-                    if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(itr) : 0))
+                    if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(itr) : ObjectGuid::Empty))
                         fallenProtector->AI()->EnterEvadeMode();
 
                 _EnterEvadeMode();
@@ -1260,7 +1260,7 @@ class boss_sun_tenderheart : public CreatureScript
 
                 // Evade Encounter
                 for (auto&& itr : protectorsList)
-                    if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(itr) : 0))
+                    if (Creature* fallenProtector = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(itr) : ObjectGuid::Empty))
                         fallenProtector->AI()->EnterEvadeMode();
 
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE);
@@ -1420,11 +1420,11 @@ class boss_sun_tenderheart : public CreatureScript
                     if (IsHeroic())
                         return false;
 
-                    if (Creature* he = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_HE_SOFTFOOT) : 0))
+                    if (Creature* he = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_HE_SOFTFOOT) : ObjectGuid::Empty))
                         if (he->HasAura(SPELL_MARK_OF_ANGUISH_VISUAL))
                             return true;
 
-                    if (Creature* rook = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_ROOK_STONETOE) : 0))
+                    if (Creature* rook = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_ROOK_STONETOE) : ObjectGuid::Empty))
                         if (rook->HasAura(SPELL_MISSERY_SORROW_GLOOM))
                             return true;
 
@@ -1511,7 +1511,7 @@ struct npc_embodied_misery : public ScriptedAI
 
             events.ScheduleEvent(EVENT_DEFILED_GROUND, 8 * IN_MILLISECONDS);
 
-            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                 me->SetFacingTo(me->GetAngle(sun));
         }
     }
@@ -1621,7 +1621,7 @@ struct npc_embodied_sorrow : public ScriptedAI
 
             events.ScheduleEvent(EVENT_INFERNO_STRIKE, 6 * IN_MILLISECONDS);
 
-            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                 me->SetFacingTo(me->GetAngle(sun));
         }
     }
@@ -1730,7 +1730,7 @@ struct npc_embodied_gloom : public ScriptedAI
 
             events.ScheduleEvent(EVENT_CORRUPTION_SHOCK_CHAIN, 1.5 * IN_MILLISECONDS);
 
-            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                 me->SetFacingTo(me->GetAngle(sun));
         }
     }
@@ -1901,7 +1901,7 @@ struct npc_embodied_despair : public ScriptedAI
             events.ScheduleEvent(EVENT_MANIFEST_DESPAIR, 0.5 * IN_MILLISECONDS);
             me->SummonCreature(NPC_DESPAIR_SPAWN, *me, TEMPSUMMON_MANUAL_DESPAWN);
 
-            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                 me->SetFacingTo(me->GetAngle(sun));
 
             if (me->GetInstanceScript())
@@ -1972,7 +1972,7 @@ struct npc_embodied_desperation : public ScriptedAI
             events.ScheduleEvent(EVENT_MANIFEST_DESPERATION, 0.5 * IN_MILLISECONDS);
             me->SummonCreature(NPC_DESPERATION_SPAWN, *me, TEMPSUMMON_MANUAL_DESPAWN);
 
-            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                 me->SetFacingTo(me->GetAngle(sun));
 
             if (me->GetInstanceScript())
@@ -2091,7 +2091,7 @@ struct npc_golden_lotus_trigger : public ScriptedAI
             if (Creature* embodiedSpirit = me->SummonCreature(goldenLotusCorrupedType.find(me->GetEntry())->second, *me, TEMPSUMMON_MANUAL_DESPAWN))
                 embodiedSpirit->CastSpell(me, VEHICLE_SPELL_RIDE_HARDCODED, true);
 
-            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+            if (Creature* sun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
             {
                 float dist = me->GetExactDist2d(sun);
                 float x, y;
@@ -2464,7 +2464,7 @@ class spell_he_mark_of_anguish_transfer : public SpellScript
         }
 
         // Achiev
-        if (Creature* rook = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetData64(NPC_ROOK_STONETOE) : 0))
+        if (Creature* rook = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript() ? caster->GetInstanceScript()->GetGuidData(NPC_ROOK_STONETOE) : ObjectGuid::Empty))
         {
             rook->AI()->SetData(TYPE_GO_LONG, (uint32)(caster->GetExactDist2d(target)));
             rook->AI()->SetGUID(caster->GetGUID());
@@ -2621,7 +2621,7 @@ class spell_sun_shadow_word_bane_main : public AuraScript
         if (Unit* owner = GetOwner()->ToUnit())
             // First 3 ticks, it jumps to another player not having the main spell.
             if (aurEff->GetTickNumber() <= 3)
-                if (Creature* sun = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(NPC_SUN_TENDERHEART) : 0))
+                if (Creature* sun = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                     sun->CastSpell(owner, SPELL_SHADOW_WORD_BANE_SELECT, true);
     }
 

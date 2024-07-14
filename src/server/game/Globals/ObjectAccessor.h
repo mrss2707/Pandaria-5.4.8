@@ -108,26 +108,6 @@ namespace ObjectAccessor
     void RemoveObject(Player* player);
 
     TC_GAME_API void SaveAllPlayers();
-
-    // ------ legacy access --------
-
-    // when using this, you must use the hashmapholder's lock
-    static HashMapHolder<Creature>::MapType const& GetCreatures()
-    {
-        return HashMapHolder<Creature>::GetContainer();
-    }
-
-    // when using this, you must use the hashmapholder's lock
-    static HashMapHolder<GameObject>::MapType const& GetGameObjects()
-    {
-        return HashMapHolder<GameObject>::GetContainer();
-    }
-
-    // returns object if is in world
-    template<class T> static T* GetObjectInWorld(ObjectGuid guid, T* /*typeSpecifier*/)
-    {
-        return HashMapHolder<T>::Find(guid);
-    }
 }
 
 #endif

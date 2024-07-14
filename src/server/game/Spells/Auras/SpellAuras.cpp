@@ -2605,7 +2605,7 @@ void Aura::SetScriptData(uint32 type, uint32 data)
         script->SetData(type, data);
 }
 
-void Aura::SetScriptGuid(uint32 type, uint64 data)
+void Aura::SetScriptGuid(uint32 type, ObjectGuid data)
 {
     for (auto &script : m_loadedScripts)
         script->SetGuid(type, data);

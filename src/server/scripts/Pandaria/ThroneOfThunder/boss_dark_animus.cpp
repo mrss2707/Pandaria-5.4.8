@@ -930,7 +930,7 @@ class spell_transfusion_missile : public SpellScript
         {
             if (Creature* target = GetHitCreature())
             {
-                if (Creature* orb = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(NPC_ANIMA_ORB) : 0))
+                if (Creature* orb = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(NPC_ANIMA_ORB) : ObjectGuid::Empty))
                     if (!orb->AI()->GetData(TYPE_DARK_ANIMUS)) // prevent energize if missle hit at evade
                         return;
 
@@ -965,7 +965,7 @@ class spell_transfusion_orb : public SpellScript
                 target->CastCustomSpell(target, SPELL_TRANSFUSION_ENERGIZE_4, &bp, NULL, NULL, true);
             }
 
-            if (Creature* orb = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(NPC_ANIMA_ORB) : 0))
+            if (Creature* orb = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(NPC_ANIMA_ORB) : ObjectGuid::Empty))
                 if (orb->AI()->GetData(TYPE_DARK_ANIMUS)) // prevent energize if missle hit at evade
                     target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         }
@@ -998,7 +998,7 @@ class spell_transfusion_intro_energize : public SpellScript
     {
         if (Creature* target = GetHitCreature())
         {
-            if (Creature* orb = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(NPC_ANIMA_ORB) : 0))
+            if (Creature* orb = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(NPC_ANIMA_ORB) : ObjectGuid::Empty))
             {
                 if (orb->AI()->GetData(TYPE_DARK_ANIMUS)) // prevent energize if missle hit at evade
                     target->AI()->DoAction(GetSpellValue()->EffectBasePoints[effIndex]);

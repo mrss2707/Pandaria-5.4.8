@@ -1122,14 +1122,14 @@ struct tribeAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_GURUBASHI_BERSERKER, 80.0f);
 
         if (tmpTargets.empty())
-            return 0;
+            return ObjectGuid::Empty;
 
         tmpTargets.sort(Trinity::HealthPctOrderPred());
 
         if (Creature* lowestTarget = tmpTargets.front())
             return lowestTarget->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 };
 
@@ -1663,14 +1663,14 @@ class npc_zandalari_prelate : public CreatureScript
                     GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_ZANDALARI_PROPHET, 80.0f);
 
                     if (tmpTargets.empty())
-                        return 0;
+                        return ObjectGuid::Empty;
 
                     tmpTargets.sort(Trinity::HealthPctOrderPred());
 
                     if (Creature* lowestTarget = tmpTargets.front())
                         return lowestTarget->GetGUID();
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
         };
     
@@ -1843,7 +1843,7 @@ class npc_garajal_spirit_binder_event : public CreatureScript
             uint32 GetData(uint32 type) const override
             {
                 for (auto&& itr : tribesList)
-                    if (itr->GetGUIDLow() == type)
+                    if (itr->GetGUID().GetCounter() == type)
                         return 1;
 
                 return 0;
@@ -3403,7 +3403,7 @@ class SummonShadowyMinionsPredicate
     
         bool operator()(WorldObject* object)
         {
-            if (_caster->AI()->GetData(object->GetGUIDLow()))
+            if (_caster->AI()->GetData(object->GetGUID().GetCounter()))
                 return false;
 
             return true;

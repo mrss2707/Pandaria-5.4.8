@@ -157,6 +157,7 @@ typedef std::multimap<uint32 /*entry*/, DoorInfo> DoorInfoMap;
 typedef std::pair<DoorInfoMap::const_iterator, DoorInfoMap::const_iterator> DoorInfoMapBounds;
 
 typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
+typedef std::map<uint32 /*type*/, ObjectGuid /*guid*/> ObjectGuidMap;
 
 enum ChallengeMedals
 {
@@ -426,6 +427,7 @@ class InstanceScript : public ZoneScript
 
         ObjectGuid GetGUID() const { return instanceGuid; }
 
+        ObjectGuid GetObjectGuid(uint32 type) const;
         virtual ObjectGuid GetGuidData(uint32 type) const override;
 
         // Scenarios
@@ -487,6 +489,7 @@ class InstanceScript : public ZoneScript
         std::vector<ObjectGuid> flexCreatures;
         DoorInfoMap doors;
         MinionInfoMap minions;
+        ObjectGuidMap _objectGuids;
         uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
         uint8 resurrections;
         uint8 determinationCount;

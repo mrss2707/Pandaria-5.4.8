@@ -123,7 +123,7 @@ class OPvPCapturePoint
 
         virtual void SendChangePhase();
 
-        virtual bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+        virtual bool HandleGossipOption(Player* player, Creature* creature, uint32 gossipid);
 
         virtual bool CanTalkTo(Player* player, Creature* c, GossipMenuItems const& gso);
 
@@ -243,7 +243,7 @@ class OutdoorPvP : public ZoneScript
 
         virtual bool HandleDropFlag(Player* player, uint32 spellId);
 
-        virtual bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+        virtual bool HandleGossipOption(Player* player, Creature* creature, uint32 gossipid);
 
         virtual bool CanTalkTo(Player* player, Creature* c, GossipMenuItems const& gso);
 

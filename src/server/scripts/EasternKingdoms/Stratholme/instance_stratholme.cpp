@@ -435,7 +435,7 @@ class instance_stratholme : public InstanceMapScript
                     case GO_ZIGGURAT4:
                         return ziggurat4GUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Update(uint32 diff) override

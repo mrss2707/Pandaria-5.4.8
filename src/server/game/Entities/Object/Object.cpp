@@ -79,7 +79,7 @@ WorldObject::~WorldObject()
         if (GetTypeId() == TYPEID_CORPSE)
         {
             TC_LOG_FATAL("misc", "Object::~Object Corpse guid=" UI64FMTD ", type=%d, entry=%u deleted but still in map!!",
-                GetGUID().GetCounter(), ((Corpse*)this)->GetType(), GetEntry());
+                GetGUID().GetRawValue(), ((Corpse*)this)->GetType(), GetEntry());
             ASSERT(false);
         }
         ResetMap();
@@ -90,7 +90,7 @@ Object::~Object()
 {
     if (IsInWorld())
     {
-        TC_LOG_FATAL("misc", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in world!!", GetGUID().GetCounter(), GetTypeId(), GetEntry());
+        TC_LOG_FATAL("misc", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in world!!", GetGUID().GetRawValue(), GetTypeId(), GetEntry());
         if (isType(TYPEMASK_ITEM))
             TC_LOG_FATAL("misc", "Item slot %u", ((Item*)this)->GetSlot());
         ASSERT(false);
@@ -99,7 +99,7 @@ Object::~Object()
 
     if (m_objectUpdated)
     {
-        TC_LOG_FATAL("misc", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in update list!!", GetGUID().GetCounter(), GetTypeId(), GetEntry());
+        TC_LOG_FATAL("misc", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in update list!!", GetGUID().GetRawValue(), GetTypeId(), GetEntry());
         ASSERT(false);
     }
 
@@ -381,6 +381,12 @@ uint16 Object::GetUInt16Value(uint16 index, uint8 offset) const
     ASSERT(index < m_valuesCount || PrintIndexError(index, false));
     ASSERT(offset < 2);
     return *(((uint16*)&m_uint32Values[index])+offset);
+}
+
+ObjectGuid Object::GetGuidValue(uint16 index) const
+{
+    ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, false));
+    return *((ObjectGuid*)&(m_uint32Values[index]));
 }
 
 uint32 Object::GetDynamicUInt32Value(uint32 tab, uint16 index) const
@@ -1107,6 +1113,20 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
         m_uint32Values[index] &= ~uint32(uint32(0xFFFF) << (offset * 16));
         m_uint32Values[index] |= uint32(uint32(value) << (offset * 16));
         _changesMask.SetBit(index);
+
+        if (m_inWorld && !m_objectUpdated)
+            AddToUpdate();
+    }
+}
+
+void Object::SetGuidValue(uint16 index, ObjectGuid value)
+{
+    ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
+    if (*((ObjectGuid*)&(m_uint32Values[index])) != value)
+    {
+        *((ObjectGuid*)&(m_uint32Values[index])) = value;
+        _changesMask.SetBit(index);
+        _changesMask.SetBit(index + 1);
 
         if (m_inWorld && !m_objectUpdated)
             AddToUpdate();

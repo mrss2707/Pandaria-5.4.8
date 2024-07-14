@@ -284,7 +284,7 @@ class TouchYshaarjAI : public PlayerAI
             if (apply)
             {
                 // Handle set health pct inc depend of mind control type (seems like spell for this doesn`t exist)
-                if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                 {
                     float percent = me->GetHealthPct();
                     amount = garrosh->HasAura(SPELL_TOUCH_EMPOWERED) ? 150 : 50;
@@ -315,7 +315,7 @@ class TouchYshaarjAI : public PlayerAI
             else
             {
                 // Handle remove health pct inc depend of mind control type (seems like spell for this doesn`t exist)
-                if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                 {
                     float percent = me->GetHealthPct();
                     uint32 currentHealth = me->GetHealth();
@@ -389,14 +389,14 @@ class TouchYshaarjAI : public PlayerAI
         }
 
     private:
-        uint64 getNotCharmedPlayerGUID()
+        ObjectGuid getNotCharmedPlayerGUID()
         {
             std::list<Player*> targets;
             GetPlayerListInGrid(targets, me, 200.0f);
             targets.remove_if([=](Player* target) { return target && (target->HasAura(SPELL_TOUCH_OF_YSHAARJ_PLAYER_EFF) || target->HasAura(SPELL_EMP_TOUCH_OF_YSHAARJ_PLAYER_EFF) || target->HasAura(SPELL_TOUCH_OH_YSHAARJ) || target->HasAura(SPELL_EMPOWERED_TOUCH_OF_YSHAARJ)); });
 
             if (targets.empty())
-                return 0;
+                return ObjectGuid::Empty;
 
             return Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID();
         }
@@ -1231,7 +1231,7 @@ class boss_garrosh_hellscream : public CreatureScript
                             for (uint8 i = 0; i < 6; i++)
                                 me->SummonCreature(NPC_WARBRINGER_KORKRON, WarbringersSpawnPos[i], TEMPSUMMON_MANUAL_DESPAWN);
 
-                            if (GameObject* westGates = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_GARROSH_SOUTH_WEST_DOOR):0))
+                            if (GameObject* westGates = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_GARROSH_SOUTH_WEST_DOOR):ObjectGuid::Empty))
                                 instance->HandleGameObject(westGates->GetGUID(), true, NULL);
 
                             if (GameObject* eastGates = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_GARROSH_SOUTH_EAST_DOOR) : ObjectGuid::Empty))
@@ -1240,7 +1240,7 @@ class boss_garrosh_hellscream : public CreatureScript
                         case GUARD_TYPE_WOLF_RIDER:
                             me->SummonCreature(NPC_WOLF_RIDER_FARSEER, WolfridersSpawnPos[wRiderGates ? 0 : 1], TEMPSUMMON_MANUAL_DESPAWN);
 
-                            if (GameObject* sideGates = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(wRiderGates ? GO_GARROSH_SOUTH_EAST_DOOR : GO_GARROSH_SOUTH_WEST_DOOR) : 0))
+                            if (GameObject* sideGates = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(wRiderGates ? GO_GARROSH_SOUTH_EAST_DOOR : GO_GARROSH_SOUTH_WEST_DOOR) : ObjectGuid::Empty))
                                 instance->HandleGameObject(sideGates->GetGUID(), true, NULL);
 
                             wRiderGates = wRiderGates ? false : true;
@@ -1524,7 +1524,7 @@ struct npc_korkron_warbringer : public soo_garrosh_guards_typeAI
         if (killer->GetGUID() != me->GetGUID())
             return;
 
-        if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+        if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
             garrosh->AI()->SetData(TYPE_GARROSH_STRIKE_COUNT, 1);
     }
 
@@ -1935,7 +1935,7 @@ struct npc_garrosh_unstable_iron_star : public ScriptedAI
 
     void Reset() override
     {
-        if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+        if (Creature* garrosh = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
             garrosh->AI()->JustSummoned(me);
 
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
@@ -2080,7 +2080,7 @@ class spell_garrosh_realm_of_yshaarj : public AuraScript
     {
         if (Player* owner = GetOwner()->ToPlayer())
         {
-            if (Creature* heartOfYshaarj = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(NPC_HEART_OF_YSHAARJ) : 0))
+            if (Creature* heartOfYshaarj = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(NPC_HEART_OF_YSHAARJ) : ObjectGuid::Empty))
             {
                 owner->TeleportTo(owner->GetMapId(), heartOfYshaarj->GetPositionX() + frand(-4.5f, 4.5f), heartOfYshaarj->GetPositionY() + frand(-3.0f, 3.0f), heartOfYshaarj->GetPositionZ(), heartOfYshaarj->GetOrientation(), TELE_TO_NOT_UNSUMMON_PET | TELE_TO_NOT_LEAVE_COMBAT);
 
@@ -2269,7 +2269,7 @@ class spell_garrosh_explosive_despair_eff : public AuraScript
     void OnAuraEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
     {
         if (Unit* owner = GetOwner()->ToUnit())
-            if (Creature* garrosh = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+            if (Creature* garrosh = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                 SetStackAmount(garrosh->AI()->GetData(TYPE_EXPLOSIVE_DESPAIR));
     }
 
@@ -2327,7 +2327,7 @@ class spell_garrosh_desecrate_selector : public SpellScript
             if (Player* target = GetHitPlayer())
             {
                 caster->SetTarget(target->GetGUID());
-                uint64 targetGUID = target->GetGUID();
+                ObjectGuid targetGUID = target->GetGUID();
                 uint32 spellId = GetSpellInfo()->Effects[caster->HasAura(SPELL_DESECRATED_EMPOWERED) ? EFFECT_1 : EFFECT_0].BasePoints;
 
                 // Target Scanning 0.2s
@@ -2845,7 +2845,7 @@ class spell_garrosh_garrosh_energy : public AuraScript
                 return;
             }
 
-            if (Creature* garrosh = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+            if (Creature* garrosh = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                 owner->SetPower(POWER_ALTERNATE_POWER, garrosh->GetPower(POWER_ENERGY));
         }
     }
@@ -2992,7 +2992,7 @@ class spell_garrosh_touch_of_yshaarj_player_launcher_2 : public SpellScript
     void HandleEffectHitTarget(SpellEffIndex eff_idx)
     {
         if (Unit* target = GetHitUnit())
-            if (Creature* garrosh = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+            if (Creature* garrosh = ObjectAccessor::GetCreature(*target, target->GetInstanceScript() ? target->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                 garrosh->CastSpell(target, garrosh->HasAura(SPELL_TOUCH_EMPOWERED) ? SPELL_EMP_TOUCH_OF_YSHAARJ_PLAYER_EFF : SPELL_TOUCH_OF_YSHAARJ_PLAYER_EFF, true);
     }
 
@@ -3591,7 +3591,7 @@ class sat_garrosh_desecrated_weapon : public IAreaTriggerAura
 {
     bool CheckTriggering(WorldObject* triggering) override
     {
-        if (Creature* garrosh = ObjectAccessor::GetCreature(*triggering, triggering->GetInstanceScript() ? triggering->GetInstanceScript()->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+        if (Creature* garrosh = ObjectAccessor::GetCreature(*triggering, triggering->GetInstanceScript() ? triggering->GetInstanceScript()->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
             return triggering && triggering->ToPlayer() && triggering->ToPlayer()->IsAlive() && !triggering->ToPlayer()->HasAura(SPELL_TOUCH_OH_YSHAARJ) && !triggering->ToPlayer()->HasAura(SPELL_TOUCH_OF_YSHAARJ_PLAYER_EFF) && !triggering->ToPlayer()->HasAura(SPELL_EMPOWERED_TOUCH_OF_YSHAARJ) && !triggering->ToPlayer()->HasAura(SPELL_EMP_TOUCH_OF_YSHAARJ_PLAYER_EFF) && !triggering->ToPlayer()->HasAura(SPELL_ENTER_REALM_OF_GARROSH) && !garrosh->AI()->GetData(TYPE_GARROSH_REALM); // prevent hit from AT if already in transition.
 
         return false;

@@ -187,7 +187,7 @@ class boss_xin_the_weaponmaster : public CreatureScript
                 Talk(TALK_RESET);
 
                 if (auto const script = me->GetInstanceScript())
-                    script->HandleGameObject(ObjectGuid::Empty, true, ObjectAccessor::GetGameObject(*me, script->GetData64(GO_DOOR_BEFORE_KING)));
+                    script->HandleGameObject(ObjectGuid::Empty, true, ObjectAccessor::GetGameObject(*me, script->GetGuidData(GO_DOOR_BEFORE_KING)));
             }
 
             void KilledUnit(Unit* /*victim*/) override
@@ -320,7 +320,7 @@ class boss_xin_the_weaponmaster : public CreatureScript
                 Talk(TALK_AGGRO);
 
                 if (auto const script = me->GetInstanceScript())
-                    script->HandleGameObject(ObjectGuid::Empty, false, ObjectAccessor::GetGameObject(*me, script->GetData64(GO_DOOR_BEFORE_KING)));
+                    script->HandleGameObject(ObjectGuid::Empty, false, ObjectAccessor::GetGameObject(*me, script->GetGuidData(GO_DOOR_BEFORE_KING)));
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -336,7 +336,7 @@ class boss_xin_the_weaponmaster : public CreatureScript
                 DeactivateWeapons();
 
                 if (auto const script = me->GetInstanceScript())
-                    script->HandleGameObject(ObjectGuid::Empty, true, ObjectAccessor::GetGameObject(*me, script->GetData64(GO_DOOR_BEFORE_KING)));
+                    script->HandleGameObject(ObjectGuid::Empty, true, ObjectAccessor::GetGameObject(*me, script->GetGuidData(GO_DOOR_BEFORE_KING)));
             }
 
             void DoAction(int32 actionId) override
@@ -856,7 +856,7 @@ class npc_mp_quilen_guardian : public CreatureScript
                 CallQuilensForHelp(who->GetGUID());
             }
 
-            void CallQuilensForHelp(uint64 attacker)
+            void CallQuilensForHelp(ObjectGuid attacker)
             {
                 std::list<Creature*> Quilens;
                 GetCreatureListWithEntryInGrid(Quilens, me, CREATURE_QUILEN_GUARDIAN, 50.0f);

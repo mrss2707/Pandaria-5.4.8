@@ -140,7 +140,7 @@ class boss_amber_shaper_unsok : public CreatureScript
             boss_amber_shaper_unsokAI(Creature* creature) : BossAI(creature, DATA_UNSOK) { }
 
             std::list<Creature*> LivingAmber;
-            std::list<uint64> protList;
+            std::list<ObjectGuid> protList;
             uint32 _phase, delay;
             ObjectGuid targetGUID;
             bool IntroDone, IsFirstReshape, InShift;
@@ -488,11 +488,11 @@ class boss_amber_shaper_unsok : public CreatureScript
                         protList.push_back(vict->GetGUID());
                 }
 
-                uint64 GetReshapeLifeTarget()
+                ObjectGuid GetReshapeLifeTarget()
                 {
                     for (auto it = protList.begin(); it != protList.end(); ++it)
                     {
-                        uint64 guid = *it;
+                        ObjectGuid guid = *it;
                         if (Unit* target = ObjectAccessor::GetUnit(*me, guid))
                         {
                             if (target->IsAlive())
@@ -504,7 +504,7 @@ class boss_amber_shaper_unsok : public CreatureScript
                         }
                     }
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
 
                 void DoMeleeAttackIfReady()
@@ -839,7 +839,7 @@ class npc_amber_scalpel : public CreatureScript
             }
 
             private:
-                uint64 SelectLivingAmberGUID()
+                ObjectGuid SelectLivingAmberGUID()
                 {
                     std::list<Creature*> AmberStalkers;
                     GetCreatureListWithEntryInGrid(AmberStalkers, me, NPC_MOLTEN_AMBER, 150.0f);
@@ -847,7 +847,7 @@ class npc_amber_scalpel : public CreatureScript
                     if (!AmberStalkers.empty())
                         return Trinity::Containers::SelectRandomContainerElement(AmberStalkers)->GetGUID();
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
         };
 
@@ -1019,7 +1019,7 @@ class npc_amber_pool_stalker : public CreatureScript
                                 init.SetUncompressed();
                                 init.Launch();
 
-                                uint64 amberGUID = amber->GetGUID();
+                                ObjectGuid amberGUID = amber->GetGUID();
                                 delay = 0;
                                 me->m_Events.Schedule(delay += amber->GetSplineDuration(), 13, [this, amberGUID]()
                                 {

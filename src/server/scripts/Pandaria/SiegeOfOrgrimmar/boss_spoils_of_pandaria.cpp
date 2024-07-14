@@ -777,7 +777,7 @@ class boss_spoils_of_pandaria : public CreatureScript
                         box->Delete();
                 }
 
-                if (GameObject* chest = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(IsHeroic() ? GO_SPOILS_CHEST_HC : GO_SPOILS_CHEST) : 0))
+                if (GameObject* chest = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(IsHeroic() ? GO_SPOILS_CHEST_HC : GO_SPOILS_CHEST) : ObjectGuid::Empty))
                     instance->DoRespawnGameObject(chest->GetGUID(), 7 * DAY * IN_MILLISECONDS);
 
                 if (Player* player = me->GetMap()->GetFirstPlayerInInstance())
@@ -897,7 +897,7 @@ struct npc_spoils_artifact_spoils : public ScriptedAI
                         myLever->CastSpell(myLever, SPELL_UNSTABLE_DEFENSE_SYSTEM_BEAM, true);
 
                     // Unlock lever to use
-                    if (GameObject* lever = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(invControllerRegionType.find(me->GetEntry())->second[1]) : 0))
+                    if (GameObject* lever = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(invControllerRegionType.find(me->GetEntry())->second[1]) : ObjectGuid::Empty))
                         lever->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
 
                     SetData(TYPE_LEVER_DATA, SPECIAL);
@@ -961,7 +961,7 @@ struct npc_spoils_lever : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
 
         ownerGUID = summoner->GetGUID();
@@ -1138,7 +1138,7 @@ struct spoils_baseAI : public ScriptedAI
         }
     }
 
-    uint64 GetCasterGuidIfPossible()
+    ObjectGuid GetCasterGuidIfPossible()
     {
         std::list<Player*> targets, m_targets;
         GetPlayerListInGrid(targets, me, 70.0f);
@@ -1158,7 +1158,7 @@ struct spoils_baseAI : public ScriptedAI
         if (!targets.empty())
             return Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 };
 
@@ -1927,7 +1927,7 @@ struct npc_spoils_ancient_brewmaster_spirit : public ScriptedAI
     }
 
     private:
-        uint64 GetCasterGuidIfPossible()
+        ObjectGuid GetCasterGuidIfPossible()
         {
             std::list<Player*> targets, m_targets;
             GetPlayerListInGrid(targets, me, 70.0f);
@@ -1947,7 +1947,7 @@ struct npc_spoils_ancient_brewmaster_spirit : public ScriptedAI
             if (!targets.empty())
                 return Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID();
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 };
 
@@ -2172,7 +2172,7 @@ struct npc_spoils_nameless_windwalker_spirit : public ScriptedAI
     }
 
 private:
-    uint64 GetCasterGuidIfPossible()
+    ObjectGuid GetCasterGuidIfPossible()
     {
         std::list<Player*> targets, m_targets;
         GetPlayerListInGrid(targets, me, 70.0f);
@@ -2192,7 +2192,7 @@ private:
         if (!targets.empty())
             return Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 };
 
@@ -2206,7 +2206,7 @@ struct npc_spoils_spark_of_life : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -2252,7 +2252,7 @@ struct npc_spoils_pandarens_gift : public ScriptedAI
 
         summonerEntry = summoner->GetEntry();
 
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -2304,7 +2304,7 @@ struct npc_spoils_zarthik_swarmer : public ScriptedAI
         me->OverrideInhabitType(INHABIT_AIR);
         me->UpdateMovementFlags();
 
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -2365,7 +2365,7 @@ struct npc_spoils_stone_statue_warlord : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -2429,7 +2429,7 @@ struct npc_spoils_unstable_spark : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -2523,7 +2523,7 @@ class go_spoils_secured_stockpile_of_spoils : public GameObjectScript
             {
                 uint32 choisedVoice = invSystemVoiceType.find(action)->second;
 
-                if (Creature* spoils = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+                if (Creature* spoils = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
                 {
                     if (choisedVoice == spoils->AI()->GetData(TYPE_CURRENT_VOICE_CHOISE))
                         spoils->AI()->DoAction(ACTION_START_INTRO);
@@ -2550,7 +2550,7 @@ class go_spoils_secured_stockpile_of_spoils : public GameObjectScript
                 std::shuffle(mixedVoiceChoise.begin(), mixedVoiceChoise.end(), g);                
 
                 // save this value for check
-                if (Creature* spoils = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+                if (Creature* spoils = ObjectAccessor::GetCreature(*go, go->GetInstanceScript() ? go->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
                     spoils->AI()->SetData(TYPE_CURRENT_VOICE_CHOISE, mainVarianty);
 
                 for (auto&& itr : mixedVoiceChoise)
@@ -2580,7 +2580,7 @@ class go_spoils_lever : public GameObjectScript
                         regionEntry = itr.first;
 
                 // Send data to this
-                if (Creature* regionController = ObjectAccessor::GetCreature(*go, go->GetInstanceScript()->GetData64(regionEntry)))
+                if (Creature* regionController = ObjectAccessor::GetCreature(*go, go->GetInstanceScript()->GetGuidData(regionEntry)))
                     regionController->AI()->SetData(TYPE_LEVER_DATA, DONE);
             }
         }
@@ -3283,7 +3283,7 @@ class spell_spoils_unstable_defense_system_alt_power : public AuraScript
         return true;
     }
 
-    void SetGuid(uint32 /*type*/, uint64 guid) override
+    void SetGuid(uint32 /*type*/, ObjectGuid guid) override
     {
         linkedSpoilsGUID = guid;
     }
@@ -3518,7 +3518,7 @@ class spell_spoils_unstable_defense_system_periodic : public AuraScript
         if (Unit* owner = GetOwner()->ToUnit())
         {
             // Prevent damage 5s after start (but aura should`ve at encounter starting)
-            if (Creature* spoils = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+            if (Creature* spoils = ObjectAccessor::GetCreature(*owner, owner->GetInstanceScript() ? owner->GetInstanceScript()->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
                 if (!spoils->AI()->GetData(TYPE_DEFENSE_SYSTEM_ACTIVE))
                     return;
 

@@ -25,6 +25,7 @@
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Guild.h"
+#include "IteratorPair.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "PoolMgr.h"
@@ -150,6 +151,9 @@ void GameObject::AddToWorld()
             m_zoneScript->OnGameObjectCreate(this);
 
         GetMap()->GetObjectsStore().Insert<GameObject>(GetGUID(), this);
+        if (m_DBTableGuid) // m_spawnId
+            GetMap()->GetGameObjectBySpawnIdStore().insert(std::make_pair(m_DBTableGuid, this));
+
         if (m_model)
         {
             if (Transport* trans = ToTransport())
@@ -175,7 +179,12 @@ void GameObject::RemoveFromWorld()
         if (m_model)
             if (GetMap()->ContainsGameObjectModel(*m_model))
                 GetMap()->RemoveGameObjectModel(*m_model);
+
         WorldObject::RemoveFromWorld();
+
+        if (m_DBTableGuid) // m_spawnId
+            Trinity::Containers::MultimapErasePair(GetMap()->GetGameObjectBySpawnIdStore(), m_DBTableGuid, this);
+
         GetMap()->GetObjectsStore().Remove<GameObject>(GetGUID());
     }
 }
@@ -946,20 +955,38 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
 
 void GameObject::DeleteFromDB()
 {
-    GetMap()->RemoveGORespawnTime(m_DBTableGuid);
+    GameObjectData const* data = sObjectMgr->GetGOData(m_DBTableGuid);
+    if (!data)
+        return;
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    sMapMgr->DoForAllMapsWithMapId(data->mapid,
+        [this, trans](Map* map) -> void
+        {
+            // despawn all active objects, and remove their respawns
+            std::vector<GameObject*> toUnload;
+            for (auto const& pair : Trinity::Containers::MapEqualRange(map->GetGameObjectBySpawnIdStore(), m_DBTableGuid))
+                toUnload.push_back(pair.second);
+            for (GameObject* obj : toUnload)
+                map->AddObjectToRemoveList(obj);
+            map->RemoveGORespawnTime(m_DBTableGuid);
+        }
+    );
+
+    WorldDatabaseTransaction trans2 = WorldDatabase.BeginTransaction();
+
     sObjectMgr->DeleteGOData(m_DBTableGuid);
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
-
     stmt->setUInt32(0, m_DBTableGuid);
-
-    WorldDatabase.Execute(stmt);
+    trans2->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_EVENT_GAMEOBJECT);
-
     stmt->setUInt32(0, m_DBTableGuid);
+    trans2->Append(stmt);
 
-    WorldDatabase.Execute(stmt);
+    WorldDatabase.CommitTransaction(trans2);
 }
 
 GameObject* GameObject::GetGameObject(WorldObject& object, ObjectGuid guid)

@@ -600,7 +600,7 @@ class npc_q29982 : public CreatureScript
 
             if (action == GOSSIP_ACTION_INFO_DEF + 1)
             {
-                uint64 playerGuid = player->GetGUID();
+                ObjectGuid playerGuid = player->GetGUID();
                 uint32 delay = 0;
                 switch (creature->GetEntry())
                 {
@@ -673,12 +673,12 @@ class npc_q29982 : public CreatureScript
                         haiyunSum->SetFacingToObject(player);
                         haiyunSum->AI()->Talk(0);
 
-                        uint64 haiyunGuid = haiyun->GetGUID();
-                        uint64 yingGuid = ying->GetGUID();
-                        uint64 huizhongGuid = huizhong->GetGUID();
-                        uint64 yingSumGuid = yingSum->GetGUID();
-                        uint64 haiyunSumGuid = haiyunSum->GetGUID();
-                        uint64 huizhongSumGuid = huizhongSum->GetGUID();
+                        ObjectGuid haiyunGuid = haiyun->GetGUID();
+                        ObjectGuid yingGuid = ying->GetGUID();
+                        ObjectGuid huizhongGuid = huizhong->GetGUID();
+                        ObjectGuid yingSumGuid = yingSum->GetGUID();
+                        ObjectGuid haiyunSumGuid = haiyunSum->GetGUID();
+                        ObjectGuid huizhongSumGuid = huizhongSum->GetGUID();
 
                         haiyunSum->m_Events.Schedule(delay += 3000, [haiyunSum, huizhongSumGuid, yingSumGuid]()
                         {
@@ -985,11 +985,11 @@ struct npc_liang_thunderfoot : public ScriptedAI
 
     void JustSummoned(Creature* summoned) override
     {
-        uint64 guid = playerGUID;
+        ObjectGuid guid = playerGUID;
         uint32 delay = 0;
         summoned->m_Events.Schedule(delay += 1000, [this, summoned, guid]()
         {
-            if (Player* player = sObjectAccessor->GetPlayer(*me, guid))
+            if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
             {
                 summoned->SetOwnerGUID(player->GetGUID());
                 summoned->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, M_PI);

@@ -1393,8 +1393,8 @@ private:
     InstanceScript* _instance;
     std::list<Creature*> _guardList;
     Transport* transport = nullptr;
-    uint64 saurfangTransportGUID = 0;
-    uint64 saurfangGUID = 0;
+    ObjectGuid saurfangTransportGUID = ObjectGuid::Empty;
+    ObjectGuid saurfangGUID = ObjectGuid::Empty;
     void Schedule(uint32 delay, std::function<void()> const& func)
     {
         me->m_Events.Schedule(delay, func);

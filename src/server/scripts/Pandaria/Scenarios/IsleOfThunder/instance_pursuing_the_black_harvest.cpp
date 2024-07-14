@@ -40,7 +40,7 @@ class instance_pursuing_the_black_harvest : public InstanceMapScript
             ObjectGuid jubekaGUID;
             ObjectGuid soulwellGUID;
             ObjectGuid demongateGUID;
-            std::vector<uint64> unboundDemonsList;
+            std::vector<ObjectGuid> unboundDemonsList;
 
             void Initialize() override
             {
@@ -249,7 +249,7 @@ class instance_pursuing_the_black_harvest : public InstanceMapScript
                         return demongateGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
     
             std::string GetSaveData() override

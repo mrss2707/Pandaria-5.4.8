@@ -625,7 +625,7 @@ class npc_greenstone_village_brewmaster_tzu : public CreatureScript
                         // Select any monstrosity
                         uint32 m_uiMonstrosity = urand(0, 1) ? NPC_BEAST_OF_JADE : NPC_JADE_DESTROYER;
 
-                        if (Creature* monstrosity = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(m_uiMonstrosity) : 0))
+                        if (Creature* monstrosity = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(m_uiMonstrosity) : ObjectGuid::Empty))
                         {
                             monstrosity->SetVisible(true);
                             monstrosity->SetFaction(16);

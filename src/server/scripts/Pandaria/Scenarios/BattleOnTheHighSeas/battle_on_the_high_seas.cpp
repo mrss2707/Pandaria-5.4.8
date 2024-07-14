@@ -636,7 +636,7 @@ struct npc_high_seas_horde_squalsharper : public customCreatureAI
             damage = 0;
     }
 
-    uint64 GetLowestFriendGUID() override
+    ObjectGuid GetLowestFriendGUID() override
     {
         std::list<Creature*> tmpTargets;
 
@@ -647,14 +647,14 @@ struct npc_high_seas_horde_squalsharper : public customCreatureAI
         GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_HORDE_CAPTAIN, 30.0f);
 
         if (tmpTargets.empty())
-            return 0;
+            return ObjectGuid::Empty;
 
         tmpTargets.sort(Trinity::HealthPctOrderPred());
 
         if (Creature* lowestTarget = tmpTargets.front())
             return lowestTarget->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 
     void UpdateAI(uint32 diff) override
@@ -1065,7 +1065,7 @@ struct npc_high_seas_admiral_hodgson : public customCreatureAI
             Talk(TALK_SPECIAL_3); // Announce
 
             // Allow to use Rapire
-            if (GameObject* rapier = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(GO_RAPIER) : 0))
+            if (GameObject* rapier = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(GO_RAPIER) : ObjectGuid::Empty))
                 rapier->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND);
         }
     }

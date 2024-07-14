@@ -28,7 +28,7 @@ enum
     NPC_SAPPLING                    = 61623
 };
 
-typedef std::pair<float, uint64> SapplingTrigger;
+typedef std::pair<float, ObjectGuid> SapplingTrigger;
 
 const Position centerPos = { 1529.520020f, 5163.240234f, 160.570999f, 0.0f };
 

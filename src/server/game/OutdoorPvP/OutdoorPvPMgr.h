@@ -73,7 +73,7 @@ class OutdoorPvPMgr
 
         void Update(uint32 diff);
 
-        void HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+        void HandleGossipOption(Player* player, Creature* creature, uint32 gossipid);
 
         bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
 

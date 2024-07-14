@@ -197,11 +197,11 @@ bool OutdoorPvPMgr::HandleOpenGo(Player* player, ObjectGuid guid)
     return false;
 }
 
-void OutdoorPvPMgr::HandleGossipOption(Player* player, uint64 guid, uint32 gossipid)
+void OutdoorPvPMgr::HandleGossipOption(Player* player, Creature* creature, uint32 gossipid)
 {
     for (OutdoorPvPSet::iterator itr = m_OutdoorPvPSet.begin(); itr != m_OutdoorPvPSet.end(); ++itr)
     {
-        if ((*itr)->HandleGossipOption(player, guid, gossipid))
+        if ((*itr)->HandleGossipOption(player, creature, gossipid))
             return;
     }
 }

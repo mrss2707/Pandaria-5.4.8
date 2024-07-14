@@ -63,7 +63,7 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
 
             uint32 m_auiEncounter[MAX_TYPES];
             std::map<uint32, uint64> ParagonEncounters;
-            std::vector<uint64> m_LasserArray, ShaVortexGUIDs, ShaVortexGoGUIDs, EmbodiedMinionGUIDs;
+            std::vector<ObjectGuid> m_LasserArray, ShaVortexGUIDs, ShaVortexGoGUIDs, EmbodiedMinionGUIDs;
             std::list<uint32> m_paragonSeq;
             std::vector<ObjectGuid> korkronSniperGUIDs;
             std::vector<ObjectGuid> boxesGUIDs;
@@ -151,10 +151,10 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
             ObjectGuid goraiGUID;
             ObjectGuid spoilsChestGUID;
             ObjectGuid spoilsHeroicChestGUID;
-            uint64 moguSpoils1GUID;
-            uint64 moguSpoils2GUID;
-            uint64 mantidSpoils1GUID;
-            uint64 mantidSpoils2GUID;
+            ObjectGuid moguSpoils1GUID;
+            ObjectGuid moguSpoils2GUID;
+            ObjectGuid mantidSpoils1GUID;
+            ObjectGuid mantidSpoils2GUID;
             ObjectGuid spoilsAccessLowRightGUID;
             ObjectGuid spoilsAccessLowLeftGUID;
             ObjectGuid spoilsAccessHighRightGUID;
@@ -194,7 +194,7 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
             ObjectGuid shannaGUID;
             ObjectGuid thrallGUID;
             ObjectGuid korkronGunnerGUID;
-            uint64 korkronGunnerGUID_2;
+            ObjectGuid korkronGunnerGUID_2;
             ObjectGuid gamonGUID;
             ObjectGuid heartOfYshaarjGUID;
             ObjectGuid garroshWestGatesGUID;
@@ -235,138 +235,138 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
                 korkronPrisonerGUIDs.clear();
                 theramoreCitizenGUIDs.clear();
 
-                fallenProtectorsPreEvent  = 0;
-                norushenPreEvent          = 0;
-                norushenPastEvent         = 0;
-                shaofPridePreEvent        = 0;
-                shaofPridePastEvent       = 0;
-                galakrasPreEvent          = 0;
-                ironJuggernautPastEvent   = 0;
-                thokBloodthirstyPreEvent  = 0;
-                paragonPreEvent           = 0;
-                shamansTotemEvent         = 0;
-                invisStalkerGUID = ObjectGuid::Empty;
-                loreWalkerChoEntranceGUID = ObjectGuid::Empty;
-                massiveAncientDoorGUID = ObjectGuid::Empty;
-                pressurePlateGUID = ObjectGuid::Empty;
-                immerseusGUID = ObjectGuid::Empty;
-                rookGUID = ObjectGuid::Empty;
-                heGUID = ObjectGuid::Empty;
-                sunGUID = ObjectGuid::Empty;
-                norushenGUID = ObjectGuid::Empty;
-                shaOfPrideGUID = ObjectGuid::Empty;
-                shaEnergyWallGUID = ObjectGuid::Empty;
-                mysteriousDoorGUID = ObjectGuid::Empty;
-                amalgamGUID = ObjectGuid::Empty;
-                quarantineMeasureGUID = ObjectGuid::Empty;
-                nazgrimGUID = ObjectGuid::Empty;
-                malkorokGUID = ObjectGuid::Empty;
-                harommGUID = ObjectGuid::Empty;
-                kardrisGUID = ObjectGuid::Empty;
-                overseerKomakGUID = ObjectGuid::Empty;
-                jiFirepawGUID = ObjectGuid::Empty;
-                eitriggGUID = ObjectGuid::Empty;
-                ironJuggernautGUID = ObjectGuid::Empty;
-                immerseusChestGUID = ObjectGuid::Empty;
-                immerseusChestHeroicGUID = ObjectGuid::Empty;
-                zealGUID = ObjectGuid::Empty;
-                shaChestGUID = ObjectGuid::Empty;
-                shaChestHeroicGUID = ObjectGuid::Empty;
-                teamInInstance            = 0;
-                lorthemarGUID = ObjectGuid::Empty;
-                aethasGUID = ObjectGuid::Empty;
-                sylvanasGUID = ObjectGuid::Empty;
-                galakrasGUID = ObjectGuid::Empty;
-                zaelaGUID = ObjectGuid::Empty;
-                norushenRoomGUID = ObjectGuid::Empty;
-                jainaRoomGUID = ObjectGuid::Empty;
-                lorthemarRoomGUID = ObjectGuid::Empty;
-                anguishGUID = ObjectGuid::Empty;
-                southTowerDoorGUID = ObjectGuid::Empty;
-                northTowerDoorGUID = ObjectGuid::Empty;
-                voljinGUID = ObjectGuid::Empty;
-                baineGUID = ObjectGuid::Empty;
-                orgrimmarGatesGUID = ObjectGuid::Empty;
-                nazgrimPreEventGUID = ObjectGuid::Empty;
-                tyrandeGUID = ObjectGuid::Empty;
-                glaiweGUID = ObjectGuid::Empty;
-                doyodaGUID = ObjectGuid::Empty;
-                wildhummerShamanGUID = ObjectGuid::Empty;
-                runthakGUID = ObjectGuid::Empty;
-                groldarGUID = ObjectGuid::Empty;
-                malkorokControllerGUID = ObjectGuid::Empty;
-                miasmaGUID = ObjectGuid::Empty;
-                rexDoorGUID = ObjectGuid::Empty;
-                thokGUID = ObjectGuid::Empty;
-                akolikGUID = ObjectGuid::Empty;
-                montakGUID = ObjectGuid::Empty;
-                goraiGUID = ObjectGuid::Empty;
-                spoilsChestGUID = ObjectGuid::Empty;
-                spoilsHeroicChestGUID = ObjectGuid::Empty;
-                moguSpoils1GUID           = 0;
-                moguSpoils2GUID           = 0;
-                mantidSpoils1GUID         = 0;
-                mantidSpoils2GUID         = 0;
-                spoilsAccessLowRightGUID = ObjectGuid::Empty;
-                spoilsAccessLowLeftGUID = ObjectGuid::Empty;
-                spoilsAccessHighRightGUID = ObjectGuid::Empty;
-                spoilsAccessHighLeftGUID = ObjectGuid::Empty;
-                spoilsCrossRightGUID = ObjectGuid::Empty;
-                spoilsCrossLeftGUID = ObjectGuid::Empty;
-                spoilsOfPandariaGUID = ObjectGuid::Empty;
-                leverUpRightGUID = ObjectGuid::Empty;
-                leverUpLeftGUID = ObjectGuid::Empty;
-                leverLowRightGUID = ObjectGuid::Empty;
-                leverLowLeftGUID = ObjectGuid::Empty;
-                siegeCrafterHelperGUID = ObjectGuid::Empty;
-                siegecrafterGUID = ObjectGuid::Empty;
-                garroshGUID = ObjectGuid::Empty;
-                southCannonGUID = ObjectGuid::Empty;
-                northCannonGUID = ObjectGuid::Empty;
-                southRopeGUID = ObjectGuid::Empty;
-                northRopeGUID = ObjectGuid::Empty;
-                varianGUID = ObjectGuid::Empty;
-                jainaGUID = ObjectGuid::Empty;
-                vereesaGUID = ObjectGuid::Empty;
-                cosmeticSpoilsGUID = ObjectGuid::Empty;
-                siegecrafterVehicleGUID = ObjectGuid::Empty;
-                paragonControllerGUID = ObjectGuid::Empty;
-                kilrukGUID = ObjectGuid::Empty;
-                xarilGUID = ObjectGuid::Empty;
-                kaztikGUID = ObjectGuid::Empty;
-                korvenGUID = ObjectGuid::Empty;
-                iyyokukGUID = ObjectGuid::Empty;
-                karozGUID = ObjectGuid::Empty;
-                skeerGUID = ObjectGuid::Empty;
-                rikkalGUID = ObjectGuid::Empty;
-                hisekGUID = ObjectGuid::Empty;
-                mantidAmberGUID = ObjectGuid::Empty;
-                siegecrafterDoorGUID = ObjectGuid::Empty;
-                siegecrafterPreEvent      = 0;
-                thrallGUID = ObjectGuid::Empty;
-                korkronGunnerGUID = ObjectGuid::Empty;
-                korkronGunnerGUID_2       = 0;
-                gamonGUID = ObjectGuid::Empty;
-                heartOfYshaarjGUID = ObjectGuid::Empty;
-                garroshWestGatesGUID = ObjectGuid::Empty;
-                garroshEastGatesGUID = ObjectGuid::Empty;
-                saurfangGUID = ObjectGuid::Empty;
-                paragonEntranceGUID = ObjectGuid::Empty;
-                garroshHellscreamPreEvent = 0;
-                gunshipMainCannonGUID = ObjectGuid::Empty;
-                starvedYetiThrashGUID = ObjectGuid::Empty;
-                enragedMushanThrashGUID = ObjectGuid::Empty;
-                beachCannonsCount         = 0;
-                aquaDefendersCount        = 0;
-                aquaDefendersEvent        = 0;
-                darkFarseerBarracksGUID = ObjectGuid::Empty;
+                fallenProtectorsPreEvent     = 0;
+                norushenPreEvent             = 0;
+                norushenPastEvent            = 0;
+                shaofPridePreEvent           = 0;
+                shaofPridePastEvent          = 0;
+                galakrasPreEvent             = 0;
+                ironJuggernautPastEvent      = 0;
+                thokBloodthirstyPreEvent     = 0;
+                paragonPreEvent              = 0;
+                shamansTotemEvent            = 0;
+                invisStalkerGUID             = ObjectGuid::Empty;
+                loreWalkerChoEntranceGUID    = ObjectGuid::Empty;
+                massiveAncientDoorGUID       = ObjectGuid::Empty;
+                pressurePlateGUID            = ObjectGuid::Empty;
+                immerseusGUID                = ObjectGuid::Empty;
+                rookGUID                     = ObjectGuid::Empty;
+                heGUID                       = ObjectGuid::Empty;
+                sunGUID                      = ObjectGuid::Empty;
+                norushenGUID                 = ObjectGuid::Empty;
+                shaOfPrideGUID               = ObjectGuid::Empty;
+                shaEnergyWallGUID            = ObjectGuid::Empty;
+                mysteriousDoorGUID           = ObjectGuid::Empty;
+                amalgamGUID                  = ObjectGuid::Empty;
+                quarantineMeasureGUID        = ObjectGuid::Empty;
+                nazgrimGUID                  = ObjectGuid::Empty;
+                malkorokGUID                 = ObjectGuid::Empty;
+                harommGUID                   = ObjectGuid::Empty;
+                kardrisGUID                  = ObjectGuid::Empty;
+                overseerKomakGUID            = ObjectGuid::Empty;
+                jiFirepawGUID                = ObjectGuid::Empty;
+                eitriggGUID                  = ObjectGuid::Empty;
+                ironJuggernautGUID           = ObjectGuid::Empty;
+                immerseusChestGUID           = ObjectGuid::Empty;
+                immerseusChestHeroicGUID     = ObjectGuid::Empty;
+                zealGUID                     = ObjectGuid::Empty;
+                shaChestGUID                 = ObjectGuid::Empty;
+                shaChestHeroicGUID           = ObjectGuid::Empty;
+                teamInInstance               = 0;
+                lorthemarGUID                = ObjectGuid::Empty;
+                aethasGUID                   = ObjectGuid::Empty;
+                sylvanasGUID                 = ObjectGuid::Empty;
+                galakrasGUID                 = ObjectGuid::Empty;
+                zaelaGUID                    = ObjectGuid::Empty;
+                norushenRoomGUID             = ObjectGuid::Empty;
+                jainaRoomGUID                = ObjectGuid::Empty;
+                lorthemarRoomGUID            = ObjectGuid::Empty;
+                anguishGUID                  = ObjectGuid::Empty;
+                southTowerDoorGUID           = ObjectGuid::Empty;
+                northTowerDoorGUID           = ObjectGuid::Empty;
+                voljinGUID                   = ObjectGuid::Empty;
+                baineGUID                    = ObjectGuid::Empty;
+                orgrimmarGatesGUID           = ObjectGuid::Empty;
+                nazgrimPreEventGUID          = ObjectGuid::Empty;
+                tyrandeGUID                  = ObjectGuid::Empty;
+                glaiweGUID                   = ObjectGuid::Empty;
+                doyodaGUID                   = ObjectGuid::Empty;
+                wildhummerShamanGUID         = ObjectGuid::Empty;
+                runthakGUID                  = ObjectGuid::Empty;
+                groldarGUID                  = ObjectGuid::Empty;
+                malkorokControllerGUID       = ObjectGuid::Empty;
+                miasmaGUID                   = ObjectGuid::Empty;
+                rexDoorGUID                  = ObjectGuid::Empty;
+                thokGUID                     = ObjectGuid::Empty;
+                akolikGUID                   = ObjectGuid::Empty;
+                montakGUID                   = ObjectGuid::Empty;
+                goraiGUID                    = ObjectGuid::Empty;
+                spoilsChestGUID              = ObjectGuid::Empty;
+                spoilsHeroicChestGUID        = ObjectGuid::Empty;
+                moguSpoils1GUID              = ObjectGuid::Empty;
+                moguSpoils2GUID              = ObjectGuid::Empty;
+                mantidSpoils1GUID            = ObjectGuid::Empty;
+                mantidSpoils2GUID            = ObjectGuid::Empty;
+                spoilsAccessLowRightGUID     = ObjectGuid::Empty;
+                spoilsAccessLowLeftGUID      = ObjectGuid::Empty;
+                spoilsAccessHighRightGUID    = ObjectGuid::Empty;
+                spoilsAccessHighLeftGUID     = ObjectGuid::Empty;
+                spoilsCrossRightGUID         = ObjectGuid::Empty;
+                spoilsCrossLeftGUID          = ObjectGuid::Empty;
+                spoilsOfPandariaGUID         = ObjectGuid::Empty;
+                leverUpRightGUID             = ObjectGuid::Empty;
+                leverUpLeftGUID              = ObjectGuid::Empty;
+                leverLowRightGUID            = ObjectGuid::Empty;
+                leverLowLeftGUID             = ObjectGuid::Empty;
+                siegeCrafterHelperGUID       = ObjectGuid::Empty;
+                siegecrafterGUID             = ObjectGuid::Empty;
+                garroshGUID                  = ObjectGuid::Empty;
+                southCannonGUID              = ObjectGuid::Empty;
+                northCannonGUID              = ObjectGuid::Empty;
+                southRopeGUID                = ObjectGuid::Empty;
+                northRopeGUID                = ObjectGuid::Empty;
+                varianGUID                   = ObjectGuid::Empty;
+                jainaGUID                    = ObjectGuid::Empty;
+                vereesaGUID                  = ObjectGuid::Empty;
+                cosmeticSpoilsGUID           = ObjectGuid::Empty;
+                siegecrafterVehicleGUID      = ObjectGuid::Empty;
+                paragonControllerGUID        = ObjectGuid::Empty;
+                kilrukGUID                   = ObjectGuid::Empty;
+                xarilGUID                    = ObjectGuid::Empty;
+                kaztikGUID                   = ObjectGuid::Empty;
+                korvenGUID                   = ObjectGuid::Empty;
+                iyyokukGUID                  = ObjectGuid::Empty;
+                karozGUID                    = ObjectGuid::Empty;
+                skeerGUID                    = ObjectGuid::Empty;
+                rikkalGUID                   = ObjectGuid::Empty;
+                hisekGUID                    = ObjectGuid::Empty;
+                mantidAmberGUID              = ObjectGuid::Empty;
+                siegecrafterDoorGUID         = ObjectGuid::Empty;
+                siegecrafterPreEvent         = 0;
+                thrallGUID                   = ObjectGuid::Empty;
+                korkronGunnerGUID            = ObjectGuid::Empty;
+                korkronGunnerGUID_2          = ObjectGuid::Empty;
+                gamonGUID                    = ObjectGuid::Empty;
+                heartOfYshaarjGUID           = ObjectGuid::Empty;
+                garroshWestGatesGUID         = ObjectGuid::Empty;
+                garroshEastGatesGUID         = ObjectGuid::Empty;
+                saurfangGUID                 = ObjectGuid::Empty;
+                paragonEntranceGUID          = ObjectGuid::Empty;
+                garroshHellscreamPreEvent    = 0;
+                gunshipMainCannonGUID        = ObjectGuid::Empty;
+                starvedYetiThrashGUID        = ObjectGuid::Empty;
+                enragedMushanThrashGUID      = ObjectGuid::Empty;
+                beachCannonsCount            = 0;
+                aquaDefendersCount           = 0;
+                aquaDefendersEvent           = 0;
+                darkFarseerBarracksGUID      = ObjectGuid::Empty;
                 darkFarseerSkullsplitterGUID = ObjectGuid::Empty;
-                rescuePrisonersCount      = 0;
-                encaseInAmberGUID = ObjectGuid::Empty;
-                thriceLockedCageGUID = ObjectGuid::Empty;
-                gastropodGUID = ObjectGuid::Empty;
-                isLfr                     = instance->ToInstanceMap()->IsLFGMap();
-                isFlex                    = instance->GetDifficulty() == RAID_DIFFICULTY_1025MAN_FLEX;
+                rescuePrisonersCount         = 0;
+                encaseInAmberGUID            = ObjectGuid::Empty;
+                thriceLockedCageGUID         = ObjectGuid::Empty;
+                gastropodGUID                = ObjectGuid::Empty;
+                isLfr                        = instance->ToInstanceMap()->IsLFGMap();
+                isFlex                       = instance->GetDifficulty() == RAID_DIFFICULTY_1025MAN_FLEX;
 
                 lfrQuarter = QUARTER_NONE;
                 instance->SetWorldState(WORLDSTATE_RESCUE_RAIDERS, 0);
@@ -549,7 +549,7 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
                     }
                     else if (lfrQuarter == QUARTER_DOWNFALL || lfrQuarter == QUARTER_DOWNFALL_F)
                     {
-                        if (GameObject* go = instance->GetGameObject(GetData64(GO_MASSIVE_IRON_DOOR_BLACKFUSE)))
+                        if (GameObject* go = instance->GetGameObject(GetGuidData(GO_MASSIVE_IRON_DOOR_BLACKFUSE)))
                             go->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
 
                         if ((creature->GetPositionX() > 1920.0f || creature->GetPositionZ() > -235.0f) &&
@@ -1319,7 +1319,7 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
                                     if (Creature* LasserArray = instance->GetCreature(itr))
                                         LasserArray->AI()->DoAction(ACTION_CONVEYOR_RESET);
 
-                                if (GameObject* go = instance->GetGameObject(GetData64(GO_PARAGON_ENTRANCE)))
+                                if (GameObject* go = instance->GetGameObject(GetGuidData(GO_PARAGON_ENTRANCE)))
                                     go->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                                 break;
                         }
@@ -1364,7 +1364,7 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
                         if (isFlex || isLfr || state != DONE)
                             break;
 
-                        if (GameObject* go = instance->GetGameObject(GetData64(GO_MASSIVE_IRON_DOOR_BLACKFUSE)))
+                        if (GameObject* go = instance->GetGameObject(GetGuidData(GO_MASSIVE_IRON_DOOR_BLACKFUSE)))
                             go->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                         break;
                     case DATA_GARROSH_HELLSCREAM:
@@ -1409,8 +1409,8 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
                         break;
                     case DATA_NORUSHEN_PRE_EVENT_1:
                         norushenPreEvent = data;
-                        HandleGameObject(GetData64(GO_SHA_ENERGY_WALL), true, NULL);
-                        HandleGameObject(GetData64(GO_MYSTERIOUS_ORNATE_DOOR), true, NULL);
+                        HandleGameObject(GetGuidData(GO_SHA_ENERGY_WALL), true, NULL);
+                        HandleGameObject(GetGuidData(GO_MYSTERIOUS_ORNATE_DOOR), true, NULL);
                         break;
                     case DATA_NORUSHEN_PRE_EVENT_2:
                         norushenPastEvent = data;
@@ -1799,7 +1799,7 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
                         return gastropodGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void ProcessEvent(WorldObject* /*gameObject*/, uint32 eventId) override
@@ -1807,7 +1807,7 @@ class instance_siege_of_orgrimmar : public InstanceMapScript
                 switch (eventId)
                 {
                     case INSTANCE_EVENT_SCARRED_VALE:
-                        HandleGameObject(GetData64(GO_MASSIVE_ANCIENT_DOOR), true, NULL);
+                        HandleGameObject(GetGuidData(GO_MASSIVE_ANCIENT_DOOR), true, NULL);
                         SetData(DATA_FALLEN_PROTECTORS_PRE_EVENT, DONE);
 
                         if (Creature* pressurePlate = instance->GetCreature(GetGuidData(NPC_PRESSURE_PLATE)))

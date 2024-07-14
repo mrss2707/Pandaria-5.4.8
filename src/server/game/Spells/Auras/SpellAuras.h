@@ -279,7 +279,7 @@ class Aura
         void CallScriptEffectSplitHandlers(AuraEffect* aurEff, AuraApplication const* aurApp, DamageInfo & dmgInfo, uint32 & splitAmount);
         bool CallScriptAuraDropModChargeHandlers(Spell* bySpell);
         void SetScriptData(uint32 type, uint32 data);
-        void SetScriptGuid(uint32 type, uint64 data);
+        void SetScriptGuid(uint32 type, ObjectGuid data);
         // Spell Proc Hooks
         bool CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
         bool CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);

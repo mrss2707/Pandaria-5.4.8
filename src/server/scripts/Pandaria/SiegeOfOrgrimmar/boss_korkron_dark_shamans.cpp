@@ -425,7 +425,7 @@ class boss_earthbreaker_haromm : public CreatureScript
                     return 0;
                 }
 
-                uint64 GetStreamTargetGUID()
+                ObjectGuid GetStreamTargetGUID()
                 {
                     std::list<Player*> targets, m_targets;
                     GetPlayerListInGrid(targets, me, 80.0f);
@@ -437,7 +437,7 @@ class boss_earthbreaker_haromm : public CreatureScript
                     if (!targets.empty())
                         return Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID();
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
 
                 void HandleRemoveIronTombs()
@@ -737,7 +737,7 @@ class boss_wavebinder_kardris : public CreatureScript
                             if (Unit* target = ObjectAccessor::GetUnit(*me, GetCasterGuidIfPossible()))
                             {
                                 events.DelayEvents(200);
-                                uint64 tempStormGUID = target->GetGUID();
+                                ObjectGuid tempStormGUID = target->GetGUID();
                                 me->SetTarget(target->GetGUID());
 
                                 // Target Scanning (DBM)
@@ -778,7 +778,7 @@ class boss_wavebinder_kardris : public CreatureScript
             }
 
             private: // default doesn`t work here - so much los and distance
-                uint64 GetCasterGuidIfPossible()
+                ObjectGuid GetCasterGuidIfPossible()
                 {
                     std::list<Player*> targets, m_targets;
                     GetPlayerListInGrid(targets, me, 80.0f);
@@ -798,7 +798,7 @@ class boss_wavebinder_kardris : public CreatureScript
                     if (!targets.empty())
                         return Trinity::Containers::SelectRandomContainerElement(targets)->GetGUID();
 
-                    return 0;
+                    return ObjectGuid::Empty;
                 }
         };
 
@@ -940,7 +940,7 @@ struct npc_dark_shamans_toxic_tornado : public ScriptedAI
         spawnPos = { me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation() };
         DoCast(me, SPELL_TOXIC_TORNADO);
 
-        if (Creature* haromm = ObjectAccessor::GetCreature(*me, me->GetInstanceId() ? me->GetInstanceScript()->GetData64(DATA_KORKRON_DARK_SHAMANS) : 0))
+        if (Creature* haromm = ObjectAccessor::GetCreature(*me, me->GetInstanceId() ? me->GetInstanceScript()->GetGuidData(DATA_KORKRON_DARK_SHAMANS) : ObjectGuid::Empty))
             haromm->AI()->JustSummoned(me);
 
         scheduler

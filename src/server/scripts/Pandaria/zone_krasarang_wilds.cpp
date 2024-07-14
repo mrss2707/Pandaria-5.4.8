@@ -627,14 +627,14 @@ struct krasarang_casterAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_STUDENT_OF_CHI_JI, 80.0f);
 
         if (tmpTargets.empty())
-            return 0;
+            return ObjectGuid::Empty;
 
         tmpTargets.sort(Trinity::HealthPctOrderPred());
 
         if (Creature* lowestTarget = tmpTargets.front())
             return lowestTarget->GetGUID();
 
-        return 0;
+        return ObjectGuid::Empty;
     }
 };
 
@@ -1603,7 +1603,7 @@ struct npc_alliance_landing_boat : public ScriptedAI
     npc_alliance_landing_boat(Creature* creature) : ScriptedAI(creature) { }
 
     EventMap nonCombatEvents;
-    uint64 ownerGUID, varianGUID;
+    ObjectGuid ownerGUID, varianGUID;
     float jumpOri, x, y;
     std::vector<ObjectGuid> champGUIDs;
 
@@ -2121,7 +2121,7 @@ struct npc_stoneplow_envoy : public ScriptedAI
         me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH_STUN);
         me->setRegeneratingHealth(false);
         me->SetHealth(46087);
-        script_timer = 0, player_guid = 0;
+        script_timer = 0, player_guid = ObjectGuid::Empty;
     }
 
     void SpellHit(Unit* caster, const SpellInfo* spell) override
@@ -2148,7 +2148,7 @@ struct npc_stoneplow_envoy : public ScriptedAI
             {
                 script_timer = 0;
 
-                if (Player* player = sObjectAccessor->GetPlayer(*me, player_guid))
+                if (Player* player = ObjectAccessor::GetPlayer(*me, player_guid))
                     Talk(0, player);
 
                 const float angle = (me->GetOrientation()) - static_cast<float>(M_PI / 2);
@@ -2255,8 +2255,8 @@ class npc_krasarang_wilds_lyalia : public CreatureScript
                 creature->RemoveFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
                 // Friendly
-                player->SummonCreature(NPC_SUNWALKER_DEZCO_QUEST, reclaimerFriends[0], TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS, 0, true);
-                player->SummonCreature(NPC_LOREKEEPER_VAELDRIN, reclaimerFriends[1], TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS, 0, true);
+                player->SummonCreature(NPC_SUNWALKER_DEZCO_QUEST, reclaimerFriends[0], TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS, 0, ObjectGuid(uint64(1)));
+                player->SummonCreature(NPC_LOREKEEPER_VAELDRIN, reclaimerFriends[1], TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS, 0, ObjectGuid(uint64(1)));
                 player->SummonCreature(NPC_GROUNDBREAKER_BROJAI, reclaimerFriends[2], TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS);
             }
 
@@ -2491,7 +2491,7 @@ class go_mysterious_whirlpool : public GameObjectScript
                     narjon->SetHomePosition(narjon->GetPosition());
                     narjon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                     narjon->SetControlled(true, UNIT_STATE_ROOT);
-                    if (Player* player = sObjectAccessor->GetPlayer(*narjon, guid))
+                    if (Player* player = ObjectAccessor::GetPlayer(*narjon, guid))
                         narjon->AI()->AttackStart(player);
                 });
             }
@@ -2742,7 +2742,7 @@ struct npc_na_lek : public ScriptedAI
         });
         me->m_Events.Schedule(10000, [this, guid]()
         {
-            if (Player* player = sObjectAccessor->GetPlayer(*me, guid))
+            if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
                 if (Creature* brojai = me->FindNearestCreature(NPC_ENTRY_GROUNDBREAKER_BROJAI, 50.0f))
                     brojai->AI()->Talk(GROUNDBREAKER_BROJAI_TEXT_01, player);
         });
@@ -2756,11 +2756,11 @@ struct npc_na_lek : public ScriptedAI
             if (Creature* brojai = me->FindNearestCreature(NPC_ENTRY_GROUNDBREAKER_BROJAI, 50.0f))
                 brojai->DespawnOrUnsummon();
 
-            if (Player* player = sObjectAccessor->GetPlayer(*me, guid))
+            if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
             {
                 for (auto&& guid : summons)
                 {
-                    if (Creature* summon = sObjectAccessor->GetCreature(*me, guid))
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                     {
                         summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         summon->SetStandState(UNIT_STAND_STATE_STAND);
@@ -2895,7 +2895,7 @@ struct npc_the_bell_peaks_start : public ScriptedAI
                 kite->m_Events.Schedule(delay += 5 * IN_MILLISECONDS,  [starter]() { starter->AI()->Talk(TEXT_06_H); });
                 kite->m_Events.Schedule(delay += 30 * IN_MILLISECONDS, [starter, guid, kite]()
                 {
-                    if (Player* player = sObjectAccessor->GetPlayer(*starter, guid))
+                    if (Player* player = ObjectAccessor::GetPlayer(*starter, guid))
                         player->KilledMonsterCredit(68726);
                 });
             }
@@ -2914,7 +2914,7 @@ struct npc_the_bell_peaks_start : public ScriptedAI
                 kite->m_Events.Schedule(delay += 7 * IN_MILLISECONDS,  [starter]() { starter->AI()->Talk(TEXT_11_A); });
                 kite->m_Events.Schedule(delay += 5 * IN_MILLISECONDS,  [starter, guid, kite]()
                 {
-                    if (Player* player = sObjectAccessor->GetPlayer(*starter, guid))
+                    if (Player* player = ObjectAccessor::GetPlayer(*starter, guid))
                         player->KilledMonsterCredit(68748);
                 });
             }
@@ -2958,7 +2958,7 @@ struct npc_lorekeeper_vaeldrin : public ScriptedAI
 
     void OnQuestAccept(Player* player, Quest const* quest) override
     {
-        uint64 playerGuid = player->GetGUID();
+        ObjectGuid playerGuid = player->GetGUID();
         uint32 delay = 0;
 
         std::function<void()> reset = [this]()
@@ -3012,9 +3012,9 @@ struct npc_lorekeeper_vaeldrin : public ScriptedAI
             {
                 vaeldrinNew->AI()->Talk(TEXT_LOREKEEPER_VAELDRIN_02);
             });
-            vaeldrinNew->m_Events.Schedule(delay += 8000, [vaeldrinNew, playerGuid]
+            vaeldrinNew->m_Events.Schedule(delay += 8000, [playerGuid]
             {
-                if (Player* player = sObjectAccessor->GetPlayer(*vaeldrinNew, playerGuid))
+                if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
                     player->KilledMonsterCredit(58894);
             });
             vaeldrinNew->m_Events.Schedule(delay += 2000, [vaeldrinNew]
@@ -3091,7 +3091,7 @@ struct npc_lorekeeper_vaeldrin : public ScriptedAI
                 lyaliaNew->AI()->Talk(TEXT_LYALIA_NEW_01);
                 vaeldrinNew->setDeathState(JUST_DIED);
 
-                if (Player* player = sObjectAccessor->GetPlayer(*vaeldrinNew, playerGuid))
+                if (Player* player = ObjectAccessor::GetPlayer(*vaeldrinNew, playerGuid))
                     player->KilledMonsterCredit(58970);
             });
             vaeldrinNew->m_Events.Schedule(delay += 5000, [vaeldrinNew, lyaliaNew, reset]

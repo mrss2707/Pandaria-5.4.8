@@ -1393,7 +1393,7 @@ class npc_mantid_tar_keg : public CreatureScript
             {
                 me->SetPosition(me->GetHomePosition());
                 if (me->m_movementInfo.transport.guid)
-                    me->m_movementInfo.transport.guid = 0;
+                    me->m_movementInfo.transport.guid = ObjectGuid::Empty;
                 me->SendMovementFlagUpdate();
                 targetGUID = ObjectGuid::Empty;
                 me->GetMotionMaster()->MoveIdle();

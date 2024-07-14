@@ -134,9 +134,9 @@ class npc_cfk_sha_base : public CreatureScript
         }
 };
 
-Position GetInitiatePosition(uint64 m_caster, float dist = 0.0f, float m_ori = 0.0f)
+Position GetInitiatePosition(Creature* me, ObjectGuid m_caster, float dist = 0.0f, float m_ori = 0.0f)
 {
-    Unit* caster = ObjectAccessor::FindUnit(m_caster);
+    Unit* caster = ObjectAccessor::GetUnit(*me, m_caster);
 
     if (!caster)
         return { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -365,7 +365,7 @@ class npc_cfk_jin_ironfist : public CreatureScript
                                 }
                             }
                             Talk(TALK_INTRO);
-                            me->GetMotionMaster()->MoveJump(GetInitiatePosition(me->GetGUID(), frand(1.5f, 2.0f)), 10.0f, 15.0f, EVENT_JUMP);
+                            me->GetMotionMaster()->MoveJump(GetInitiatePosition(me, me->GetGUID(), frand(1.5f, 2.0f)), 10.0f, 15.0f, EVENT_JUMP);
                             break;
                         case EVENT_FLYING_KICK:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, FlyingKickPredicate(me)))
@@ -493,7 +493,7 @@ class npc_cfk_pool_of_life : public CreatureScript
             void SendEssenceSpawn(uint8 m_count)
             {
                 for (uint8 i = 0; i < m_count; ++i)
-                    me->SummonCreature(NPC_ESSENCE_OF_HATE, GetInitiatePosition(me->GetGUID(), 10.5f, Trinity::Containers::SelectRandomContainerElement(CircleOri)));
+                    me->SummonCreature(NPC_ESSENCE_OF_HATE, GetInitiatePosition(me, me->GetGUID(), 10.5f, Trinity::Containers::SelectRandomContainerElement(CircleOri)));
             }
 
             void UpdateAI(uint32 diff) override 
@@ -555,7 +555,7 @@ class npc_cfk_crypt_guardian_hall : public CreatureScript
                 if (actionId == ACTION_GUARDIAN_INIT)
                 {
                     me->SetFaction(16);
-                    me->GetMotionMaster()->MovePoint(0, GetInitiatePosition(me->GetGUID(), 15.0f, me->GetOrientation()));
+                    me->GetMotionMaster()->MovePoint(0, GetInitiatePosition(me, me->GetGUID(), 15.0f, me->GetOrientation()));
                 }
             }
 

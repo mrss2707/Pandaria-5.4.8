@@ -737,7 +737,7 @@ class npc_zanvess_zanthik_ambermancer : public CreatureScript
             }
 
         private:
-            uint64 FriendlyTargetGUID()
+            ObjectGuid FriendlyTargetGUID()
             {
                 std::list<Creature*> friendList;
                 GetCreatureListWithEntryInGrid(friendList, me, NPC_ZANTHIK_AMBERMANCER, 30.0f);
@@ -747,7 +747,7 @@ class npc_zanvess_zanthik_ambermancer : public CreatureScript
                     if (Creature* AmberTarget = Trinity::Containers::SelectRandomContainerElement(friendList))
                         return AmberTarget->GetGUID();
 
-                return 0;
+                return ObjectGuid::Empty;
             }
         };
 
@@ -890,9 +890,9 @@ class npc_zanvess_7th_legion_priest : public CreatureScript
             }
 
             private:
-                uint64 LowestHpTargetGUID()
+                ObjectGuid LowestHpTargetGUID()
                 {
-                    uint64 targetGUID = 0;
+                    ObjectGuid targetGUID = ObjectGuid::Empty;
                     float pctHealth = 100.0f;
                     std::list<Creature*> friendList;
 

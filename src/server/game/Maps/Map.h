@@ -487,9 +487,19 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         GameObject* GetGameObject(ObjectGuid guid);
         Transport* GetTransport(ObjectGuid guid);
         DynamicObject* GetDynamicObject(ObjectGuid guid);
+        Creature* GetCreatureBySpawnId(ObjectGuid::LowType spawnId) const;
+        GameObject* GetGameObjectBySpawnId(ObjectGuid::LowType spawnId) const;
         Pet* GetPet(ObjectGuid const& guid);
 
         MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
+
+        typedef std::unordered_multimap<ObjectGuid::LowType, Creature*> CreatureBySpawnIdContainer;
+        CreatureBySpawnIdContainer& GetCreatureBySpawnIdStore() { return _creatureBySpawnIdStore; }
+        CreatureBySpawnIdContainer const& GetCreatureBySpawnIdStore() const { return _creatureBySpawnIdStore; }
+
+        typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
+        GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameObjectBySpawnIdStore; }
+        GameObjectBySpawnIdContainer const& GetGameObjectBySpawnIdStore() const { return _gameObjectBySpawnIdStore; }
 
         MapInstanced* ToMapInstanced(){ if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return NULL;  }
         const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return NULL;  }
@@ -757,6 +767,8 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
         std::unique_ptr<ActivePoolData> _poolData;
         MapStoredObjectTypesContainer _objectsStore;
+        CreatureBySpawnIdContainer _creatureBySpawnIdStore;
+        GameObjectBySpawnIdContainer _gameObjectBySpawnIdStore;
 
         std::unordered_map<uint32 /*dbGUID*/, time_t> _creatureRespawnTimes;
         std::unordered_map<uint32 /*dbGUID*/, time_t> _goRespawnTimes;
