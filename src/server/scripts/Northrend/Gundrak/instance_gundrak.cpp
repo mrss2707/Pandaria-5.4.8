@@ -67,8 +67,8 @@ class instance_gundrak : public InstanceMapScript
             uint64 uiGalDarahDoor2;
             uint64 uiBridge;
             uint64 uiCollision;
-            uint64 middleGalDarahRhinoGuid;
-            uint64 frontGalDarahRhinoGuid;
+            ObjectGuid middleGalDarahRhinoGuid;
+            ObjectGuid frontGalDarahRhinoGuid;
 
             uint32 m_auiEncounter[MAX_ENCOUNTER];
 
@@ -80,7 +80,7 @@ class instance_gundrak : public InstanceMapScript
             GOState uiCollisionState;
 
             std::set<uint64> DwellerGUIDs;
-            std::vector<uint64> LivingMojoGUIDs;
+            std::vector<ObjectGuid> LivingMojoGUIDs;
 
             std::string str_data;
 
@@ -257,7 +257,7 @@ class instance_gundrak : public InstanceMapScript
                     case GO_GALDARAH_DOOR:
                         uiGalDarahDoor = go->GetGUID();
                         if (m_auiEncounter[3] == IN_PROGRESS)
-                            HandleGameObject(0, false, go);
+                            HandleGameObject(ObjectGuid::Empty, false, go);
                         break;
                     case GO_GALDARAH_DOOR_1:
                         uiGalDarahDoor1 = go->GetGUID();
@@ -342,7 +342,7 @@ class instance_gundrak : public InstanceMapScript
                     SaveToDB();
             }
 
-            void SetData64(uint32 type, uint64 data) override
+            void SetGuidData(uint32 type, ObjectGuid data) override
             {
                 if (type == DATA_RUIN_DWELLER_DIED)
                     DwellerGUIDs.erase(data);
@@ -363,7 +363,7 @@ class instance_gundrak : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -563,9 +563,9 @@ class go_gundrak_altar : public GameObjectScript
             {
                 switch (go->GetEntry())
                 {
-                    case GO_ALTAR_OF_SLADRAN:           uiStatue = instance->GetData64(DATA_SLAD_RAN_STATUE);          break;
-                    case GO_ALTAR_OF_MOORABI:           uiStatue = instance->GetData64(DATA_MOORABI_STATUE);           break;
-                    case GO_ALTAR_OF_DRAKKARI_COLOSSUS: uiStatue = instance->GetData64(DATA_DRAKKARI_COLOSSUS_STATUE); break;
+                    case GO_ALTAR_OF_SLADRAN:           uiStatue = instance->GetGuidData(DATA_SLAD_RAN_STATUE);          break;
+                    case GO_ALTAR_OF_MOORABI:           uiStatue = instance->GetGuidData(DATA_MOORABI_STATUE);           break;
+                    case GO_ALTAR_OF_DRAKKARI_COLOSSUS: uiStatue = instance->GetGuidData(DATA_DRAKKARI_COLOSSUS_STATUE); break;
                 }
                 if (dynamic_cast<instance_gundrak::instance_gundrak_InstanceMapScript*>(instance)->QueueActivation(uiStatue, 3500))
                 {

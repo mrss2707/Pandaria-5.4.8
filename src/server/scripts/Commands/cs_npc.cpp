@@ -856,7 +856,7 @@ public:
     //move selected creature
     static bool HandleNpcMoveCommand(ChatHandler* handler, char const* args)
     {
-        uint32 lowguid = 0;
+        uint32 lowguid = ObjectGuid::Empty;
 
         Creature* creature = handler->getSelectedCreature();
 
@@ -1021,7 +1021,7 @@ public:
         if (!guid_str)
             return false;
 
-        uint32 lowguid = 0;
+        uint32 lowguid = ObjectGuid::Empty;
         Creature* creature = NULL;
 
         if (dontdel_str)

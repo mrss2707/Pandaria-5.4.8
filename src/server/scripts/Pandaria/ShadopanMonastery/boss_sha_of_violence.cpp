@@ -60,7 +60,7 @@ class boss_sha_of_violence : public CreatureScript
 
             bool enrageDone;
             uint32 shaCount;
-            std::vector<uint64> prisonedShaGUIDs;
+            std::vector<ObjectGuid> prisonedShaGUIDs;
 
             void InitializeAI() override
             {
@@ -139,16 +139,16 @@ class boss_sha_of_violence : public CreatureScript
                     instance->SetData(DATA_SHA_VIOLENCE, FAIL);
                     instance->SetBossState(DATA_SHA_VIOLENCE, FAIL);
 
-                    if (GameObject* prison1 = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_SHA_PRISON_1)))
+                    if (GameObject* prison1 = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_SHA_PRISON_1)))
                         prison1->SetGoState(GO_STATE_READY);
 
-                    if (GameObject* prison2 = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_SHA_PRISON_2)))
+                    if (GameObject* prison2 = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_SHA_PRISON_2)))
                         prison2->SetGoState(GO_STATE_READY);
 
-                    if (GameObject* prison3 = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_SHA_PRISON_3)))
+                    if (GameObject* prison3 = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_SHA_PRISON_3)))
                         prison3->SetGoState(GO_STATE_READY);
 
-                    if (GameObject* button = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_CONTAINMENT_OVERRIDE)))
+                    if (GameObject* button = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_CONTAINMENT_OVERRIDE)))
                     {
                         button->SetGoState(GO_STATE_READY);
                         button->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_IN_USE);

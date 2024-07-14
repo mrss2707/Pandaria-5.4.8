@@ -311,7 +311,7 @@ class boss_durumu : public CreatureScript
             uint32 lowMaze_2;
             uint32 highMaze_1;
             uint32 highMaze_2;
-            uint64 lifeDrainEyeGUID;
+            ObjectGuid lifeDrainEyeGUID;
             float x, y, ori;
             std::vector<uint32> achievementFogs;
             std::vector<uint32> achievementFogsEntry;
@@ -354,7 +354,7 @@ class boss_durumu : public CreatureScript
                 _Reset();
                 x = 0.0f; y = 0.0f;
                 phaseId = 0;
-                lifeDrainEyeGUID = 0;
+                lifeDrainEyeGUID = ObjectGuid::Empty;
 
                 if (!me->IsVisible())
                     nonCombatEvents.ScheduleEvent(EVENT_CHECK_FOGS, 1500);
@@ -961,7 +961,7 @@ class boss_durumu : public CreatureScript
                         if (Creature* tarMover = me->SummonCreature(NPC_YELLOW_EYE_MOVER, x, y, me->GetPositionZ() + 3.0f))
                         {
                             me->CastSpell(tarMover, SPELL_DISINTEGRATION_BEAM_PRECAST, true);
-                            me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, tarMover->GetGUID());
+                            me->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, tarMover->GetGUID());
                             me->SetTarget(tarMover->GetGUID());
                         }
 
@@ -1021,7 +1021,7 @@ struct npc_durumu_fog : public ScriptedAI
 
     void JustDied(Unit* killer) override
     {
-        if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_DURUMU_THE_FORGOTTEN) : 0))
+        if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : ObjectGuid::Empty))
         {
             if (me->GetEntry() == NPC_BLUE_FOG) // blue fog when die cast aoe and summon blue fog in another place
                 DoCast(me, SPELL_FLASH_FREEZE, true);
@@ -1194,7 +1194,7 @@ struct npc_durumu_eye : public ScriptedAI
     EventMap events;
     int32 beamDuration;
     uint32 lifeDrainLostDuration;
-    uint64 lifeDrainGUID;
+    ObjectGuid lifeDrainGUID;
     bool hasLifeDrainEyeActive;
 
     void Reset() override
@@ -1202,12 +1202,12 @@ struct npc_durumu_eye : public ScriptedAI
         me->SetReactState(REACT_PASSIVE);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         InitializeEvents();
-        lifeDrainGUID = 0;
+        lifeDrainGUID = ObjectGuid::Empty;
         lifeDrainLostDuration = 0;
         hasLifeDrainEyeActive = false;
     }
 
-    void SetGUID(uint64 guid, int32 type) override
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         if (type)
             beamDuration = type;
@@ -1215,7 +1215,7 @@ struct npc_durumu_eye : public ScriptedAI
             lifeDrainGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return lifeDrainGUID;
     }
@@ -1342,7 +1342,7 @@ struct npc_durumu_eye : public ScriptedAI
                         DoCast(target, SPELL_FORCE_OF_WILL);
                     }
 
-                    if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_DURUMU_THE_FORGOTTEN) : 0))
+                    if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : ObjectGuid::Empty))
                         durumu->GetAI()->DoAction(ACTION_SAY_FORCE_OF_WILL);
 
                     events.ScheduleEvent(EVENT_FORCE_OF_WILL, 20000);
@@ -1443,7 +1443,7 @@ struct npc_durumu_eye : public ScriptedAI
     private:
         bool HasInMazeOrSpectrumPhase(uint32 eventId)
         {
-            if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_DURUMU_THE_FORGOTTEN) : 0))
+            if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : ObjectGuid::Empty))
             {
                 switch (durumu->AI()->GetData(TYPE_PHASE))
                 {
@@ -1471,10 +1471,10 @@ struct npc_durumu_ice_wall : public ScriptedAI
     npc_durumu_ice_wall(Creature* creature) : ScriptedAI(creature) { }
 
     InstanceScript* instance;
-    std::vector<uint64> icewallGUIDs;
+    std::vector<ObjectGuid> icewallGUIDs;
     float x, y;
     bool byEncounter;
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -1486,7 +1486,7 @@ struct npc_durumu_ice_wall : public ScriptedAI
         instance = me->GetInstanceScript();
         DoCast(me, SPELL_ICEWALL_SPAWN, true);
 
-        if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_DURUMU_THE_FORGOTTEN) : 0))
+        if (Creature* durumu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : ObjectGuid::Empty))
         {
             durumu->AI()->JustSummoned(me);
             me->SetFacingTo(Position::NormalizeOrientation(me->GetAngle(durumu) + M_PI));
@@ -1810,7 +1810,7 @@ class spell_disintegration_beam_precast : public AuraScript
             if (Unit* caster = GetCaster())
             {
                 caster->CastSpell(caster, SPELL_DESINTEGRATION_BEAM, true);
-                caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, owner->GetGUID());
+                caster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, owner->GetGUID());
                 caster->SetTarget(owner->GetGUID());
             }
 
@@ -2073,7 +2073,7 @@ class spell_durumu_life_drain_aura : public AuraScript
 // 577. Summoned by 133793 - Lingering Gaze
 class sat_lingering_gaze: public IAreaTriggerAura
 {
-    std::vector<uint64> affectedTargetGUIDs;
+    std::vector<ObjectGuid> affectedTargetGUIDs;
 
     bool CheckTriggering(WorldObject* triggering) override
     {

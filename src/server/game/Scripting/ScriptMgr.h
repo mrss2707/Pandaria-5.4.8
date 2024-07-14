@@ -953,7 +953,7 @@ protected:
 public:
 
     // items
-    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, uint32 /*itemGuid*/) { }
+    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, ObjectGuid /*itemGuid*/) { }
     virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
 };
 
@@ -1224,7 +1224,7 @@ class TC_GAME_API ScriptMgr
         void FillGameEventWorldStates(GameEventData const& event, Player* player, WorldStateBuilder& builder);
 
     public: /* GlobalScript */
-        void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, uint32 itemGuid);
+        void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid itemGuid);
         void OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display);
 
     public: /* UnitScript */

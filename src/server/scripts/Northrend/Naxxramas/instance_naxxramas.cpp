@@ -110,28 +110,28 @@ class instance_naxxramas : public InstanceMapScript
                 LoadDoorData(doorData);
                 LoadMinionData(minionData);
 
-                GothikGateGUID          = 0;
-                HorsemenChestGUID       = 0;
-                FaerlinaGUID            = 0;
-                ThaneGUID               = 0;
-                LadyGUID                = 0;
-                BaronGUID               = 0;
-                SirGUID                 = 0;
-                ThaddiusGUID            = 0;
-                HeiganGUID              = 0;
-                FeugenGUID              = 0;
-                StalaggGUID             = 0;
-                SapphironGUID           = 0;
-                KelthuzadGUID           = 0;
-                KelthuzadTriggerGUID    = 0;
-                sphereGUID              = 0;
+                GothikGateGUID = ObjectGuid::Empty;
+                HorsemenChestGUID = ObjectGuid::Empty;
+                FaerlinaGUID = ObjectGuid::Empty;
+                ThaneGUID = ObjectGuid::Empty;
+                LadyGUID = ObjectGuid::Empty;
+                BaronGUID = ObjectGuid::Empty;
+                SirGUID = ObjectGuid::Empty;
+                ThaddiusGUID = ObjectGuid::Empty;
+                HeiganGUID = ObjectGuid::Empty;
+                FeugenGUID = ObjectGuid::Empty;
+                StalaggGUID = ObjectGuid::Empty;
+                SapphironGUID = ObjectGuid::Empty;
+                KelthuzadGUID = ObjectGuid::Empty;
+                KelthuzadTriggerGUID = ObjectGuid::Empty;
+                sphereGUID = ObjectGuid::Empty;
 
                 playerDied              = 0;
 
-                aracPortalGUID          = 0;
-                millitaryPortalGUID     = 0;
-                constructionPortalGUID  = 0;
-                plaguePortalGUID        = 0;
+                aracPortalGUID = ObjectGuid::Empty;
+                millitaryPortalGUID = ObjectGuid::Empty;
+                constructionPortalGUID = ObjectGuid::Empty;
+                plaguePortalGUID = ObjectGuid::Empty;
 
 
                 m_mEvents.Reset();
@@ -336,7 +336,7 @@ class instance_naxxramas : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 id) const override
+            ObjectGuid GetGuidData(uint32 id) const override
             {
                 switch (id)
                 {
@@ -549,50 +549,50 @@ class instance_naxxramas : public InstanceMapScript
             EventMap m_mEvents;
             /* The Arachnid Quarter */
             // Grand Widow Faerlina
-            uint64 FaerlinaGUID;
+            ObjectGuid FaerlinaGUID;
 
             /* The Plague Quarter */
             // Heigan the Unclean
             std::set<uint64> HeiganEruptionGUID[4];
-            uint64 HeiganGUID;
+            ObjectGuid HeiganGUID;
 
             /* The Military Quarter */
             // Gothik the Harvester
-            uint64 GothikGateGUID;
+            ObjectGuid GothikGateGUID;
             // The Four Horsemen
-            uint64 ThaneGUID;
-            uint64 LadyGUID;
-            uint64 BaronGUID;
-            uint64 SirGUID;
-            uint64 HorsemenChestGUID;
-            uint64 HorsemenTeleporterGUID;
+            ObjectGuid ThaneGUID;
+            ObjectGuid LadyGUID;
+            ObjectGuid BaronGUID;
+            ObjectGuid SirGUID;
+            ObjectGuid HorsemenChestGUID;
+            ObjectGuid HorsemenTeleporterGUID;
             time_t minHorsemenDiedTime;
             time_t maxHorsemenDiedTime;
 
             /* The Construct Quarter */
             // Thaddius
-            uint64 ThaddiusGUID;
-            uint64 FeugenGUID;
-            uint64 StalaggGUID;
+            ObjectGuid ThaddiusGUID;
+            ObjectGuid FeugenGUID;
+            ObjectGuid StalaggGUID;
 
             /* Frostwyrm Lair */
-            uint64 sphereGUID;
+            ObjectGuid sphereGUID;
             // Sapphiron
-            uint64 SapphironGUID;
+            ObjectGuid SapphironGUID;
             // Kel'Thuzad
-            uint64 KelthuzadGUID;
-            uint64 KelthuzadTriggerGUID;
-            uint64 PortalsGUID[4];
+            ObjectGuid KelthuzadGUID;
+            ObjectGuid KelthuzadTriggerGUID;
+            ObjectGuid PortalsGUID[4];
             uint8 AbominationCount;
 
             /* The Immortal / The Undying */
             uint32 playerDied;
 
             // Portal Data
-            uint64 aracPortalGUID;
-            uint64 millitaryPortalGUID;
-            uint64 constructionPortalGUID;
-            uint64 plaguePortalGUID;
+            ObjectGuid aracPortalGUID;
+            ObjectGuid millitaryPortalGUID;
+            ObjectGuid constructionPortalGUID;
+            ObjectGuid plaguePortalGUID;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override

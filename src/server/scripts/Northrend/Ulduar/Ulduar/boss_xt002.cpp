@@ -516,7 +516,7 @@ class npc_xt002_heart : public CreatureScript
                     return;
 
                 if (instance)
-                    if (Creature* XT002 = me->GetCreature(*me, instance->GetData64(BOSS_XT002)))
+                    if (Creature* XT002 = me->GetCreature(*me, instance->GetGuidData(BOSS_XT002)))
                         if (XT002->AI())
                             XT002->AI()->DoAction(ACTION_ENTER_HARD_MODE);
 
@@ -528,7 +528,7 @@ class npc_xt002_heart : public CreatureScript
 
             void DamageTaken(Unit* /*who*/, uint32& damage) override
             {
-                if (Creature* XT002 = me->GetCreature(*me, instance->GetData64(BOSS_XT002)))
+                if (Creature* XT002 = me->GetCreature(*me, instance->GetGuidData(BOSS_XT002)))
                     if (XT002->AI())
                     {
                         uint32 health = me->GetHealth();
@@ -572,7 +572,7 @@ class npc_scrapbot : public CreatureScript
 
                 rangeCheckTimer = 500;
 
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(BOSS_XT002)))
                     me->GetMotionMaster()->MoveFollow(pXT002, 0.1f, 0.0f);
             }
 
@@ -585,7 +585,7 @@ class npc_scrapbot : public CreatureScript
             {
                 if (rangeCheckTimer <= diff)
                 {
-                    if (Creature* xt002 = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_XT002)))
+                    if (Creature* xt002 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(BOSS_XT002)))
                     {
                         if (!casted && xt002->IsAlive())
                             if (me->IsWithinMeleeRange(xt002))
@@ -1114,7 +1114,7 @@ class spell_xt002_heart_overload_periodic : public SpellScriptLoader
                     {
                         std::vector<Unit*> piles;
                         for (uint32 i = 0; i < 4; ++i)
-                            if (Unit* toyPile = ObjectAccessor::GetUnit(*caster, instance->GetData64(DATA_TOY_PILE_0 + i)))
+                            if (Unit* toyPile = ObjectAccessor::GetUnit(*caster, instance->GetGuidData(DATA_TOY_PILE_0 + i)))
                                 if (caster->GetVehicleBase()->GetExactDist2d(toyPile) > 30.0f)
                                     piles.push_back(toyPile);
 

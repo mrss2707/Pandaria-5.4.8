@@ -952,7 +952,7 @@ struct npc_black_harvest_kanrethad_ebonlocke : public customCreatureAI
             {
                 Talk(TALK_SPECIAL_6);
 
-                if (Creature* jubeka = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_JUBEKA_SHADOWBREAKER) : 0))
+                if (Creature* jubeka = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_JUBEKA_SHADOWBREAKER) : ObjectGuid::Empty))
                     jubeka->AI()->DoAction(ACTION_START_INTRO);
             });
         }
@@ -984,7 +984,7 @@ struct npc_black_harvest_kanrethad_ebonlocke : public customCreatureAI
             .Schedule(Milliseconds(delay += 4000), [this](TaskContext context)
         {
             // Start call demon here
-            if (Creature* gateWay = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_DEMONIC_GATEWAY) : 0))
+            if (Creature* gateWay = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_DEMONIC_GATEWAY) : ObjectGuid::Empty))
                 DoCast(gateWay, SPELL_SUMMON_PIT_LORD);
         });
 
@@ -1098,7 +1098,7 @@ struct npc_black_harvest_black_temple_top_credit : public ScriptedAI
     npc_black_harvest_black_temple_top_credit(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -1179,13 +1179,13 @@ struct npc_black_harvest_demonic_soulwell : public customCreatureAI
     npc_black_harvest_demonic_soulwell(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonGUID;
+    ObjectGuid summonGUID;
     bool hasTriggered;
 
     void Reset() override
     {
         events.Reset();
-        summonGUID = 0;
+        summonGUID = ObjectGuid::Empty;
     }
 
     void OnSpellClick(Unit* clicker, bool& /*result*/) override
@@ -1256,13 +1256,13 @@ struct npc_black_harvest_jubeka_shadowbreaker : public ScriptedAI
 
             me->SetVisible(true);
 
-            if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KANRETHAD_EBONLOCKE) : 0))
+            if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KANRETHAD_EBONLOCKE) : ObjectGuid::Empty))
                 me->GetMotionMaster()->MovePoint(0, kanrethad->GetPositionX() + frand(-5.0f, 5.0f), kanrethad->GetPositionY() + frand(-5.0f, 5.0f), kanrethad->GetPositionZ());
 
             scheduler
                 .Schedule(Milliseconds(2000), [this](TaskContext context)
             {
-                if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KANRETHAD_EBONLOCKE) : 0))
+                if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KANRETHAD_EBONLOCKE) : ObjectGuid::Empty))
                     kanrethad->AI()->Talk(TALK_SPECIAL_7);
             });
 
@@ -1271,7 +1271,7 @@ struct npc_black_harvest_jubeka_shadowbreaker : public ScriptedAI
             {
                 Talk(TALK_INTRO);
 
-                if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KANRETHAD_EBONLOCKE) : 0))
+                if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KANRETHAD_EBONLOCKE) : ObjectGuid::Empty))
                     DoCast(kanrethad, SPELL_ETERNAL_BANISHMENT);
 
                 if (Player* target = ObjectAccessor::GetPlayer(*me, instance ? instance->GetData64(PLAYER_DATA) : 0))
@@ -1283,7 +1283,7 @@ struct npc_black_harvest_jubeka_shadowbreaker : public ScriptedAI
             {
                 Talk(TALK_INTRO);
 
-                if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KANRETHAD_EBONLOCKE) : 0))
+                if (Creature* kanrethad = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KANRETHAD_EBONLOCKE) : ObjectGuid::Empty))
                     kanrethad->AI()->Talk(TALK_SPECIAL_8);
             });
 

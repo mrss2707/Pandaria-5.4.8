@@ -167,7 +167,7 @@ class npc_arena_of_annihiliation_scar_shell : public CreatureScript
         {
             npc_arena_of_annihiliation_scar_shellAI(Creature* creature) : BossAI(creature, DATA_SCAR_SHELL) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool HasEnrage;
             float x, y;
 
@@ -301,7 +301,7 @@ class npc_arena_of_annihiliation_jol_grum : public CreatureScript
         {
             npc_arena_of_annihiliation_jol_grumAI(Creature* creature) : BossAI(creature, DATA_JOL_GRUM) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool HasEnrage;
 
             void Reset() override
@@ -414,7 +414,7 @@ class npc_arena_of_annihiliation_little_liuyang : public CreatureScript
         {
             npc_arena_of_annihiliation_little_liuyangAI(Creature* creature) : BossAI(creature, DATA_LIUYANG) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool HasEnrage;
             uint32 m_LineStep;
 
@@ -567,7 +567,7 @@ class npc_arena_of_annihiliation_flamecoaxing_spirit : public CreatureScript
 
                 // Summon 6 waves
                 if (instance)
-                    if (Unit* Liuyang = ObjectAccessor::GetUnit(*me, instance->GetData64(NPC_LITTLE_LIUYANG)))
+                    if (Unit* Liuyang = ObjectAccessor::GetUnit(*me, instance->GetGuidData(NPC_LITTLE_LIUYANG)))
                         for (uint8 i = 0; i < 6; ++i)
                             if (TempSummon* m_wave = me->SummonCreature(NPC_FLAME_WALL, GetCoaxingSpiritSpawnPos(Liuyang->GetAngle(me) - M_PI / 6, Liuyang->GetGUID()), TEMPSUMMON_MANUAL_DESPAWN))
                                 WaveTrigger.push_back(m_wave->GetGUID());
@@ -626,7 +626,7 @@ class npc_arena_of_annihiliation_flamecoaxing_spirit : public CreatureScript
                             break;
                         }
                         case EVENT_PUSH_WAVE:
-                            if (Unit* Liuyang = ObjectAccessor::GetUnit(*me, instance ? instance->GetData64(NPC_LITTLE_LIUYANG) : 0))
+                            if (Unit* Liuyang = ObjectAccessor::GetUnit(*me, instance ? instance->GetGuidData(NPC_LITTLE_LIUYANG) : ObjectGuid::Empty))
                                 me->GetMotionMaster()->MovePoint(0, GetCoaxingSpiritSpawnPos(Position::NormalizeOrientation(Liuyang->GetAngle(me) + M_PI / 6), Liuyang->GetGUID(), GetCircleRange(me->GetGUID(), Liuyang->GetGUID())).GetPositionX(), GetCoaxingSpiritSpawnPos(Position::NormalizeOrientation(Liuyang->GetAngle(me) + M_PI / 6), Liuyang->GetGUID(), GetCircleRange(me->GetGUID(), Liuyang->GetGUID())).GetPositionY(), GetCoaxingSpiritSpawnPos(Position::NormalizeOrientation(Liuyang->GetAngle(me) + M_PI / 6), Liuyang->GetGUID(), GetCircleRange(me->GetGUID(), Liuyang->GetGUID())).GetPositionZ());
 
                             step = 0.0f;
@@ -704,7 +704,7 @@ class npc_arena_of_annihiliation_flame_wall : public CreatureScript
                 {
                     if (eventId == EVENT_MOVE)
                     {
-                        if (Unit* Liuyang = ObjectAccessor::GetUnit(*me, instance ? instance->GetData64(NPC_LITTLE_LIUYANG) : 0))
+                        if (Unit* Liuyang = ObjectAccessor::GetUnit(*me, instance ? instance->GetGuidData(NPC_LITTLE_LIUYANG) : ObjectGuid::Empty))
                             me->GetMotionMaster()->MovePoint(0, GetCoaxingSpiritSpawnPos(Position::NormalizeOrientation(Liuyang->GetAngle(me) + M_PI / 6), Liuyang->GetGUID(), GetCircleRange(me->GetGUID(), Liuyang->GetGUID())).GetPositionX(), GetCoaxingSpiritSpawnPos(Position::NormalizeOrientation(Liuyang->GetAngle(me) + M_PI / 6), Liuyang->GetGUID(), GetCircleRange(me->GetGUID(), Liuyang->GetGUID())).GetPositionY(), GetCoaxingSpiritSpawnPos(Position::NormalizeOrientation(Liuyang->GetAngle(me) + M_PI / 6), Liuyang->GetGUID(), GetCircleRange(me->GetGUID(), Liuyang->GetGUID())).GetPositionZ());
                     }
                     break;
@@ -741,7 +741,7 @@ class npc_arena_of_annihiliation_chagan_firehoof : public CreatureScript
         {
             npc_arena_of_annihiliation_chagan_firehoofAI(Creature* creature) : BossAI(creature, DATA_CHAGAN) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool HasEnrage;
 
             void Reset() override
@@ -860,7 +860,7 @@ class npc_arena_of_annihiliation_batu : public CreatureScript
 
             EventMap events;
             InstanceScript* instance;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
 
             void IsSummonedBy(Unit* summoner) override
             {
@@ -886,7 +886,7 @@ class npc_arena_of_annihiliation_batu : public CreatureScript
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
                     me->SetHomePosition(*me);
 
-                    if (Creature* chagan = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_CHAGAN_FIREHOOF) : 0))
+                    if (Creature* chagan = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_CHAGAN_FIREHOOF) : ObjectGuid::Empty))
                         chagan->AI()->DoAction(ACTION_REMOVE_VEHICLE);
                 }
             }
@@ -952,14 +952,14 @@ class npc_arena_of_annihiliation_assassin : public CreatureScript
         {
             npc_arena_of_annihiliation_assassinAI(Creature* creature) : BossAI(creature, DATA_ASSASSIN) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool HasEnrage;
 
             void Reset() override
             {
                 _Reset();
                 events.Reset();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
             }
 
             void IsSummonedBy(Unit* summoner) override

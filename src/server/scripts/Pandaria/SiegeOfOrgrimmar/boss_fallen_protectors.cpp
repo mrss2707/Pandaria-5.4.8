@@ -181,7 +181,7 @@ enum Spells
     SPELL_SHADOW_WEAKNESS          = 144176,
     SPELL_SHADOW_WEAKNESS_TRANSFER = 144081, // Dummy on Effect 0 to apply a stack of SPELL_SHADOW_WEAKNESS on all players when using SPELL_MARK_OF_ANGUISH_TRANSFER.
 
-    // Manifest Emotions – Embodied Despair and Embodied Desperation focus their negative emotions, creating Sha manifestations which attack players. 
+    // Manifest Emotions ï¿½ Embodied Despair and Embodied Desperation focus their negative emotions, creating Sha manifestations which attack players. 
     // Any damage taken by these manifested emotions will also be suffered by the creature that spawned them.
 
     // Embodied Despair
@@ -287,7 +287,7 @@ class boss_rook_stonetoe : public CreatureScript
             bool eventComplete;
             bool hasEvade;
             bool allowAchiev;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             uint32 corruptedBrewCounter;
             uint32 markSummaryDistance;
             std::set<uint64> markSenderGUIDs;
@@ -305,7 +305,7 @@ class boss_rook_stonetoe : public CreatureScript
                 lotusScheduled = false;
                 hasEvade       = false;
                 allowAchiev    = false;
-                targetGUID     = 0;
+                targetGUID = ObjectGuid::Empty;
                 corruptedBrewCounter = 0;
                 markSummaryDistance  = 0;
                 markSenderGUIDs.clear();
@@ -386,7 +386,7 @@ class boss_rook_stonetoe : public CreatureScript
                 }
             }
 
-            void SetGUID(uint64 guid, int32 /*type*/) override
+            void SetGUID(ObjectGuid guid, int32 /*type*/) override
             {
                 markSenderGUIDs.insert(guid);
 
@@ -714,7 +714,7 @@ class boss_he_softfoot : public CreatureScript
             bool doneDesperateMeasuresPhase, doneDesperateMeasuresPhase2;
             bool lotusScheduled;
             bool hasEvade;
-            uint64 noxGUID;
+            ObjectGuid noxGUID;
 
             void Reset() override
             {
@@ -728,7 +728,7 @@ class boss_he_softfoot : public CreatureScript
 
                 lotusScheduled = false;
                 hasEvade = false;
-                noxGUID  = 0;
+                noxGUID = ObjectGuid::Empty;
 
                 _Reset();
 
@@ -778,12 +778,12 @@ class boss_he_softfoot : public CreatureScript
 
             }
 
-            void SetGUID(uint64 guid, int32 /*type*/) override
+            void SetGUID(ObjectGuid guid, int32 /*type*/) override
             {
                 noxGUID = guid;
             }
 
-            uint64 GetGUID(int32 /*type*/) const override
+            ObjectGuid GetGUID(int32 /*type*/) const override
             {
                 return noxGUID;
             }
@@ -1011,7 +1011,7 @@ class boss_he_softfoot : public CreatureScript
                             me->AddAura(SPELL_MARK_OF_ANGUISH_VISUAL, me);
 
                             // Achiev
-                            if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_ROOK_STONETOE) : 0))
+                            if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_ROOK_STONETOE) : ObjectGuid::Empty))
                                 rook->AI()->SetData(TYPE_GO_LONG_CLEAR, 1);
 
                             if (Creature* anguish = me->SummonCreature(NPC_EMBODIED_ANGUISH, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 1000))
@@ -1073,7 +1073,7 @@ class boss_sun_tenderheart : public CreatureScript
 
             bool doneDesperateMeasuresPhase, doneDesperateMeasuresPhase2;
             bool lotusScheduled;
-            uint64 shadowWordTargetGUID;
+            ObjectGuid shadowWordTargetGUID;
             bool hasEvade;
             uint32 calamityPower;
 
@@ -1089,7 +1089,7 @@ class boss_sun_tenderheart : public CreatureScript
 
                 lotusScheduled = false;
                 hasEvade       = false;
-                shadowWordTargetGUID = 0;
+                shadowWordTargetGUID = ObjectGuid::Empty;
                 calamityPower        = 1;
 
                 _Reset();
@@ -1101,12 +1101,12 @@ class boss_sun_tenderheart : public CreatureScript
                 });
             }
 
-            void SetGUID(uint64 guid, int32 /*type*/) override
+            void SetGUID(ObjectGuid guid, int32 /*type*/) override
             {
                 shadowWordTargetGUID = guid;
             }
 
-            uint64 GetGUID(int32 /*type*/) const override
+            ObjectGuid GetGUID(int32 /*type*/) const override
             {
                 return shadowWordTargetGUID;
             }
@@ -1353,7 +1353,7 @@ class boss_sun_tenderheart : public CreatureScript
                             if (!IsHeroic())
                             {
                                 // Remove He`s poisons while it casting
-                                if (Creature* he = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_HE_SOFTFOOT) : 0))
+                                if (Creature* he = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_HE_SOFTFOOT) : ObjectGuid::Empty))
                                 {
                                     he->RemoveAurasDueToSpell(SPELL_INSTANT_POISON);
                                     he->RemoveAurasDueToSpell(SPELL_NOXIOUS_POISON);
@@ -1805,7 +1805,7 @@ struct npc_embodied_anguish : public ScriptedAI
     npc_embodied_anguish(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 markTargetGUID;
+    ObjectGuid markTargetGUID;
 
     void Reset() override
     {
@@ -1821,12 +1821,12 @@ struct npc_embodied_anguish : public ScriptedAI
             me->GetInstanceScript()->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         markTargetGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return markTargetGUID;
     }
@@ -2023,7 +2023,7 @@ struct npc_despair_spawn : public ScriptedAI
 {
     npc_despair_spawn(Creature* creature) : ScriptedAI(creature) { }
 
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2051,7 +2051,7 @@ struct npc_desperation_spawn : public ScriptedAI
 {
     npc_desperation_spawn(Creature* creature) : ScriptedAI(creature) { }
 
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {

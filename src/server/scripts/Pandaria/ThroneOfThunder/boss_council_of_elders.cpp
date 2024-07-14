@@ -353,8 +353,8 @@ class boss_council_of_elders_baseAI : public ScriptedAI
         TaskScheduler scheduler;
         EventMap events, darkPowerEvents;
         InstanceScript* instance;
-        uint64 frostBiteGUID;
-        uint64 recklessChargeGUID;
+        ObjectGuid frostBiteGUID;
+        ObjectGuid recklessChargeGUID;
         std::vector<uint32> playerGUIDs;
         bool hasFeign;
 
@@ -377,8 +377,8 @@ class boss_council_of_elders_baseAI : public ScriptedAI
             uiDarkPowerCount        = 0;
             hasFeign = false;
             uiDamageTakenPossessed  = 0;
-            frostBiteGUID           = 0;
-            recklessChargeGUID      = 0;
+            frostBiteGUID = ObjectGuid::Empty;
+            recklessChargeGUID = ObjectGuid::Empty;
 
             // if feign death remove
             me->RemoveFlag(OBJECT_FIELD_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
@@ -398,7 +398,7 @@ class boss_council_of_elders_baseAI : public ScriptedAI
         {
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-            if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_COUNCIL_OF_ELDERS) : 0))
+            if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_COUNCIL_OF_ELDERS) : ObjectGuid::Empty))
                 pGarajal->AI()->DoAction(ACTION_FIGHT_BEGIN);
 
             Talk(TALK_AGGRO);
@@ -427,7 +427,7 @@ class boss_council_of_elders_baseAI : public ScriptedAI
 
             CreatureAI::EnterEvadeMode();
 
-            if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_COUNCIL_OF_ELDERS) : 0))
+            if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_COUNCIL_OF_ELDERS) : ObjectGuid::Empty))
                 pGarajal->AI()->EnterEvadeMode();
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE);
@@ -498,7 +498,7 @@ class boss_council_of_elders_baseAI : public ScriptedAI
 
                 // Remove Garajal Spirit
                 if (me->GetVehicleKit() && me->GetVehicleKit()->GetPassenger(0))
-                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_GARA_JALS_SOUL) : 0))
+                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_GARA_JALS_SOUL) : ObjectGuid::Empty))
                         pGarajal->AI()->DoAction(ACTION_EXIT_COUNCILLOR);
 
                 me->RemoveAllAuras();
@@ -519,7 +519,7 @@ class boss_council_of_elders_baseAI : public ScriptedAI
             {
                 // No remove when no other councillor alive
                 if (IsACouncillorAlive())
-                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_GARA_JALS_SOUL) : 0))
+                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_GARA_JALS_SOUL) : ObjectGuid::Empty))
                         pGarajal->AI()->DoAction(ACTION_EXIT_COUNCILLOR);
 
                 uiDamageTakenPossessed = 0; // Reset in both case to prevent chain call to IsACouncillorAlive
@@ -564,7 +564,7 @@ class boss_council_of_elders_baseAI : public ScriptedAI
 
             events.Reset();
 
-            if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_COUNCIL_OF_ELDERS) : 0))
+            if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_COUNCIL_OF_ELDERS) : ObjectGuid::Empty))
             {
                 if (CreatureAI* pAI = pGarajal->AI())
                 {
@@ -601,10 +601,10 @@ class boss_council_of_elders_baseAI : public ScriptedAI
         // other councillor is alive.
         bool IsACouncillorAlive() const
         {
-            Creature    *pMalakk   = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_COUNCIL_FROST_KING_MALAKK) : 0),
-                        *pKazrajin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_COUNCIL_KAZRAJIN) : 0),
-                        *pSul      = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_COUNCIL_SUL_THE_SANDCRAWLER) : 0),
-                        *pMarli    = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_COUNCIL_HIGH_PRIESTESS_MARLI) : 0);
+            Creature    *pMalakk   = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_COUNCIL_FROST_KING_MALAKK) : ObjectGuid::Empty),
+                        *pKazrajin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_COUNCIL_KAZRAJIN) : ObjectGuid::Empty),
+                        *pSul      = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_COUNCIL_SUL_THE_SANDCRAWLER) : ObjectGuid::Empty),
+                        *pMarli    = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_COUNCIL_HIGH_PRIESTESS_MARLI) : ObjectGuid::Empty);
 
             // Pointers should not be null
             if (!pMalakk || !pKazrajin || !pSul || !pMarli)
@@ -689,12 +689,12 @@ class boss_frost_king_malakk : public CreatureScript
         {
             boss_frost_king_malakkAI(Creature* creature) : CouncilBaseAI(creature) { }
 
-            void SetGUID(uint64 guid, int32 /*type*/) override
+            void SetGUID(ObjectGuid guid, int32 /*type*/) override
             {
                 frostBiteGUID = guid;
             }
 
-            uint64 GetGUID(int32 /*type*/) const override
+            ObjectGuid GetGUID(int32 /*type*/) const override
             {
                 return frostBiteGUID;
             }
@@ -803,19 +803,19 @@ class boss_kazrajin : public CreatureScript
             {
                 instance = me->GetInstanceScript();
                 uiDamagesDoneInPastSecs = 0;
-                recklessChargeGUID      = 0;
+                recklessChargeGUID = ObjectGuid::Empty;
                 playerGUIDs.clear();
 
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 CouncilBaseAI::Reset(); // Finalize Reset
             }
 
-            void SetGUID(uint64 guid, int32 /*type*/) override
+            void SetGUID(ObjectGuid guid, int32 /*type*/) override
             {
                 recklessChargeGUID = guid;
             }
 
-            uint64 GetGUID(int32 /*type*/) const override
+            ObjectGuid GetGUID(int32 /*type*/) const override
             {
                 return recklessChargeGUID;
             }
@@ -921,7 +921,7 @@ class boss_kazrajin : public CreatureScript
             // Amount of damages received during past seconds in Heroic,
             // cause spell ticks each second, instead of being a permanent
             // dummy. Fuck blizzard's logic.
-            uint64 uiRecklessChargeTargetGUID;
+            ObjectGuid uiRecklessChargeTargetGUID;
             void InitStandartEvents() override
             {
                 darkPowerEvents.Reset();
@@ -1451,10 +1451,10 @@ class npc_garajal : public CreatureScript
 
                 list.clear();
 
-                list.push_back(instance->GetData64(NPC_COUNCIL_FROST_KING_MALAKK));
-                list.push_back(instance->GetData64(NPC_COUNCIL_HIGH_PRIESTESS_MARLI));
-                list.push_back(instance->GetData64(NPC_COUNCIL_SUL_THE_SANDCRAWLER));
-                list.push_back(instance->GetData64(NPC_COUNCIL_KAZRAJIN));
+                list.push_back(instance->GetGuidData(NPC_COUNCIL_FROST_KING_MALAKK));
+                list.push_back(instance->GetGuidData(NPC_COUNCIL_HIGH_PRIESTESS_MARLI));
+                list.push_back(instance->GetGuidData(NPC_COUNCIL_SUL_THE_SANDCRAWLER));
+                list.push_back(instance->GetGuidData(NPC_COUNCIL_KAZRAJIN));
             }
 
             void FinishFight()
@@ -1619,7 +1619,7 @@ class guidVectorPredicate
             return uiGuid == _guid;
         }
     private:
-        uint64 _guid;
+        ObjectGuid _guid;
 };
 
 // Reckless Charge 69453
@@ -1704,7 +1704,7 @@ struct npc_garajals_soul : public ScriptedAI
             if (prevCouncillor)
                 possessedTargets.erase(std::find(possessedTargets.begin(), possessedTargets.end(), prevCouncillor));
 
-            possessedTargets.remove_if([=](uint64 councillorEntry) { return instance && ObjectAccessor::GetCreature(*me, instance->GetData64(councillorEntry)) && ObjectAccessor::GetCreature(*me, instance->GetData64(councillorEntry))->HasAura(SPELL_PERMANENT_FEIGN_DEATH); });
+            possessedTargets.remove_if([=](uint64 councillorEntry) { return instance && ObjectAccessor::GetCreature(*me, instance->GetGuidData(councillorEntry)) && ObjectAccessor::GetCreature(*me, instance->GetGuidData(councillorEntry))->HasAura(SPELL_PERMANENT_FEIGN_DEATH); });
 
             if (possessedTargets.empty())
             {
@@ -1720,7 +1720,7 @@ struct npc_garajals_soul : public ScriptedAI
         }
         else // In Begun case
         {
-            possessedTargets.remove_if([=](uint64 councillorEntry) { return instance && ObjectAccessor::GetCreature(*me, instance->GetData64(councillorEntry)) && ObjectAccessor::GetCreature(*me, instance->GetData64(councillorEntry))->HasAura(SPELL_PERMANENT_FEIGN_DEATH); });
+            possessedTargets.remove_if([=](uint64 councillorEntry) { return instance && ObjectAccessor::GetCreature(*me, instance->GetGuidData(councillorEntry)) && ObjectAccessor::GetCreature(*me, instance->GetGuidData(councillorEntry))->HasAura(SPELL_PERMANENT_FEIGN_DEATH); });
 
             if (possessedTargets.empty())
             {
@@ -1760,12 +1760,12 @@ struct npc_garajals_soul : public ScriptedAI
                 // cast).
                 if (IsHeroic() && Is25ManRaid())
                 {
-                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_COUNCIL_OF_ELDERS) : 0))
+                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_COUNCIL_OF_ELDERS) : ObjectGuid::Empty))
                         pGarajal->CastSpell(pGarajal, SPELL_SOUL_FRAGMENT_SELECTOR, true);
                 }
                 else if (IsHeroic() && fragmentCounter % 2 == 0) // through time in 10 ppl
                 {
-                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_COUNCIL_OF_ELDERS) : 0))
+                    if (Creature* pGarajal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_COUNCIL_OF_ELDERS) : ObjectGuid::Empty))
                         pGarajal->CastSpell(pGarajal, SPELL_SOUL_FRAGMENT_SELECTOR, true);
                 }
             
@@ -1938,7 +1938,7 @@ struct npc_blessed_loa_spirit : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        uiTargetGuid = 0;
+        uiTargetGuid = ObjectGuid::Empty;
         me->SetReactState(REACT_PASSIVE);
         me->SetSpeed(MOVE_RUN, 0.85f);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -1985,7 +1985,7 @@ struct npc_blessed_loa_spirit : public ScriptedAI
     void HandleTargetSelection()
     {
         // Select a target now
-        std::list<Creature*> councillors = { ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_COUNCIL_FROST_KING_MALAKK) : 0), ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_COUNCIL_KAZRAJIN) : 0), ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_COUNCIL_SUL_THE_SANDCRAWLER) : 0) };
+        std::list<Creature*> councillors = { ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_COUNCIL_FROST_KING_MALAKK) : ObjectGuid::Empty), ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_COUNCIL_KAZRAJIN) : ObjectGuid::Empty), ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_COUNCIL_SUL_THE_SANDCRAWLER) : ObjectGuid::Empty) };
         councillors.remove_if([](Creature const* pCouncil) -> bool { return pCouncil->HasAura(SPELL_PERMANENT_FEIGN_DEATH); });
 
         if (councillors.empty())
@@ -2040,7 +2040,7 @@ struct npc_blessed_loa_spirit : public ScriptedAI
     private:
         EventMap events;
         InstanceScript* instance;
-        uint64 uiTargetGuid; // GUID of the councillor we are moving toward
+        ObjectGuid uiTargetGuid; // GUID of the councillor we are moving toward
 };
 
 // Shadowed Loa Spirit 69548
@@ -2063,7 +2063,7 @@ struct npc_shadowed_loa_spirit : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        uiTargetGuid = 0;
+        uiTargetGuid = ObjectGuid::Empty;
         me->SetReactState(REACT_PASSIVE);
         me->SetSpeed(MOVE_RUN, 0.85f);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -2163,7 +2163,7 @@ struct npc_shadowed_loa_spirit : public ScriptedAI
     private:
         EventMap events;
         InstanceScript* instance;
-        uint64 uiTargetGuid; // GUID of the councillor we are moving toward
+        ObjectGuid uiTargetGuid; // GUID of the councillor we are moving toward
 };
 
 // Twisted Fate 69740, 69746
@@ -2174,13 +2174,13 @@ struct npc_twisted_fate : public ScriptedAI
         me->SetReactState(REACT_PASSIVE);
     }
 
-    uint64 copyGUID;
+    ObjectGuid copyGUID;
     // Add a new TwistedFate_t to the helper
     void IsSummonedBy(Unit* summoner) override
     {
         me->SetWalk(true);
 
-        if (Creature* garajalCouncil = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_COUNCIL_OF_ELDERS) : 0))
+        if (Creature* garajalCouncil = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_COUNCIL_OF_ELDERS) : ObjectGuid::Empty))
             garajalCouncil->AI()->JustSummoned(me);
 
         if (me->GetEntry() == NPC_TWISTED_FATE_FIRST)
@@ -2205,12 +2205,12 @@ struct npc_twisted_fate : public ScriptedAI
         }
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         copyGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return copyGUID;
     }
@@ -2227,7 +2227,7 @@ struct npc_twisted_fate : public ScriptedAI
 
     protected:
         InstanceScript* instance;
-        uint64 uiOtherTwistedFateGuid; // Guid of the other twisted fate
+        ObjectGuid uiOtherTwistedFateGuid; // Guid of the other twisted fate
     
         // Boolean to control whenever we are in the linked phase or not,
         // and used to compute correctly the amount of damages of the
@@ -3276,7 +3276,7 @@ class spell_marked_soul : public SpellScript
 class correctGuidPredicate
 {
     private:
-        uint64 casterGuid;
+        ObjectGuid casterGuid;
     public:
         correctGuidPredicate(uint64 guid) : casterGuid(guid) { }
 
@@ -3441,7 +3441,7 @@ class AreaTrigger_behind_council_of_elders : public AreaTriggerScript
         bool OnTrigger(Player* player, AreaTriggerEntry const* trigger) override
         {
             if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* garajalCouncil = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_COUNCIL_OF_ELDERS)))
+                if (Creature* garajalCouncil = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_COUNCIL_OF_ELDERS)))
                     garajalCouncil->AI()->DoAction(ACTION_COUNCIL_INTRO);
     
             return false;

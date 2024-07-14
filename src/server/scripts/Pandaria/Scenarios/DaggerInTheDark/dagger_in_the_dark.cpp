@@ -1101,13 +1101,13 @@ struct npc_dagger_in_dark_darkhatched_lizard_lord : public customCreatureAI
 
     TaskScheduler scheduler;
     bool hasTriggered;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
         summons.DespawnAll();
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
     }
 
     void JustEngagedWith(Unit* who) override

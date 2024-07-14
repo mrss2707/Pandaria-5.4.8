@@ -336,12 +336,12 @@ public:
         npc_daegarnAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool bEventInProgress;
-        uint64 uiPlayerGUID;
+        ObjectGuid uiPlayerGUID;
 
         void Reset() override
         {
             bEventInProgress = false;
-            uiPlayerGUID = 0;
+            uiPlayerGUID = ObjectGuid::Empty;
         }
 
         void StartEvent(uint64 uiGUID)

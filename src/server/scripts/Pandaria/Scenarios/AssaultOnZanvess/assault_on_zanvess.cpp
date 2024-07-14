@@ -133,12 +133,12 @@ class npc_zanvess_korkron_gunship : public CreatureScript
             npc_zanvess_korkron_gunshipAI(Creature* creature) : CreatureAI(creature) 
             { 
                 instance = me->GetInstanceScript();
-                nalleyGUID = 0;
+                nalleyGUID = ObjectGuid::Empty;
             }
 
             TaskScheduler scheduler;
-            uint64 targetGUID;
-            uint64 nalleyGUID;
+            ObjectGuid targetGUID;
+            ObjectGuid nalleyGUID;
             EventMap events;
             Position pos;
             std::vector<Position> loopPath;
@@ -399,7 +399,7 @@ class npc_zanvess_nalley : public CreatureScript
         {
             npc_zanvess_nalleyAI(Creature* creature) : ScriptedAI(creature) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             EventMap nonCombatEvents;
 
             void IsSummonedBy(Unit* summoner) override
@@ -486,7 +486,7 @@ class npc_zanvess_sonic_control_tower : public CreatureScript
         {
             npc_zanvess_sonic_control_towerAI(Creature* creature) : zanvess_klaxxi_typeAI(creature) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             InstanceScript* instance;
 
             void Reset() override
@@ -535,7 +535,7 @@ class npc_zanvess_scenario_controller : public CreatureScript
         {
             npc_zanvess_scenario_controllerAI(Creature* creature) : zanvess_klaxxi_typeAI(creature) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
 
             void Reset() override
             {
@@ -568,7 +568,7 @@ struct npc_zanvess_scorpid_relocator : public zanvess_klaxxi_typeAI
 
     Position spawnPos;
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
@@ -946,12 +946,12 @@ class npc_zanvess_team_leader_scooter : public CreatureScript
             npc_zanvess_team_leader_scooterAI(Creature* creature) : zanvess_assault_typeAI(creature) { }
 
             EventMap events;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
 
             void Reset() override
             {
                 events.Reset();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
             }
 
             void JustEngagedWith(Unit* /*who*/) override
@@ -1217,11 +1217,11 @@ struct npc_zanvess_strafing_ran_trigger : public ScriptedAI
 {
     npc_zanvess_strafing_ran_trigger(Creature* creature) : ScriptedAI(creature) 
     { 
-        summonerGUID = 0;
+        summonerGUID = ObjectGuid::Empty;
     }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -1336,7 +1336,7 @@ class AreaTrigger_at_zanvess_heart : public AreaTriggerScript
                     instance->SetData(DATA_HEART_OF_ZANVESS, instance->GetData(DATA_HEART_OF_ZANVESS) + 1);
                     instance->SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_REACH_HEART_OF_ZANVESS, 1, instance->GetScenarioGUID(), time(NULL), 0, 0));
 
-                    if (Creature* Telvrak = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_COMMANDER_TELVRAK)))
+                    if (Creature* Telvrak = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_COMMANDER_TELVRAK)))
                         Telvrak->AI()->Talk(TALK_INTRO);
                 }
             }

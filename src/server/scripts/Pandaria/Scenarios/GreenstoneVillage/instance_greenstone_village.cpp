@@ -140,7 +140,7 @@ class instance_greenstone_village : public InstanceMapScript
                                 if (Creature* m_barrel = instance->GetCreature(itr))
                                     m_barrel->SetVisible(true);
 
-                            if (Creature* Tzu = instance->GetCreature(GetData64(NPC_BREWMASTER_TZU)))
+                            if (Creature* Tzu = instance->GetCreature(GetGuidData(NPC_BREWMASTER_TZU)))
                                 Tzu->GetMotionMaster()->MovePoint(0, TzuPath[0]);
 
                             SetBossState(type, EncounterState(DONE));
@@ -155,7 +155,7 @@ class instance_greenstone_village : public InstanceMapScript
 
                         if (chapterThree == TO_BE_DECIDED + 1)
                         {
-                            if (Creature* Tzu = instance->GetCreature(GetData64(NPC_BREWMASTER_TZU)))
+                            if (Creature* Tzu = instance->GetCreature(GetGuidData(NPC_BREWMASTER_TZU)))
                             {
                                 Tzu->AI()->Talk(TALK_SPECIAL_3);
                                 Tzu->AI()->Talk(TALK_SPECIAL_4); // ann
@@ -180,7 +180,7 @@ class instance_greenstone_village : public InstanceMapScript
 
                         if (chapterFour == DONE)
                         {
-                            if (Creature* Hui = instance->GetCreature(GetData64(NPC_VENGEFUL_HUI)))
+                            if (Creature* Hui = instance->GetCreature(GetGuidData(NPC_VENGEFUL_HUI)))
                                 Hui->AI()->DoAction(ACTION_INTRO);
 
                             for (auto&& itr : instance->GetPlayers())
@@ -224,7 +224,7 @@ class instance_greenstone_village : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {

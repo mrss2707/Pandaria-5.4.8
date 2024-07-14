@@ -2180,12 +2180,12 @@ class npc_molten_guards : public CreatureScript
             EventMap events;
             TaskScheduler scheduler;
             uint8 spellRotation;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
 
             void Reset() override
             {
                 spellRotation = 0;
-                targetGUID    = 0;
+                targetGUID = ObjectGuid::Empty;
                 me->SetReactState(REACT_AGGRESSIVE);
                 events.Reset();
             }

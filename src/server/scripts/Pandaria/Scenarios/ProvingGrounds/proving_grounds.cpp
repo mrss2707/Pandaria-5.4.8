@@ -130,7 +130,7 @@ struct provingGroundsAI : public customCreatureAI
     bool hasReached;
     bool allowCast;
     float x, y;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     uint32 timerID;
 
     void Reset() override
@@ -141,7 +141,7 @@ struct provingGroundsAI : public customCreatureAI
         allowCast  = true;
         DoCast(me, invIllusionaryType.find(me->GetEntry())->second);
         me->SetInCombatWithZone();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         timerID    = 0;
 
         // Send Attack us by player friends
@@ -1575,7 +1575,7 @@ struct npc_proving_grounds_controller : public ScriptedAI
     uint32 waveId;
     uint32 trialId;
     uint32 endlessWaveId;
-    std::vector<uint64> illusionGUIDs;
+    std::vector<ObjectGuid> illusionGUIDs;
     bool hasYellSlayer;
     bool hasYellVarmint;
     bool hasYellGuardian;

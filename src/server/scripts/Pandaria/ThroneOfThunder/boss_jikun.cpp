@@ -394,7 +394,7 @@ class boss_jikun : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FEED_POOL_EFF);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GENTLE_YET_FIRM);
 
-                    if (Creature* chamberExit = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_EXIT_CHAMBER)))
+                    if (Creature* chamberExit = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_EXIT_CHAMBER)))
                         chamberExit->CastSpell(chamberExit, SPELL_EXIT_CHAMBER_AT, true);
 
                     // Save in data cuz setBossState not possible check hanlde after crash. Need for activate feathers and portal
@@ -840,7 +840,7 @@ struct npc_fall_catcher_jikun : public ScriptedAI
     npc_fall_catcher_jikun(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     float x, y;
 
     void IsSummonedBy(Unit* summoner) override
@@ -886,7 +886,7 @@ struct npc_jikun_feed : public ScriptedAI
 
     TaskScheduler scheduler;
     EventMap nonCombatEvents;
-    std::vector<uint64> slimedGUIDs;
+    std::vector<ObjectGuid> slimedGUIDs;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -1046,11 +1046,11 @@ struct npc_nest_guardian : public ScriptedAI
     EventMap events;
     TaskScheduler scheduler;
     InstanceScript* instance;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         instance = me->GetInstanceScript();
 
         if (Creature* jiKun = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_JI_KUN) : 0))

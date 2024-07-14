@@ -72,23 +72,23 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
                 braiserState          = NOT_STARTED;
                 fallEvent             = false;
                 playersInInstanceCnt  = 0;
-                kiptilakGuid          = 0;
-                gadokGuid             = 0;
-                rimokGuid             = 0;
-                raigonnGuid           = 0;
-                raigonWeakGuid        = 0;
+                kiptilakGuid = ObjectGuid::Empty;
+                gadokGuid = ObjectGuid::Empty;
+                rimokGuid = ObjectGuid::Empty;
+                raigonnGuid = ObjectGuid::Empty;
+                raigonWeakGuid = ObjectGuid::Empty;
                 explosionTarget1GUID  = 0;
                 explosionTarget2GUID  = 0;
                 explosionTarget3GUID  = 0;
-                firstDoorGuid         = 0;
-                wallCGuid             = 0;
-                wallAGUID             = 0;
-                wallBGUID             = 0;
-                defenderAGUID         = 0;
-                defenderBGUID         = 0;
-                traineeGUID           = 0;
-                fireSignalGuid        = 0;
-                greatDoorGUID         = 0;
+                firstDoorGuid = ObjectGuid::Empty;
+                wallCGuid = ObjectGuid::Empty;
+                wallAGUID = ObjectGuid::Empty;
+                wallBGUID = ObjectGuid::Empty;
+                defenderAGUID = ObjectGuid::Empty;
+                defenderBGUID = ObjectGuid::Empty;
+                traineeGUID = ObjectGuid::Empty;
+                fireSignalGuid = ObjectGuid::Empty;
+                greatDoorGUID = ObjectGuid::Empty;
                 greatDoor2GUID        = 0;
 
                 bombarderGuids.clear();
@@ -530,7 +530,7 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
                 return 0;
             }
 
-            void SetData64(uint32 type, uint64 data) override
+            void SetGuidData(uint32 type, ObjectGuid data) override
             {
                 switch (type)
                 {
@@ -540,7 +540,7 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
                 }
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -648,25 +648,25 @@ class instance_gate_of_the_setting_sun : public InstanceMapScript
             uint32 cornerCstate;
             uint32 firstDoorstate;
             uint32 braiserState;
-            uint64 kiptilakGuid;
-            uint64 gadokGuid;
-            uint64 rimokGuid;
-            uint64 raigonnGuid;
-            uint64 raigonWeakGuid;
+            ObjectGuid kiptilakGuid;
+            ObjectGuid gadokGuid;
+            ObjectGuid rimokGuid;
+            ObjectGuid raigonnGuid;
+            ObjectGuid raigonWeakGuid;
             uint64 explosionTarget1GUID;
             uint64 explosionTarget2GUID;
             uint64 explosionTarget3GUID;
-            uint64 firstDoorGuid;
-            uint64 fireSignalGuid;
-            uint64 wallAGUID;
-            uint64 wallBGUID;
-            uint64 wallCGuid;
-            uint64 traineeGUID;
-            uint64 defenderAGUID;
-            uint64 defenderBGUID;
-            uint64 greatDoorGUID;
+            ObjectGuid firstDoorGuid;
+            ObjectGuid fireSignalGuid;
+            ObjectGuid wallAGUID;
+            ObjectGuid wallBGUID;
+            ObjectGuid wallCGuid;
+            ObjectGuid traineeGUID;
+            ObjectGuid defenderAGUID;
+            ObjectGuid defenderBGUID;
+            ObjectGuid greatDoorGUID;
             uint64 greatDoor2GUID;
-            uint64 elevatorGUID;
+            ObjectGuid elevatorGUID;
             uint32 dataStorage[MAX_DATA];
             std::list<uint64> bombarderGuids;
             std::list<uint64> fallDefendersGUIDS;

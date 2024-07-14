@@ -51,7 +51,7 @@ public:
 
         void Reset() override
         {
-            _rageclawGUID = 0;
+            _rageclawGUID = ObjectGuid::Empty;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
             float x, y, z;
@@ -106,7 +106,7 @@ public:
         }
 
         private:
-            uint64 _rageclawGUID;
+            ObjectGuid _rageclawGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -271,8 +271,8 @@ public:
 
         void Reset() override
         {
-            _summonGUID = 0;
-            _playerGUID = 0;
+            _summonGUID = ObjectGuid::Empty;
+            _playerGUID = ObjectGuid::Empty;
 
             me->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             uiTimer = 0;
@@ -359,7 +359,7 @@ public:
                             if (Creature* summon = Unit::GetCreature(*me, _summonGUID))
                                 summon->GetMotionMaster()->MoveJump(5776.319824f, -2981.005371f, 273.100037f, 10.0f, 20.0f);
                             uiPhase = 0;
-                            _summonGUID = 0;
+                            _summonGUID = ObjectGuid::Empty;
                             break;
                         case 3:
                             Talk(SAY_QUEST_ACCEPT_KORRAK_2);
@@ -428,8 +428,8 @@ public:
         private:
             bool   _removeFlag;
             uint8  _bossRandom;
-            uint64 _summonGUID;
-            uint64 _playerGUID;
+            ObjectGuid _summonGUID;
+            ObjectGuid _playerGUID;
 
             uint32 uiTimer;
             uint32 uiPhase;
@@ -506,8 +506,8 @@ public:
             _fishyScent         = false;
             uiBattleShoutTimer  = 0;
             uiFishyScentTimer   = 20000;
-            _whiskerGUID        = 0;
-            _affectedGUID       = 0;
+            _whiskerGUID = ObjectGuid::Empty;
+            _affectedGUID = ObjectGuid::Empty;
         }
 
         void EnterEvadeMode() override
@@ -600,8 +600,8 @@ public:
             bool   _fishyScent;
             uint32 uiBattleShoutTimer;
             uint32 uiFishyScentTimer;
-            uint64 _affectedGUID;
-            uint64 _whiskerGUID;
+            ObjectGuid _affectedGUID;
+            ObjectGuid _whiskerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

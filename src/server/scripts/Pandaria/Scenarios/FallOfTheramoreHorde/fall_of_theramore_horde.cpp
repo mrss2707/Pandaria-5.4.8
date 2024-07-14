@@ -96,7 +96,7 @@ struct theramore_guard_typeAI : public ScriptedAI
     EventMap events, nonCombatEvents;
     bool hasInterrupted, intro;
     uint32 prevSpellId, delay;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void DoAction(int32 actionId) override
     {
@@ -183,7 +183,7 @@ struct theramore_guard_typeAI : public ScriptedAI
         return false;
     }
 
-    uint64 GetLowestFriendlyGUID()
+    ObjectGuid GetLowestFriendlyGUID()
     {
         std::list<Creature*> tmpTargets;
 
@@ -753,7 +753,7 @@ class npc_big_bessa : public CreatureScript
             {
                 events.Reset();
                 summons.DespawnAll();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
                 me->GetMap()->SetWorldState(WORLDSTATE_NO_KITE_YOU, 1);
             }
 
@@ -1077,7 +1077,7 @@ class AreaTrigger_at_theramore_songweaver_prison : public AreaTriggerScript
                 if (instance->GetData(DATA_TANKS_FOR_NOTHING) != DONE)
                     return false;
 
-                if (Creature* Talen = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_THALEN_SONGWEAVER)))
+                if (Creature* Talen = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_THALEN_SONGWEAVER)))
                     Talen->AI()->DoAction(ACTION_INTRO_SONGWEAVER);
             }
 
@@ -1095,7 +1095,7 @@ class AreaTrigger_at_captain_drok_ship : public AreaTriggerScript
         {
             if (InstanceScript* instance = player->GetInstanceScript())
             {
-                if (Creature* Drok = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_CAPTAIN_DROK)))
+                if (Creature* Drok = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_CAPTAIN_DROK)))
                     Drok->AI()->DoAction(ACTION_INTRO_SHIP);
             }
 

@@ -196,7 +196,7 @@ class boss_tayak : public CreatureScript
                 PrevSideTornado  = 0;
                 spellTornado     = 0;
                 currentTank      = 0;
-                targetGUID       = 0;
+                targetGUID = ObjectGuid::Empty;
                 braziersCount    = 0;
                 storm1Done       = false;
                 unseenReturn     = false;
@@ -233,7 +233,7 @@ class boss_tayak : public CreatureScript
 
                     instance->SetBossState(DATA_TAYAK, FAIL);
 
-                    if (GameObject* entranceDoor = instance->instance->GetGameObject(instance->GetData64(GO_QUARTERS_DOOR_ENTRANCE)))
+                    if (GameObject* entranceDoor = instance->instance->GetGameObject(instance->GetGuidData(GO_QUARTERS_DOOR_ENTRANCE)))
                         entranceDoor->SetGoState(GO_STATE_ACTIVE);
 
                     // Remove fire from candles and makes them unclickable
@@ -298,7 +298,7 @@ class boss_tayak : public CreatureScript
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
                     instance->SetBossState(DATA_TAYAK, IN_PROGRESS);
 
-                    if (GameObject* entranceDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_QUARTERS_DOOR_ENTRANCE) : 0))
+                    if (GameObject* entranceDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_QUARTERS_DOOR_ENTRANCE) : ObjectGuid::Empty))
                         entranceDoor->SetGoState(GO_STATE_READY);
                 }
 
@@ -415,7 +415,7 @@ class boss_tayak : public CreatureScript
                     instance->SetBossState(DATA_TAYAK, DONE);
                     instance->DoRemoveBloodLustDebuffSpellOnPlayers();
 
-                    if (GameObject* entranceDoor = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_QUARTERS_DOOR_ENTRANCE)))
+                    if (GameObject* entranceDoor = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_QUARTERS_DOOR_ENTRANCE)))
                         entranceDoor->SetGoState(GO_STATE_ACTIVE);
                 }
                 ActivateGaleWinds(ACTION_STOP_WIND);
@@ -901,7 +901,7 @@ class npc_storm_unleashed_tornado : public CreatureScript
             InstanceScript* instance;
             bool storm1;
             float x, y;
-            uint64 m_ownerGUID;
+            ObjectGuid m_ownerGUID;
             uint32 m_passenger;
 
             void IsSummonedBy(Unit* summoner) override
@@ -996,7 +996,7 @@ class npc_storm_unleashed_tornado : public CreatureScript
 
                 // Removing storm from the 1st storm phase (20-10%) when switching on 2nd storm phase (10-0%)
                 if (storm1)
-                    if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_TAYAK) : 0))
+                    if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_TAYAK) : ObjectGuid::Empty))
                         if (tayak->AI()->GetData(TYPE_TARGET_ID))
                             Eject();
 
@@ -1037,7 +1037,7 @@ class npc_gale_winds_stalker : public CreatureScript
                 {
                     case ACTION_WIND:
                     {
-                        if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TAYAK) : 0))
+                        if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                         {
                             bool firstPos = tayak->AI()->GetData(TYPE_TARGET_ID);
                             if ((firstPos && firstWind) || (!firstPos && !firstWind))
@@ -1058,7 +1058,7 @@ class npc_gale_winds_stalker : public CreatureScript
                     {
                         me->RemoveAurasDueToSpell(SPELL_SU_WIND_GALE);
 
-                        if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TAYAK) : 0))
+                        if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                         {
                             Position pos = { tayak->GetPositionX(), tayak->GetPositionY(), tayak->GetPositionZ(), 0.0f };
 
@@ -1084,7 +1084,7 @@ class npc_gale_winds_stalker : public CreatureScript
                 if (!instance || !isActive)
                     return;
 
-                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TAYAK) : 0))
+                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                 {
                     Position pos = { tayak->GetPositionX(), tayak->GetPositionY(), tayak->GetPositionZ(), 0.0f };
 
@@ -1618,7 +1618,7 @@ class spell_blade_templest_jump : public SpellScriptLoader
 
                 if (Unit* caster = GetCaster())
                     if (InstanceScript* instance = caster->GetInstanceScript())
-                        if (Unit* target = ObjectAccessor::GetUnit(*caster, instance->GetData64(DATA_TAYAK)))
+                        if (Unit* target = ObjectAccessor::GetUnit(*caster, instance->GetGuidData(DATA_TAYAK)))
                             if (caster->GetExactDist2d(target) > 2.0f)
                                 caster->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 35.0f, 15.0f);
 
@@ -1675,7 +1675,7 @@ class AreaTrigger_at_tayak_room : public AreaTriggerScript
         bool OnTrigger(Player* player, AreaTriggerEntry const* trigger) override
         {
             if (InstanceScript* instance = player->GetInstanceScript())
-                if (Unit* tayak = ObjectAccessor::GetUnit(*player, instance->GetData64(DATA_TAYAK)))
+                if (Unit* tayak = ObjectAccessor::GetUnit(*player, instance->GetGuidData(DATA_TAYAK)))
                     if (tayak->ToCreature() && tayak->ToCreature()->AI() && instance->GetData(DATA_TAYAK) < DONE)
                         tayak->ToCreature()->AI()->DoAction(ACTION_TAYAK_ENTRANCE);
 

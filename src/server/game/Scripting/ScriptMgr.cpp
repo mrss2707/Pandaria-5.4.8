@@ -1916,7 +1916,7 @@ void ScriptMgr::FillGameEventWorldStates(GameEventData const& event, Player* pla
     tmpscript->FillWorldStates(player, builder);
 }
 
-void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, uint32 itemGuid)
+void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid itemGuid)
 {
     ASSERT(trans);
     ASSERT(itemGuid);

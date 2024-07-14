@@ -664,13 +664,13 @@ struct npc_essence_of_creation : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* raDen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_RA_DEN) : 0))
+        if (Creature* raDen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_RA_DEN) : ObjectGuid::Empty))
             raDen->AI()->DoAction(me->GetEntry() == NPC_ESSENSE_OF_ANIMA ? ACTION_ABSORB_VITA : ACTION_ABSORB_ANIMA);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (Creature* raDen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_RA_DEN) : 0))
+        if (Creature* raDen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_RA_DEN) : ObjectGuid::Empty))
         {
             if (raDen->IsWithinDist(me, 2.0f, false))
                 raDen->AI()->DoAction(me->GetEntry() == NPC_ESSENSE_OF_ANIMA ? ACTION_ABSORB_ANIMA : ACTION_ABSORB_VITA);
@@ -752,7 +752,7 @@ struct npc_corrupted_essence_of_creation : public ScriptedAI
         if (!choiseMe)
             return;
 
-        if (Creature* raDen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_RA_DEN) : 0))
+        if (Creature* raDen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_RA_DEN) : ObjectGuid::Empty))
         {
             if (raDen->IsWithinDist(me, 2.0f, false))
             {
@@ -1341,7 +1341,7 @@ class AreaTrigger_forward_ra_den : public AreaTriggerScript
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/) override
         {
             if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* raden = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_RA_DEN)))
+                if (Creature* raden = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_RA_DEN)))
                     raden->AI()->DoAction(ACTION_START_INTRO);
     
             return true;

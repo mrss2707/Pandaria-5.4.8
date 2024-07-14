@@ -159,7 +159,7 @@ class boss_striker_gadok : public CreatureScript
                 strafingEventProgress = 0;
                 move                  = 0;
                 curPct                = 70;
-                targetGUID            = 0;
+                targetGUID = ObjectGuid::Empty;
                 x = 0.0f; y = 0.0f;
                 me->GetMotionMaster()->Clear();
                 events.Reset();
@@ -522,7 +522,7 @@ class boss_striker_gadok : public CreatureScript
             uint8 strafingEventCount, strafingEventProgress, move;
             uint32 strafingTimer;
             int32 curPct;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             float x, y;
             EventMap events;
 
@@ -784,7 +784,7 @@ class npc_flak_cannon : public CreatureScript
                 {
                     for (uint8 i = 0; i < 5; ++i)
                     {
-                        if (Creature* bombarder = instance->instance->GetCreature(instance->GetData64(DATA_RANDOM_BOMBARDER)))
+                        if (Creature* bombarder = instance->instance->GetCreature(instance->GetGuidData(DATA_RANDOM_BOMBARDER)))
                         {
                             me->CastSpell(bombarder, 116553, true);
                             bombarder->GetMotionMaster()->MoveFall();

@@ -490,14 +490,14 @@ class npc_despondent_warden_of_zhu : public CreatureScript
         {
             npc_despondent_warden_of_zhuAI(Creature* creature) : ScriptedAI(creature) { }
 
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint32 talkTimer;
             uint32 auraRecastTimer;
 
             void Reset() override
             {
                 me->CastSpell(me, SPELL_DESPAIR, true);
-                playerGUID = 0;
+                playerGUID = ObjectGuid::Empty;
                 talkTimer = 0;
                 auraRecastTimer = 0;
             }
@@ -618,7 +618,7 @@ struct krasarang_casterAI : public ScriptedAI
         return false;
     }
 
-    uint64 GetLowestFriendlyGUID()
+    ObjectGuid GetLowestFriendlyGUID()
     {
         std::list<Creature*> tmpTargets;
         GetCreatureListWithEntryInGrid(tmpTargets, me, NPC_KRASARI_RUNEKEEPER, 80.0f);
@@ -657,13 +657,13 @@ struct npc_krasari_tormentor : public ScriptedAI
     npc_krasari_tormentor(Creature* creature) : ScriptedAI(creature) { }
 
     EventMap events;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     uint32 delay;
 
     void Reset() override
     {
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         delay = 0;
     }
 
@@ -720,13 +720,13 @@ struct npc_krasari_runekeeper : public krasarang_casterAI
     npc_krasari_runekeeper(Creature* creature) : krasarang_casterAI(creature) { }
 
     EventMap events;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     uint32 delay;
 
     void Reset() override
     {
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         delay = 0;
     }
 
@@ -1469,13 +1469,13 @@ struct npc_child_of_chi_ji_krasarang : public krasarang_casterAI
     npc_child_of_chi_ji_krasarang(Creature* creature) : krasarang_casterAI(creature) { }
 
     EventMap events;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     uint32 delay;
 
     void Reset() override
     {
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         delay = 0;
     }
 
@@ -1605,7 +1605,7 @@ struct npc_alliance_landing_boat : public ScriptedAI
     EventMap nonCombatEvents;
     uint64 ownerGUID, varianGUID;
     float jumpOri, x, y;
-    std::vector<uint64> champGUIDs;
+    std::vector<ObjectGuid> champGUIDs;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -1762,9 +1762,9 @@ struct npc_horde_landing_boat : public ScriptedAI
     npc_horde_landing_boat(Creature* creature) : ScriptedAI(creature) { }
 
     EventMap nonCombatEvents;
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
     float jumpOri, x, y;
-    std::vector<uint64> landingGUIDs;
+    std::vector<ObjectGuid> landingGUIDs;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2164,7 +2164,7 @@ struct npc_stoneplow_envoy : public ScriptedAI
     }
 
 private:
-    uint64 player_guid;
+    ObjectGuid player_guid;
     uint32 script_timer;
 };
 
@@ -2302,7 +2302,7 @@ struct npc_groundbreaker_brojai : public customCreatureAI
 
     TaskScheduler scheduler;
     float x, y;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void InitializeAI() override
     {
@@ -2388,8 +2388,8 @@ struct npc_krasarang_wilds_sunwalker_dezco_reclaimer : public ScriptedAI
     npc_krasarang_wilds_sunwalker_dezco_reclaimer(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 lorekeeperGUID;
-    uint64 targetGUID;
+    ObjectGuid lorekeeperGUID;
+    ObjectGuid targetGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {

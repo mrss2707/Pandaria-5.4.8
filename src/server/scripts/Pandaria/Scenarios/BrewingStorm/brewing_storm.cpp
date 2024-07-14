@@ -685,7 +685,7 @@ struct npc_borokhula_the_destroyer : public ScriptedAI
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_PACIFIED);
             me->SetInCombatWithZone();
 
-            if (Creature* blanche = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_BREWMASTER_BLANCHE) : 0))
+            if (Creature* blanche = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_BREWMASTER_BLANCHE) : ObjectGuid::Empty))
                 blanche->AI()->Talk(TALK_BOROKHALA_INTRO);
         }
     }
@@ -696,7 +696,7 @@ struct npc_borokhula_the_destroyer : public ScriptedAI
         {
             SayAtLow = true;
 
-            if (Creature* Blanche = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_BREWMASTER_BLANCHE) : 0))
+            if (Creature* Blanche = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_BREWMASTER_BLANCHE) : ObjectGuid::Empty))
                 Blanche->AI()->Talk(TALK_BOROKHALA_LOW);
         }
     }
@@ -707,7 +707,7 @@ struct npc_borokhula_the_destroyer : public ScriptedAI
         {
             instance->SetData(DATA_SAVE_THUNDERPAW_REFUGE, DONE);
 
-            if (Creature* blanche = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_BREWMASTER_BLANCHE)))
+            if (Creature* blanche = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BREWMASTER_BLANCHE)))
             {
                 blanche->AI()->Talk(TALK_SCENARIO_END);
 

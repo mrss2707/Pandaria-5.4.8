@@ -544,10 +544,10 @@ class boss_jin_qin_xi : public CreatureScript
                 // Anti bug safe check --> kill them all
                 if (me->GetPositionX() > 3915.f)
                 {
-                    if (Creature* jan_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_JAN_XI) : 0))
+                    if (Creature* jan_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_JAN_XI) : ObjectGuid::Empty))
                         jan_xi->AI()->DoAction(ACTION_WIPE);
 
-                    if (Creature* qin_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_QIN_XI) : 0))
+                    if (Creature* qin_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_QIN_XI) : ObjectGuid::Empty))
                         qin_xi->AI()->DoAction(ACTION_WIPE);
 
                     if (Creature* anc_mogu_machine = GetClosestCreatureWithEntry(me, NPC_ANCIENT_MOGU_MACHINE, 200.0f))
@@ -727,10 +727,10 @@ class boss_jin_qin_xi : public CreatureScript
                                 }
                                 else // it cause evade them if any can`t cast Devastation Arc
                                 {
-                                    if (Creature* jan_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_JAN_XI) : 0))
+                                    if (Creature* jan_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_JAN_XI) : ObjectGuid::Empty))
                                         jan_xi->AI()->DoAction(ACTION_WIPE);
 
-                                    if (Creature* qin_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_QIN_XI) : 0))
+                                    if (Creature* qin_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_QIN_XI) : ObjectGuid::Empty))
                                         qin_xi->AI()->DoAction(ACTION_WIPE);
                                 }
                             }
@@ -741,10 +741,10 @@ class boss_jin_qin_xi : public CreatureScript
                             }
                             else // it cause evade them if any can`t cast Devastation Arc
                             {
-                                if (Creature* jan_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_JAN_XI) : 0))
+                                if (Creature* jan_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_JAN_XI) : ObjectGuid::Empty))
                                     jan_xi->AI()->DoAction(ACTION_WIPE);
 
-                                if (Creature* qin_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_QIN_XI) : 0))
+                                if (Creature* qin_xi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_QIN_XI) : ObjectGuid::Empty))
                                     qin_xi->AI()->DoAction(ACTION_WIPE);
                             }
 
@@ -858,7 +858,7 @@ class npc_woe_add_generic : public CreatureScript
         {
             npc_woe_add_genericAI(Creature* creature) : ScriptedAI(creature) { }
 
-            uint64 targetGuid;
+            ObjectGuid targetGuid;
             EventMap events, nonCombatEvents;
             InstanceScript* instance;
             uint64 targetGUID, smashTriggerGUID;
@@ -890,8 +890,8 @@ class npc_woe_add_generic : public CreatureScript
                 // Wait before casting
                 nonCombatEvents.ScheduleEvent(EVENT_CAST_SKYBEAM, 1000);
 
-                targetGuid = 0;
-                smashTriggerGUID = 0;
+                targetGuid = ObjectGuid::Empty;
+                smashTriggerGUID = ObjectGuid::Empty;
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -1200,7 +1200,7 @@ class npc_woe_add_generic : public CreatureScript
                             targetGUID = itr->GetGUID();
                     }
                     else if (targetGUID)
-                        targetGUID = 0;
+                        targetGUID = ObjectGuid::Empty;
 
                     DoMeleeAttackIfReady();
                 }
@@ -1225,12 +1225,12 @@ class npc_woe_titan_spark : public CreatureScript
 
             TaskScheduler scheduler;
             uint32 delay;
-            uint64 targetGuid;
+            ObjectGuid targetGuid;
             bool canExplode;
 
             void Reset() override
             {
-                targetGuid = 0;
+                targetGuid = ObjectGuid::Empty;
                 delay      = 0;
                 canExplode = false;
 
@@ -1467,10 +1467,10 @@ class npc_ancient_mogu_machine : public CreatureScript
                             if (!IsHeroic())
                             {
                                 // Reset spawning terracota while titan gas in use
-                                if (Unit* QinXi = ObjectAccessor::GetUnit(*me, instance->GetData64(NPC_QIN_XI)))
+                                if (Unit* QinXi = ObjectAccessor::GetUnit(*me, instance->GetGuidData(NPC_QIN_XI)))
                                     QinXi->ToCreature()->AI()->DoAction(ACTION_TITAN_GAS);
                         
-                                if (Unit* JanXi = ObjectAccessor::GetUnit(*me, instance->GetData64(NPC_JAN_XI)))
+                                if (Unit* JanXi = ObjectAccessor::GetUnit(*me, instance->GetGuidData(NPC_JAN_XI)))
                                     JanXi->ToCreature()->AI()->DoAction(ACTION_TITAN_GAS);
                         
                                 events.ScheduleEvent(EVENT_END_TITAN_GAS, 30000);
@@ -1484,10 +1484,10 @@ class npc_ancient_mogu_machine : public CreatureScript
                             Talk(TALK_TITAN_GAS_END);
                         
                             // Set spawn terracota again
-                            if (Unit* QinXi = ObjectAccessor::GetUnit(*me, instance->GetData64(NPC_QIN_XI)))
+                            if (Unit* QinXi = ObjectAccessor::GetUnit(*me, instance->GetGuidData(NPC_QIN_XI)))
                                 QinXi->ToCreature()->AI()->DoAction(ACTION_TITAN_GAS_END);
                         
-                            if (Unit* JanXi = ObjectAccessor::GetUnit(*me, instance->GetData64(NPC_JAN_XI)))
+                            if (Unit* JanXi = ObjectAccessor::GetUnit(*me, instance->GetGuidData(NPC_JAN_XI)))
                                 JanXi->ToCreature()->AI()->DoAction(ACTION_TITAN_GAS_END);
                             break;
                         }
@@ -1642,7 +1642,7 @@ class spell_magnetized_qin : public SpellScriptLoader
             }
 
             private:
-                uint64 targetGUID;
+                ObjectGuid targetGUID;
 
 
             void Register() override
@@ -1677,7 +1677,7 @@ class spell_magnetized_jan : public SpellScriptLoader
             }
 
             private:
-                uint64 targetGUID;
+                ObjectGuid targetGUID;
 
             void Register() override
             {
@@ -2188,10 +2188,10 @@ class go_ancien_control_console : public GameObjectScript
                 if (!instance->CheckRequiredBosses(DATA_WILL_OF_EMPEROR, player))
                     return false;
 
-                if (Creature* jan_xi = instance->instance->GetCreature(instance->GetData64(NPC_JAN_XI)))
+                if (Creature* jan_xi = instance->instance->GetCreature(instance->GetGuidData(NPC_JAN_XI)))
                     jan_xi->AI()->DoAction(ACTION_ACTIVATE);
 
-                if (Creature* qin_xi = instance->instance->GetCreature(instance->GetData64(NPC_QIN_XI)))
+                if (Creature* qin_xi = instance->instance->GetCreature(instance->GetGuidData(NPC_QIN_XI)))
                     qin_xi->AI()->DoAction(ACTION_ACTIVATE);
 
                 if (Creature* console = GetClosestCreatureWithEntry(go, NPC_ANCIENT_MOGU_MACHINE, 200.0f))

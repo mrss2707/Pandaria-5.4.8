@@ -109,7 +109,7 @@ class boss_ook_ook : public CreatureScript
             boss_ook_ook_AI(Creature* creature) : BossAI(creature, DATA_OOK_OOK) { }
 
             bool introDone, initializedBarrels;
-            uint64 targetGuid;
+            ObjectGuid targetGuid;
 
             void InitializeAI() override
             {
@@ -292,7 +292,7 @@ class npc_barrel : public CreatureScript
         {
             npc_barrel_AI(Creature* creature) : ScriptedAI(creature) {}
 
-            uint64 playerGuid;
+            ObjectGuid playerGuid;
             EventMap events;
             bool initiate;
 
@@ -407,7 +407,7 @@ class npc_hozen_hollerer : public CreatureScript
             uint32 GetBarrelTimer() const
             {
                 if (instance)
-                    if (Unit* ookOok = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_OOK_OOK)))
+                    if (Unit* ookOok = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_OOK_OOK)))
                         if (ookOok->GetAura(SPELL_GOING_BANANAS))
                         {
                             switch (ookOok->GetAura(SPELL_GOING_BANANAS)->GetStackAmount())

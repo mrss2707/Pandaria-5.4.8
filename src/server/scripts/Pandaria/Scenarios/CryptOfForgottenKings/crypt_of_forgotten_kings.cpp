@@ -168,13 +168,13 @@ class npc_cfk_seething_sha : public CreatureScript
 
             InstanceScript* instance;
             EventMap events;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
 
             void Reset() override
             {
                 instance = me->GetInstanceScript();
                 events.Reset();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
             }
 
             void JustEngagedWith(Unit* /*who*/) override
@@ -234,7 +234,7 @@ class npc_cfk_shado_pan_initiate : public CreatureScript
                 instance = me->GetInstanceScript();
                 me->SetFaction(1665);
 
-                if (Unit* Jin = ObjectAccessor::GetUnit(*me, instance ? instance->GetData64(NPC_JIN_IRONFIST) : 0))
+                if (Unit* Jin = ObjectAccessor::GetUnit(*me, instance ? instance->GetGuidData(NPC_JIN_IRONFIST) : ObjectGuid::Empty))
                     me->AI()->AttackStart(Jin);
             }
 
@@ -286,14 +286,14 @@ class npc_cfk_jin_ironfist : public CreatureScript
         {
             npc_cfk_jin_ironfistAI(Creature* creature) : BossAI(creature, DATA_JIN_IRONFIST) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool HasEnrage;
 
             void Reset() override
             {
                 _Reset();
                 events.Reset();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
                 HasEnrage = false;
             }
 
@@ -317,7 +317,7 @@ class npc_cfk_jin_ironfist : public CreatureScript
                     instance->SetData(DATA_POOL_OF_LIFE, IN_PROGRESS);
                     instance->DoCastSpellOnPlayers(SPELL_POOL_OF_LIFE_PROGRESS_BAR);
 
-                    if (Creature* lifePool = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_POOL_OF_LIFE)))
+                    if (Creature* lifePool = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_POOL_OF_LIFE)))
                         lifePool->AI()->DoAction(ACTION_CHAPTER_TWO_BEGIN);
 
                     // Cosmetic event: Essence of Hate move to life pool
@@ -640,7 +640,7 @@ class npc_cfk_crypt_guardian_vault : public CreatureScript
 
             EventMap events, nonCombatEvents;
             InstanceScript* instance;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool initiateGuard;
 
             void InitializeAI() override
@@ -653,7 +653,7 @@ class npc_cfk_crypt_guardian_vault : public CreatureScript
             void Reset() override
             {
                 events.Reset();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
             }
 
             void JustEngagedWith(Unit* /*who*/) override
@@ -761,7 +761,7 @@ class npc_cfk_abomination_of_anger : public CreatureScript
         {
             npc_cfk_abomination_of_angerAI(Creature* creature) : BossAI(creature, DATA_ABOMINATION_OF_ANGER) { }
 
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             uint32 initiateArrived;
 
             void InitializeAI() override
@@ -773,7 +773,7 @@ class npc_cfk_abomination_of_anger : public CreatureScript
             void Reset() override
             {
                 events.Reset();
-                targetGUID      = 0;
+                targetGUID = ObjectGuid::Empty;
                 me->GetMap()->SetWorldState(WORLDSTATE_FANCY_FOORWORK, 1);
             }
 
@@ -1020,11 +1020,11 @@ class npc_cfk_lightning_trap : public CreatureScript
 
             EventMap events;
             bool HasProc;
-            uint64 DummyGUID;
+            ObjectGuid DummyGUID;
 
             void Reset() override
             {
-                DummyGUID = 0;
+                DummyGUID = ObjectGuid::Empty;
                 HasProc   = false;
                 events.ScheduleEvent(EVENT_LIGHTNING_TRAP, 0.5 * IN_MILLISECONDS);
             }
@@ -1308,7 +1308,7 @@ class AreaTrigger_at_crypt_behind_abomination : public AreaTriggerScript
         {
             if (InstanceScript* instance = player->GetInstanceScript())
             {
-                if (Creature* Abomination = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_ABOMINATION_OF_ANGER)))
+                if (Creature* Abomination = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_ABOMINATION_OF_ANGER)))
                 {
                     if (uint32 abomInit = Abomination->AI()->GetData(TYPE_ABOMINATION_INIT))
                     {

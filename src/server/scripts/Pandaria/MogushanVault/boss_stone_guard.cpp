@@ -410,7 +410,7 @@ class boss_stone_guard_controller : public CreatureScript
             {
                 for (uint32 entry : guardiansEntry)
                 {
-                    if (Creature* guardian = ObjectAccessor::GetCreature(*me, instance->GetData64(entry)))
+                    if (Creature* guardian = ObjectAccessor::GetCreature(*me, instance->GetGuidData(entry)))
                         if (guardian->IsInCombat())
                             continue;
 
@@ -423,7 +423,7 @@ class boss_stone_guard_controller : public CreatureScript
             bool AnyGuardHasPetrification()
             {
                 for (uint32 entry : guardiansEntry)
-                    if (Creature* guardian = ObjectAccessor::GetCreature(*me, instance->GetData64(entry)))
+                    if (Creature* guardian = ObjectAccessor::GetCreature(*me, instance->GetGuidData(entry)))
                         for (auto&& pId : petrificationList)
                             if (guardian->HasAura(pId))
                                 return true;
@@ -468,7 +468,7 @@ class boss_stone_guard_controller : public CreatureScript
                             // Select new guardian from updated container
                             prevPetrifiedGuardian = Trinity::Containers::SelectRandomContainerElement(StoneGuardsStorage);
 
-                            if (Creature* sGuardian = ObjectAccessor::GetCreature(*me, instance->GetData64(prevPetrifiedGuardian)))
+                            if (Creature* sGuardian = ObjectAccessor::GetCreature(*me, instance->GetGuidData(prevPetrifiedGuardian)))
                                 if (sGuardian->IsAlive() && sGuardian->IsInCombat())
                                     sGuardian->AI()->DoAction(ACTION_PETRIFICATION);
  
@@ -607,7 +607,7 @@ class boss_generic_guardian : public CreatureScript
             Creature* GetController()
             {
                 if (instance)
-                    return me->GetMap()->GetCreature(instance->GetData64(NPC_STONE_GUARD_CONTROLLER));
+                    return me->GetMap()->GetCreature(instance->GetGuidData(NPC_STONE_GUARD_CONTROLLER));
                 else
                     return NULL;
             }
@@ -1199,11 +1199,11 @@ class spell_jasper_chains : public SpellScriptLoader
         {
             PrepareAuraScript(spell_jasper_chains_AuraScript);
 
-            uint64 playerLinkedGuid;
+            ObjectGuid playerLinkedGuid;
 
             bool Load() override
             {
-                playerLinkedGuid = 0;
+                playerLinkedGuid = ObjectGuid::Empty;
                 return true;
             }
 
@@ -1328,7 +1328,7 @@ class spell_energized_tiles : public SpellScriptLoader
 
                         if (InstanceScript* instance = caster->GetInstanceScript())
                         {
-                            if (Creature* controller = ObjectAccessor::GetCreature(*caster, instance->GetData64(NPC_STONE_GUARD_CONTROLLER)))
+                            if (Creature* controller = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(NPC_STONE_GUARD_CONTROLLER)))
                                 controller->CastSpell(caster, SPELL_TILES_DISPLAYED, false);
 
                             instance->DoCastSpellOnPlayers(SPELL_TILES_AURA_EFFECT, true);
@@ -1363,7 +1363,7 @@ class spell_petrification_overload : public SpellScriptLoader
             {
                 if (Unit* caster = GetCaster())
                     if (InstanceScript* instance = caster->GetInstanceScript())
-                        if (Creature* controller = ObjectAccessor::GetCreature(*caster, instance->GetData64(NPC_STONE_GUARD_CONTROLLER)))
+                        if (Creature* controller = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(NPC_STONE_GUARD_CONTROLLER)))
                             controller->AI()->DoAction(ACTION_PETRIFICATION);
             }
 

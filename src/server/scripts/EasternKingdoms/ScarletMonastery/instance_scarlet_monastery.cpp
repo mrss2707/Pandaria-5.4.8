@@ -158,7 +158,7 @@ class instance_scarlet_monastery : public InstanceMapScript
                 ScheduleChallengeTimeUpdate(diff);
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -251,13 +251,13 @@ class instance_scarlet_monastery : public InstanceMapScript
             }
 
         protected:
-            uint64 ThalnosGUID;
-            uint64 KorloffGUID;
-            uint64 DurandGUID;
-            uint64 WhitemaneGUID;
-            uint64 FallenCrusaderGUID;
-            uint64 WhitemaneDoorGUID;
-            uint64 HoodedGUID;
+            ObjectGuid ThalnosGUID;
+            ObjectGuid KorloffGUID;
+            ObjectGuid DurandGUID;
+            ObjectGuid WhitemaneGUID;
+            ObjectGuid FallenCrusaderGUID;
+            ObjectGuid WhitemaneDoorGUID;
+            ObjectGuid HoodedGUID;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override

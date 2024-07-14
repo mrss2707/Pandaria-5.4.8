@@ -59,7 +59,7 @@ struct npc_draenei_survivor : public ScriptedAI
 
     void Reset() override
     {
-        caster = 0;
+        caster = ObjectGuid::Empty;
         sayThanksTimer = 0;
         runAwayTimer = 0;
         despawnTimer = 0;
@@ -153,7 +153,7 @@ struct npc_draenei_survivor : public ScriptedAI
     }
 
 private:
-    uint64 caster;
+    ObjectGuid caster;
     uint32 sayHelpTimer;
     uint32 sayThanksTimer;
     uint32 runAwayTimer;
@@ -434,7 +434,7 @@ public:
     {
         npc_geezleAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 SparkGUID;
+        ObjectGuid SparkGUID;
 
         uint8 Step;
         uint32 SayTimer;
@@ -443,7 +443,7 @@ public:
 
         void Reset() override
         {
-            SparkGUID = 0;
+            SparkGUID = ObjectGuid::Empty;
             Step = 0;
             StartEvent();
         }

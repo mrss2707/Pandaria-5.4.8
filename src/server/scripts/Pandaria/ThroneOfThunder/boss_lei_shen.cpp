@@ -292,7 +292,7 @@ class boss_lei_shen : public CreatureScript
             boss_lei_shenAI(Creature* creature) : BossAI(creature, DATA_LEI_SHEN) { }
 
             EventMap berserkEvents;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             uint32 phaseId, galeWindsEntry;
             int32 healthPct;
             std::vector<uint32> stealedConduit;
@@ -306,7 +306,7 @@ class boss_lei_shen : public CreatureScript
                 me->SetReactState(REACT_AGGRESSIVE);
                 _Reset();
                 DoCast(me, SPELL_COSMETIC_TELEPORT_SOUTH);
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
                 galeWindsEntry = 0;
                 healthPct = 65;
                 phaseId = PHASE_NONE;
@@ -355,11 +355,11 @@ class boss_lei_shen : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DECAPITATE_EFF);
 
                     // Deactivate visual station
-                    if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_CHARGING_STATION)))
+                    if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_CHARGING_STATION)))
                         overchargedStation->SetGoState(GO_STATE_READY);
 
                     // Remove Collision
-                    if (GameObject* discCollision = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_THUNDER_KING_DISC_COLLISION)))
+                    if (GameObject* discCollision = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_THUNDER_KING_DISC_COLLISION)))
                         discCollision->Delete();
 
                     // Deactivate floors
@@ -424,11 +424,11 @@ class boss_lei_shen : public CreatureScript
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     
                         // Deactivate visual station
-                        if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_CHARGING_STATION) : 0))
+                        if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_CHARGING_STATION) : ObjectGuid::Empty))
                             overchargedStation->SetGoState(GO_STATE_READY);
                     
                         // Remove Collision
-                        if (GameObject* discCollision = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_THUNDER_KING_DISC_COLLISION) : 0))
+                        if (GameObject* discCollision = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_THUNDER_KING_DISC_COLLISION) : ObjectGuid::Empty))
                             discCollision->Delete();
                     
                         // Deactivate Visual Floors
@@ -576,11 +576,11 @@ class boss_lei_shen : public CreatureScript
                 HandleSendActionToConduits(ACTION_RESET_CONDUIT);
 
                 // override visual station
-                if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_CHARGING_STATION) : 0))
+                if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_CHARGING_STATION) : ObjectGuid::Empty))
                     overchargedStation->SetGoState(GO_STATE_READY);
 
                 // Remove Collision
-                if (GameObject* discCollision = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_THUNDER_KING_DISC_COLLISION) : 0))
+                if (GameObject* discCollision = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_THUNDER_KING_DISC_COLLISION) : ObjectGuid::Empty))
                     discCollision->Delete();
 
                 // override conduits
@@ -820,7 +820,7 @@ struct npc_electric_conduit : public ScriptedAI
                     .SetValidator([this] { return !isDisabled; })
                     .Schedule(Milliseconds(500), [this](TaskContext context)
                 {
-                    if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_LEI_SHEN) : 0))
+                    if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_LEI_SHEN) : ObjectGuid::Empty))
                     {
                         // Skip if last phase
                         if (leiShen->AI()->GetData(TYPE_LEI_SHEN_PHASE) == PHASE_LORD_OF_THUNDER)
@@ -983,7 +983,7 @@ struct npc_ball_lightning : public ScriptedAI
 
         DoCast(me, SPELL_BALL_LIGHTNING_VISUAL, true);
 
-        if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_LEI_SHEN) : 0))
+        if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_LEI_SHEN) : ObjectGuid::Empty))
             leiShen->AI()->JustSummoned(me);
 
         scheduler
@@ -1036,11 +1036,11 @@ struct npc_unharnessed_power : public ScriptedAI
             return;
         }
 
-        if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_LEI_SHEN) : 0))
+        if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_LEI_SHEN) : ObjectGuid::Empty))
             leiShen->AI()->JustSummoned(me);
 
         // Continue bouncing cicle if our pull weren`t avoid
-        if (Creature* eastConduit = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_DIFFUSION_CHAIN_CONDUIT) : 0))
+        if (Creature* eastConduit = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_DIFFUSION_CHAIN_CONDUIT) : ObjectGuid::Empty))
             if (Creature* nearQuadrant = me->FindNearestCreature(NPC_QUADRANT_STALKER, 40.0f, true))
                 DoCast(nearQuadrant, eastConduit->AI()->GetData(TYPE_CONDUIT_LEVEL) > 1 ? SPELL_BOUNCING_BOLT_MISSLE_2 : SPELL_BOUNCING_BOLT_MISSLE_1, true);
 
@@ -1087,7 +1087,7 @@ struct npc_diffused_lightning : public ScriptedAI
     {
         instance = me->GetInstanceScript();
 
-        if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_LEI_SHEN) : 0))
+        if (Creature* leiShen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_LEI_SHEN) : ObjectGuid::Empty))
             leiShen->AI()->JustSummoned(me);
 
         scheduler
@@ -1519,7 +1519,7 @@ class spell_displace : public SpellScript
         {
             // Activate visual station
             if (InstanceScript* instance = caster->GetInstanceScript())
-                if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_CHARGING_STATION)))
+                if (GameObject* overchargedStation = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_CHARGING_STATION)))
                     overchargedStation->SetGoState(GO_STATE_ACTIVE);
 
             // Set Collision after knockback

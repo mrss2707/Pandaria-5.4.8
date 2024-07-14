@@ -144,17 +144,17 @@ class instance_utgarde_pinnacle : public InstanceMapScript
                 {
                     case GO_SKADI_THE_RUTHLESS_DOOR:
                         uiSkadiTheRuthlessDoor = go->GetGUID();
-                        if (m_auiEncounter[2] == DONE) HandleGameObject(0, true, go);
+                        if (m_auiEncounter[2] == DONE) HandleGameObject(ObjectGuid::Empty, true, go);
                         break;
                     case GO_KING_YMIRON_DOOR:
                         uiKingYmironDoor = go->GetGUID();
-                        if (m_auiEncounter[3] == DONE) HandleGameObject(0, true, go);
+                        if (m_auiEncounter[3] == DONE) HandleGameObject(ObjectGuid::Empty, true, go);
                         break;
                     case GO_GORK_PALEHOOF_SPHERE:
                         uiGortokPalehoofSphere = go->GetGUID();
                         if (m_auiEncounter[1] == DONE)
                         {
-                            HandleGameObject(0, true, go);
+                            HandleGameObject(ObjectGuid::Empty, true, go);
                             go->SetFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         }
                         break;
@@ -223,7 +223,7 @@ class instance_utgarde_pinnacle : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {

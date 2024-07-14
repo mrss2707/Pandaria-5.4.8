@@ -823,9 +823,9 @@ class npc_carrot_breath_stalker : public CreatureScript
                 me->SetDisableGravity(true);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-                if (Creature* hoppy = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HOPTALLUS)))
+                if (Creature* hoppy = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HOPTALLUS)))
                 {
-                    hoppy->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
+                    hoppy->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
                     hoppy->SetTarget(me->GetGUID());
                 }
             }
@@ -857,7 +857,7 @@ class npc_carrot_breath_stalker : public CreatureScript
 
                             if (Creature* hoppy = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_HOPTALLUS)))
                             {
-                                hoppy->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
+                                hoppy->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
                                 hoppy->SetTarget(me->GetGUID());
                                 hoppy->UpdateOrientation(hoppy->GetAngle(me));
                             }

@@ -39,13 +39,13 @@ class instance_unga_ingoo : public InstanceMapScript
             uint32 chapterThree;
             uint32 m_barrelsCount;
             uint32 prevType;
-            uint64 brewmasterBoGUID;
-            uint64 mainBrewmasterGUID;
-            uint64 birdhaverGUID;
-            uint64 ookOokGUID;
-            uint64 okuOkuGUID;
-            uint64 gagoonGUID;
-            uint64 brewKegGUID;
+            ObjectGuid brewmasterBoGUID;
+            ObjectGuid mainBrewmasterGUID;
+            ObjectGuid birdhaverGUID;
+            ObjectGuid ookOokGUID;
+            ObjectGuid okuOkuGUID;
+            ObjectGuid gagoonGUID;
+            ObjectGuid brewKegGUID;
             EventMap m_mEvents;
 
             void Initialize() override
@@ -58,11 +58,11 @@ class instance_unga_ingoo : public InstanceMapScript
                 chapterThree       = 0;
                 m_barrelsCount     = 0;
                 prevType           = 0;
-                brewmasterBoGUID   = 0;
-                mainBrewmasterGUID = 0;
-                birdhaverGUID      = 0;
-                ookOokGUID         = 0;
-                gagoonGUID         = 0;
+                brewmasterBoGUID = ObjectGuid::Empty;
+                mainBrewmasterGUID = ObjectGuid::Empty;
+                birdhaverGUID = ObjectGuid::Empty;
+                ookOokGUID = ObjectGuid::Empty;
+                gagoonGUID = ObjectGuid::Empty;
 
                 m_firstPirates.clear();
                 m_PastObjects.clear();
@@ -151,16 +151,16 @@ class instance_unga_ingoo : public InstanceMapScript
                     switch (unit->GetEntry())
                     {
                         case NPC_TRAINED_JUNGLE_LORY:
-                            if (Creature* m_haver = instance->GetCreature(GetData64(NPC_UNGA_BIRD_HAVER)))
+                            if (Creature* m_haver = instance->GetCreature(GetGuidData(NPC_UNGA_BIRD_HAVER)))
                                 m_haver->AI()->DoAction(ACTION_INTRO);
                             break;
                         case NPC_UNGA_BIRD_HAVER:
-                            if (Creature* m_bo = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_ESCORT)))
+                            if (Creature* m_bo = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_ESCORT)))
                                 m_bo->AI()->DoAction(ACTION_HAVER_DEATH);
                             break;
                         case NPC_OKU_OKU:
                         case NPC_GAGOON:
-                            if (Creature* m_bo = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_ESCORT)))
+                            if (Creature* m_bo = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_ESCORT)))
                                 m_bo->AI()->DoAction(ACTION_GLADIATORS_DEATH);
                             break;
                     }
@@ -251,7 +251,7 @@ class instance_unga_ingoo : public InstanceMapScript
                 switch (m_type)
                 {
                     case TYPE_PIRATE:
-                        if (Creature* brewMaster = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_BREW)))
+                        if (Creature* brewMaster = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
                             brewMaster->AI()->Talk(TALK_SPECIAL_13);
 
                         for (uint8 i = 0; i < 2; i++)
@@ -281,10 +281,10 @@ class instance_unga_ingoo : public InstanceMapScript
 
                         if (chapterOne == DONE)
                         {
-                            if (Creature* boEscort = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_ESCORT)))
+                            if (Creature* boEscort = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_ESCORT)))
                                 boEscort->DespawnOrUnsummon();
 
-                            if (Creature* boBrew = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_BREW)))
+                            if (Creature* boBrew = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
                                 boBrew->AI()->DoAction(ACTION_INTRO);
 
                             for (auto&& itr : instance->GetPlayers())
@@ -303,7 +303,7 @@ class instance_unga_ingoo : public InstanceMapScript
 
                         if (chapterTwo == DONE)
                         {
-                            if (Creature* boBrew = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_BREW)))
+                            if (Creature* boBrew = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
                             {
                                 // Keg runer achievement
                                 if (boBrew->AI()->GetData(TYPE_KEG_RUNNED))
@@ -317,10 +317,10 @@ class instance_unga_ingoo : public InstanceMapScript
                             m_mEvents.Reset();
                             DoRemoveAurasDueToSpellOnPlayers(SPELL_UNGA_BREW_COLLECTED_AURA);
 
-                            if (Creature* Ook = instance->GetCreature(GetData64(NPC_CAPTAIN_OOK)))
+                            if (Creature* Ook = instance->GetCreature(GetGuidData(NPC_CAPTAIN_OOK)))
                                 Ook->AI()->DoAction(ACTION_INTRO);
 
-                            if (Creature* boBrew = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_BREW)))
+                            if (Creature* boBrew = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
                                 boBrew->AI()->DoAction(ACTION_CAPTAIN_ASSAULT);
 
                             for (auto&& itr : instance->GetPlayers())
@@ -335,7 +335,7 @@ class instance_unga_ingoo : public InstanceMapScript
 
                         if (chapterThree == DONE)
                         {
-                            if (Creature* boBrew = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_BREW)))
+                            if (Creature* boBrew = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
                                 boBrew->AI()->DoAction(ACTION_CAPTAIN_DEFEAT);
 
                             SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_OOK_OOK_DEFEATED, 1, GetScenarioGUID(), time(NULL), 0, 0));
@@ -386,7 +386,7 @@ class instance_unga_ingoo : public InstanceMapScript
                             SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_CAULDRON_COUNT, m_barrelsCount, GetScenarioGUID(), time(NULL), 0, 0));
                             break;
                         case 3:
-                            if (Creature* boBrew = instance->GetCreature(GetData64(NPC_BREWMASTER_BO_BREW)))
+                            if (Creature* boBrew = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
                                 boBrew->AI()->SetData(TYPE_KEG_RUNNED, 0);
                             break;
                     }
@@ -411,7 +411,7 @@ class instance_unga_ingoo : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {

@@ -876,7 +876,7 @@ class spell_garalon_pheromones_dummy : public AuraScript
         if (Unit* caster = GetOwner()->ToUnit())
             if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
                 if (instance->GetBossState(DATA_GARALON) == IN_PROGRESS)
-                    if (Creature* garalon = ObjectAccessor::GetCreature(*caster, instance->GetData64(DATA_GARALON)))
+                    if (Creature* garalon = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_GARALON)))
                         garalon->CastSpell(garalon, SPELL_PHER_INIT_CAST);
     }
 

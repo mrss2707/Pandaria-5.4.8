@@ -532,7 +532,7 @@ class npc_aysa : public CreatureScript
                     events.ScheduleEvent(EVENT_START, 600); //Begin script
                 inCombat = false;
                 timer = 0;
-                lifeiGUID = 0;
+                lifeiGUID = ObjectGuid::Empty;
                 me->SetReactState(REACT_DEFENSIVE);
                 me->SetFaction(2263);
             }
@@ -540,7 +540,7 @@ class npc_aysa : public CreatureScript
             EventMap events;
             std::vector<Player*> playersInvolved;
 
-            uint64 lifeiGUID;
+            ObjectGuid lifeiGUID;
 
             bool inCombat;
             uint32 timer;
@@ -599,7 +599,7 @@ class npc_aysa : public CreatureScript
                     if (Creature* lifei = GetLifei())
                     {
                         lifei->DespawnOrUnsummon();
-                        lifeiGUID = 0;
+                        lifeiGUID = ObjectGuid::Empty;
                     }
                 }
             }
@@ -663,7 +663,7 @@ class npc_aysa : public CreatureScript
                                     if (i == 6)
                                     {
                                         lifei->DespawnOrUnsummon(500);
-                                        lifeiGUID = 0;
+                                        lifeiGUID = ObjectGuid::Empty;
                                     }
                                     break;
                                 }
@@ -686,7 +686,7 @@ class npc_aysa : public CreatureScript
                             if (Creature* lifei = GetLifei())
                             {
                                 lifei->DespawnOrUnsummon();
-                                lifeiGUID = 0;
+                                lifeiGUID = ObjectGuid::Empty;
                             }
 
                             events.ScheduleEvent(EVENT_START, 10000);
@@ -1057,11 +1057,11 @@ class spell_feet_of_fury : public SpellScriptLoader
         {
             PrepareAuraScript(spell_feet_of_fury_AuraScript)
 
-            uint64 targetGuid;
+            ObjectGuid targetGuid;
 
             bool Load() override
             {
-                targetGuid = 0;
+                targetGuid = ObjectGuid::Empty;
                 return true;
             }
 
@@ -1087,7 +1087,7 @@ class spell_feet_of_fury : public SpellScriptLoader
 
                 if (!target)
                 {
-                    targetGuid = 0;
+                    targetGuid = ObjectGuid::Empty;
                     return;
                 }
 

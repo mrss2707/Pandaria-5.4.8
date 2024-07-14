@@ -206,7 +206,7 @@ class boss_zorlok : public CreatureScript
             bool PreCombatPhase, CanCombat, clocksideRings, TargetInLos, InFlyOrAfterLanding, lastEcho, inPulse;
             std::map <uint32, uint32> PlatformDict, m_RepEvents;
             std::list<Position> PredNoise;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             float NoiseMod, m_pulse_ori_right, m_pulse_ori_left, sonicStep;
 
             uint64 zealousBugs[ZEALOUS_BUGS_COUNT];
@@ -229,7 +229,7 @@ class boss_zorlok : public CreatureScript
                 inPulse = false;
                 wp          = 4;
                 PlatformMod = 0;
-                targetGUID  = 0;
+                targetGUID = ObjectGuid::Empty;
                 delay       = 0;
                 NoiseMod    = 2.5f;
                 // Platform Dictionary
@@ -301,7 +301,7 @@ class boss_zorlok : public CreatureScript
                 exhaleTarget = 0;
                 sonicSpirals = 0;
                 CurrentEvent = 0;
-                targetGUID   = 0;
+                targetGUID = ObjectGuid::Empty;
                 delay        = 0;
                 clocksideRings = true;
                 lastEcho = false;
@@ -1257,7 +1257,7 @@ class npc_zorlok_echo_of_power : public CreatureScript
                 instance = me->GetInstanceScript();
 
                 // Last echo should move
-                if (Creature* zorlok = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_ZORLOK) : 0))
+                if (Creature* zorlok = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_ZORLOK) : ObjectGuid::Empty))
                     if (!zorlok->AI()->GetData(TYPE_ZORLOK_LAST_ECHO))
                         SetCombatMovement(false);
 
@@ -1269,7 +1269,7 @@ class npc_zorlok_echo_of_power : public CreatureScript
             EventMap events;
             uint32 m_eventType, sonicValue;
             bool clocksideRings, TargetInLos, inPulse;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             float NoiseMod, m_pulse_ori_right, m_pulse_ori_left, sonicStep;
             std::list<Position> PredNoise;
 
@@ -1471,7 +1471,7 @@ class npc_zorlok_echo_of_power : public CreatureScript
                             // When Echo cast Force and Verve, it should spawn noise in zorlok current area also
                             PredNoise.clear(); // remove all pos for next schedule
 
-                            if (Creature* zorlok = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_ZORLOK) : 0))
+                            if (Creature* zorlok = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_ZORLOK) : ObjectGuid::Empty))
                             {
                                 for (int i = 1; i < count - 2; ++i)
                                 {
@@ -2034,7 +2034,7 @@ class spell_zorlok_achievement_loot_bug : public SpellScript
 
         bug->CastSpell(GetHitUnit(), SPELL_ZEALOUS_PARASITE, true);
         if (auto* instance = bug->GetInstanceScript())
-            if (Creature* zorlok = ObjectAccessor::GetCreature(*bug, instance->GetData64(DATA_ZORLOK)))
+            if (Creature* zorlok = ObjectAccessor::GetCreature(*bug, instance->GetGuidData(DATA_ZORLOK)))
                 if (auto script = dynamic_cast<boss_zorlok::boss_zorlokAI*>(zorlok->AI()))
                     script->OnZealousBugUsed(bug->GetGUID());
     }

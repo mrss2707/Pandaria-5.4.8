@@ -672,7 +672,7 @@ struct npc_siege_of_orgrimmar_lorewalker_cho : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 7900), [this](TaskContext context)
                 {
-                    if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_ROOK_STONETOE) : 0))
+                    if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_ROOK_STONETOE) : ObjectGuid::Empty))
                         rook->AI()->Talk(TALK_INTRO);
                 });
 
@@ -685,14 +685,14 @@ struct npc_siege_of_orgrimmar_lorewalker_cho : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 7600), [this](TaskContext context)
                 {
-                    if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_ROOK_STONETOE) : 0))
+                    if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_ROOK_STONETOE) : ObjectGuid::Empty))
                         rook->AI()->Talk(TALK_SPECIAL_1);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 9300), [this](TaskContext context)
                 {
-                    if (Creature* sun = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SUN_TENDERHEART) : 0))
+                    if (Creature* sun = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SUN_TENDERHEART) : ObjectGuid::Empty))
                         sun->AI()->Talk(TALK_INTRO);
                 });
 
@@ -705,7 +705,7 @@ struct npc_siege_of_orgrimmar_lorewalker_cho : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 12500), [this](TaskContext context)
                 {
-                    if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_ROOK_STONETOE) : 0))
+                    if (Creature* rook = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_ROOK_STONETOE) : ObjectGuid::Empty))
                         rook->AI()->Talk(TALK_SPECIAL_2);
                 });
 
@@ -742,7 +742,7 @@ struct npc_siege_of_orgrimmar_lorewalker_cho_norushen : public customCreatureAI
     TaskScheduler scheduler;
     InstanceScript* instance;
     uint32 delay;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void Reset() override
     {
@@ -3050,14 +3050,14 @@ struct npc_siege_of_orgrimmar_corrupted_skullsplitter : public customCreatureAI
     npc_siege_of_orgrimmar_corrupted_skullsplitter(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
         events.Reset();
         scheduler.CancelAll();
         me->SetReactState(REACT_AGGRESSIVE);
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         me->SetFaction(14);
     }
 
@@ -4287,21 +4287,21 @@ struct npc_siege_of_orgrimmar_thrall : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay), [this](TaskContext context)
                 {
-                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                         garrosh->AI()->Talk(TALK_SPECIAL_12);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 21800), [this](TaskContext context)
                 {
-                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                         garrosh->AI()->Talk(TALK_SPECIAL_13);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 13500), [this](TaskContext context)
                 {
-                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                         garrosh->AI()->Talk(TALK_SPECIAL_14);
                 });
 
@@ -4320,7 +4320,7 @@ struct npc_siege_of_orgrimmar_thrall : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 6400), [this](TaskContext context)
                 {
-                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                         garrosh->AI()->Talk(TALK_SPECIAL_15);
                 });
                 break;
@@ -4333,7 +4333,7 @@ struct npc_siege_of_orgrimmar_thrall : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay), [this](TaskContext context)
                 {
-                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                    if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                     {
                         garrosh->AI()->Talk(TALK_SPECIAL_16);
                         garrosh->GetMotionMaster()->MovePoint(5, garroshPathReach[0]);
@@ -4353,7 +4353,7 @@ struct npc_siege_of_orgrimmar_thrall : public customCreatureAI
                         if (instance)
                             instance->SetData(DATA_GARROSH_HELLSCREAM_PREVE_EVENT, DONE);
 
-                        if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_GARROSH_HELLSCREAM) : 0))
+                        if (Creature* garrosh = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_GARROSH_HELLSCREAM) : ObjectGuid::Empty))
                             garrosh->CastSpell(garrosh, SPELL_ATTACK_THRALL, false);
                     });
                 });

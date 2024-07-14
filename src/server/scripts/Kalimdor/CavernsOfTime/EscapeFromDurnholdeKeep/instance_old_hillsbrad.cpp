@@ -57,9 +57,9 @@ public:
         uint32 mBarrelCount;
         uint32 mThrallEventCount;
 
-        uint64 ThrallGUID;
-        uint64 TarethaGUID;
-        uint64 EpochGUID;
+        ObjectGuid ThrallGUID;
+        ObjectGuid TarethaGUID;
+        ObjectGuid EpochGUID;
 
         void Initialize() override
         {
@@ -67,9 +67,9 @@ public:
 
             mBarrelCount        = 0;
             mThrallEventCount   = 0;
-            ThrallGUID          = 0;
-            TarethaGUID         = 0;
-            EpochGUID        = 0;
+            ThrallGUID = ObjectGuid::Empty;
+            TarethaGUID = ObjectGuid::Empty;
+            EpochGUID = ObjectGuid::Empty;
         }
 
         Player* GetPlayerInMap()
@@ -222,7 +222,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {

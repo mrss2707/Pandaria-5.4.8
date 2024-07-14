@@ -226,7 +226,7 @@ struct npc_salyin_skrimisher : public ScriptedAI
     npc_salyin_skrimisher(Creature* creature) : ScriptedAI(creature) { }
 
     EventMap events;
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {

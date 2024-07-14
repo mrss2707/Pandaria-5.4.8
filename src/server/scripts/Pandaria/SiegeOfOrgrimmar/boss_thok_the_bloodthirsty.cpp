@@ -199,8 +199,8 @@ class boss_thok_the_bloodthirsty : public CreatureScript
             uint32 cleaveSpellEntry;
             uint32 nextFrenzyPct;
             uint32 thirdCageCount;
-            uint64 targetGUID;
-            uint64 fixateTargetGUID;
+            ObjectGuid targetGUID;
+            ObjectGuid fixateTargetGUID;
 
             void Reset() override
             {
@@ -211,8 +211,8 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                 me->SetPower(POWER_MANA, 0);
                 me->setRegeneratingMana(false);
                 me->SetSpeed(MOVE_RUN, 1.8f);
-                targetGUID       = 0;
-                fixateTargetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
+                fixateTargetGUID = ObjectGuid::Empty;
                 eatHelperEntry   = 0;
                 cleaveSpellEntry = 0;
                 nextFrenzyPct    = 80;
@@ -235,7 +235,7 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
                 // Not available to use
-                if (GameObject* thirdCage = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_THRICE_LOCKED_CAGE) : 0))
+                if (GameObject* thirdCage = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_THRICE_LOCKED_CAGE) : ObjectGuid::Empty))
                     thirdCage->SetFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
                 scheduler
@@ -255,7 +255,7 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                     if (instance && instance->GetData(DATA_THOK_BLOODTHIRSTY_PRE_EVENT) == DONE)
                     {
                         me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-                        instance->HandleGameObject(instance->GetData64(GO_REX_DOOR), true, NULL);
+                        instance->HandleGameObject(instance->GetGuidData(GO_REX_DOOR), true, NULL);
 
                         Movement::MoveSplineInit init(me);
 
@@ -269,12 +269,12 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                 });
             }
 
-            void SetGUID(uint64 guid, int32 /*type*/) override
+            void SetGUID(ObjectGuid guid, int32 /*type*/) override
             {
                 fixateTargetGUID = guid;
             }
 
-            uint64 GetGUID(int32 /*type*/) const override
+            ObjectGuid GetGUID(int32 /*type*/) const override
             {
                 return fixateTargetGUID;
             }
@@ -324,7 +324,7 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                     shockCollar->CastSpell(me, VEHICLE_SPELL_RIDE_HARDCODED, true);
 
                 // Allow to use it (Achievement)
-                if (GameObject* thirdCage = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_THRICE_LOCKED_CAGE) : 0))
+                if (GameObject* thirdCage = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_THRICE_LOCKED_CAGE) : ObjectGuid::Empty))
                     thirdCage->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
                 events.ScheduleEvent(EVENT_FEARSOME_ROAR, 12 * IN_MILLISECONDS);
@@ -371,14 +371,14 @@ class boss_thok_the_bloodthirsty : public CreatureScript
 
                         if (instance)
                         {
-                            instance->HandleGameObject(instance->GetData64(GO_REX_DOOR), true, NULL);
+                            instance->HandleGameObject(instance->GetGuidData(GO_REX_DOOR), true, NULL);
                             instance->SetData(DATA_THOK_BLOODTHIRSTY_PRE_EVENT, DONE);
 
                             // Pull beasts
-                            if (Creature* yeti = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_STARVED_YETI_TRASH)))
+                            if (Creature* yeti = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_STARVED_YETI_TRASH)))
                                 yeti->AI()->DoAction(ACTION_START_INTRO);
 
-                            if (Creature* mushan = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ENRAGED_MUSHAN_BEAST)))
+                            if (Creature* mushan = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ENRAGED_MUSHAN_BEAST)))
                                 mushan->AI()->DoAction(ACTION_START_INTRO);
                         }
 
@@ -625,7 +625,7 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                 berserkerEvents.Reset();
                 me->SetAutoattackOverrideSpell(0, 0);
 
-                if (GameObject* thirdCage = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_THRICE_LOCKED_CAGE) : 0))
+                if (GameObject* thirdCage = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_THRICE_LOCKED_CAGE) : ObjectGuid::Empty))
                 {
                     thirdCage->SetFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     thirdCage->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_IN_USE);
@@ -658,7 +658,7 @@ class boss_thok_the_bloodthirsty : public CreatureScript
                     // Achiev Snail!
                     if (GetData(TYPE_GIANT_SNAIL_LOCKED_COUNT) > 2)
                     {
-                        if (Creature* gastropod = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_MONSTROUS_GASTROPOD)))
+                        if (Creature* gastropod = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MONSTROUS_GASTROPOD)))
                             gastropod->AI()->DoAction(ACTION_START_INTRO);
                     }
                 }
@@ -1124,7 +1124,7 @@ struct npc_thok_ice_tomb : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {

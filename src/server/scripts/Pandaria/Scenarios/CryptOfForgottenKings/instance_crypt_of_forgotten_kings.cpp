@@ -50,8 +50,8 @@ class instance_crypt_of_forgotten_kings : public InstanceMapScript
                 LoadDoorData(doorData);
                 memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-                jinGUID         = 0;
-                AbominationGUID = 0;
+                jinGUID = ObjectGuid::Empty;
+                AbominationGUID = ObjectGuid::Empty;
                 chapterOne      = 0;
                 chapterTwo      = 0;
                 chapterThree    = 0;
@@ -257,7 +257,7 @@ class instance_crypt_of_forgotten_kings : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {

@@ -285,7 +285,7 @@ struct npc_archmage_landalock : public ScriptedAI
     npc_archmage_landalock(Creature* creature) : ScriptedAI(creature)
     {
         _switchImageTimer = MINUTE * IN_MILLISECONDS;
-        _summonGUID = 0;
+        _summonGUID = ObjectGuid::Empty;
     }
 
     uint32 GetImageEntry(uint32 QuestId)
@@ -368,7 +368,7 @@ struct npc_archmage_landalock : public ScriptedAI
 
 private:
     uint32 _switchImageTimer;
-    uint64 _summonGUID;
+    ObjectGuid _summonGUID;
 };
 
 

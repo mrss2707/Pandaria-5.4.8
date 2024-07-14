@@ -2655,7 +2655,7 @@ struct npc_sunreaver_bloodhawk : public CreatureAI
     }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2814,7 +2814,7 @@ struct npc_silver_covenant_hippogryph : public CreatureAI
     }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2904,7 +2904,7 @@ struct npc_lorthemar_theron_isle_intro : public ScriptedAI
     npc_lorthemar_theron_isle_intro(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -3027,12 +3027,12 @@ struct npc_stone_ritual_bunny_controller : public ScriptedAI
     npc_stone_ritual_bunny_controller(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 conquerorGUID;
+    ObjectGuid conquerorGUID;
 
     void Reset() override
     {
         scheduler.CancelAll();
-        conquerorGUID = 0;
+        conquerorGUID = ObjectGuid::Empty;
 
         if (Creature* stoneConqueror = me->SummonCreature(NPC_ANCIENT_STONE_CONQUEROR, *me, TEMPSUMMON_MANUAL_DESPAWN))
             conquerorGUID = stoneConqueror->GetGUID();
@@ -3538,7 +3538,7 @@ struct npc_nalak_essence_of_storms : public customCreatureAI
 {
     npc_nalak_essence_of_storms(Creature* creature) : customCreatureAI(creature) { }
 
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
     TaskScheduler scheduler;
     bool canAttack;
 

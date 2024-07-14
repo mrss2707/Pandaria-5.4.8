@@ -136,7 +136,7 @@ class boss_iron_juggernaut : public CreatureScript
             }
 
             uint32 energyGainTick;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             uint32 crawlerCount; // 3 per phase
             uint32 superheatedMineStomped;
             EventMap berserkerEvents;
@@ -184,7 +184,7 @@ class boss_iron_juggernaut : public CreatureScript
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-                    if (Creature* voljin = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VOLJIN)))
+                    if (Creature* voljin = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VOLJIN)))
                         voljin->AI()->DoAction(ACTION_IRON_JUGGERNAUT_COMBAT_INIT);
                 }
 
@@ -260,7 +260,7 @@ class boss_iron_juggernaut : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EXPLOSIVE_TAR_EFF);
                     instance->DoRemoveBloodLustDebuffSpellOnPlayers();
 
-                    if (Creature* voljin = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VOLJIN)))
+                    if (Creature* voljin = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VOLJIN)))
                         voljin->AI()->DoAction(ACTION_IRON_JUGGERNAUT_DEFEAT);
 
                     instance->SetData(DATA_IRON_JUGGERNAUT_PAST_EVENT, DONE);
@@ -484,16 +484,16 @@ struct npc_crawler_mine : public ScriptedAI
     npc_crawler_mine(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 ownerGUID;
-    uint64 targetGUID;
-    uint64 explosionGUID;
+    ObjectGuid ownerGUID;
+    ObjectGuid targetGUID;
+    ObjectGuid explosionGUID;
     bool hasPassenger;
 
     void IsSummonedBy(Unit* summoner) override
     {
         ownerGUID  = summoner->GetGUID();
-        targetGUID = 0;
-        explosionGUID = 0;
+        targetGUID = ObjectGuid::Empty;
+        explosionGUID = ObjectGuid::Empty;
         hasPassenger = false;
 
         if (Creature* juggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
@@ -533,7 +533,7 @@ struct npc_crawler_mine : public ScriptedAI
             DoCast(me, SPELL_SUPERHEATED_CRAWLER_MINE, true);
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return explosionGUID;
     }
@@ -604,7 +604,7 @@ struct npc_borer_drill : public ScriptedAI
     npc_borer_drill(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -690,7 +690,7 @@ struct npc_juggernaut_cutter_laser : public ScriptedAI
 
     EventMap events;
     uint32 laserActive;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -774,16 +774,16 @@ struct npc_juggernaut_sawblade : public ScriptedAI
     npc_juggernaut_sawblade(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 firstTargetGUID;
-    uint64 secondTargetGUID;
+    ObjectGuid firstTargetGUID;
+    ObjectGuid secondTargetGUID;
     bool hasLaunched;
 
     void DoAction(int32 actionId) override
     {
         if (actionId == ACTION_START_INTRO)
         {
-            firstTargetGUID  = 0;
-            secondTargetGUID = 0;
+            firstTargetGUID = ObjectGuid::Empty;
+            secondTargetGUID = ObjectGuid::Empty;
             hasLaunched = false;
 
             if (Creature* ironJuggernaut = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_IRON_JUGGERNAUT) : 0))
@@ -1278,7 +1278,7 @@ class spell_juggernaut_demolisher_cannons_selector : public SpellScript
     }
 };
 
-// Explosive Tar 144492 ÷
+// Explosive Tar 144492 ï¿½
 class spell_juggernaut_explosive_tar : public AuraScript
 {
     PrepareAuraScript(spell_juggernaut_explosive_tar);

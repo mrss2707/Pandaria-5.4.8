@@ -30,8 +30,8 @@ class instance_thunder_king_citadel : public InstanceMapScript
             uint32 step1;
             uint32 step2;
             uint32 chestCounter;
-            uint64 playerGUID;
-            uint64 doorGUID;
+            ObjectGuid playerGUID;
+            ObjectGuid doorGUID;
             uint32 timeData;
             uint32 goldenChestCount;
             std::list<uint64> firstDoorPackGUIDs;
@@ -46,8 +46,8 @@ class instance_thunder_king_citadel : public InstanceMapScript
                 step1            = 0;
                 step2            = 0;
                 chestCounter     = 0;
-                playerGUID       = 0;
-                doorGUID         = 0;
+                playerGUID = ObjectGuid::Empty;
+                doorGUID = ObjectGuid::Empty;
                 timeData         = 0;
                 goldenChestCount = 0;
                 hasGoldenChestAchieved = false;
@@ -175,7 +175,7 @@ class instance_thunder_king_citadel : public InstanceMapScript
                 return 0;
             }
     
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {

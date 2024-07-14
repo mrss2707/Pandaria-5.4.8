@@ -184,7 +184,7 @@ class boss_immerseus : public CreatureScript
             int8 contaminatedPuddlesToSummon;  // For Split phase. 1 / each 4 Corruption points boss lacks.
             uint8 puddleDoneCount;
             uint32 tearsSlainCount;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             bool secondPhaseInProgress;         // Used as an UpdateAI diff check.
             bool hasDefendersFallen;
 
@@ -224,7 +224,7 @@ class boss_immerseus : public CreatureScript
 
                 shaPuddlesToSummon = 0;
                 contaminatedPuddlesToSummon = 0;
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
                 puddleDoneCount = 0;
                 tearsSlainCount = 0;
 
@@ -264,7 +264,7 @@ class boss_immerseus : public CreatureScript
                 _JustEngagedWith();
 
                 // Disable Pre-Event
-                if (Creature* oozeController = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_OOZE_CONTROLLER) : 0))
+                if (Creature* oozeController = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_OOZE_CONTROLLER) : ObjectGuid::Empty))
                     oozeController->AI()->DoAction(ACTION_START_INTRO);
             }
 
@@ -654,7 +654,7 @@ class boss_immerseus : public CreatureScript
                                 if (Creature* swirlTarget = me->SummonCreature(NPC_SWIRL_TARGET, x, y, 246.83f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13100))
                                 {
                                     me->PrepareChanneledCast(sOri, SPELL_SWIRL);
-                                    me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, swirlTarget->GetGUID());
+                                    me->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, swirlTarget->GetGUID());
                                     me->SetTarget(swirlTarget->GetGUID());
                                 }
 
@@ -840,7 +840,7 @@ struct npc_sha_puddle_immerseus : public ScriptedAI
     }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     bool reachedBoss;
 
     void IsSummonedBy(Unit* summoner) override
@@ -908,7 +908,7 @@ struct npc_contaminated_puddle_immerseus : public ScriptedAI
     }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     bool reachedBoss;
     bool hasCleared;
 

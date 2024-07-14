@@ -65,23 +65,23 @@ class instance_shadopan_monastery : public InstanceMapScript
         uint32 iceArchersState;
         uint32 fireArchersState;
         uint32 snowdriftState;
-        uint64 guCloudstikeGUID;
-        uint64 masterSnowdriftGUID;
-        uint64 shaViolenceGuid;
-        uint64 taranZhuGuid;
-        uint64 azureSerpentGUID;
-        uint64 snowdriftRefereeGUID;
+        ObjectGuid guCloudstikeGUID;
+        ObjectGuid masterSnowdriftGUID;
+        ObjectGuid shaViolenceGuid;
+        ObjectGuid taranZhuGuid;
+        ObjectGuid azureSerpentGUID;
+        ObjectGuid snowdriftRefereeGUID;
         uint64 taranZhuCache;
         uint64 snowdriftPossesions;
         uint64 taranZhuCacheH;
         uint64 snowdriftPossesionsH;
-        uint64 masterSnowdriftOutroGUID;
+        ObjectGuid masterSnowdriftOutroGUID;
         uint64 shadowriftEntance;
         uint64 shadowriftFireWall;
         uint64 shaPrison1GUID;
         uint64 shaPrison2GUID;
         uint64 shaPrison3GUID;
-        uint64 containOverrideGUID;
+        ObjectGuid containOverrideGUID;
 
         void Initialize() override
         {
@@ -93,23 +93,23 @@ class instance_shadopan_monastery : public InstanceMapScript
             snowdriftState           = NOT_STARTED;
             aliveNoviceCount         = MAX_NOVICE;
             aliveMinibossCount       = 2;
-            guCloudstikeGUID         = 0;
-            masterSnowdriftGUID      = 0;
-            shaViolenceGuid          = 0;
-            taranZhuGuid             = 0;
-            azureSerpentGUID         = 0;
-            snowdriftRefereeGUID     = 0;
+            guCloudstikeGUID = ObjectGuid::Empty;
+            masterSnowdriftGUID = ObjectGuid::Empty;
+            shaViolenceGuid = ObjectGuid::Empty;
+            taranZhuGuid = ObjectGuid::Empty;
+            azureSerpentGUID = ObjectGuid::Empty;
+            snowdriftRefereeGUID = ObjectGuid::Empty;
             taranZhuCache            = 0;
             snowdriftPossesions      = 0;
             taranZhuCacheH           = 0;
             snowdriftPossesionsH     = 0;
-            masterSnowdriftOutroGUID = 0;
+            masterSnowdriftOutroGUID = ObjectGuid::Empty;
             shadowriftEntance        = 0;
             shadowriftFireWall       = 0;
             shaPrison1GUID           = 0;
             shaPrison2GUID           = 0;
             shaPrison3GUID           = 0;
-            containOverrideGUID      = 0;
+            containOverrideGUID = ObjectGuid::Empty;
             firstArcherySet.clear();
             secondArcherySet.clear();
 
@@ -454,7 +454,7 @@ class instance_shadopan_monastery : public InstanceMapScript
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {

@@ -61,19 +61,19 @@ class instance_culling_of_stratholme : public InstanceMapScript
         {
             instance_culling_of_stratholme_InstanceMapScript(Map* map) : InstanceScript(map)
             {
-                _arthasGUID = 0;
-                _meathookGUID = 0;
-                _salrammGUID = 0;
-                _epochGUID = 0;
-                _malGanisGUID = 0;
-                _infiniteGUID = 0;
-                _shkafGateGUID = 0;
+                _arthasGUID = ObjectGuid::Empty;
+                _meathookGUID = ObjectGuid::Empty;
+                _salrammGUID = ObjectGuid::Empty;
+                _epochGUID = ObjectGuid::Empty;
+                _malGanisGUID = ObjectGuid::Empty;
+                _infiniteGUID = ObjectGuid::Empty;
+                _shkafGateGUID = ObjectGuid::Empty;
                 _malGanisGate1GUID = 0;
                 _malGanisGate2GUID = 0;
-                _exitGateGUID = 0;
-                _malGanisChestGUID = 0;
-                _genericBunnyGUID = 0;
-                _lordaeronCrierGUID = 0;
+                _exitGateGUID = ObjectGuid::Empty;
+                _malGanisChestGUID = ObjectGuid::Empty;
+                _genericBunnyGUID = ObjectGuid::Empty;
+                _lordaeronCrierGUID = ObjectGuid::Empty;
                 _artasStepUi = 0;
                 memset(&_encounterState[0], 0, sizeof(uint32) * MAX_ENCOUNTER);
                 _crateCount = 0;
@@ -294,7 +294,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                                 for (auto&& guid : _citizensList)
                                     if (Creature* citizen = instance->GetCreature(guid))
                                     {
-                                        if (Creature* arthas = instance->GetCreature(GetData64(DATA_ARTHAS)))
+                                        if (Creature* arthas = instance->GetCreature(GetGuidData(DATA_ARTHAS)))
                                             if (Creature* risenZombie = arthas->SummonCreature(NPC_ZOMBIE, citizen->GetPositionX(), citizen->GetPositionY(), citizen->GetPositionZ(), citizen->GetOrientation())) //, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                                                 _zombiesList.push_back(risenZombie->GetGUID());
                                         citizen->SetPhaseMask(2, true);
@@ -372,7 +372,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -476,19 +476,19 @@ class instance_culling_of_stratholme : public InstanceMapScript
             }
 
         private:
-            uint64 _arthasGUID;
-            uint64 _meathookGUID;
-            uint64 _salrammGUID;
-            uint64 _epochGUID;
-            uint64 _malGanisGUID;
-            uint64 _infiniteGUID;
-            uint64 _shkafGateGUID;
+            ObjectGuid _arthasGUID;
+            ObjectGuid _meathookGUID;
+            ObjectGuid _salrammGUID;
+            ObjectGuid _epochGUID;
+            ObjectGuid _malGanisGUID;
+            ObjectGuid _infiniteGUID;
+            ObjectGuid _shkafGateGUID;
             uint64 _malGanisGate1GUID;
             uint64 _malGanisGate2GUID;
-            uint64 _exitGateGUID;
-            uint64 _malGanisChestGUID;
-            uint64 _genericBunnyGUID;
-            uint64 _lordaeronCrierGUID;
+            ObjectGuid _exitGateGUID;
+            ObjectGuid _malGanisChestGUID;
+            ObjectGuid _genericBunnyGUID;
+            ObjectGuid _lordaeronCrierGUID;
             uint32 _artasStepUi;
             uint32 _encounterState[MAX_ENCOUNTER];
             uint32 _crateCount;

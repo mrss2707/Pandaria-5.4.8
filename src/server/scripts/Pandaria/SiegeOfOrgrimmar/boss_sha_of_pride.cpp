@@ -471,7 +471,7 @@ class boss_sha_of_pride : public CreatureScript
                             me->RemoveAurasDueToSpell(SPELL_EMERGE_SUBMERGE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
-                            if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_NORUSHEN_2)))
+                            if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_NORUSHEN_2)))
                                 norushen->AI()->Talk(SAY_NORUSHEN_INTRO_2);
                             else if (Creature* norushen = me->SummonCreature(NPC_NORUSHEN_2, norushenShaRoom, TEMPSUMMON_MANUAL_DESPAWN))// in case - norushen defeat - server crash
                                 norushen->AI()->Talk(SAY_NORUSHEN_INTRO_2);
@@ -581,7 +581,7 @@ class boss_sha_of_pride : public CreatureScript
                 berserkerEvents.ScheduleEvent(EVENT_CHECK_EVADE, 1 * IN_MILLISECONDS);
                 HandleExecuteSwellingPride();
 
-                if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_NORUSHEN_2) : 0))
+                if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_NORUSHEN_2) : 0))
                     norushen->AI()->DoAction(ACTION_START_INTRO);
 
                 if (IsHeroic())
@@ -621,7 +621,7 @@ class boss_sha_of_pride : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_OVERCOME_CHARMED);
                     instance->DoRemoveBloodLustDebuffSpellOnPlayers();
 
-                    if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_NORUSHEN_2)))
+                    if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_NORUSHEN_2)))
                     {
                         norushen->AI()->Reset();
                         norushen->Respawn();

@@ -998,7 +998,7 @@ struct npc_liang_thunderfoot : public ScriptedAI
     }
 
 private:
-    uint64 playerGUID;
+    ObjectGuid playerGUID;
 };
 
 struct npc_francis_the_shepherd_boy : public ScriptedAI
@@ -1820,7 +1820,7 @@ struct npc_vfw_barrel_of_fireworks : public ScriptedAI
     npc_vfw_barrel_of_fireworks(Creature* creature) : ScriptedAI(creature) { }
     
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -1886,16 +1886,16 @@ struct npc_vfw_ik_thik_wing_commander : public customCreatureAI
     npc_vfw_ik_thik_wing_commander(Creature* creature) : customCreatureAI(creature), summons(me) { }
 
     SummonList summons;
-    uint64 maskApplyGUID;
+    ObjectGuid maskApplyGUID;
 
     void Reset() override
     {
         events.Reset();
         me->SetReactState(REACT_AGGRESSIVE);
-        maskApplyGUID = 0;
+        maskApplyGUID = ObjectGuid::Empty;
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         maskApplyGUID = guid;
     }
@@ -2018,8 +2018,8 @@ struct npc_vfw_krungko_fingerlicker : public customCreatureAI
     npc_vfw_krungko_fingerlicker(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
-    uint64 helperGUID;
+    ObjectGuid summonerGUID;
+    ObjectGuid helperGUID;
     bool hasTriggered;
 
     void IsSummonedBy(Unit* summoner) override
@@ -2136,7 +2136,7 @@ struct npc_vfw_unbarreled_pandaren : public customCreatureAI
     npc_vfw_unbarreled_pandaren(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {

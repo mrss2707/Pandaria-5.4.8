@@ -45,11 +45,11 @@ class instance_mogu_shan_palace : public InstanceMapScript
 
             // Trial of the king.
             uint32 delay;
-            uint64 m_uiXinGuid;
-            uint64 m_uiKuaiGuid;
-            uint64 m_uiMingGuid;
-            uint64 m_uiHaiyanGuid;
-            uint64 m_uiBeaconGuid;
+            ObjectGuid m_uiXinGuid;
+            ObjectGuid m_uiKuaiGuid;
+            ObjectGuid m_uiMingGuid;
+            ObjectGuid m_uiHaiyanGuid;
+            ObjectGuid m_uiBeaconGuid;
             std::list<uint64> m_lScrapperList;
             std::list<uint64> m_lAdeptList;
             std::list<uint64> m_lGruntList;
@@ -58,14 +58,14 @@ class instance_mogu_shan_palace : public InstanceMapScript
             uint32 m_auiBossNumber[3];
 
             // m_uiGekkanGuid.
-            uint64 m_uiGekkanGuid;
-            uint64 m_uiAncientTreasureGuid;
+            ObjectGuid m_uiGekkanGuid;
+            ObjectGuid m_uiAncientTreasureGuid;
 
             // Xin the weaponmaster.
             std::list<uint64> m_lStaffList;
             std::list<uint64> m_lAxeList;
 
-            uint64 m_uiScoutGuid;
+            ObjectGuid m_uiScoutGuid;
 
             // Storage
             uint64 m_auiGuids64[MAX_GUIDS];
@@ -79,18 +79,18 @@ class instance_mogu_shan_palace : public InstanceMapScript
                 SetBossNumber(MAX_ENCOUNTER);
 
                 delay = 0;
-                m_uiXinGuid = 0;
-                m_uiKuaiGuid = 0;
-                m_uiMingGuid = 0;
-                m_uiHaiyanGuid = 0;
-                m_uiBeaconGuid = 0;
+                m_uiXinGuid = ObjectGuid::Empty;
+                m_uiKuaiGuid = ObjectGuid::Empty;
+                m_uiMingGuid = ObjectGuid::Empty;
+                m_uiHaiyanGuid = ObjectGuid::Empty;
+                m_uiBeaconGuid = ObjectGuid::Empty;
 
-                m_uiGekkanGuid = 0;
-                m_uiAncientTreasureGuid = 0;
+                m_uiGekkanGuid = ObjectGuid::Empty;
+                m_uiAncientTreasureGuid = ObjectGuid::Empty;
 
                 InitializeTrialOfKing();
 
-                m_uiScoutGuid = 0;
+                m_uiScoutGuid = ObjectGuid::Empty;
 
                 if (instance->IsChallengeDungeon())
                     LoadScenarioInfo(scenarioBosses, CRITERIA_ENEMIES);
@@ -201,7 +201,7 @@ class instance_mogu_shan_palace : public InstanceMapScript
                     if (GameObject* go = GetGameObjectFromStorage(instance->GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC ? GO_ANCIENT_MOGU_TREASURE_HC : GO_ANCIENT_MOGU_TREASURE))
                         go->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
 
-                    HandleGameObject(0, true, GetGameObjectFromStorage(GO_GEKKAN_TREASURE_DOOR));
+                    HandleGameObject(ObjectGuid::Empty, true, GetGameObjectFromStorage(GO_GEKKAN_TREASURE_DOOR));
                 }
 
                 if (instance->IsChallengeDungeon() && !IsChallengeModeCompleted())
@@ -259,7 +259,7 @@ class instance_mogu_shan_palace : public InstanceMapScript
                 return m_auiEncounter[type];
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 if (type < MAX_GUIDS)
                     return m_auiGuids64[type];
@@ -352,7 +352,7 @@ class instance_mogu_shan_palace : public InstanceMapScript
                 {
                     case TYPE_WIPE_FIRST_BOSS:
                     {
-                        HandleGameObject(0, true, GetGameObjectFromStorage(GO_DOOR_BEFORE_TRIAL));
+                        HandleGameObject(ObjectGuid::Empty, true, GetGameObjectFromStorage(GO_DOOR_BEFORE_TRIAL));
                         switch (data)
                         {
                             case 0:
@@ -617,7 +617,7 @@ class instance_mogu_shan_palace : public InstanceMapScript
                         if (m_uiBossCount < 3)
                         {
                             SetData(m_auiBossNumber[m_uiBossCount], 0);
-                            HandleGameObject(0, false, GetGameObjectFromStorage(GO_DOOR_BEFORE_TRIAL));
+                            HandleGameObject(ObjectGuid::Empty, false, GetGameObjectFromStorage(GO_DOOR_BEFORE_TRIAL));
                         }
                         else
                         {
@@ -632,7 +632,7 @@ class instance_mogu_shan_palace : public InstanceMapScript
                                     pScout->AI()->DoAction(0);
                             }
 
-                            HandleGameObject(0, true, GetGameObjectFromStorage(GO_DOOR_BEFORE_TRIAL));
+                            HandleGameObject(ObjectGuid::Empty, true, GetGameObjectFromStorage(GO_DOOR_BEFORE_TRIAL));
                         }
                         break;
                     case TYPE_TRIAL_CHEST:
@@ -646,13 +646,13 @@ class instance_mogu_shan_palace : public InstanceMapScript
                             for (auto&& itr : instance->GetPlayers())
                                 itr.GetSource()->ModifyCurrency(395, (instance->IsHeroic() ? 125 : 70) * CURRENCY_PRECISION);
 
-                        HandleGameObject(0, true, GetGameObjectFromStorage(GO_DOOR_SECRET_STEPS));
+                        HandleGameObject(ObjectGuid::Empty, true, GetGameObjectFromStorage(GO_DOOR_SECRET_STEPS));
                         m_mEvents.ScheduleEvent(1, 5 * IN_MILLISECONDS);
                         break;
                 }
             }
 
-            void SetData64(uint32 type, uint64 data) override
+            void SetGuidData(uint32 type, ObjectGuid data) override
             {
                 if (type >= MAX_GUIDS)
                     return;

@@ -982,7 +982,7 @@ struct npc_shaolmara_anki : public customCreatureAI
     npc_shaolmara_anki(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 passengerGUID;
+    ObjectGuid passengerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2527,12 +2527,12 @@ struct npc_shanze_slaver : public customCreatureAI
 {
     npc_shanze_slaver(Creature* creature) : customCreatureAI(creature)
     {
-        slaveGUID = 0;
+        slaveGUID = ObjectGuid::Empty;
 
         SetCombatMovement(false);
     }
 
-    uint64 slaveGUID;
+    ObjectGuid slaveGUID;
 
     void Reset() override
     {
@@ -2561,7 +2561,7 @@ struct npc_shanze_slaver : public customCreatureAI
             slave->CastSpell(slave, 136703);
             slave->SetFaction(35);
             slave->DespawnOrUnsummon(30 * IN_MILLISECONDS);
-            slaveGUID = 0;
+            slaveGUID = ObjectGuid::Empty;
         }
     }
 
@@ -3004,7 +3004,7 @@ struct npc_zandlari_beastcaller_to_skies : public customCreatureAI
     npc_zandlari_beastcaller_to_skies(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -4010,7 +4010,7 @@ struct npc_stormsea_landing_sentry_totem : public ScriptedAI
     npc_stormsea_landing_sentry_totem(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void InitializeAI() override
     {
@@ -4021,12 +4021,12 @@ struct npc_stormsea_landing_sentry_totem : public ScriptedAI
         });
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         targetGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return targetGUID;
     }
@@ -4049,7 +4049,7 @@ struct npc_stormsea_landing_sentry_beam_bunny : public ScriptedAI
     npc_stormsea_landing_sentry_beam_bunny(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -4169,10 +4169,10 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 5500), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_8);
 
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                         lorthemar->AI()->Talk(TALK_SPECIAL_7);
                 });
 
@@ -4191,77 +4191,77 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                         lorthemar->AI()->Talk(TALK_SPECIAL_8);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1800), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_9);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1800), [this](TaskContext context)
                 {
-                    if (Creature* vereesa = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_VEREESA + 5000) : 0))
+                    if (Creature* vereesa = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_VEREESA + 5000) : 0))
                         vereesa->AI()->Talk(TALK_SPECIAL_4);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1200), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_10);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3000), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_11);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3200), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                         lorthemar->AI()->Talk(TALK_SPECIAL_9);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                         lorthemar->AI()->Talk(TALK_SPECIAL_10);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1500), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_12);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 2000), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_13);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 1200), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                         lorthemar->AI()->Talk(TALK_SPECIAL_11);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 2500), [this](TaskContext context)
                 {
-                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                         taoshi->AI()->Talk(TALK_SPECIAL_2);
                 });
 
@@ -4274,7 +4274,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 2500), [this](TaskContext context)
                 {
-                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                         taoshi->AI()->Talk(TALK_SPECIAL_3);
                 });
 
@@ -4287,7 +4287,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 4500), [this](TaskContext context)
                 {
-                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                         taoshi->AI()->Talk(TALK_SPECIAL_4);
                 });
 
@@ -4297,21 +4297,21 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     if (Player* target = ObjectAccessor::GetPlayer(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(PLAYER_DATA) : 0))
                         me->SetFacingToObject(target);
 
-                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                         taoshi->AI()->Talk(TALK_SPECIAL_5);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 5000), [this](TaskContext context)
                 {
-                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                         taoshi->AI()->Talk(TALK_SPECIAL_6);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
                 {
-                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                         taoshi->AI()->Talk(TALK_SPECIAL_7);
                 });
                 break;
@@ -4333,7 +4333,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     scheduler
                         .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
                     {
-                        if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+                        if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
                             taranZhu->AI()->Talk(TALK_INTRO);
 
                         // Summon Zandalars
@@ -4350,11 +4350,11 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     scheduler
                         .Schedule(Milliseconds(delay += 8000), [this](TaskContext context)
                     {
-                        if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                        if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                             lorthemar->AI()->Talk(TALK_SPECIAL_4);
 
                         // Close Gates
-                        if (GameObject* moguDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_MOGU_GATES_CENTER) : 0))
+                        if (GameObject* moguDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_MOGU_GATES_CENTER) : ObjectGuid::Empty))
                             instance->HandleGameObject(moguDoor->GetGUID(), false, NULL);
 
                         // Leave to Nalak
@@ -4374,7 +4374,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     scheduler
                         .Schedule(Milliseconds(delay += 2000), [this](TaskContext context)
                     {
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                             jaina->AI()->Talk(TALK_SPECIAL_4);
                     });
                 }
@@ -4419,7 +4419,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     if (instance)
                     {
                         // Invisible Wall (only horde)
-                        instance->HandleGameObject(instance->GetData64(GO_SPIRIT_WALL + 1), true, NULL);
+                        instance->HandleGameObject(instance->GetGuidData(GO_SPIRIT_WALL + 1), true, NULL);
 
                         instance->HandleGameObject(instance->GetData64(instance->GetData64(FACTION_DATA) ? GO_MOGU_GATES_HORDE : GO_MOGU_GATES_STORMSEA), true, NULL);
                     }
@@ -4480,14 +4480,14 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 4000), [this](TaskContext context)
                 {
-                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_VEREESA + 5000) : 0))
+                    if (Creature* scoutLeader = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_VEREESA + 5000) : 0))
                         scoutLeader->AI()->Talk(TALK_SPECIAL_3);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 4500), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_5);
                 });
 
@@ -4503,7 +4503,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     Talk(TALK_SPECIAL_3);
 
                     // Open Gates
-                    if (GameObject* moguDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_MOGU_GATES_CENTER) : 0))
+                    if (GameObject* moguDoor = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_MOGU_GATES_CENTER) : ObjectGuid::Empty))
                         instance->HandleGameObject(moguDoor->GetGUID(), true, NULL);
 
                     me->GetMotionMaster()->MovePoint(0, taranZhuFollowPos);
@@ -4518,21 +4518,21 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                     scheduler
                         .Schedule(Milliseconds(delay += 4900), [this](TaskContext context)
                     {
-                        if (Creature* shanbu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHAN_BU) : 0))
+                        if (Creature* shanbu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHAN_BU) : ObjectGuid::Empty))
                             shanbu->AI()->Talk(TALK_SPECIAL_1);
                     });
 
                     scheduler
                         .Schedule(Milliseconds(delay += 4500), [this](TaskContext context)
                     {
-                        if (Creature* shanbu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHAN_BU) : 0))
+                        if (Creature* shanbu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHAN_BU) : ObjectGuid::Empty))
                             shanbu->AI()->Talk(TALK_SPECIAL_2);
 
                         me->GetMotionMaster()->MoveJump(taranZhuJumpPos, 20.0f, 15.0f, EVENT_JUMP);
 
                         // Open Invisible Wall
                         if (instance)
-                            instance->HandleGameObject(instance->GetData64(GO_SPIRIT_WALL), true, NULL);
+                            instance->HandleGameObject(instance->GetGuidData(GO_SPIRIT_WALL), true, NULL);
                     });
                 });
                 break;
@@ -4540,14 +4540,14 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 Talk(TALK_SPECIAL_3);
                 me->InterruptNonMeleeSpells(true, SPELL_RESSURECT_NALAK);
 
-                if (Creature* nalak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_NALAK) : 0))
+                if (Creature* nalak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_NALAK) : ObjectGuid::Empty))
                     nalak->AI()->DoAction(ACTION_START_INTRO);
 
                 delay = 0;
                 scheduler
                     .Schedule(Milliseconds(delay += 3500), [this](TaskContext context)
                 {
-                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
                         taranZhu->AI()->Talk(TALK_SPECIAL_7);
                 });
 
@@ -4566,7 +4566,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
             case ACTION_SHANBU_DEFEATED:
                 Talk(TALK_SPECIAL_10);
 
-                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                     taoshi->AI()->DoAction(ACTION_TARAN_BLEEDED);
                 break;
             case ACTION_TARAN_BLEEDED:
@@ -4588,14 +4588,14 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 3000), [this](TaskContext context)
                 {
-                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
                         taranZhu->AI()->Talk(TALK_SPECIAL_11);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 2500), [this](TaskContext context)
                 {
-                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
                         taranZhu->AI()->Talk(TALK_SPECIAL_12);
                 });
 
@@ -4608,7 +4608,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += 3200), [this](TaskContext context)
                 {
-                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+                    if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
                         taranZhu->AI()->DoAction(ACTION_BREAK_THIS_CONFLICT);
                 });
                 break;
@@ -4627,28 +4627,28 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 scheduler
                     .Schedule(Milliseconds(delay += me->GetSplineDuration()), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_6);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 2500), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                         lorthemar->AI()->Talk(TALK_SPECIAL_5);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 4000), [this](TaskContext context)
                 {
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_JAINA + 5000) : 0))
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_JAINA + 5000) : 0))
                         jaina->AI()->Talk(TALK_SPECIAL_7);
                 });
 
                 scheduler
                     .Schedule(Milliseconds(delay += 3000), [this](TaskContext context)
                 {
-                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_LORTHEMAR + 5000) : 0))
+                    if (Creature* lorthemar = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_LORTHEMAR + 5000) : 0))
                         lorthemar->AI()->Talk(TALK_SPECIAL_6);
                 });
 
@@ -4657,7 +4657,7 @@ struct shanbuAssaultBaseAI : public customCreatureAI
                 {
                     me->GetMotionMaster()->MoveJump(taranZhuBreakPos, 20.0f, 15.0f, EVENT_JUMP + 1);
 
-                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TAOSHI) : 0))
+                    if (Creature* taoshi = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TAOSHI) : ObjectGuid::Empty))
                     {
                         Movement::MoveSplineInit newInit(taoshi);
 
@@ -4990,7 +4990,7 @@ struct npc_shan_bu : public shanbuAssaultBaseAI
         {
             instance->SetData(STEP_DEFEAT_SHAN_BU, DONE);
 
-            if (Creature* nalak = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_NALAK)))
+            if (Creature* nalak = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_NALAK)))
                 nalak->DespawnOrUnsummon();
 
             if (Player* target = ObjectAccessor::GetPlayer(*me, instance->GetData64(PLAYER_DATA)))
@@ -5003,7 +5003,7 @@ struct npc_shan_bu : public shanbuAssaultBaseAI
         events.ScheduleEvent(EVENT_SHADOW_CRASH, urand(1.5 * IN_MILLISECONDS, 2.5 * IN_MILLISECONDS));
         events.ScheduleEvent(EVENT_DRAW_SHADOWS, 7.5 * IN_MILLISECONDS);
 
-        if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+        if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
             taranZhu->AI()->Talk(TALK_SPECIAL_8);
     }
 
@@ -5018,7 +5018,7 @@ struct npc_shan_bu : public shanbuAssaultBaseAI
             scheduler
                 .Schedule(Milliseconds(1500), [this](TaskContext context)
             {
-                if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHANBU_TARAN_ZHU) : 0))
+                if (Creature* taranZhu = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHANBU_TARAN_ZHU) : ObjectGuid::Empty))
                 {
                     taranZhu->AI()->Talk(TALK_SPECIAL_9);
                     taranZhu->CastSpell(taranZhu, SPELL_BLOOD_DRIP, true);
@@ -5158,7 +5158,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                         {
                             Talk(TALK_SPECIAL_1);
 
-                            if (GameObject* moguCrucible = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_MOGU_CRUCIBLE) : 0))
+                            if (GameObject* moguCrucible = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_MOGU_CRUCIBLE) : ObjectGuid::Empty))
                                 moguCrucible->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         });
                     
@@ -5200,7 +5200,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                             // Progress bar and waves
                             DoCast(me, SPELL_THUNDER_FORGE_CHARGING, true);
 
-                            if (Creature* thunderForge = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_THUNDER_FORGE) : 0))
+                            if (Creature* thunderForge = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_THUNDER_FORGE) : ObjectGuid::Empty))
                                 thunderForge->AI()->DoAction(ACTION_START_INTRO);
                         });
                         break;
@@ -5215,7 +5215,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                         scheduler
                             .Schedule(Milliseconds(4500), [this](TaskContext context)
                         {
-                            if (Creature* shadopanDefender = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SHADO_PAN_DEFENDER) : 0))
+                            if (Creature* shadopanDefender = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SHADO_PAN_DEFENDER) : ObjectGuid::Empty))
                                 shadopanDefender->AI()->Talk(TALK_SPECIAL_2);
                         });
 
@@ -5281,7 +5281,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                         {
                             Talk(TALK_SPECIAL_11);
 
-                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_THUNDER_FORGE_2) : 0))
+                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_THUNDER_FORGE_2) : 0))
                                 anvil->AI()->DoAction(ACTION_START_INTRO);
                         });
 
@@ -5323,7 +5323,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                             Talk(TALK_SPECIAL_15);
 
                             // Summon Almagmation
-                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_THUNDER_FORGE_2) : 0))
+                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_THUNDER_FORGE_2) : 0))
                                 anvil->CastSpell(anvil, SPELL_SHA_COSMETIC_SPAWN, true);
                         });
                         break;

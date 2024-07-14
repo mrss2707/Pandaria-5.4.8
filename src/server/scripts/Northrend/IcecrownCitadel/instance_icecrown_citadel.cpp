@@ -104,46 +104,46 @@ class instance_icecrown_citadel : public InstanceMapScript
                 LoadDoorData(doorData);
                 TeamInInstance = 0;
                 HeroicAttempts = MaxHeroicAttempts;
-                LadyDeathwisperElevatorGUID = 0;
-                DeathbringerSaurfangGUID = 0;
-                DeathbringerSaurfangDoorGUID = 0;
-                DeathbringerSaurfangEventGUID = 0;
-                DeathbringersCacheGUID = 0;
+                LadyDeathwisperElevatorGUID = ObjectGuid::Empty;
+                DeathbringerSaurfangGUID = ObjectGuid::Empty;
+                DeathbringerSaurfangDoorGUID = ObjectGuid::Empty;
+                DeathbringerSaurfangEventGUID = ObjectGuid::Empty;
+                DeathbringersCacheGUID = ObjectGuid::Empty;
                 BloodwingDoor                   = 0;
                 FrostwingDoor                   = 0;
-                PlagueSigilGUID = 0;
-                BloodwingSigilGUID = 0;
-                FrostwingSigilGUID = 0;
+                PlagueSigilGUID = ObjectGuid::Empty;
+                BloodwingSigilGUID = ObjectGuid::Empty;
+                FrostwingSigilGUID = ObjectGuid::Empty;
                 memset(PutricideValveGUIDs, 0, 2 * sizeof(uint64));
                 memset(PutricideValveState, 0, 2 * sizeof(bool));
                 memset(PutricidePipeGUIDs, 0, 2 * sizeof(uint64));
                 memset(PutricideGateGUIDs, 0, 2 * sizeof(uint64));
-                PutricideCollisionGUID = 0;
-                FestergutGUID = 0;
-                RotfaceGUID = 0;
-                ProfessorPutricideGUID = 0;
-                PutricideTableGUID = 0;
+                PutricideCollisionGUID = ObjectGuid::Empty;
+                FestergutGUID = ObjectGuid::Empty;
+                RotfaceGUID = ObjectGuid::Empty;
+                ProfessorPutricideGUID = ObjectGuid::Empty;
+                PutricideTableGUID = ObjectGuid::Empty;
                 memset(BloodCouncilGUIDs, 0, 3 * sizeof(uint64));
-                BloodCouncilControllerGUID = 0;
-                BloodQueenLanaThelGUID = 0;
-                CrokScourgebaneGUID = 0;
+                BloodCouncilControllerGUID = ObjectGuid::Empty;
+                BloodQueenLanaThelGUID = ObjectGuid::Empty;
+                CrokScourgebaneGUID = ObjectGuid::Empty;
                 memset(CrokCaptainGUIDs, 0, 4 * sizeof(uint64));
-                SisterSvalnaGUID = 0;
-                ValithriaDreamwalkerGUID = 0;
-                ValithriaLichKingGUID = 0;
-                ValithriaTriggerGUID = 0;
-                SindragosaGUID = 0;
-                SindragosaDoorGUID = 0;
-                SpinestalkerGUID = 0;
-                RimefangGUID = 0;
-                TheLichKingGUID = 0;
-                HighlordTirionFordringGUID = 0;
-                TerenasMenethilGUID = 0;
-                ArthasPlatformGUID = 0;
-                ArthasPrecipiceGUID = 0;
-                FrozenThroneEdgeGUID = 0;
-                FrozenThroneWindGUID = 0;
-                FrozenThroneWarningGUID = 0;
+                SisterSvalnaGUID = ObjectGuid::Empty;
+                ValithriaDreamwalkerGUID = ObjectGuid::Empty;
+                ValithriaLichKingGUID = ObjectGuid::Empty;
+                ValithriaTriggerGUID = ObjectGuid::Empty;
+                SindragosaGUID = ObjectGuid::Empty;
+                SindragosaDoorGUID = ObjectGuid::Empty;
+                SpinestalkerGUID = ObjectGuid::Empty;
+                RimefangGUID = ObjectGuid::Empty;
+                TheLichKingGUID = ObjectGuid::Empty;
+                HighlordTirionFordringGUID = ObjectGuid::Empty;
+                TerenasMenethilGUID = ObjectGuid::Empty;
+                ArthasPlatformGUID = ObjectGuid::Empty;
+                ArthasPrecipiceGUID = ObjectGuid::Empty;
+                FrozenThroneEdgeGUID = ObjectGuid::Empty;
+                FrozenThroneWindGUID = ObjectGuid::Empty;
+                FrozenThroneWarningGUID = ObjectGuid::Empty;
                 FrostwyrmCount = 0;
                 SpinestalkerTrashCount = 0;
                 RimefangTrashCount = 0;
@@ -159,20 +159,20 @@ class instance_icecrown_citadel : public InstanceMapScript
                 ColdflameJetsState = NOT_STARTED;
                 BloodQuickeningState = NOT_STARTED;
                 BloodQuickeningMinutes = 0;
-                SindragosasWardGUID = 0;
-                UnstableExperimentStalkerRedGUID = 0;
-                UnstableExperimentStalkerGreenGUID = 0;
+                SindragosasWardGUID = ObjectGuid::Empty;
+                UnstableExperimentStalkerRedGUID = ObjectGuid::Empty;
+                UnstableExperimentStalkerGreenGUID = ObjectGuid::Empty;
                 PutricideTrapState = NOT_STARTED;
                 IccBuffSelected = 30;
                 // Gunship Battle
                 FirstSquadState = 0;
                 SecondSquadState = 0;
                 SpireSquadState = 0;
-                SkybreakerBossGUID = 0;
-                OrgrimmarBossGUID = 0;
-                DeathbringerSaurfangGbGUID = 0;
-                MuradinBronzebeardGbGUID = 0;
-                GbBattleMageGUID = 0;
+                SkybreakerBossGUID = ObjectGuid::Empty;
+                OrgrimmarBossGUID = ObjectGuid::Empty;
+                DeathbringerSaurfangGbGUID = ObjectGuid::Empty;
+                MuradinBronzebeardGbGUID = ObjectGuid::Empty;
+                GbBattleMageGUID = ObjectGuid::Empty;
                 isPrepared = false;
                 // Gunship Battle
             }
@@ -504,7 +504,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             void OnCreatureRemove(Creature* creature) override
             {
                 if (creature->GetEntry() == NPC_SINDRAGOSA)
-                    SindragosaGUID = 0;
+                    SindragosaGUID = ObjectGuid::Empty;
             }
 
             // Weekly quest spawn prevention
@@ -946,7 +946,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 return 0;
             }
 
-            void SetData64(uint32 type, uint64 data) override
+            void SetGuidData(uint32 type, ObjectGuid data) override
             {
                 switch (type)
                 {
@@ -958,7 +958,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 }
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -1974,79 +1974,79 @@ class instance_icecrown_citadel : public InstanceMapScript
 
         protected:
             EventMap Events;
-            uint64 LightsHammerTheLichKingGUID;
-            uint64 LightsHammerSaurfangMuradinGUID;
-            std::vector<uint64> LightsHammerKorkronGeneralAllianceCommanderGUIDs;
-            uint64 LordMarrowgarGUID;
-            uint64 LadyDeahtwhisperGUID;
-            uint64 LadyDeathwisperElevatorGUID;
+            ObjectGuid LightsHammerTheLichKingGUID;
+            ObjectGuid LightsHammerSaurfangMuradinGUID;
+            std::vector<ObjectGuid> LightsHammerKorkronGeneralAllianceCommanderGUIDs;
+            ObjectGuid LordMarrowgarGUID;
+            ObjectGuid LadyDeahtwhisperGUID;
+            ObjectGuid LadyDeathwisperElevatorGUID;
             // Gunship battle
             uint32 FirstSquadState;
             uint32 SecondSquadState;
-            uint64 SkybreakerBossGUID;
-            uint64 OrgrimmarBossGUID;
-            uint64 DeathbringerSaurfangGbGUID;
-            uint64 MuradinBronzebeardGbGUID;
-            uint64 GbBattleMageGUID;
+            ObjectGuid SkybreakerBossGUID;
+            ObjectGuid OrgrimmarBossGUID;
+            ObjectGuid DeathbringerSaurfangGbGUID;
+            ObjectGuid MuradinBronzebeardGbGUID;
+            ObjectGuid GbBattleMageGUID;
             uint64 GunshipArmoryGUID = 0;
-            uint64 DeathbringerSaurfangGUID;
-            uint64 DeathbringerSaurfangDoorGUID;
-            uint64 DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
-            uint64 DeathbringersCacheGUID;
-            uint64 PlagueSigilGUID;
+            ObjectGuid DeathbringerSaurfangGUID;
+            ObjectGuid DeathbringerSaurfangDoorGUID;
+            ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
+            ObjectGuid DeathbringersCacheGUID;
+            ObjectGuid PlagueSigilGUID;
             uint64 BloodwingDoor;
             uint64 FrostwingDoor;
-            uint64 BloodwingSigilGUID;
-            uint64 FrostwingSigilGUID;
+            ObjectGuid BloodwingSigilGUID;
+            ObjectGuid FrostwingSigilGUID;
             uint64 PutricideValveGUIDs[2];
             bool PutricideValveState[2];
             uint64 PutricidePipeGUIDs[2];
             uint64 PutricideGateGUIDs[2];
-            uint64 PutricideCollisionGUID;
-            uint64 FestergutGUID;
-            uint64 RotfaceGUID;
-            uint64 ProfessorPutricideGUID;
-            uint64 PutricideTableGUID;
+            ObjectGuid PutricideCollisionGUID;
+            ObjectGuid FestergutGUID;
+            ObjectGuid RotfaceGUID;
+            ObjectGuid ProfessorPutricideGUID;
+            ObjectGuid PutricideTableGUID;
             uint64 BloodCouncilGUIDs[3];
-            uint64 BloodCouncilControllerGUID;
-            uint64 BloodQueenLanaThelCouncilGUID;
-            uint64 BloodQueenLanaThelGUID;
-            uint64 CrokScourgebaneGUID;
+            ObjectGuid BloodCouncilControllerGUID;
+            ObjectGuid BloodQueenLanaThelCouncilGUID;
+            ObjectGuid BloodQueenLanaThelGUID;
+            ObjectGuid CrokScourgebaneGUID;
             uint64 CrokCaptainGUIDs[4];
-            uint64 SisterSvalnaGUID;
-            uint64 ValithriaDreamwalkerGUID;
-            uint64 ValithriaLichKingGUID;
-            uint64 ValithriaTriggerGUID;
-            uint64 SindragosaGUID;
-            uint64 SindragosaDoorGUID;
-            uint64 SpinestalkerGUID;
-            uint64 RimefangGUID;
-            uint64 TheLichKingGUID;
-            uint64 HighlordTirionFordringGUID;
-            uint64 TerenasMenethilGUID;
-            uint64 ArthasPlatformGUID;
-            uint64 ArthasPrecipiceGUID;
-            uint64 FrozenThroneEdgeGUID;
-            uint64 FrozenThroneWindGUID;
-            uint64 FrozenThroneWarningGUID;
-            uint64 FrozenBolvarGUID;
-            uint64 PillarsChainedGUID;
-            uint64 PillarsUnchainedGUID;
+            ObjectGuid SisterSvalnaGUID;
+            ObjectGuid ValithriaDreamwalkerGUID;
+            ObjectGuid ValithriaLichKingGUID;
+            ObjectGuid ValithriaTriggerGUID;
+            ObjectGuid SindragosaGUID;
+            ObjectGuid SindragosaDoorGUID;
+            ObjectGuid SpinestalkerGUID;
+            ObjectGuid RimefangGUID;
+            ObjectGuid TheLichKingGUID;
+            ObjectGuid HighlordTirionFordringGUID;
+            ObjectGuid TerenasMenethilGUID;
+            ObjectGuid ArthasPlatformGUID;
+            ObjectGuid ArthasPrecipiceGUID;
+            ObjectGuid FrozenThroneEdgeGUID;
+            ObjectGuid FrozenThroneWindGUID;
+            ObjectGuid FrozenThroneWarningGUID;
+            ObjectGuid FrozenBolvarGUID;
+            ObjectGuid PillarsChainedGUID;
+            ObjectGuid PillarsUnchainedGUID;
             uint64 FrostyEdgeInner;
             uint64 FrostyEdgeOuter;
             uint64 EdgeDestroyWarning;
             uint64 FrozenLavaman;
             uint64 LavamanPillars;
-            uint64 GunShipControllerGUID;
-            uint64 GBMuradinGUID;
-            uint64 GBSaurfangGUID;
-            uint64 GBSkybreakerGUID;
-            uint64 GBOgrimsHammerGUID;
-            uint64 SindragosasWardGUID;
-            uint64 UnstableExperimentStalkerRedGUID;
-            uint64 UnstableExperimentStalkerGreenGUID;
-            uint64 PutricideEntranceGUID;
-            uint64 CrimsonHallDoorGUID;
+            ObjectGuid GunShipControllerGUID;
+            ObjectGuid GBMuradinGUID;
+            ObjectGuid GBSaurfangGUID;
+            ObjectGuid GBSkybreakerGUID;
+            ObjectGuid GBOgrimsHammerGUID;
+            ObjectGuid SindragosasWardGUID;
+            ObjectGuid UnstableExperimentStalkerRedGUID;
+            ObjectGuid UnstableExperimentStalkerGreenGUID;
+            ObjectGuid PutricideEntranceGUID;
+            ObjectGuid CrimsonHallDoorGUID;
             uint32 SpireSquadState;
             uint32 TeamInInstance;
             uint32 ColdflameJetsState;

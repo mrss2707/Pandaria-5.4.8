@@ -218,7 +218,7 @@ class npc_brewmaster_bo_escort : public CreatureScript
                     case 5:
                         DoCast(me, SPELL_COLLECTED_BREW);
 
-                        if (Creature* ungaKeg = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_UNGA_BREW_KEG)))
+                        if (Creature* ungaKeg = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_UNGA_BREW_KEG)))
                             ungaKeg->CastSpell(me, VEHICLE_SPELL_RIDE_HARDCODED, true);
 
                         nonCombatEvents.ScheduleEvent(EVENT_SPECIAL, 6 * IN_MILLISECONDS);
@@ -234,7 +234,7 @@ class npc_brewmaster_bo_escort : public CreatureScript
                         Talk(TALK_SPECIAL_7);
 
                         for (auto&& itr : gladiators)
-                            if (Creature* m_glad = ObjectAccessor::GetCreature(*me, instance->GetData64(itr)))
+                            if (Creature* m_glad = ObjectAccessor::GetCreature(*me, instance->GetGuidData(itr)))
                                 m_glad->AI()->DoAction(ACTION_INTRO);
                         break;
                     case 12:
@@ -815,7 +815,7 @@ struct npc_unga_banana_ship : public ScriptedAI
         scheduler
             .Schedule(Milliseconds(me->GetSplineDuration()), [this](TaskContext context)
         {
-            if (Creature* Ook = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_CAPTAIN_OOK) : 0))
+            if (Creature* Ook = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_CAPTAIN_OOK) : ObjectGuid::Empty))
                 Ook->AI()->DoAction(ACTION_CAPTAIN_ASSAULT);
 
             me->DespawnOrUnsummon();

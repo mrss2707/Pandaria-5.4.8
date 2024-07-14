@@ -229,7 +229,7 @@ class boss_iron_qon : public CreatureScript
 
                 me->m_Events.Schedule(1500, 20, [this]()
                 {
-                    if (Creature* roshak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_ROSHAK) : 0))
+                    if (Creature* roshak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_ROSHAK) : ObjectGuid::Empty))
                     {
                         roshak->OverrideInhabitType(INHABIT_AIR);
                         roshak->UpdateMovementFlags();
@@ -250,7 +250,7 @@ class boss_iron_qon : public CreatureScript
                     if (Creature* quelin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(itr) : 0))
                         quelin->AI()->JustEngagedWith(who);
 
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance ? instance->GetData64(GO_IRON_QON_SEWER_GATE) : 0))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance ? instance->GetGuidData(GO_IRON_QON_SEWER_GATE) : ObjectGuid::Empty))
                     go->SetGoState(GO_STATE_READY);
 
                 events.ScheduleEvent(EVENT_IMPALE, 20 * IN_MILLISECONDS);
@@ -274,7 +274,7 @@ class boss_iron_qon : public CreatureScript
                         DoCast(me, SPELL_RISING_ANGER, true);
 
                         // Init ignite Freeze Cyclones
-                        if (Creature* windController = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_RUSHING_WINDS_CONTROLLER) : 0))
+                        if (Creature* windController = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_RUSHING_WINDS_CONTROLLER) : ObjectGuid::Empty))
                             for (uint32 i = 0; i < 5; i++)
                                 windController->CastSpell(windController, SPELL_GUST_OF_WIND, true);
 
@@ -365,7 +365,7 @@ class boss_iron_qon : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FAILED_FROZEN_SOLID);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FAILED_RUSHING_WINDS);
 
-                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_IRON_QON_SEWER_GATE)))
+                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_IRON_QON_SEWER_GATE)))
                         go->SetGoState(GO_STATE_ACTIVE);
                 }
 
@@ -400,7 +400,7 @@ class boss_iron_qon : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_IMPALE);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ELECTRIFIED);
 
-                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_IRON_QON_SEWER_GATE)))
+                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_IRON_QON_SEWER_GATE)))
                         go->SetGoState(GO_STATE_ACTIVE);
                 }
             }
@@ -505,7 +505,7 @@ struct quelingBaseAI : public ScriptedAI
     SummonList summons;
     uint32 windStormValue;
     uint32 prevDeadZone;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     float x, y;
     bool inferno;
     bool atEvade;
@@ -529,7 +529,7 @@ struct quelingBaseAI : public ScriptedAI
         additionalEvents.Reset();
         scheduler.CancelAll();
         me->SetReactState(REACT_PASSIVE);
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         prevDeadZone = 0;
         windStormValue = 1;
         inferno = true;
@@ -680,7 +680,7 @@ struct quelingBaseAI : public ScriptedAI
             me->SetPower(POWER_MANA, 0);
             scheduler.CancelAll();
 
-            if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_IRON_QON) : 0))
+            if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_IRON_QON) : ObjectGuid::Empty))
                 qon->AI()->DoAction(ACTION_SWITCH_QUELIN);
 
             if (me->GetEntry() != NPC_DAMREN)
@@ -719,7 +719,7 @@ struct quelingBaseAI : public ScriptedAI
         me->SetRespawnDelay(respawnDelay);
         me->GetMap()->CreatureRelocation(me, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), me->GetHomePosition().GetOrientation());
 
-        if (Creature* ironQon = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_IRON_QON) : 0))
+        if (Creature* ironQon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_IRON_QON) : ObjectGuid::Empty))
             ironQon->AI()->EnterEvadeMode();
     }
 
@@ -728,7 +728,7 @@ struct quelingBaseAI : public ScriptedAI
         if (IsHeroic())
             return;
 
-        if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_IRON_QON) : 0))
+        if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_IRON_QON) : ObjectGuid::Empty))
             qon->AI()->DoAction(ACTION_SWITCH_QUELIN);
 
         if (instance)
@@ -797,7 +797,7 @@ class npc_roshak : public CreatureScript
                         quelin->SetInCombatWithZone();
 
                 // Init Qon in combat too
-                if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_IRON_QON) : 0))
+                if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_IRON_QON) : ObjectGuid::Empty))
                 {
                     qon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                     qon->SetInCombatWithZone();
@@ -1025,7 +1025,7 @@ class npc_quetzal : public CreatureScript
                                 me->UpdateMovementFlags();
                             });
 
-                            if (Creature* windController = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_RUSHING_WINDS_CONTROLLER) : 0))
+                            if (Creature* windController = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_RUSHING_WINDS_CONTROLLER) : ObjectGuid::Empty))
                             {
                                 windController->CastSpell(windController, SPELL_RUSHING_WINDS_AT, true);
                                 windController->CastSpell(windController, SPELL_RUSHING_WINDS_PULL, true);
@@ -1186,7 +1186,7 @@ class npc_iron_qons_spear : public CreatureScript
             {
                 if (actionId == ACTION_ENCHANT_SPEAR)
                 {
-                    if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_IRON_QON) : 0))
+                    if (Creature* qon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_IRON_QON) : ObjectGuid::Empty))
                     {
                         spearEff = 0;
 
@@ -1269,7 +1269,7 @@ struct npc_rushing_wind : public ScriptedAI
         instance = me->GetInstanceScript();
         me->SetDisplayId(me->GetCreatureTemplate()->Modelid1);
 
-        if (Creature* ironQon = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_IRON_QON) : 0))
+        if (Creature* ironQon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_IRON_QON) : ObjectGuid::Empty))
         {
             ironQon->AI()->JustSummoned(me);
 
@@ -1295,7 +1295,7 @@ struct npc_rushing_wind : public ScriptedAI
                 clockSide = urand(0, 1);
                 me->DespawnOrUnsummon(25 * IN_MILLISECONDS);
 
-                if (Creature* quetZal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_QUETZAL) : 0))
+                if (Creature* quetZal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_QUETZAL) : ObjectGuid::Empty))
                 {
                     quetZal->AI()->JustSummoned(me);
 
@@ -1321,7 +1321,7 @@ struct npc_rushing_wind : public ScriptedAI
                     Movement::MoveSplineInit newInit(me);
                     for (uint8 i = 1; i < 25; ++i)
                     {
-                        if (Creature* windController = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_RUSHING_WINDS_CONTROLLER) : 0))
+                        if (Creature* windController = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_RUSHING_WINDS_CONTROLLER) : ObjectGuid::Empty))
                         {
                             x = windController->GetPositionX() + 6.0f * mod * cos(Position::NormalizeOrientation(me->GetAngle(windController) + (i * M_PI / 12) - M_PI));
                             y = clockSide ? windController->GetPositionY() + 6.0f * mod * sin(Position::NormalizeOrientation(me->GetAngle(windController) + (i * M_PI / 12) - M_PI)) : windController->GetPositionY() - 6.0f * mod * sin(Position::NormalizeOrientation(me->GetAngle(windController) + (i * M_PI / 12) - M_PI));
@@ -1397,7 +1397,7 @@ struct npc_lightnig_cloud : public ScriptedAI
 {
     npc_lightnig_cloud(Creature* creature) : ScriptedAI(creature) { }
 
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2229,7 +2229,7 @@ class sat_iron_qon_frozen_blood : public IAreaTriggerAura
 // 691. Summoned by 136574 - Rushing Winds
 class sat_iron_qon_rushing_winds : public IAreaTriggerAura
 {
-    std::vector<uint64> affectedTargetGUIDs;
+    std::vector<ObjectGuid> affectedTargetGUIDs;
 
     bool CheckTriggering(WorldObject* triggering) override
     {

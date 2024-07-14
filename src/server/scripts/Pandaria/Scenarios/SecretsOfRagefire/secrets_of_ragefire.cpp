@@ -1197,7 +1197,7 @@ struct npc_ragefire_overseer_elaglo : public customCreatureAI
     }
 
     TaskScheduler scheduler;
-    std::vector<uint64> summonerGUIDs;
+    std::vector<ObjectGuid> summonerGUIDs;
     uint32 waveId;
     float x, y;
 

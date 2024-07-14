@@ -333,7 +333,7 @@ class npc_wind_lord_meljarak_intro : public CreatureScript
                             {
                                 instance->SetData(DATA_GARALON, SPECIAL);
 
-                                if (Creature* Garalon = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_GARALON) : 0))
+                                if (Creature* Garalon = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_GARALON) : ObjectGuid::Empty))
                                     Garalon->AI()->DoAction(ACTION_GARALON_INITIALIZE);
                             }
                             break;
@@ -1098,7 +1098,7 @@ class npc_instructor_kli_thak : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TAYAK) : 0))
+                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                     tayak->ToCreature()->AI()->DoAction(ACTION_TAYAK_TALK_TRASH);
             }
 
@@ -1196,7 +1196,7 @@ class npc_instructor_tak_thok : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TAYAK) : 0))
+                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                     tayak->ToCreature()->AI()->DoAction(ACTION_TAYAK_TALK_TRASH);
             }
 
@@ -1300,7 +1300,7 @@ class npc_instructor_maltik : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TAYAK) : 0))
+                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                     tayak->ToCreature()->AI()->DoAction(ACTION_TAYAK_TALK_TRASH);
             }
 
@@ -1438,7 +1438,7 @@ class npc_instructor_zarik : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TAYAK) : 0))
+                if (Creature* tayak = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TAYAK) : ObjectGuid::Empty))
                     tayak->ToCreature()->AI()->DoAction(ACTION_TAYAK_TALK_TRASH);
 
                 summons.DespawnAll();
@@ -1859,7 +1859,7 @@ class npc_korthik_swarmguard : public CreatureScript
         {
             npc_korthik_swarmguardAI(Creature* creature) : ScriptedAI(creature) { }
             EventMap events;
-            uint64 charmerByGUID;
+            ObjectGuid charmerByGUID;
 
             void InitializeAI() override
             {
@@ -2210,12 +2210,12 @@ class npc_amber_searsting : public CreatureScript
             npc_amber_searstingAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
 
             void Reset() override
             {
                 events.Reset();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
             }
 
             void JustEngagedWith(Unit* who) override

@@ -54,30 +54,30 @@ class instance_dragon_soul : public InstanceMapScript
             {
                 SetBossNumber(MAX_ENCOUNTER);
 
-                uiMorchokGUID = 0;
-                uiKohcromGUID = 0;
-                uiYorsahjGUID = 0;
-                uiZonozzGUID = 0;
-                uiHagaraGUID = 0;
-                uiUltraxionGUID = 0;
-                uiBlackhornGUID = 0;
-                uiAllianceShipGUID = 0;
+                uiMorchokGUID = ObjectGuid::Empty;
+                uiKohcromGUID = ObjectGuid::Empty;
+                uiYorsahjGUID = ObjectGuid::Empty;
+                uiZonozzGUID = ObjectGuid::Empty;
+                uiHagaraGUID = ObjectGuid::Empty;
+                uiUltraxionGUID = ObjectGuid::Empty;
+                uiBlackhornGUID = ObjectGuid::Empty;
+                uiAllianceShipGUID = ObjectGuid::Empty;
                 uiAllianceShipFirstGUID =0;
-                uiHordeShipGUID = 0;
-                uiSwayzeGUID = 0;
+                uiHordeShipGUID = ObjectGuid::Empty;
+                uiSwayzeGUID = ObjectGuid::Empty;
                 // teleports
-                uiWyrmrestBaseFromSummitGUID = 0;
-                uiWyrmrestBaseFromGunshipGUID = 0;
-                uiWyrmrestBaseFromMaelstormGUID = 0;
-                uiWyrmrestSummitGUID = 0;
-                uiEyeofEternityGUID = 0;
-                uiDeckGUID = 0;
-                uiMaelstormGUID = 0;
-                uiDeathwingGUID = 0;
-                uiAlexstraszaDragonGUID = 0;
-                uiNozdormuDragonGUID = 0;
-                uiYseraDragonGUID = 0;
-                uiKalecgosDragonGUID = 0;
+                uiWyrmrestBaseFromSummitGUID = ObjectGuid::Empty;
+                uiWyrmrestBaseFromGunshipGUID = ObjectGuid::Empty;
+                uiWyrmrestBaseFromMaelstormGUID = ObjectGuid::Empty;
+                uiWyrmrestSummitGUID = ObjectGuid::Empty;
+                uiEyeofEternityGUID = ObjectGuid::Empty;
+                uiDeckGUID = ObjectGuid::Empty;
+                uiMaelstormGUID = ObjectGuid::Empty;
+                uiDeathwingGUID = ObjectGuid::Empty;
+                uiAlexstraszaDragonGUID = ObjectGuid::Empty;
+                uiNozdormuDragonGUID = ObjectGuid::Empty;
+                uiYseraDragonGUID = ObjectGuid::Empty;
+                uiKalecgosDragonGUID = ObjectGuid::Empty;
                 uiThrall2GUID = 0;
 
                 memset(uiLesserCacheofTheAspects, 0, sizeof(uiLesserCacheofTheAspects));
@@ -90,7 +90,7 @@ class instance_dragon_soul : public InstanceMapScript
                 memset(twilightAssaultLanesUsedH, 0, sizeof(twilightAssaultLanesUsedH));
                 memset(twilightAssaultLanesUsedV, 0, sizeof(twilightAssaultLanesUsedV));
 
-                uiNethestraszGUID = 0;
+                uiNethestraszGUID = ObjectGuid::Empty;
                 uiOpenPortalEvent = 0;
                 bHagaraEvent = 0;
                 uiThrallEvent = 0;
@@ -359,25 +359,25 @@ class instance_dragon_soul : public InstanceMapScript
                 switch (creature->GetEntry())
                 {
                     case NPC_ULTRAXION:
-                        uiUltraxionGUID = 0;
+                        uiUltraxionGUID = ObjectGuid::Empty;
                         break;
                     case NPC_BLACKHORN:
-                        uiBlackhornGUID = 0;
+                        uiBlackhornGUID = ObjectGuid::Empty;
                         break;
                     case NPC_DEATHWING:
-                        uiDeathwingGUID = 0;
+                        uiDeathwingGUID = ObjectGuid::Empty;
                         break;
                     case NPC_ALEXSTRASZA_DRAGON:
-                        uiAlexstraszaDragonGUID = 0;
+                        uiAlexstraszaDragonGUID = ObjectGuid::Empty;
                         break;
                     case NPC_NOZDORMU_DRAGON:
-                        uiNozdormuDragonGUID = 0;
+                        uiNozdormuDragonGUID = ObjectGuid::Empty;
                         break;
                     case NPC_YSERA_DRAGON:
-                        uiYseraDragonGUID = 0;
+                        uiYseraDragonGUID = ObjectGuid::Empty;
                         break;
                     case NPC_KALECGOS_DRAGON:
-                        uiKalecgosDragonGUID = 0;
+                        uiKalecgosDragonGUID = ObjectGuid::Empty;
                         break;
                 }
             }
@@ -519,7 +519,7 @@ class instance_dragon_soul : public InstanceMapScript
                 }
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -643,7 +643,7 @@ class instance_dragon_soul : public InstanceMapScript
                         {
                             if (Creature* thrall = instance->GetCreature(uiThrallEvent))
                                 thrall->AI()->DoAction(ACTION_STOP_ASSAULTERS_SPAWN);
-                            if (Creature* Deathwing = instance->GetCreature(GetData64(DATA_DRAGON_SOUL_EVENT)))
+                            if (Creature* Deathwing = instance->GetCreature(GetGuidData(DATA_DRAGON_SOUL_EVENT)))
                                 Deathwing->AI()->DoAction(ACTION_DEATHWING_INTRO);
                             for (std::vector<uint64>::const_iterator itr = assaultersGUIDs.begin(); itr != assaultersGUIDs.end(); ++itr)
                                 if (Creature* assaulters = instance->GetCreature(*itr))
@@ -1094,30 +1094,30 @@ class instance_dragon_soul : public InstanceMapScript
             private:
                 uint32 uiTeamInInstance;
 
-                uint64 uiMorchokGUID;
-                uint64 uiKohcromGUID;
-                uint64 uiYorsahjGUID;
-                uint64 uiZonozzGUID;
-                uint64 uiHagaraGUID;
-                uint64 uiUltraxionGUID;
-                uint64 uiBlackhornGUID;
-                uint64 uiAllianceShipGUID;
-                uint64 uiAllianceShipFirstGUID;
-                uint64 uiHordeShipGUID;
-                uint64 uiSwayzeGUID;
+                ObjectGuid uiMorchokGUID;
+                ObjectGuid uiKohcromGUID;
+                ObjectGuid uiYorsahjGUID;
+                ObjectGuid uiZonozzGUID;
+                ObjectGuid uiHagaraGUID;
+                ObjectGuid uiUltraxionGUID;
+                ObjectGuid uiBlackhornGUID;
+                ObjectGuid uiAllianceShipGUID;
+                ObjectGuid uiAllianceShipFirstGUID;
+                ObjectGuid uiHordeShipGUID;
+                ObjectGuid uiSwayzeGUID;
                 // teleports
-                uint64 uiWyrmrestBaseFromSummitGUID;
-                uint64 uiWyrmrestBaseFromGunshipGUID;
-                uint64 uiWyrmrestBaseFromMaelstormGUID;
-                uint64 uiWyrmrestSummitGUID;
-                uint64 uiEyeofEternityGUID;
-                uint64 uiDeckGUID;
-                uint64 uiMaelstormGUID;
-                uint64 uiDeathwingGUID;
-                uint64 uiAlexstraszaDragonGUID;
-                uint64 uiNozdormuDragonGUID;
-                uint64 uiYseraDragonGUID;
-                uint64 uiKalecgosDragonGUID;
+                ObjectGuid uiWyrmrestBaseFromSummitGUID;
+                ObjectGuid uiWyrmrestBaseFromGunshipGUID;
+                ObjectGuid uiWyrmrestBaseFromMaelstormGUID;
+                ObjectGuid uiWyrmrestSummitGUID;
+                ObjectGuid uiEyeofEternityGUID;
+                ObjectGuid uiDeckGUID;
+                ObjectGuid uiMaelstormGUID;
+                ObjectGuid uiDeathwingGUID;
+                ObjectGuid uiAlexstraszaDragonGUID;
+                ObjectGuid uiNozdormuDragonGUID;
+                ObjectGuid uiYseraDragonGUID;
+                ObjectGuid uiKalecgosDragonGUID;
                 uint64 uiThrall2GUID;
 
                 uint64 uiLesserCacheofTheAspects[4];
@@ -1125,19 +1125,19 @@ class instance_dragon_soul : public InstanceMapScript
                 uint64 uiGreaterCacheofTheAspects[4];
                 uint64 uiElementiumFragment[4];
 
-                std::vector<uint64> dragonstaxiGUIDs;
-                std::vector<uint64> assaultersGUIDs;
-                std::vector<uint64> startportalsGUIDs;
-                std::vector<uint64> wyrmrestsummitGUIDs;
-                std::vector<uint64> maelstormteleGUIDs;
-                std::vector<uint64> teleportGUIDs;
+                std::vector<ObjectGuid> dragonstaxiGUIDs;
+                std::vector<ObjectGuid> assaultersGUIDs;
+                std::vector<ObjectGuid> startportalsGUIDs;
+                std::vector<ObjectGuid> wyrmrestsummitGUIDs;
+                std::vector<ObjectGuid> maelstormteleGUIDs;
+                std::vector<ObjectGuid> teleportGUIDs;
 
                 uint64 twilightAssaultStalkerGuidsH[7][8];
                 uint64 twilightAssaultStalkerGuidsV[5][10];
                 uint8 twilightAssaultLanesUsedH[7];
                 uint8 twilightAssaultLanesUsedV[5];
 
-                uint64 uiNethestraszGUID;
+                ObjectGuid uiNethestraszGUID;
                 uint64 uiOpenPortalEvent;
                 uint64 uiDeathwingEvent;
                 uint64 uiThrallEvent;

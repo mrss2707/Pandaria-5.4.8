@@ -737,7 +737,7 @@ struct npc_hyjal_aronus_ride : public CreatureAI
     npc_hyjal_aronus_ride(Creature* creature) : CreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     uint32 delay;
 
     void IsSummonedBy(Unit* summoner) override

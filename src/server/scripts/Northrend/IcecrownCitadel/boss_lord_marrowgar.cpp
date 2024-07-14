@@ -451,7 +451,7 @@ class boss_lord_marrowgar : public CreatureScript
         private:
             Position _coldflameLastPos;
             std::vector<uint64> _boneSpikeImmune;
-            uint64 _coldflameTarget;
+            ObjectGuid _coldflameTarget;
             uint32 _coldflameSummonSpell;
             uint32 _boneStormDuration;
             float _baseSpeed;
@@ -922,7 +922,7 @@ class at_lord_marrowgar_entrance : public AreaTriggerScript
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
         {
             if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* lordMarrowgar = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_LORD_MARROWGAR)))
+                if (Creature* lordMarrowgar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LORD_MARROWGAR)))
                     lordMarrowgar->AI()->DoAction(ACTION_TALK_ENTER_ZONE);
 
             return true;

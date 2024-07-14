@@ -540,24 +540,24 @@ class boss_spoils_of_pandaria : public CreatureScript
                         {
                             Talk(TALK_INTRO);
 
-                            if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_1) : 0))
+                            if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
                             {
                                 DoCast(me, SPELL_SPOILS_OF_PANDARIA_AT_LOW_RIGHT, true);
                                 moguSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
                             }
 
-                            if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_1) : 0))
+                            if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
                             {
                                 DoCast(me, SPELL_SPOILS_OF_PANDARIA_AT_UP_LEFT, true);
                                 mantidSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
                             }
 
                             // Unlock 2/4 Sectors
-                            if (instance && instance->GetData64(GO_SPOILS_ACCESS_HIGH_LEFT))
-                                instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_HIGH_LEFT), true, NULL);
+                            if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_LEFT))
+                                instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_LEFT), true, NULL);
 
-                            if (instance && instance->GetData64(GO_SPOILS_ACCESS_LOW_RIGHT))
-                                instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_LOW_RIGHT), true, NULL);
+                            if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_LOW_RIGHT))
+                                instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_LOW_RIGHT), true, NULL);
 
                             DoCast(me, SPELL_UNSTABLE_DEFENSE_SYSTEM_AT_BOX);
                             DoCast(me, SPELL_UNSTABLE_DEFENSE_SYSTEM_AT_BOX_AREA, true);
@@ -583,32 +583,32 @@ class boss_spoils_of_pandaria : public CreatureScript
                     case ACTION_SECOND_QUADRANT:
                         Talk(TALK_SYSTEM_PREPARE_1);
 
-                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_2) : 0))
+                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
                             mantidSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
 
-                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_2) : 0))
+                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
                             moguSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
 
                         // Remove Frames from old
-                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_1) : 0))
+                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
                             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, mantidSpoils);
 
-                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_1) : 0))
+                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
                             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, moguSpoils);
 
                         // Unlock 4/4 Sectors
-                        if (instance && instance->GetData64(GO_SPOILS_ACCESS_HIGH_RIGHT))
-                            instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_HIGH_RIGHT), true, NULL);
+                        if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_RIGHT))
+                            instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_RIGHT), true, NULL);
 
-                        if (instance && instance->GetData64(GO_SPOILS_ACCESS_LOW_LEFT))
-                            instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_LOW_LEFT), true, NULL);
+                        if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_LOW_LEFT))
+                            instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_LOW_LEFT), true, NULL);
 
                         // Unlock Cross Doors
-                        if (instance && instance->GetData64(GO_SPOILS_CROSS_RIGHT))
-                            instance->HandleGameObject(instance->GetData64(GO_SPOILS_CROSS_RIGHT), true, NULL);
+                        if (instance && instance->GetGuidData(GO_SPOILS_CROSS_RIGHT))
+                            instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_CROSS_RIGHT), true, NULL);
 
-                        if (instance && instance->GetData64(GO_SPOILS_CROSS_LEFT))
-                            instance->HandleGameObject(instance->GetData64(GO_SPOILS_CROSS_LEFT), true, NULL);
+                        if (instance && instance->GetGuidData(GO_SPOILS_CROSS_LEFT))
+                            instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_CROSS_LEFT), true, NULL);
 
                         timerValue = 270;
 
@@ -619,7 +619,7 @@ class boss_spoils_of_pandaria : public CreatureScript
                 }
             }
 
-            void SetGUID(uint64 guid, int32 type) override
+            void SetGUID(ObjectGuid guid, int32 type) override
             {
                 if (crissCross.find(guid) == crissCross.end())
                     crissCross.insert(std::pair<uint64, uint32>(guid, type));
@@ -691,33 +691,33 @@ class boss_spoils_of_pandaria : public CreatureScript
 
                     // Controller Reset
                     for (auto&& itr : invControllerLeverType)
-                        if (Creature* regionSpoils = ObjectAccessor::GetCreature(*me, instance->GetData64(itr.first)))
+                        if (Creature* regionSpoils = ObjectAccessor::GetCreature(*me, instance->GetGuidData(itr.first)))
                             regionSpoils->AI()->DoAction(ACTION_RESET);
 
                     // Remove Frames
                     for (auto&& itr : invControllerLeverType)
-                        if (Creature* regionSpoils = ObjectAccessor::GetCreature(*me, instance->GetData64(itr.first)))
+                        if (Creature* regionSpoils = ObjectAccessor::GetCreature(*me, instance->GetGuidData(itr.first)))
                             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, regionSpoils);
 
                     // Lock Sectors
-                    if (instance && instance->GetData64(GO_SPOILS_ACCESS_HIGH_LEFT))
-                        instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_HIGH_LEFT), false, NULL);
+                    if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_LEFT))
+                        instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_LEFT), false, NULL);
 
-                    if (instance && instance->GetData64(GO_SPOILS_ACCESS_LOW_RIGHT))
-                        instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_LOW_RIGHT), false, NULL);
+                    if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_LOW_RIGHT))
+                        instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_LOW_RIGHT), false, NULL);
 
-                    if (instance && instance->GetData64(GO_SPOILS_ACCESS_HIGH_RIGHT))
-                        instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_HIGH_RIGHT), false, NULL);
+                    if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_RIGHT))
+                        instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_HIGH_RIGHT), false, NULL);
 
-                    if (instance && instance->GetData64(GO_SPOILS_ACCESS_LOW_LEFT))
-                        instance->HandleGameObject(instance->GetData64(GO_SPOILS_ACCESS_LOW_LEFT), false, NULL);
+                    if (instance && instance->GetGuidData(GO_SPOILS_ACCESS_LOW_LEFT))
+                        instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_ACCESS_LOW_LEFT), false, NULL);
 
                     // Lock Cross Doors
-                    if (instance && instance->GetData64(GO_SPOILS_CROSS_RIGHT))
-                        instance->HandleGameObject(instance->GetData64(GO_SPOILS_CROSS_RIGHT), false, NULL);
+                    if (instance && instance->GetGuidData(GO_SPOILS_CROSS_RIGHT))
+                        instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_CROSS_RIGHT), false, NULL);
 
-                    if (instance && instance->GetData64(GO_SPOILS_CROSS_LEFT))
-                        instance->HandleGameObject(instance->GetData64(GO_SPOILS_CROSS_LEFT), false, NULL);
+                    if (instance && instance->GetGuidData(GO_SPOILS_CROSS_LEFT))
+                        instance->HandleGameObject(instance->GetGuidData(GO_SPOILS_CROSS_LEFT), false, NULL);
 
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNSTABLE_DEFENSE_SYSTEME_AT_EFF);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNSTABLE_DEFENSE_SYSTEM_AT_EFF_2);
@@ -769,11 +769,11 @@ class boss_spoils_of_pandaria : public CreatureScript
                         instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_CRISS_CROSS_ACHIEV);
 
                     for (auto&& itr : invControllerLeverType)
-                        if (Creature* regionSpoils = ObjectAccessor::GetCreature(*me, instance->GetData64(itr.first)))
+                        if (Creature* regionSpoils = ObjectAccessor::GetCreature(*me, instance->GetGuidData(itr.first)))
                             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, regionSpoils);
 
                     // Despawn cosmetic Spoil Box
-                    if (GameObject* box = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_SECURED_STOCKPILE_OF_SPOILS)))
+                    if (GameObject* box = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SECURED_STOCKPILE_OF_SPOILS)))
                         box->Delete();
                 }
 
@@ -818,17 +818,17 @@ struct npc_spoils_artifact_spoils : public ScriptedAI
     InstanceScript* instance;
     uint32 powerValue;
     uint32 regionData;
-    uint64 leverGUID;
+    ObjectGuid leverGUID;
 
     void Reset() override
     {
         powerValue = 0;
         regionData = 0;
-        leverGUID  = 0;
+        leverGUID = ObjectGuid::Empty;
         SetData(TYPE_LEVER_DATA, NOT_STARTED);
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return leverGUID;
     }
@@ -851,33 +851,33 @@ struct npc_spoils_artifact_spoils : public ScriptedAI
 
                 if (firstPair)
                 {
-                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_1) : 0))
+                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
                         if (moguSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
-                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_1) : 0))
+                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
                         if (mantidSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
                     if (counter > 1) // switch to second quadrant
                     {
-                        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+                        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
                             spoils->AI()->DoAction(ACTION_SECOND_QUADRANT);
                     }
                 }
                 else
                 {
-                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_2) : 0))
+                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
                         if (moguSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
-                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_2) : 0))
+                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
                         if (mantidSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
                     if (counter > 1) // Complete encounter
                     {
-                        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+                        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
                             spoils->AI()->JustDied(me);
                     }
                 }
@@ -931,7 +931,7 @@ struct npc_spoils_artifact_spoils : public ScriptedAI
             {
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-                if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SPOILS_OF_PANDARIA)))
+                if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SPOILS_OF_PANDARIA)))
                     spoils->CastSpell(me, SPELL_UNSTABLE_DEFENSE_SYSTEM_ALT_POWER, true);
 
                 DoCast(me, invControllerRegionType.find(me->GetEntry())->second[0], true);
@@ -957,7 +957,7 @@ struct npc_spoils_lever : public ScriptedAI
 {
     npc_spoils_lever(Creature* creature) : ScriptedAI(creature) { }
 
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -967,7 +967,7 @@ struct npc_spoils_lever : public ScriptedAI
         ownerGUID = summoner->GetGUID();
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return ownerGUID;
     }
@@ -982,8 +982,8 @@ struct spoils_baseAI : public ScriptedAI
     InstanceScript* instance;
     EventMap events;
     SummonList summons;
-    uint64 summonerGUID;
-    uint64 targetGUID;
+    ObjectGuid summonerGUID;
+    ObjectGuid targetGUID;
     uint32 windCount;
     uint32 mantidSwarmCount;
     uint32 statueCount;
@@ -996,13 +996,13 @@ struct spoils_baseAI : public ScriptedAI
         instance = me->GetInstanceScript();
         events.Reset();
         windCount  = 0;
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         targetsCount = 2;
         mantidSwarmCount = 0;
         statueCount = 0;
 
         // Just summoned couldn`t have called cuz summoned by object
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -1024,12 +1024,12 @@ struct spoils_baseAI : public ScriptedAI
             me->GetMotionMaster()->MoveChase(victim);
     }
 
-    void SetGUID(uint64 guid, int32 type) override
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         summonerGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return summonerGUID;
     }
@@ -1044,7 +1044,7 @@ struct spoils_baseAI : public ScriptedAI
             return;
 
         // Achievement
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
         {
             if (spoils->AI()->GetData(TYPE_CRISS_CROSS)) // allow achiev, no reason to check this if not available
             {
@@ -1061,7 +1061,7 @@ struct spoils_baseAI : public ScriptedAI
         // For Mogu
         if (mogu)
         {
-            if (Creature* moguController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_1) : 0))
+            if (Creature* moguController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
             {
                 if (moguController1->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1072,14 +1072,14 @@ struct spoils_baseAI : public ScriptedAI
 
                         if (IsHeroic())
                         {
-                            if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+                            if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
                                 spoils->CastSpell(sparkSpawnRoomPos[0].GetPositionX() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[0].GetPositionY() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[0].GetPositionZ(), SPELL_UNSTABLE_SPARK_MISSLE, true);
                         }
                     }
                 }
             }
 
-            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_2) : 0))
+            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
             {
                 if (moguController2->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1090,7 +1090,7 @@ struct spoils_baseAI : public ScriptedAI
 
                         if (IsHeroic())
                         {
-                            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_2) : 0))
+                            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
                                 mantidController2->CastSpell(sparkSpawnRoomPos[2].GetPositionX() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[2].GetPositionY() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[2].GetPositionZ(), SPELL_UNSTABLE_SPARK_MISSLE, true);
                         }
                     }
@@ -1100,7 +1100,7 @@ struct spoils_baseAI : public ScriptedAI
         else
         {
             // For Mantids
-            if (Creature* mantidController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_1) : 0))
+            if (Creature* mantidController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
             {
                 if (mantidController1->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1111,14 +1111,14 @@ struct spoils_baseAI : public ScriptedAI
 
                         if (IsHeroic())
                         {
-                            if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+                            if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
                                 spoils->CastSpell(sparkSpawnRoomPos[1].GetPositionX() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[1].GetPositionY() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[1].GetPositionZ(), SPELL_UNSTABLE_SPARK_MISSLE, true);
                         }
                     }
                 }
             }
 
-            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_SPOILS_2) : 0))
+            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
             {
                 if (mantidController2->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1129,7 +1129,7 @@ struct spoils_baseAI : public ScriptedAI
 
                         if (IsHeroic())
                         {
-                            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MOGU_SPOILS_2) : 0))
+                            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
                                 moguController2->CastSpell(sparkSpawnRoomPos[3].GetPositionX() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[3].GetPositionY() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[3].GetPositionZ(), SPELL_UNSTABLE_SPARK_MISSLE, true);
                         }
                     }
@@ -1173,7 +1173,7 @@ struct npc_modified_anima_golem : public spoils_baseAI
         events.ScheduleEvent(EVENT_CRIMSON_RECONSTRUCT, urand(6 * IN_MILLISECONDS, 7 * IN_MILLISECONDS));
     }
 
-    void SetGUID(uint64 guid, int32 type) override
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         if (type > 0)
         {
@@ -1751,14 +1751,14 @@ struct npc_spoils_lift_hook : public ScriptedAI
     TaskScheduler scheduler;
     bool hasPassenger;
     float x, y, oriDiff;
-    uint64 clickerGUID;
+    ObjectGuid clickerGUID;
 
     void Reset() override
     {
         me->SetDisplayId(me->GetCreatureTemplate()->Modelid2);
         me->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
         hasPassenger = false;
-        clickerGUID = 0;
+        clickerGUID = ObjectGuid::Empty;
     }
 
     void OnSpellClick(Unit* clicker, bool& /*result*/) override
@@ -1802,7 +1802,7 @@ struct npc_spoils_lift_hook : public ScriptedAI
                         scheduler
                             .Schedule(Milliseconds(me->GetSplineDuration()), [this](TaskContext context)
                         {
-                            clickerGUID = 0;
+                            clickerGUID = ObjectGuid::Empty;
                             hasPassenger = false;
                         });
                     });
@@ -1824,15 +1824,15 @@ struct npc_spoils_ancient_brewmaster_spirit : public ScriptedAI
 
     InstanceScript* instance;
     EventMap events;
-    uint64 summonerGUID;
-    uint64 targetGUID;
+    ObjectGuid summonerGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
         instance = me->GetInstanceScript();
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
 
         // Temp Hackfix
         if (instance && instance->instance->GetSpawnMode() == RAID_DIFFICULTY_10MAN_NORMAL)
@@ -1845,7 +1845,7 @@ struct npc_spoils_ancient_brewmaster_spirit : public ScriptedAI
         }
 
         // Just summoned couldn`t have called cuz summoned by object
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -1867,12 +1867,12 @@ struct npc_spoils_ancient_brewmaster_spirit : public ScriptedAI
             me->GetMotionMaster()->MoveChase(victim);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         summonerGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return summonerGUID;
     }
@@ -1958,15 +1958,15 @@ struct npc_spoils_wise_mistweaver_spirit : public ScriptedAI
 
     InstanceScript* instance;
     EventMap events;
-    uint64 summonerGUID;
-    uint64 targetGUID;
+    ObjectGuid summonerGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
         instance = me->GetInstanceScript();
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
 
         // Temp Hackfix
         if (instance && instance->instance->GetSpawnMode() == RAID_DIFFICULTY_10MAN_NORMAL)
@@ -1979,7 +1979,7 @@ struct npc_spoils_wise_mistweaver_spirit : public ScriptedAI
         }
 
         // Just summoned couldn`t have called cuz summoned by object
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -2001,12 +2001,12 @@ struct npc_spoils_wise_mistweaver_spirit : public ScriptedAI
             me->GetMotionMaster()->MoveChase(victim);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         summonerGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return summonerGUID;
     }
@@ -2056,15 +2056,15 @@ struct npc_spoils_nameless_windwalker_spirit : public ScriptedAI
     InstanceScript* instance;
     TaskScheduler scheduler;
     EventMap events;
-    uint64 summonerGUID;
-    uint64 targetGUID;
+    ObjectGuid summonerGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
         instance = me->GetInstanceScript();
         events.Reset();
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
 
         // Temp Hackfix
         if (instance && instance->instance->GetSpawnMode() == RAID_DIFFICULTY_10MAN_NORMAL)
@@ -2077,7 +2077,7 @@ struct npc_spoils_nameless_windwalker_spirit : public ScriptedAI
         }
 
         // Just summoned couldn`t have called cuz summoned by object
-        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_SPOILS_OF_PANDARIA) : 0))
+        if (Creature* spoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_SPOILS_OF_PANDARIA) : ObjectGuid::Empty))
             spoils->AI()->JustSummoned(me);
     }
 
@@ -2099,12 +2099,12 @@ struct npc_spoils_nameless_windwalker_spirit : public ScriptedAI
             me->GetMotionMaster()->MoveChase(victim);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         summonerGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return summonerGUID;
     }
@@ -2361,7 +2361,7 @@ struct npc_spoils_stone_statue_warlord : public ScriptedAI
     npc_spoils_stone_statue_warlord(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 ownerGUID;
+    ObjectGuid ownerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2369,7 +2369,7 @@ struct npc_spoils_stone_statue_warlord : public ScriptedAI
             spoils->AI()->JustSummoned(me);
     }
 
-    void SetGUID(uint64 guid, int32 type) override
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         ownerGUID = guid;
     }
@@ -3275,11 +3275,11 @@ class spell_spoils_unstable_defense_system_alt_power : public AuraScript
 {
     PrepareAuraScript(spell_spoils_unstable_defense_system_alt_power);
 
-    uint64 linkedSpoilsGUID;
+    ObjectGuid linkedSpoilsGUID;
 
     bool Load() override
     {
-        linkedSpoilsGUID = 0;
+        linkedSpoilsGUID = ObjectGuid::Empty;
         return true;
     }
 
@@ -3735,7 +3735,7 @@ class sat_spoils_crimson_reconstruction : public IAreaTriggerAura
 // 1158. Summoned by 145460 - Mogu Rune of Power
 class sat_spoils_mogu_rune_of_power : public IAreaTriggerAura
 {
-    std::vector<uint64> affectedTargetGUIDs;
+    std::vector<ObjectGuid> affectedTargetGUIDs;
 
     bool CheckTriggering(WorldObject* triggering) override
     {
@@ -3793,7 +3793,7 @@ class sat_spoils_breath_of_fire : public IAreaTriggerAura
 // 1222. Summoned by 146180 - Gusting Crane Kick
 class sat_spoils_gusting_crane_kick : public IAreaTriggerAura
 {
-    std::vector<uint64> affectedTargetGUIDs;
+    std::vector<ObjectGuid> affectedTargetGUIDs;
     Position forceMovementPos;
 
     bool CheckTriggering(WorldObject* triggering) override
@@ -3940,7 +3940,7 @@ class sat_spoils_unstable_defense_system_box : public IAreaTriggerAura
 // 1213. Summoned by 145838 - Unstable Defense System Box Area
 class sat_spoils_unstable_defense_system_box_area : public IAreaTriggerAura
 {
-    std::vector<uint64> affectedTargetGUIDs;
+    std::vector<ObjectGuid> affectedTargetGUIDs;
 
     bool CheckTriggering(WorldObject* triggering) override
     {

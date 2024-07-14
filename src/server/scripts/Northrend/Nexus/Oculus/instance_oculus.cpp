@@ -40,21 +40,21 @@ class instance_oculus : public InstanceMapScript
                 SetBossNumber(EncounterCount);
                 LoadDoorData(doorData);
 
-                DrakosGUID          = 0;
-                VarosGUID           = 0;
-                UromGUID            = 0;
-                EregosGUID          = 0;
+                DrakosGUID = ObjectGuid::Empty;
+                VarosGUID = ObjectGuid::Empty;
+                UromGUID = ObjectGuid::Empty;
+                EregosGUID = ObjectGuid::Empty;
 
                 CentrifugueConstructCounter = 0;
 
-                EregosCacheGUID     = 0;
-                EregosCacheSpotlightGUID = 0;
+                EregosCacheGUID = ObjectGuid::Empty;
+                EregosCacheSpotlightGUID = ObjectGuid::Empty;
 
                 GreaterWhelpList.clear();
 
-                BelgaristraszGUID   = 0;
-                EternosGUID         = 0;
-                VerdisaGUID         = 0;
+                BelgaristraszGUID = ObjectGuid::Empty;
+                EternosGUID = ObjectGuid::Empty;
+                VerdisaGUID = ObjectGuid::Empty;
 
                 instance->SetWorldState(WORLDSTATE_RUBY_VOID, 1);
                 instance->SetWorldState(WORLDSTATE_EMERALD_VOID, 1);
@@ -266,7 +266,7 @@ class instance_oculus : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -385,19 +385,19 @@ class instance_oculus : public InstanceMapScript
             }
 
         protected:
-            uint64 DrakosGUID;
-            uint64 VarosGUID;
-            uint64 UromGUID;
-            uint64 EregosGUID;
+            ObjectGuid DrakosGUID;
+            ObjectGuid VarosGUID;
+            ObjectGuid UromGUID;
+            ObjectGuid EregosGUID;
 
-            uint64 BelgaristraszGUID;
-            uint64 EternosGUID;
-            uint64 VerdisaGUID;
+            ObjectGuid BelgaristraszGUID;
+            ObjectGuid EternosGUID;
+            ObjectGuid VerdisaGUID;
 
             uint8 CentrifugueConstructCounter;
 
-            uint64 EregosCacheGUID;
-            uint64 EregosCacheSpotlightGUID;
+            ObjectGuid EregosCacheGUID;
+            ObjectGuid EregosCacheSpotlightGUID;
 
             std::string str_data;
 

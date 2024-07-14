@@ -65,7 +65,7 @@ public:
     {
         npc_injured_rainspeaker_oracleAI(Creature* creature) : npc_escortAI(creature) { c_guid = creature->GetGUID(); }
 
-        uint64 c_guid;
+        ObjectGuid c_guid;
 
         void Reset() override
         {
@@ -510,8 +510,8 @@ public:
             sayStep = 0;
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID = ObjectGuid::Empty;
+            orphanGUID = ObjectGuid::Empty;
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -636,8 +636,8 @@ public:
             uint8 sayStep;
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
-            uint64 orphanGUID;
+            ObjectGuid playerGUID;
+            ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

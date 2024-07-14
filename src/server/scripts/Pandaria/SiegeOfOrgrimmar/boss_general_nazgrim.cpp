@@ -191,9 +191,9 @@ class boss_general_nazgrim : public CreatureScript
             EventMap berserkEvents;
             uint8 phaseId;
             uint32 forcesId;
-            uint64 ravagerTargetGUID; // ravager has launch to target at begun.
-            uint64 shockwaveTargetGUID;
-            uint64 targetGUID;
+            ObjectGuid ravagerTargetGUID; // ravager has launch to target at begun.
+            ObjectGuid shockwaveTargetGUID;
+            ObjectGuid targetGUID;
             bool hasIntroDone;
             bool hasAdditionalForces;
 
@@ -204,10 +204,10 @@ class boss_general_nazgrim : public CreatureScript
                 events.Reset();
                 berserkEvents.Reset();
                 phaseId = NONE_STANCE;
-                ravagerTargetGUID   = 0;
-                shockwaveTargetGUID = 0;
+                ravagerTargetGUID = ObjectGuid::Empty;
+                shockwaveTargetGUID = ObjectGuid::Empty;
                 forcesId            = 1;
-                targetGUID          = 0;
+                targetGUID = ObjectGuid::Empty;
 
                 me->SetPowerType(POWER_MANA);
                 me->SetMaxPower(POWER_MANA, 100);
@@ -227,7 +227,7 @@ class boss_general_nazgrim : public CreatureScript
                 });
             }
 
-            uint64 GetGUID(int32 type) const override
+            ObjectGuid GetGUID(int32 type) const override
             {
                 switch (type)
                 {
@@ -319,7 +319,7 @@ class boss_general_nazgrim : public CreatureScript
                     me->GetMap()->SetWorldState(WORLDSTATE_GAMON_WILL_SAVE_US, 0);
                     me->GetMap()->SetWorldState(WORLDSTATE_GAMON_WILL_SAVE_US_2, 0);
 
-                    if (Creature* gamon = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_GAMON)))
+                    if (Creature* gamon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GAMON)))
                         gamon->DespawnOrUnsummon();
                 }
 
@@ -412,7 +412,7 @@ class boss_general_nazgrim : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUNDERING_BLOW);
                     instance->DoRemoveBloodLustDebuffSpellOnPlayers();
 
-                    if (Creature* gamon = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_GAMON)))
+                    if (Creature* gamon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GAMON)))
                         gamon->AI()->DoAction(ACTION_GAMON_OUTRO);
                 }
 
@@ -834,16 +834,16 @@ struct npc_nazgrim_korkron_assassin : public ScriptedAI
     npc_nazgrim_korkron_assassin(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 markGUID;
+    ObjectGuid markGUID;
 
     void Reset() override
     {
-        markGUID = 0;
+        markGUID = ObjectGuid::Empty;
         DoCast(me, me->GetDBTableGUIDLow() ? SPELL_STEALTH : SPELL_ASSASSINS_MARK, true);
         me->ClearUnitState(UNIT_STATE_CASTING);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         markGUID = guid;
     }
@@ -994,19 +994,19 @@ struct npc_nazgrim_korkron_sniper : public ScriptedAI
 
     TaskScheduler scheduler;
     EventMap events;
-    uint64 markGUID;
+    ObjectGuid markGUID;
 
     void Reset() override
     {
-        markGUID = 0;
+        markGUID = ObjectGuid::Empty;
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         markGUID = guid;
     }
 
-    uint64 GetGUID(int32 type) const override
+    ObjectGuid GetGUID(int32 type) const override
     {
         return markGUID;
     }

@@ -42,20 +42,20 @@ class instance_ahnkahet : public InstanceMapScript
         {
             instance_ahnkahet_InstanceScript(Map* map) : InstanceScript(map) { }
 
-            uint64 ElderNadoxGUID;
-            uint64 PrinceTaldaramGUID;
-            uint64 JedogaShadowseekerGUID;
-            uint64 HeraldVolazjGUID;
-            uint64 AmanitarGUID;
+            ObjectGuid ElderNadoxGUID;
+            ObjectGuid PrinceTaldaramGUID;
+            ObjectGuid JedogaShadowseekerGUID;
+            ObjectGuid HeraldVolazjGUID;
+            ObjectGuid AmanitarGUID;
 
             uint64 PrinceTaldaramSphereGUIDs[2];
-            uint64 PrinceTaldaramPlatformGUID;
-            uint64 PrinceTaldaramGateGUID;
+            ObjectGuid PrinceTaldaramPlatformGUID;
+            ObjectGuid PrinceTaldaramGateGUID;
 
             std::set<uint64> InitiandGUIDs;
             std::list<uint64> questCreatures;
             uint64 JedogaSacrifices;
-            uint64 JedogaTarget;
+            ObjectGuid JedogaTarget;
 
             uint32 m_auiEncounter[MAX_ENCOUNTER];
             uint32 spheres[2];
@@ -148,7 +148,7 @@ class instance_ahnkahet : public InstanceMapScript
                     case GO_PRINCE_TALDARAM_PLATFORM:
                         PrinceTaldaramPlatformGUID = go->GetGUID();
                         if (m_auiEncounter[1] == DONE)
-                            HandleGameObject(0, true, go);
+                            HandleGameObject(ObjectGuid::Empty, true, go);
                         break;
                     case GO_PRINCE_TALDARAM_SPHERE_1:
                         PrinceTaldaramSphereGUIDs[0] = go->GetGUID();
@@ -173,7 +173,7 @@ class instance_ahnkahet : public InstanceMapScript
                     case GO_PRINCE_TALDARAM_GATE:
                         PrinceTaldaramGateGUID = go->GetGUID(); // Web gate past Prince Taldaram
                         if (m_auiEncounter[1] == DONE)
-                            HandleGameObject(0, true, go);
+                            HandleGameObject(ObjectGuid::Empty, true, go);
                         break;
                 }
             }
@@ -187,7 +187,7 @@ class instance_ahnkahet : public InstanceMapScript
                 }
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {

@@ -120,7 +120,7 @@ class boss_svala : public CreatureScript
 
             uint8 uiIntroPhase;
 
-            uint64 uiSvalaGuid;
+            ObjectGuid uiSvalaGuid;
             uint64 uiArthas;
 
             IntroPhase Phase;
@@ -142,7 +142,7 @@ class boss_svala : public CreatureScript
                     else 
                         Phase = FINISHED;
 
-                uiDoodadMirror = instance? instance->GetData64(DATA_DOODAD_UTGARDE_MIRROR_FX01) : 0;
+                uiDoodadMirror = instance? instance->GetGuidData(DATA_DOODAD_UTGARDE_MIRROR_FX01) : 0;
             }
 
             void MoveInLineOfSight(Unit* who) override
@@ -323,9 +323,9 @@ class boss_svala_sorrowgrave : public CreatureScript
                 me->CastStop();
                 me->SetReactState(REACT_DEFENSIVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
-                uiFlameBrazier_1 = instance? instance->GetData64(DATA_FLAME_BRAZIER_1) : 0;
-                uiFlameBrazier_2 = instance? instance->GetData64(DATA_FLAME_BRAZIER_2) : 0;
-                uiDoodadMirror   = instance? instance->GetData64(DATA_DOODAD_UTGARDE_MIRROR_FX01) : 0;
+                uiFlameBrazier_1 = instance? instance->GetGuidData(DATA_FLAME_BRAZIER_1) : 0;
+                uiFlameBrazier_2 = instance? instance->GetGuidData(DATA_FLAME_BRAZIER_2) : 0;
+                uiDoodadMirror   = instance? instance->GetGuidData(DATA_DOODAD_UTGARDE_MIRROR_FX01) : 0;
                 uiSinsterStrikeTimer = 7 * IN_MILLISECONDS;
                 uiCallFlamesTimer = 10 * IN_MILLISECONDS;
                 uiSacrificeTimer = 2 * IN_MILLISECONDS;
@@ -484,7 +484,7 @@ class boss_svala_sorrowgrave : public CreatureScript
             {
                 if (instance)
                 {
-                    Creature* pSvala = Unit::GetCreature(*me, instance->GetData64(DATA_SVALA));
+                    Creature* pSvala = Unit::GetCreature(*me, instance->GetGuidData(DATA_SVALA));
                     if (pSvala && pSvala->IsAlive())
                         killer->Kill(pSvala);
 

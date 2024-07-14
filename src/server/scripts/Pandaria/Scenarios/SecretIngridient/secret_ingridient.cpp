@@ -34,7 +34,7 @@ struct npc_secret_ing_sungshin_iron_paw : public ScriptedAI
 
     TaskScheduler scheduler;
     uint32 delay;
-    uint64 selectedScholarGUID;
+    ObjectGuid selectedScholarGUID;
     bool isTraining;
     bool firstSeat;
     bool firstTable;
@@ -51,7 +51,7 @@ struct npc_secret_ing_sungshin_iron_paw : public ScriptedAI
         firstNoodle = true;
         firstDelivery = true;
         firstEaten = true;
-        selectedScholarGUID = 0;
+        selectedScholarGUID = ObjectGuid::Empty;
         waitingQueue.clear();
 
         for (uint32 i = 1; i < 6; i++)
@@ -87,12 +87,12 @@ struct npc_secret_ing_sungshin_iron_paw : public ScriptedAI
         }
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         selectedScholarGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return selectedScholarGUID;
     }
@@ -241,7 +241,7 @@ struct npc_secret_ing_noodle_stand : public ScriptedAI
     }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     bool hasUse;
 
     void IsSummonedBy(Unit* summoner) override
@@ -277,14 +277,14 @@ struct npc_secret_ing_scholar : public ScriptedAI
     npc_secret_ing_scholar(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 tableGUID;
+    ObjectGuid tableGUID;
     uint32 ourPositionInQueue;
     uint32 leaveNotEaten;
     bool hasInLeaveProgress;
 
     void Reset() override
     {
-        tableGUID = 0;
+        tableGUID = ObjectGuid::Empty;
         hasInLeaveProgress = false;
         ourPositionInQueue = 0;
         leaveNotEaten = 0;
@@ -331,7 +331,7 @@ struct npc_secret_ing_scholar : public ScriptedAI
         }
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         tableGUID = guid;
     }

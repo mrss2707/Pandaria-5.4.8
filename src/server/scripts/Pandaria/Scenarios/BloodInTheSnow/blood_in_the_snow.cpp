@@ -390,10 +390,10 @@ struct npc_bloodsnow_frostmane_flesh_eater : public customCreatureAI
 {
     npc_bloodsnow_frostmane_flesh_eater(Creature* creature) : customCreatureAI(creature) 
     { 
-        scoutGUID = 0;
+        scoutGUID = ObjectGuid::Empty;
     }
 
-    uint64 scoutGUID;
+    ObjectGuid scoutGUID;
 
     void Reset() override
     {
@@ -405,7 +405,7 @@ struct npc_bloodsnow_frostmane_flesh_eater : public customCreatureAI
         events.ScheduleEvent(EVENT_DRAIN_BLOOD, urand(2.5 * IN_MILLISECONDS, 5.5 * IN_MILLISECONDS));
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         scoutGUID = guid;
     }
@@ -444,11 +444,11 @@ struct npc_bloodsnow_frostmane_headhunter : public customCreatureAI
 {
     npc_bloodsnow_frostmane_headhunter(Creature* creature) : customCreatureAI(creature) 
     {
-        scoutGUID = 0;
+        scoutGUID = ObjectGuid::Empty;
     }
 
     bool allowAttack;
-    uint64 scoutGUID;
+    ObjectGuid scoutGUID;
 
     void Reset() override
     {
@@ -461,7 +461,7 @@ struct npc_bloodsnow_frostmane_headhunter : public customCreatureAI
         events.ScheduleEvent(EVENT_THROW_AXE, 1.5 * IN_MILLISECONDS);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         scoutGUID = guid;
     }
@@ -528,11 +528,11 @@ struct npc_bloodsnow_frostmane_snowstalker : public customCreatureAI
 {
     npc_bloodsnow_frostmane_snowstalker(Creature* creature) : customCreatureAI(creature) 
     {
-        scoutGUID = 0;
+        scoutGUID = ObjectGuid::Empty;
     }
 
     TaskScheduler scheduler;
-    uint64 scoutGUID;
+    ObjectGuid scoutGUID;
 
     void Reset() override
     {
@@ -551,7 +551,7 @@ struct npc_bloodsnow_frostmane_snowstalker : public customCreatureAI
         events.ScheduleEvent(EVENT_SHOT, 1 * IN_MILLISECONDS);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         scoutGUID = guid;
     }
@@ -612,10 +612,10 @@ struct npc_bloodsnow_frostmane_berserker : public customCreatureAI
 {
     npc_bloodsnow_frostmane_berserker(Creature* creature) : customCreatureAI(creature) 
     {
-        scoutGUID = 0;
+        scoutGUID = ObjectGuid::Empty;
     }
 
-    uint64 scoutGUID;
+    ObjectGuid scoutGUID;
 
     void Reset() override
     {
@@ -627,7 +627,7 @@ struct npc_bloodsnow_frostmane_berserker : public customCreatureAI
         events.ScheduleEvent(EVENT_DEVASTATING_LEAP, urand(6.5 * IN_MILLISECONDS, 10 * IN_MILLISECONDS));
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         scoutGUID = guid;
     }
@@ -672,11 +672,11 @@ struct npc_bloodsnow_frostmane_bonechiller : public customCreatureAI
 {
     npc_bloodsnow_frostmane_bonechiller(Creature* creature) : customCreatureAI(creature) 
     {
-        scoutGUID = 0;
+        scoutGUID = ObjectGuid::Empty;
     }
 
     bool hasElementalTriggered;
-    uint64 scoutGUID;
+    ObjectGuid scoutGUID;
 
     void Reset() override
     {
@@ -690,7 +690,7 @@ struct npc_bloodsnow_frostmane_bonechiller : public customCreatureAI
         events.ScheduleEvent(EVENT_BLIZZARD, 16 * IN_MILLISECONDS);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         scoutGUID = guid;
     }
@@ -813,7 +813,7 @@ struct npc_bloodsnow_freeze_solid : public customCreatureAI
 {
     npc_bloodsnow_freeze_solid(Creature* creature) : customCreatureAI(creature) { }
 
-    uint64 affectedTargetGUID;
+    ObjectGuid affectedTargetGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -956,10 +956,10 @@ struct npc_bloodsnow_frostmane_witch_doctor : public customCreatureAI
 {
     npc_bloodsnow_frostmane_witch_doctor(Creature* creature) : customCreatureAI(creature) 
     {
-        scoutGUID = 0;
+        scoutGUID = ObjectGuid::Empty;
     }
 
-    uint64 scoutGUID;
+    ObjectGuid scoutGUID;
 
     void Reset() override
     {
@@ -972,7 +972,7 @@ struct npc_bloodsnow_frostmane_witch_doctor : public customCreatureAI
         events.ScheduleEvent(EVENT_HEKIMAS_WISDOM, 14 * IN_MILLISECONDS);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         scoutGUID = guid;
     }
@@ -1242,12 +1242,12 @@ struct npc_bloodsnow_zandalari_rage_banner : public customCreatureAI
 {
     npc_bloodsnow_zandalari_rage_banner(Creature* creature) : customCreatureAI(creature)
     {
-        scoutGUID = 0;
+        scoutGUID = ObjectGuid::Empty;
     }
 
-    uint64 scoutGUID;
+    ObjectGuid scoutGUID;
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         scoutGUID = guid;
     }

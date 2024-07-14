@@ -289,14 +289,14 @@ struct brawlers_guild_encounter_typeAI : public ScriptedAI
     SummonList summons;
     EventMap events, nonCombatEvents;
     ObjectGuid summonerGUID, targetGUID;
-    uint64 challengeCardGUID;
+    ObjectGuid challengeCardGUID;
     bool hasTele, hasYell;
 
     void IsSummonedBy(Unit* summoner) override
     {
         //Talk(TALK_BATTLE_INIT);
         summonerGUID = summoner->GetGUID();
-        challengeCardGUID = 0;
+        challengeCardGUID = ObjectGuid::Empty;
 
         if (me->GetEntry() != NPC_BO_BOBBLE)
         {
@@ -309,7 +309,7 @@ struct brawlers_guild_encounter_typeAI : public ScriptedAI
         nonCombatEvents.ScheduleEvent(EVENT_INIT_BATTLE, 3 * IN_MILLISECONDS);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         challengeCardGUID = guid;
     }
@@ -571,7 +571,7 @@ struct npc_brawlers_guild_bizmo : public ScriptedAI
     TaskScheduler scheduler;
     EventMap berserkerEvents;
     std::vector<uint32> playersInQueue;
-    std::vector<uint64> challengeCardGUIDs;
+    std::vector<ObjectGuid> challengeCardGUIDs;
     ObjectGuid currentChampionGUID;
     ObjectGuid currentEncounterGUID;
     bool hasQueueStarted;
@@ -610,15 +610,15 @@ struct npc_brawlers_guild_bizmo : public ScriptedAI
         berserkerEvents.Reset();
     }
 
-    void SetGUID(uint64 guid, int32 type) override 
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         if (type == TYPE_CHALLENGE_CARD && std::find(challengeCardGUIDs.begin(), challengeCardGUIDs.end(), guid) == challengeCardGUIDs.end())
             challengeCardGUIDs.push_back(guid);
     }
 
-    uint64 GetGUID(int32 type) const override
+    ObjectGuid GetGUID(int32 type) const override
     {
-        uint32 i = 0; // default
+        uint64 i = 0; // default
 
         for (auto&& itr : playersInQueue)
         {
@@ -628,7 +628,7 @@ struct npc_brawlers_guild_bizmo : public ScriptedAI
                 break;
         }
 
-        return i;
+        return ObjectGuid(i);
     }
 
     uint32 GetData(uint32 type) const override
@@ -994,7 +994,7 @@ struct npc_brawlers_guild_boss_bazzelflange : public ScriptedAI
     TaskScheduler scheduler;
     EventMap berserkerEvents;
     std::vector<uint32> playersInQueue;
-    std::vector<uint64> challengeCardGUIDs;
+    std::vector<ObjectGuid> challengeCardGUIDs;
     ObjectGuid currentChampionGUID;
     ObjectGuid currentEncounterGUID;
     bool hasQueueStarted;
@@ -1034,15 +1034,15 @@ struct npc_brawlers_guild_boss_bazzelflange : public ScriptedAI
         berserkerEvents.Reset();
     }
 
-    void SetGUID(uint64 guid, int32 type) override 
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         if (type == TYPE_CHALLENGE_CARD && std::find(challengeCardGUIDs.begin(), challengeCardGUIDs.end(), guid) == challengeCardGUIDs.end())
             challengeCardGUIDs.push_back(guid);
     }
 
-    uint64 GetGUID(int32 type) const override
+    ObjectGuid GetGUID(int32 type) const override
     {
-        uint32 i = 0; // default
+        uint64 i = 0; // default
 
         for (auto&& itr : playersInQueue)
         {
@@ -1052,7 +1052,7 @@ struct npc_brawlers_guild_boss_bazzelflange : public ScriptedAI
                 break;
         }
 
-        return i;
+        return ObjectGuid(i);
     }
 
     uint32 GetData(uint32 type) const override
@@ -3277,7 +3277,7 @@ struct npc_brawlers_guild_lepregnomes : public brawlers_guild_encounter_typeAI
 {
     npc_brawlers_guild_lepregnomes(Creature* creature) : brawlers_guild_encounter_typeAI(creature) { }
 
-    std::vector<uint64> LeproListGUID;
+    std::vector<ObjectGuid> LeproListGUID;
     bool fakeDeath;
     uint32 cLepro, leproOwnerGUID;
 
@@ -3289,8 +3289,8 @@ struct npc_brawlers_guild_lepregnomes : public brawlers_guild_encounter_typeAI
 
         fakeDeath = false;
         cLepro = 0;
-        leproOwnerGUID = 0;
-        challengeCardGUID = 0;
+        leproOwnerGUID = ObjectGuid::Empty;
+        challengeCardGUID = ObjectGuid::Empty;
 
         if (me->GetEntry() == NPC_QUEAZY)
         {
@@ -3312,9 +3312,9 @@ struct npc_brawlers_guild_lepregnomes : public brawlers_guild_encounter_typeAI
         events.Reset();
     }
 
-    uint64 GetGUID(int32 type) const override
+    ObjectGuid GetGUID(int32 type) const override
     {
-        return me->GetEntry() == NPC_QUEAZY ? summonerGUID : 0;
+        return me->GetEntry() == NPC_QUEAZY ? summonerGUID : ObjectGuid::Empty;
     }
 
     void JustEngagedWith(Unit* who) override

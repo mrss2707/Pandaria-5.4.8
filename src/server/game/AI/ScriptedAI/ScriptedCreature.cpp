@@ -924,7 +924,7 @@ void AssistBehavior::Update(uint32 diff)
 
         if (!victim)
         {
-            m_assistTarget = 0;
+            m_assistTarget = ObjectGuid::Empty;
             return;
         }
 

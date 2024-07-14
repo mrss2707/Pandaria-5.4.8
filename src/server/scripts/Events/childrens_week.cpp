@@ -200,8 +200,8 @@ class npc_winterfin_playmate : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
-                orphanGUID = 0;
+                playerGUID = ObjectGuid::Empty;
+                orphanGUID = ObjectGuid::Empty;
             }
 
             void MoveInLineOfSight(Unit* who) override
@@ -271,8 +271,8 @@ class npc_winterfin_playmate : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
-            uint64 orphanGUID;
+            ObjectGuid playerGUID;
+            ObjectGuid orphanGUID;
 
         };
 
@@ -301,8 +301,8 @@ class npc_snowfall_glade_playmate : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
-                orphanGUID = 0;
+                playerGUID = ObjectGuid::Empty;
+                orphanGUID = ObjectGuid::Empty;
             }
 
             void MoveInLineOfSight(Unit* who) override
@@ -372,8 +372,8 @@ class npc_snowfall_glade_playmate : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
-            uint64 orphanGUID;
+            ObjectGuid playerGUID;
+            ObjectGuid orphanGUID;
         };
 
         CreatureAI* GetAI(Creature* pCreature) const
@@ -401,8 +401,8 @@ class npc_high_oracle_soo_roo : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
-                orphanGUID = 0;
+                playerGUID = ObjectGuid::Empty;
+                orphanGUID = ObjectGuid::Empty;
             }
 
             void MoveInLineOfSight(Unit* who) override
@@ -462,8 +462,8 @@ class npc_high_oracle_soo_roo : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
-            uint64 orphanGUID;
+            ObjectGuid playerGUID;
+            ObjectGuid orphanGUID;
 
         };
 
@@ -492,8 +492,8 @@ class npc_elder_kekek : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
-                orphanGUID = 0;
+                playerGUID = ObjectGuid::Empty;
+                orphanGUID = ObjectGuid::Empty;
             }
 
             void MoveInLineOfSight(Unit* who) override
@@ -552,8 +552,8 @@ class npc_elder_kekek : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
-            uint64 orphanGUID;
+            ObjectGuid playerGUID;
+            ObjectGuid orphanGUID;
 
         };
 
@@ -579,8 +579,8 @@ class npc_alexstraza_the_lifebinder : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
-                orphanGUID = 0;
+                playerGUID = ObjectGuid::Empty;
+                orphanGUID = ObjectGuid::Empty;
                 me->SetReactState(REACT_AGGRESSIVE); // To make MoveInLineOfSight work
             }
 
@@ -713,8 +713,8 @@ class npc_alexstraza_the_lifebinder : public CreatureScript
             private:
                 int8 phase;
                 uint32 timer;
-                uint64 playerGUID;
-                uint64 orphanGUID;
+                ObjectGuid playerGUID;
+                ObjectGuid orphanGUID;
 
         };
 

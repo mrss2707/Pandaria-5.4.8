@@ -284,7 +284,7 @@ class boss_suen : public CreatureScript
             uint32 targetLowGUID;
             uint32 currentCelestialArea;
             uint32 celestialCounter;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             EventMap berserkEvents;
             bool atEvade;
             bool feignDeath;
@@ -301,8 +301,8 @@ class boss_suen : public CreatureScript
                 isDefeat = false;
                 _Reset();
                 phase = PHASE_NONE;
-                targetGUID = 0;
-                targetLowGUID = 0;
+                targetGUID = ObjectGuid::Empty;
+                targetLowGUID = ObjectGuid::Empty;
                 celestialCounter = 0;
                 currentCelestialArea = PHASE_NONE;
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -331,7 +331,7 @@ class boss_suen : public CreatureScript
                 });
             }
 
-            uint64 GetGUID(int32 /*type*/) const override
+            ObjectGuid GetGUID(int32 /*type*/) const override
             {
                 return targetGUID;
             }
@@ -345,7 +345,7 @@ class boss_suen : public CreatureScript
                 if (instance)
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-                if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_LULIN) : 0))
+                if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
                 {
                     lulin->SetInCombatWithZone();
                     lulin->AI()->DoAction(ACTION_START_INTRO);
@@ -385,7 +385,7 @@ class boss_suen : public CreatureScript
                         instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
                         // If not Twilight Phase
-                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_LULIN)))
+                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LULIN)))
                             lulin->AI()->DoAction(ACTION_LAST_STAND);
                     }
 
@@ -408,14 +408,14 @@ class boss_suen : public CreatureScript
                         DoCast(me, SPELL_DISSIPATE_SUEN);
 
                         // Visible Night
-                        if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER) : 0))
+                        if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                         {
                             worldTrigger_1->CastSpell(worldTrigger_1, SPELL_STARY_SKY_DARKNESS, true);
                             worldTrigger_1->CastSpell(worldTrigger_1, SPELL_SUNNY_SKY, true);
                         }
 
                         // Visible Star Sky
-                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER + 1) : 0))
+                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
                         {
                             worldTrigger_2->SetObjectScale(0.1f);
                             worldTrigger_2->CastSpell(worldTrigger_2, SPELL_STARY_SKY_DARKNESS, true);
@@ -448,14 +448,14 @@ class boss_suen : public CreatureScript
                         summons.DespawnEntry(NPC_INVISIBLE_MAN);
 
                         // Visible Night
-                        if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER) : 0))
+                        if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                         {
                             worldTrigger_1->RemoveAurasDueToSpell(SPELL_STARY_SKY_DARKNESS);
                             worldTrigger_1->CastSpell(worldTrigger_1, SPELL_SUNNY_SKY, true);
                         }
 
                         // Visible Star Sky
-                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER + 1) : 0))
+                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
                         {
                             worldTrigger_2->RemoveAurasDueToSpell(SPELL_STARY_SKY_DARKNESS);
                             worldTrigger_2->RemoveAurasDueToSpell(SPELL_STARY_SKY);
@@ -481,7 +481,7 @@ class boss_suen : public CreatureScript
                         }
 
                         // Set Lulin in Inactive State
-                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_LULIN) : 0))
+                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
                             lulin->AI()->DoAction(ACTION_LULIN_DAY);
 
                         // Set Seun in Active State
@@ -520,10 +520,10 @@ class boss_suen : public CreatureScript
                         SendActionToImages(ACTION_CELESTIAL_REBIRTH);
 
                         // Twilight
-                        if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER) : 0))
+                        if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                             worldTrigger_1->RemoveAurasDueToSpell(SPELL_SUNNY_SKY);
 
-                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER + 1) : 0))
+                        if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
                         {
                             worldTrigger_2->SetObjectScale(1.0f);
                             worldTrigger_2->CastSpell(worldTrigger_2, SPELL_STARY_SKY_DARKNESS, true);
@@ -572,7 +572,7 @@ class boss_suen : public CreatureScript
                         events.CancelEvent(EVENT_FAN_OF_FLAMES);
 
                         // Set Lulin in Active State
-                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_LULIN) : 0))
+                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
                             lulin->AI()->DoAction(ACTION_LULIN_TWILIGHT);
 
                         break;
@@ -685,13 +685,13 @@ class boss_suen : public CreatureScript
 
                 SendActionToImages(ACTION_CELESTIALS_NOT_INTERRACT);
 
-                if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER) : 0))
+                if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                     worldTrigger_1->RemoveAllAuras();
 
-                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER + 1) : 0))
+                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
                     worldTrigger_2->RemoveAllAuras();
 
-                if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_LULIN) : 0))
+                if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
                     lulin->AI()->EnterEvadeMode();
 
                 HandleInactivityCreatures();
@@ -716,7 +716,7 @@ class boss_suen : public CreatureScript
                 // Encounter Done
                 if (Player* killer = me->FindNearestPlayer(200.0f))
                 {
-                    if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_LULIN) : 0))
+                    if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
                     {
                         lulin->RemoveAura(SPELL_PERMANENT_FEIGN_DEATH);
                         killer->Kill(lulin);
@@ -738,17 +738,17 @@ class boss_suen : public CreatureScript
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BEAST_OF_NIGHTMATRES_AURA);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ICY_SHADOWS_EFF);
 
-                    if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_LULIN)))
+                    if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LULIN)))
                         if (lulin->IsAlive())
                             lulin->AI()->Talk(TALK_SUEN_DEATH);
                 }
 
                 SendActionToImages(ACTION_CELESTIALS_NOT_INTERRACT);
 
-                if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER) : 0))
+                if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                     worldTrigger_1->RemoveAllAuras();
 
-                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER + 1) : 0))
+                if (Creature* worldTrigger_2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER + 1) : 0))
                     worldTrigger_2->RemoveAllAuras();
 
                 HandleInactivityCreatures();
@@ -772,7 +772,7 @@ class boss_suen : public CreatureScript
                     {
                         DoCast(me, SPELL_BERSERK, true);
 
-                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_LULIN) : 0))
+                        if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
                             lulin->CastSpell(lulin, SPELL_BERSERK, true);
 
                     }
@@ -874,7 +874,7 @@ class boss_suen : public CreatureScript
 
                 bool hasLulinAlive()
                 {
-                    if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_LULIN) : 0))
+                    if (Creature* lulin = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_LULIN) : ObjectGuid::Empty))
                         if (lulin->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
                             return false;
 
@@ -910,7 +910,7 @@ class boss_lulin : public CreatureScript
             bool feignDeath;
             bool isTwilight;
             bool isDefeat;
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
 
             void Reset() override
             {
@@ -922,7 +922,7 @@ class boss_lulin : public CreatureScript
                 isTwilight = false;
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
 
                 // Temp Hackfix
                 if (instance && instance->instance->GetSpawnMode() == RAID_DIFFICULTY_10MAN_NORMAL)
@@ -950,7 +950,7 @@ class boss_lulin : public CreatureScript
                 me->setActive(true, ActiveFlags::InCombat);
                 DoZoneInCombat();
 
-                if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TWIN_CONSORTS) : 0))
+                if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                     DoZoneInCombat(suen, 200.0f);
 
                 if (instance)
@@ -996,7 +996,7 @@ class boss_lulin : public CreatureScript
                     me->PrepareChanneledCast(me->GetOrientation());
                     DoCast(me, SPELL_PERMANENT_FEIGN_DEATH, true);
 
-                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TWIN_CONSORTS) : 0))
+                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                         if (suen->GetHealthPct() > 30.0f)
                             me->GetMap()->SetWorldState(WORLDSTATE_FROM_DUSK_TILL_DOWN, 1);
 
@@ -1005,7 +1005,7 @@ class boss_lulin : public CreatureScript
                         instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
                         // If not Twilight Phase
-                        if (Creature* suen = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TWIN_CONSORTS)))
+                        if (Creature* suen = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TWIN_CONSORTS)))
                             suen->AI()->DoAction(ACTION_LAST_STAND);
                     }
 
@@ -1026,7 +1026,7 @@ class boss_lulin : public CreatureScript
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
-                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TWIN_CONSORTS)))
+                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TWIN_CONSORTS)))
                         suen->AI()->EnterEvadeMode();
                 }
 
@@ -1063,7 +1063,7 @@ class boss_lulin : public CreatureScript
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
-                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TWIN_CONSORTS)))
+                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TWIN_CONSORTS)))
                         suen->AI()->JustDied(killer);
                 }
             }
@@ -1155,7 +1155,7 @@ class boss_lulin : public CreatureScript
                             events.ScheduleEvent(EVENT_BEAST_OF_NIGHTMARES, 60 * IN_MILLISECONDS);
                             break;
                         case EVENT_ICE_COMET:
-                            if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TWIN_CONSORTS) : 0))
+                            if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                             {
                                 uint32 currentSpellId = suen->GetCurrentSpell(CURRENT_CHANNELED_SPELL) ? suen->GetCurrentSpell(CURRENT_CHANNELED_SPELL)->m_spellInfo->Id : 0;
 
@@ -1166,7 +1166,7 @@ class boss_lulin : public CreatureScript
                                 }
                             }
 
-                            if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TWIN_CONSORTS) : 0))
+                            if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                                 suen->AI()->DoAction(ACTION_LIGHT_OF_DAY_DELAY);
 
                             DoCast(me, SPELL_ICE_COMET_SELECTOR, true);
@@ -1187,7 +1187,7 @@ class boss_lulin : public CreatureScript
                             });
                             break;
                         case EVENT_SPAWN_LURKER:
-                            if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_WORLD_TRIGGER) : 0))
+                            if (Creature* worldTrigger_1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_WORLD_TRIGGER) : ObjectGuid::Empty))
                                 me->SummonCreature(NPC_LURKER_IN_THE_NIGHT, worldTrigger_1->GetPositionX() + frand(-50.0f, 50.0f), worldTrigger_1->GetPositionY() + frand(-50.0f, 50.0f), me->GetPositionZ(), TEMPSUMMON_MANUAL_DESPAWN);
 
                             events.ScheduleEvent(EVENT_SPAWN_LURKER, 10 * IN_MILLISECONDS);
@@ -1202,7 +1202,7 @@ class boss_lulin : public CreatureScript
             private:
                 bool hasSuenAlive()
                 {
-                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(DATA_TWIN_CONSORTS) : 0))
+                    if (Creature* suen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(DATA_TWIN_CONSORTS) : ObjectGuid::Empty))
                         if (suen->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
                             return false;
 
@@ -1223,13 +1223,13 @@ struct npc_faded_image_of_celestial : public ScriptedAI
 
     bool hasActivated;
     uint32 seqValue;
-    uint64 clickerGUID;
+    ObjectGuid clickerGUID;
 
     void Reset() override
     {
         hasActivated = false;
         seqValue = 1;
-        clickerGUID = 0;
+        clickerGUID = ObjectGuid::Empty;
         me->SetVisible(true);
     }
 
@@ -1251,7 +1251,7 @@ struct npc_faded_image_of_celestial : public ScriptedAI
                 {
                     me->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                     seqValue = 1;
-                    clickerGUID = 0;
+                    clickerGUID = ObjectGuid::Empty;
 
                     // Reset Drawing Seq
                     if (Creature* sulin = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(DATA_TWIN_CONSORTS) : 0))
@@ -1313,12 +1313,12 @@ struct npc_celestial_star : public ScriptedAI
     uint32 sequenceValue;
     uint32 isNext;
     uint32 ownerEntry;
-    uint64 starGUID;
+    ObjectGuid starGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
         isNext = 0;
-        starGUID = 0;
+        starGUID = ObjectGuid::Empty;
         me->SetPhaseMask(2, true);
 
         if (summoner && summoner->ToCreature())
@@ -1374,12 +1374,12 @@ struct npc_celestial_star : public ScriptedAI
             isNext = data;
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         starGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return starGUID;
     }
@@ -1388,7 +1388,7 @@ struct npc_celestial_star : public ScriptedAI
     {
         if (actionId == ACTION_CELESTIAL_DRAWING_WRONG)
         {
-            starGUID = 0;
+            starGUID = ObjectGuid::Empty;
 
             if (!me->HasAura(SPELL_MOONBEAM_STATE_WORLD))
                 isNext = 0;
@@ -1467,7 +1467,7 @@ struct npc_beast_of_nightmares : public ScriptedAI
 {
     npc_beast_of_nightmares(Creature* creature) : ScriptedAI(creature) { }
 
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     TaskScheduler scheduler;
 
     void IsSummonedBy(Unit* summoner) override
@@ -1511,7 +1511,7 @@ struct npc_ice_comet : public ScriptedAI
 {
     npc_ice_comet(Creature* creature) : ScriptedAI(creature) { }
 
-    uint64 tombGUID;
+    ObjectGuid tombGUID;
     TaskScheduler scheduler;
 
     void IsSummonedBy(Unit* summoner) override

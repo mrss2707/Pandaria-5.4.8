@@ -277,8 +277,8 @@ public:
 
         std::map<uint64, float> chained;
 
-        uint64 PortalsGUID[4];
-        uint64 KTTriggerGUID;
+        ObjectGuid PortalsGUID[4];
+        ObjectGuid KTTriggerGUID;
 
         SummonList spawns; // adds spawn by the trigger. kept in separated list (i.e. not in summons)
 
@@ -299,7 +299,7 @@ public:
             _Reset();
 
             PortalsGUID[0] = PortalsGUID[1] = PortalsGUID[2] = PortalsGUID[3] = 0;
-            KTTriggerGUID = 0;
+            KTTriggerGUID = ObjectGuid::Empty;
 
             me->SetFaction(35);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
@@ -376,11 +376,11 @@ public:
 
         void FindGameObjects()
         {
-            PortalsGUID[0] = instance ? instance->GetData64(DATA_KELTHUZAD_PORTAL01) : 0;
-            PortalsGUID[1] = instance ? instance->GetData64(DATA_KELTHUZAD_PORTAL02) : 0;
-            PortalsGUID[2] = instance ? instance->GetData64(DATA_KELTHUZAD_PORTAL03) : 0;
-            PortalsGUID[3] = instance ? instance->GetData64(DATA_KELTHUZAD_PORTAL04) : 0;
-            KTTriggerGUID = instance ? instance->GetData64(DATA_KELTHUZAD_TRIGGER) : 0;
+            PortalsGUID[0] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL01) : 0;
+            PortalsGUID[1] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL02) : 0;
+            PortalsGUID[2] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL03) : 0;
+            PortalsGUID[3] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL04) : 0;
+            KTTriggerGUID = instance ? instance->GetGuidData(DATA_KELTHUZAD_TRIGGER) : ObjectGuid::Empty;
         }
 
         void UpdateAI(uint32 diff) override
@@ -668,7 +668,7 @@ public:
         if (!instance || instance->IsEncounterInProgress() || instance->GetBossState(BOSS_KELTHUZAD) == DONE)
             return false;
 
-        Creature* pKelthuzad = Unit::GetCreature(*player, instance->GetData64(DATA_KELTHUZAD));
+        Creature* pKelthuzad = Unit::GetCreature(*player, instance->GetGuidData(DATA_KELTHUZAD));
         if (!pKelthuzad)
             return false;
 
@@ -677,7 +677,7 @@ public:
             return false;
 
         pKelthuzadAI->AttackStart(player);
-        if (GameObject* trigger = instance->instance->GetGameObject(instance->GetData64(DATA_KELTHUZAD_TRIGGER)))
+        if (GameObject* trigger = instance->instance->GetGameObject(instance->GetGuidData(DATA_KELTHUZAD_TRIGGER)))
         {
             if (trigger->getLootState() == GO_READY)
                 trigger->UseDoorOrButton();

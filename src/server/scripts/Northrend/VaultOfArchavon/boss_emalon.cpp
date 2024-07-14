@@ -195,7 +195,7 @@ class npc_tempest_minion : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (Creature* emalon = Unit::GetCreature(*me, instance ? instance->GetData64(DATA_EMALON) : 0))
+                if (Creature* emalon = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_EMALON) : ObjectGuid::Empty))
                 {
                     if (emalon->IsAlive())
                     {
@@ -210,7 +210,7 @@ class npc_tempest_minion : public CreatureScript
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_SHOCK, 20000);
 
-                if (Creature* pEmalon = Unit::GetCreature(*me, instance ? instance->GetData64(DATA_EMALON) : 0))
+                if (Creature* pEmalon = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_EMALON) : ObjectGuid::Empty))
                 {
                     if (!pEmalon->GetVictim() && pEmalon->AI())
                         pEmalon->AI()->AttackStart(who);

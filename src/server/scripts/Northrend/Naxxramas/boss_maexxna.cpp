@@ -163,7 +163,7 @@ public:
     {
         npc_webwrapAI(Creature* creature) : NullCreatureAI(creature), victimGUID(0) { }
 
-        uint64 victimGUID;
+        ObjectGuid victimGUID;
 
         void SetGUID(uint64 guid, int32 /*param*/) override
         {

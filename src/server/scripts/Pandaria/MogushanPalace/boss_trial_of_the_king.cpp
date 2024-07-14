@@ -812,7 +812,7 @@ class boss_kuai_the_brute : public CreatureScript
                 me->SetHomePosition(pTrialHomePositions[TYPE_KUAI]);
             }
 
-            uint64 pet_guid;
+            ObjectGuid pet_guid;
             bool m_bIsMovingHome;
 
             void InitializeAI() override
@@ -2106,7 +2106,7 @@ class CorrectUnitCheck
         }
 
     private:
-        uint64 casterGuid;
+        ObjectGuid casterGuid;
 };
 
 class spell_saurok_help_call : public SpellScriptLoader

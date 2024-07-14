@@ -2336,7 +2336,7 @@ class spell_hunt_barrage : public SpellScript
 {
     PrepareSpellScript(spell_hunt_barrage);
 
-    uint64 mainTarget;
+    ObjectGuid mainTarget;
 
     void GetMainTarget(SpellEffIndex)
     {

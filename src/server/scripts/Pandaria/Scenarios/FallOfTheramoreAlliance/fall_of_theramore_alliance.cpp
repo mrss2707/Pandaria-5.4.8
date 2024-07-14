@@ -39,7 +39,7 @@ struct theramore_invader_typeAI : public ScriptedAI
     EventMap events, nonCombatEvents;
     bool hasInterrupted, intro;
     uint32 prevSpellId, delay;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
@@ -144,7 +144,7 @@ struct theramore_invader_typeAI : public ScriptedAI
         return false;
     }
 
-    uint64 GetLowestFriendlyGUID()
+    ObjectGuid GetLowestFriendlyGUID()
     {
         std::list<Creature*> tmpTargets;
 
@@ -1323,7 +1323,7 @@ class npc_theramore_gatecrusher : public CreatureScript
             {
                 events.Reset();
                 summons.DespawnAll();
-                targetGUID = 0;
+                targetGUID = ObjectGuid::Empty;
                 me->GetMap()->SetWorldState(WORLDSTATE_NO_TANK_YOU, 1);
             }
 
@@ -1436,7 +1436,7 @@ class AreaTrigger_at_jaina_theramore : public AreaTriggerScript
                 if (instance->GetData(DATA_DESTROY_THE_DESTROYER) != DONE)
                     return false;
 
-                if (Creature* jaina = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_JAINA_PROUDMOORE)))
+                if (Creature* jaina = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_JAINA_PROUDMOORE)))
                     jaina->AI()->DoAction(ACTION_JAINA_LAST_STAND);
             }
 

@@ -82,7 +82,7 @@ class SummonList
         storage_.clear();
     }
 
-    uint64 front()
+    ObjectGuid front()
     {
         return storage_.front();
     }
@@ -111,7 +111,7 @@ class SummonList
     {
         // We need to use a copy of SummonList here, otherwise original SummonList would be modified
         StorageType listCopy = storage_;
-        Trinity::Containers::RandomResizeList<uint64, Predicate>(listCopy, predicate, max);
+        Trinity::Containers::RandomResizeList<ObjectGuid, Predicate>(listCopy, predicate, max);
         for (StorageType::iterator i = listCopy.begin(); i != listCopy.end();)
         {
             Creature* summon = Unit::GetCreature(*me, *i++);
@@ -142,7 +142,7 @@ class EntryCheckPredicate
 class DummyEntryCheckPredicate
 {
     public:
-    bool operator()(uint64)
+    bool operator()(ObjectGuid)
     {
         return true;
     }
@@ -692,7 +692,7 @@ public:
     void Update(uint32 diff);
 private:
     uint32 m_assistTimer = 0;
-    uint64 m_assistTarget = 0;
+    ObjectGuid m_assistTarget = ObjectGuid::Empty;
     Creature* me;
 };
 

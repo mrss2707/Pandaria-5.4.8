@@ -1296,7 +1296,7 @@ public:
         }
 
         uint32 count = 0;
-        for (auto&& go : sObjectAccessor->GetGameObjects())
+        for (auto&& go : ObjectAccessor::GetGameObjects())
         {
             if (go.second->GetEntry() == entry)
             {

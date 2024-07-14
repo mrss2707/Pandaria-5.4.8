@@ -976,7 +976,7 @@ class npc_pandriarch_windfur : public CreatureScript
             npc_pandriarch_windfurAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
-            uint64 playerGuid;
+            ObjectGuid playerGuid;
 
             void Reset() override
             {
@@ -1125,7 +1125,7 @@ class npc_pandriarch_bramblestaff : public CreatureScript
             npc_pandriarch_bramblestaffAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
-            uint64 playerGuid;
+            ObjectGuid playerGuid;
 
             void Reset() override
             {
@@ -1277,7 +1277,7 @@ class npc_pandriarch_goldendraft : public CreatureScript
             npc_pandriarch_goldendraftAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
-            uint64 playerGuid;
+            ObjectGuid playerGuid;
 
             void Reset() override
             {
@@ -1416,7 +1416,7 @@ class npc_big_bao : public CreatureScript
             npc_big_baoAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
-            uint64 playerGuid;
+            ObjectGuid playerGuid;
 
             void Reset() override
             {
@@ -2183,13 +2183,13 @@ struct npc_morgrinn_crackfang : public ScriptedAI
 
     EventMap events;
     uint32 delay;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void Reset() override
     {
         events.Reset();
         delay      = 0;
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -2854,14 +2854,14 @@ class npc_instructor_skythorn : public CreatureScript
         {
             npc_instructor_skythornAI(Creature* creature) : ScriptedAI(creature) { }
 
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint8 eventPhase;
             uint32 eventTimer;
 
             void Reset() override
             {
                 eventTimer = 0;
-                playerGUID = 0;
+                playerGUID = ObjectGuid::Empty;
                 eventPhase = 0;
             }
 
@@ -3452,7 +3452,7 @@ class npc_instructor_windblade_cutscene : public CreatureScript
         {
             npc_instructor_windblade_cutsceneAI(Creature* creature) : ScriptedAI(creature) { }
 
-            uint64 SummonerGUID;
+            ObjectGuid SummonerGUID;
 
             void IsSummonedBy(Unit* summoner) override
             {
@@ -3756,7 +3756,7 @@ struct npc_lorewalker_cho_peering_into_past : public customCreatureAI
     npc_lorewalker_cho_peering_into_past(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     uint32 delay;
 
     void IsSummonedBy(Unit* summoner) override
@@ -3949,7 +3949,7 @@ struct npc_prince_anduin_decision : public customCreatureAI
     npc_prince_anduin_decision(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     uint32 delay;
 
     void IsSummonedBy(Unit* summoner) override
@@ -4099,7 +4099,7 @@ struct npc_prince_anduin_decision_helpers : public customCreatureAI
     npc_prince_anduin_decision_helpers(Creature* creature) : customCreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
     uint32 delay;
 
     void IsSummonedBy(Unit* summoner) override
@@ -4760,7 +4760,7 @@ struct npc_jade_forest_instant_message_camera_bunny : public ScriptedAI
     npc_jade_forest_instant_message_camera_bunny(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 summonerGUID;
+    ObjectGuid summonerGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {

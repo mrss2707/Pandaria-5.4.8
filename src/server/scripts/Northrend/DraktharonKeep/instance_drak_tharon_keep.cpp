@@ -81,7 +81,7 @@ public:
         uint64 introReanimatorGUID = 0;
         uint64 introGuardianRightGUID = 0;
         uint64 introGuardianLeftGUID = 0;
-        std::vector<uint64> introWarriorGUIDs;
+        std::vector<ObjectGuid> introWarriorGUIDs;
 
         uint64 kurzelCocoonGUID = 0;
 
@@ -216,7 +216,7 @@ public:
                 novosSummonerGUID4 = creature->GetGUID();
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {

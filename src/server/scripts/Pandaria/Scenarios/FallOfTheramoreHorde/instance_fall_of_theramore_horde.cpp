@@ -260,7 +260,7 @@ class instance_fall_of_theramore_horde : public InstanceMapScript
                 return 0;
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -297,7 +297,7 @@ class instance_fall_of_theramore_horde : public InstanceMapScript
                     switch (type)
                     {
                         case DATA_TO_THE_WATERLINE:
-                            if (Creature* SparkFuse = instance->GetCreature(GetData64(NPC_BLASTMASTER_SPARKFUSE)))
+                            if (Creature* SparkFuse = instance->GetCreature(GetGuidData(NPC_BLASTMASTER_SPARKFUSE)))
                                 SparkFuse->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                             break;
                         case DATA_THE_BLASTMASTER:

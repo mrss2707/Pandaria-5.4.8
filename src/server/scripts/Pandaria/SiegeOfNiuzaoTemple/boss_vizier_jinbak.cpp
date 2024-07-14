@@ -66,7 +66,7 @@ class boss_vizier_jinbak : public CreatureScript
             boss_vizier_jinbakAI(Creature* creature) : BossAI(creature, BOSS_JINBAK)
             {
                 visualTimer = 5000;
-                puddleGUID = 0;
+                puddleGUID = ObjectGuid::Empty;
                 introDone = false;
             }
 
@@ -270,7 +270,7 @@ class boss_vizier_jinbak : public CreatureScript
             uint32 evadeCheckCooldown;
             uint32 visualTimer;
             std::list<SapplingTrigger > summonDestList;
-            uint64 puddleGUID;
+            ObjectGuid puddleGUID;
             bool introDone;
         };
 

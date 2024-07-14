@@ -110,7 +110,7 @@ class instance_sunken_temple : public InstanceMapScript
                 return saveStream.str();
             }
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {

@@ -483,63 +483,63 @@ class boss_paragon_of_the_klaxxi : public CreatureScript
 
                         hasIntro = true;
 
-                        if (Creature* killruk = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KILRUK_THE_WIND_REAVER) : 0))
+                        if (Creature* killruk = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KILRUK_THE_WIND_REAVER) : ObjectGuid::Empty))
                             killruk->AI()->Talk(TALK_PARAGON_INTRO);
 
                         uint32 delay = 4800;
                         scheduler
                             .Schedule(Milliseconds(delay), [this](TaskContext context)
                         {
-                            if (Creature* rikkal = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_RIKKAL_THE_DISSECTOR) : 0))
+                            if (Creature* rikkal = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_RIKKAL_THE_DISSECTOR) : ObjectGuid::Empty))
                                 rikkal->AI()->Talk(TALK_PARAGON_INTRO);
                         });
 
                         scheduler
                             .Schedule(Milliseconds(delay += 6900), [this](TaskContext context)
                         {
-                            if (Creature* iyokkuk = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_IYYOKUK_THE_LUCID) : 0))
+                            if (Creature* iyokkuk = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_IYYOKUK_THE_LUCID) : ObjectGuid::Empty))
                                 iyokkuk->AI()->Talk(TALK_PARAGON_INTRO);
                         });
 
                         scheduler
                             .Schedule(Milliseconds(delay += 6000), [this](TaskContext context)
                         {
-                            if (Creature* xaril = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_XARIL_THE_POISONED_MIND) : 0))
+                            if (Creature* xaril = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_XARIL_THE_POISONED_MIND) : ObjectGuid::Empty))
                                 xaril->AI()->Talk(TALK_PARAGON_INTRO);
                         });
 
                         scheduler
                             .Schedule(Milliseconds(delay += 7400), [this](TaskContext context)
                         {
-                            if (Creature* kaztik = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KAZTIK_THE_MANIPULATOR) : 0))
+                            if (Creature* kaztik = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KAZTIK_THE_MANIPULATOR) : ObjectGuid::Empty))
                                 kaztik->AI()->Talk(TALK_PARAGON_INTRO);
                         });
 
                         scheduler
                             .Schedule(Milliseconds(delay += 6000), [this](TaskContext context)
                         {
-                            if (Creature* korven = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KORVEN_THE_PRIME) : 0))
+                            if (Creature* korven = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KORVEN_THE_PRIME) : ObjectGuid::Empty))
                                 korven->AI()->Talk(TALK_PARAGON_INTRO);
                         });
 
                         scheduler
                             .Schedule(Milliseconds(delay += 10700), [this](TaskContext context)
                         {
-                            if (Creature* karoz = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_KAROZ_THE_LOCUST) : 0))
+                            if (Creature* karoz = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_KAROZ_THE_LOCUST) : ObjectGuid::Empty))
                                 karoz->AI()->Talk(TALK_PARAGON_INTRO);
                         });
 
                         scheduler
                             .Schedule(Milliseconds(delay += 7160), [this](TaskContext context)
                         {
-                            if (Creature* skeer = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_SKEER_THE_BLOODSEEKER) : 0))
+                            if (Creature* skeer = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SKEER_THE_BLOODSEEKER) : ObjectGuid::Empty))
                                 skeer->AI()->Talk(TALK_PARAGON_INTRO);
                         });
 
                         scheduler
                             .Schedule(Milliseconds(delay += 6800), [this](TaskContext context)
                         {
-                            if (Creature* hisek = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_HISEK_THE_SWARMKEEPER) : 0))
+                            if (Creature* hisek = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_HISEK_THE_SWARMKEEPER) : ObjectGuid::Empty))
                                 hisek->AI()->Talk(TALK_PARAGON_INTRO);
                         });
                         break;
@@ -666,7 +666,7 @@ class boss_paragon_of_the_klaxxi : public CreatureScript
                     instance->DoRemoveBloodLustDebuffSpellOnPlayers();
                 }
 
-                if (Creature* mantidAmber = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_AMBER) : 0))
+                if (Creature* mantidAmber = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_AMBER) : ObjectGuid::Empty))
                     mantidAmber->AI()->EnterEvadeMode();
 
                 _DespawnAtEvade();
@@ -804,10 +804,10 @@ struct soo_paragon_typeAI : public ScriptedAI
     Position pos;
     uint8 kunchlongCount;
     uint32 prevToxin, paragonStrength, roleType, aimCount, aimTarget, calculateDone;
-    uint64 targetGUID;
-    uint64 amberGUID;
-    uint64 aimTargetGUID;
-    uint64 bloodlettingTargetGUID;
+    ObjectGuid targetGUID;
+    ObjectGuid amberGUID;
+    ObjectGuid aimTargetGUID;
+    ObjectGuid bloodlettingTargetGUID;
     uint32 whirlCount;
     uint32 flashDistance;
     float x, y;
@@ -865,17 +865,17 @@ struct soo_paragon_typeAI : public ScriptedAI
         me->SetFaction(14);
         me->RemoveFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
         prevToxin       = 0;
-        targetGUID      = 0;
+        targetGUID = ObjectGuid::Empty;
         paragonStrength = 0;
         roleType        = 0;
         aimCount        = 0;
         calculateDone   = 0;
         kunchlongCount  = 0;
-        amberGUID       = 0;
+        amberGUID = ObjectGuid::Empty;
         whirlCount      = 0;
-        aimTargetGUID   = 0;
+        aimTargetGUID = ObjectGuid::Empty;
         flashDistance   = 0;
-        bloodlettingTargetGUID = 0;
+        bloodlettingTargetGUID = ObjectGuid::Empty;
         inWhirl         = false;
         hasEvade        = false;
         hasMeleeProc    = false;
@@ -906,7 +906,7 @@ struct soo_paragon_typeAI : public ScriptedAI
             for (auto&& calculation : m_CalculationList)
                 instance->DoRemoveAurasDueToSpellOnPlayers(calculation);
 
-            if (Creature* paragonController = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_PARAGON_OF_THE_KLAXXI)))
+            if (Creature* paragonController = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_PARAGON_OF_THE_KLAXXI)))
                 paragonController->AI()->EnterEvadeMode();
         }
 
@@ -1123,7 +1123,7 @@ struct soo_paragon_typeAI : public ScriptedAI
             {
                 me->GetInstanceScript()->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
-                if (Creature* paragonController = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_PARAGON_OF_THE_KLAXXI)))
+                if (Creature* paragonController = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_PARAGON_OF_THE_KLAXXI)))
                     paragonController->AI()->DoAction(ACTION_NEXT_PARAGON_MEMBER);
 
                 switch (me->GetEntry())
@@ -1522,7 +1522,7 @@ struct boss_korven_the_prime : public soo_paragon_typeAI
             me->SetFacingTo(me->GetAngle(caster));
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return amberGUID;
     }
@@ -1632,7 +1632,7 @@ struct npc_soo_paragon_amber : public ScriptedAI
 {
     npc_soo_paragon_amber(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) { }
 
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -1655,7 +1655,7 @@ struct npc_soo_paragon_amber : public ScriptedAI
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return targetGUID;
     }
@@ -1796,7 +1796,7 @@ struct boss_karoz_the_locust : public soo_paragon_typeAI
                     DoCast(me, SPELL_STORE_KINETIC_ENERGY, true);
                     break;
                 case EVENT_REMOVE_ADDITIONAL_ABILITY:
-                    if (Creature* m_rAmber = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(NPC_MANTID_AMBER) : 0))
+                    if (Creature* m_rAmber = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_AMBER) : ObjectGuid::Empty))
                         me->GetMotionMaster()->MoveJump(m_rAmber->GetPositionX() + frand(-8.0f, 8.0f), m_rAmber->GetPositionY() + frand(-10.0f, 10.0f), m_rAmber->GetPositionZ(), 20.0f, 25.0f, EVENT_JUMP + 4);
                     break;
                 case EVENT_FLASH:
@@ -1911,12 +1911,12 @@ struct boss_skeer_the_bloodseeker : public soo_paragon_typeAI
         summon->SetWalk(true);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         bloodlettingTargetGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return bloodlettingTargetGUID;
     }
@@ -2051,12 +2051,12 @@ struct boss_hisek_the_swarmkeeper : public soo_paragon_typeAI
             aimCount = data;
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         aimTargetGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return aimTargetGUID;
     }
@@ -2172,7 +2172,7 @@ struct npc_paragon_mantid_amber : public ScriptedAI
                 me->RemoveAurasDueToSpell(SPELL_COSMETIC_TO_FIGHT);
             
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* m_Paragon = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_PARAGON_OF_THE_KLAXXI)))
+                    if (Creature* m_Paragon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_PARAGON_OF_THE_KLAXXI)))
                         m_Paragon->AI()->DoAction(ACTION_KLAXXI_COMBAT);
                 break;
         }
@@ -2188,10 +2188,10 @@ struct npc_soo_paragon_hungry_kunchong : public ScriptedAI
     npc_soo_paragon_hungry_kunchong(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     EventMap events;
     float requiredDamage;
-    uint64 mesmerizeGUID;
+    ObjectGuid mesmerizeGUID;
 
     void IsSummonedBy(Unit* summoner) override
     {
@@ -2208,12 +2208,12 @@ struct npc_soo_paragon_hungry_kunchong : public ScriptedAI
         DoCast(me, SPELL_HUNGRY);
         DoCast(me, SPELL_THICK_SHELL);
         me->GetMotionMaster()->MoveRandom(7.5f);
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         requiredDamage = 100.0f;
-        mesmerizeGUID = 0;
+        mesmerizeGUID = ObjectGuid::Empty;
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         mesmerizeGUID = guid;
     }
@@ -2308,7 +2308,7 @@ struct npc_blood : public ScriptedAI
     npc_blood(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     bool reachTarget;
 
     void Reset() override
@@ -2319,7 +2319,7 @@ struct npc_blood : public ScriptedAI
         me->SetInCombatWithZone();
         me->UpdateSpeed(MOVE_RUN, true);
         reachTarget = false;
-        targetGUID  = 0;
+        targetGUID = ObjectGuid::Empty;
 
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_THREAT, true);
@@ -2398,7 +2398,7 @@ struct npc_paragon_amber_parasite : public ScriptedAI
     npc_paragon_amber_parasite(Creature* creature) : ScriptedAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 fixateTargetGUID;
+    ObjectGuid fixateTargetGUID;
 
     void Reset() override
     {
@@ -2409,7 +2409,7 @@ struct npc_paragon_amber_parasite : public ScriptedAI
         me->SetPowerType(POWER_ENERGY);
         me->SetMaxPower(POWER_ENERGY, 100);
         me->SetPower(POWER_ENERGY, 0);
-        fixateTargetGUID = 0;
+        fixateTargetGUID = ObjectGuid::Empty;
 
         DoCast(me, SPELL_GENETIC_MODIFICATION);
 
@@ -2423,12 +2423,12 @@ struct npc_paragon_amber_parasite : public ScriptedAI
         });
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         fixateTargetGUID = guid;
     }
 
-    uint64 GetGUID(int32 /*type*/) const override
+    ObjectGuid GetGUID(int32 /*type*/) const override
     {
         return fixateTargetGUID;
     }
@@ -3078,7 +3078,7 @@ class spell_soo_insane_calculation_fiery_edge : public SpellScript
 {
     PrepareSpellScript(spell_soo_insane_calculation_fiery_edge);
 
-    std::vector<uint64> targetGUIDs;
+    std::vector<ObjectGuid> targetGUIDs;
 
     void HandleAfterCast()
     {
@@ -3699,7 +3699,7 @@ class spell_paragon_fiery_edge_eff : public SpellScript
 
     bool Load() override
     {
-        linkedTargetGUID = 0;
+        linkedTargetGUID = ObjectGuid::Empty;
         return true;
     }
 
@@ -3732,7 +3732,7 @@ class spell_paragon_fiery_edge_eff : public SpellScript
     }
 
     private:
-        uint64 linkedTargetGUID;
+        ObjectGuid linkedTargetGUID;
 
     void Register() override
     {
@@ -4938,7 +4938,7 @@ class sat_paragon_sonic_pulse : public IAreaTriggerAura
 // 1335. Summoned by 148676 - Reave
 class sat_paragon_reave : public IAreaTriggerAura
 {
-    std::vector<uint64> affectedTargetGUIDs;
+    std::vector<ObjectGuid> affectedTargetGUIDs;
     Position forceMovementPos;
 
     bool CheckTriggering(WorldObject* triggering) override

@@ -61,8 +61,8 @@ class instance_azjol_nerub : public InstanceMapScript
             uint64 uiAnubarakDoor[3];
 
             uint64 uiKrikthirDoor;
-            uint64 questGiverGUID;
-            uint64 questEnderGUID;
+            ObjectGuid questGiverGUID;
+            ObjectGuid questEnderGUID;
 
             std::list<uint64> hadronoxTrash;
             std::list<uint64> questCreatures;
@@ -84,8 +84,8 @@ class instance_azjol_nerub : public InstanceMapScript
                 uiKrikthir = 0;
                 uiHadronox = 0;
                 uiAnubarak = 0;
-                questGiverGUID = 0;
-                questEnderGUID = 0;
+                questGiverGUID = ObjectGuid::Empty;
+                questEnderGUID = ObjectGuid::Empty;
                 uiWatcherGashra = 0;
                 uiWatcherSilthik = 0;
                 uiWatcherNarjil = 0;
@@ -201,7 +201,7 @@ class instance_azjol_nerub : public InstanceMapScript
             }
 
 
-            uint64 GetData64(uint32 type) const override
+            ObjectGuid GetGuidData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -290,13 +290,13 @@ class instance_azjol_nerub : public InstanceMapScript
                                 if (Creature* creature = instance->GetCreature(questCreatureGUID))
                                     creature->SetVisible(true);
 
-                            if (Creature* qStarter = instance->GetCreature(GetData64(NPC_RECLAIMER_AZAK)))
+                            if (Creature* qStarter = instance->GetCreature(GetGuidData(NPC_RECLAIMER_AZAK)))
                             {
                                 qStarter->SetVisible(false);
                                 qStarter->RemoveFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                             }
 
-                            if (Creature* qEnder = instance->GetCreature(GetData64(NPC_RECLAIMER_AZAK + 1)))
+                            if (Creature* qEnder = instance->GetCreature(GetGuidData(NPC_RECLAIMER_AZAK + 1)))
                             {
                                 qEnder->SetVisible(true);
                                 qEnder->SetFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);

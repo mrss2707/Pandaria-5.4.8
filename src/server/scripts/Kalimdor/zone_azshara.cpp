@@ -39,17 +39,17 @@ struct npc_azshara_awol_grunt : public CreatureAI
     npc_azshara_awol_grunt(Creature* creature) : CreatureAI(creature) { }
 
     TaskScheduler scheduler;
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
     bool hasDefeat;
 
     void Reset() override
     {
-        targetGUID = 0;
+        targetGUID = ObjectGuid::Empty;
         hasDefeat = false;
         me->SetFaction(125);
     }
 
-    void SetGUID(uint64 guid, int32 /*type*/) override
+    void SetGUID(ObjectGuid guid, int32 /*type*/) override
     {
         targetGUID = guid;
     }

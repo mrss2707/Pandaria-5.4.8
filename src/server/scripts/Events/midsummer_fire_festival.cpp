@@ -343,7 +343,7 @@ struct npc_torch_tossing_target_bunny_controller : public CreatureAI
     {
         events.Reset();
         events.ScheduleEvent(EVENT_RECHECK_TARGETS, 1000);
-        lastTargetGuid = 0;
+        lastTargetGuid = ObjectGuid::Empty;
     }
 
     void UpdateAI(uint32 diff) override
@@ -411,7 +411,7 @@ struct npc_torch_tossing_target_bunny_controller : public CreatureAI
 private:
     EventMap events;
     std::set<uint64> targetGuids;
-    uint64 lastTargetGuid;
+    ObjectGuid lastTargetGuid;
 };
 
 void AddSC_event_midsummer_fire_festival()
