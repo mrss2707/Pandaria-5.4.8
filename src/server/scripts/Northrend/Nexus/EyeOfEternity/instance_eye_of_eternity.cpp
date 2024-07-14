@@ -57,7 +57,7 @@ public:
             {
                 if (state == FAIL)
                 {
-                    for (std::list<uint64>::const_iterator itr_trigger = portalTriggers.begin(); itr_trigger != portalTriggers.end(); ++itr_trigger)
+                    for (std::list<ObjectGuid>::const_iterator itr_trigger = portalTriggers.begin(); itr_trigger != portalTriggers.end(); ++itr_trigger)
                     {
                         if (Creature* trigger = instance->GetCreature(*itr_trigger))
                         {
@@ -192,7 +192,7 @@ public:
             if (Creature* malygos = instance->GetCreature(malygosGUID))
             {
                 std::list<HostileReference*> m_threatlist = malygos->getThreatManager().getThreatList();
-                for (std::list<uint64>::const_iterator itr_vortex = vortexTriggers.begin(); itr_vortex != vortexTriggers.end(); ++itr_vortex)
+                for (std::list<ObjectGuid>::const_iterator itr_vortex = vortexTriggers.begin(); itr_vortex != vortexTriggers.end(); ++itr_vortex)
                 {
                     if (m_threatlist.empty())
                         return;
@@ -226,7 +226,7 @@ public:
         {
             bool next = (lastPortalGUID == portalTriggers.back() || !lastPortalGUID ? true : false);
 
-            for (std::list<uint64>::const_iterator itr_trigger = portalTriggers.begin(); itr_trigger != portalTriggers.end(); ++itr_trigger)
+            for (std::list<ObjectGuid>::const_iterator itr_trigger = portalTriggers.begin(); itr_trigger != portalTriggers.end(); ++itr_trigger)
             {
                 if (next)
                 {
@@ -279,7 +279,7 @@ public:
                     return giftBoxBunnyGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
@@ -325,8 +325,8 @@ public:
         }
 
         private:
-            std::list<uint64> vortexTriggers;
-            std::list<uint64> portalTriggers;
+            std::list<ObjectGuid> vortexTriggers;
+            std::list<ObjectGuid> portalTriggers;
             ObjectGuid malygosGUID;
             ObjectGuid irisGUID;
             ObjectGuid lastPortalGUID;

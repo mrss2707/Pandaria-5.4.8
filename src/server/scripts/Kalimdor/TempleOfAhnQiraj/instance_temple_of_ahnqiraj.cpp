@@ -147,7 +147,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                     case DATA_VISCIDUS:
                         return ViscidusGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }                                                       // end GetData64
 
             void SetData(uint32 type, uint32 data) override

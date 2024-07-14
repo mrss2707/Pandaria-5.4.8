@@ -53,7 +53,7 @@ class instance_dire_maul : public InstanceMapScript
                 if (type == GO_CONSERVATORY_DOOR)
                     return conservatoryDoorGUID;
 
-                return 0;
+                return ObjectGuid::Empty;
             }
         };
 

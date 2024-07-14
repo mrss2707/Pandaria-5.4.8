@@ -262,7 +262,7 @@ class instance_halls_of_lightning : public InstanceMapScript
                     case NPC_STORMHERALD_ELJRRIN_QG + 1:
                         return m_questEnderGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

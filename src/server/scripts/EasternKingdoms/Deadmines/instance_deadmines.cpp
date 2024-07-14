@@ -249,7 +249,7 @@ class instance_deadmines : public InstanceMapScript
                     case DATA_ADMIRAL:
                         return uiAdmiralGUID;
                     case DATA_TEAM_IN_INSTANCE:     
-                        return TeamInInstance;
+                        return ObjectGuid(uint64(TeamInInstance));
                 }
                 return ObjectGuid::Empty;
             }

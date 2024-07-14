@@ -62,8 +62,8 @@ class instance_steam_vault : public InstanceMapScript
                 KalithreshGUID = ObjectGuid::Empty;
 
                 MainChambersDoorGUID = ObjectGuid::Empty;
-                MekDoor              = 0;
-                HydroDoor            = 0;
+                MekDoor              = ObjectGuid::Empty;
+                HydroDoor            = ObjectGuid::Empty;
                 DistillerState       = 0;
             }
 
@@ -116,7 +116,7 @@ class instance_steam_vault : public InstanceMapScript
                     case GO_ACCESS_PANEL_MEK:
                         return MekDoor;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void SetData(uint32 type, uint32 data) override
@@ -213,8 +213,8 @@ class instance_steam_vault : public InstanceMapScript
                 ObjectGuid KalithreshGUID;
 
                 ObjectGuid MainChambersDoorGUID;
-                uint64 MekDoor;
-                uint64 HydroDoor;
+                ObjectGuid MekDoor;
+                ObjectGuid HydroDoor;
                 uint8 DistillerState;
         };
 

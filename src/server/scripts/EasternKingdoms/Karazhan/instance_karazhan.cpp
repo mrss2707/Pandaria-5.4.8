@@ -442,7 +442,7 @@ class instance_karazhan : public InstanceMapScript
                     case NPC_CHESS_VICTORY_CONTROLLER:  return chessVictoryControllerGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void DoPrepareChessEvent() override

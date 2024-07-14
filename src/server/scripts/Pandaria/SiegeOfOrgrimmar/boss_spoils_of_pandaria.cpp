@@ -540,13 +540,13 @@ class boss_spoils_of_pandaria : public CreatureScript
                         {
                             Talk(TALK_INTRO);
 
-                            if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
+                            if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : ObjectGuid::Empty))
                             {
                                 DoCast(me, SPELL_SPOILS_OF_PANDARIA_AT_LOW_RIGHT, true);
                                 moguSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
                             }
 
-                            if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
+                            if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : ObjectGuid::Empty))
                             {
                                 DoCast(me, SPELL_SPOILS_OF_PANDARIA_AT_UP_LEFT, true);
                                 mantidSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
@@ -583,17 +583,17 @@ class boss_spoils_of_pandaria : public CreatureScript
                     case ACTION_SECOND_QUADRANT:
                         Talk(TALK_SYSTEM_PREPARE_1);
 
-                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
+                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : ObjectGuid::Empty))
                             mantidSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
 
-                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
+                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : ObjectGuid::Empty))
                             moguSpoils->AI()->DoAction(ACTION_INITIALIZE_COMBAT);
 
                         // Remove Frames from old
-                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
+                        if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : ObjectGuid::Empty))
                             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, mantidSpoils);
 
-                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
+                        if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : ObjectGuid::Empty))
                             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, moguSpoils);
 
                         // Unlock 4/4 Sectors
@@ -851,11 +851,11 @@ struct npc_spoils_artifact_spoils : public ScriptedAI
 
                 if (firstPair)
                 {
-                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
+                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : ObjectGuid::Empty))
                         if (moguSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
-                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
+                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : ObjectGuid::Empty))
                         if (mantidSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
@@ -867,11 +867,11 @@ struct npc_spoils_artifact_spoils : public ScriptedAI
                 }
                 else
                 {
-                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
+                    if (Creature* moguSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : ObjectGuid::Empty))
                         if (moguSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
-                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
+                    if (Creature* mantidSpoils = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : ObjectGuid::Empty))
                         if (mantidSpoils->AI()->GetData(TYPE_LEVER_DATA) == DONE)
                             counter++;
 
@@ -1061,7 +1061,7 @@ struct spoils_baseAI : public ScriptedAI
         // For Mogu
         if (mogu)
         {
-            if (Creature* moguController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : 0))
+            if (Creature* moguController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_1) : ObjectGuid::Empty))
             {
                 if (moguController1->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1079,7 +1079,7 @@ struct spoils_baseAI : public ScriptedAI
                 }
             }
 
-            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
+            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : ObjectGuid::Empty))
             {
                 if (moguController2->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1090,7 +1090,7 @@ struct spoils_baseAI : public ScriptedAI
 
                         if (IsHeroic())
                         {
-                            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
+                            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : ObjectGuid::Empty))
                                 mantidController2->CastSpell(sparkSpawnRoomPos[2].GetPositionX() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[2].GetPositionY() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[2].GetPositionZ(), SPELL_UNSTABLE_SPARK_MISSLE, true);
                         }
                     }
@@ -1100,7 +1100,7 @@ struct spoils_baseAI : public ScriptedAI
         else
         {
             // For Mantids
-            if (Creature* mantidController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : 0))
+            if (Creature* mantidController1 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_1) : ObjectGuid::Empty))
             {
                 if (mantidController1->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1118,7 +1118,7 @@ struct spoils_baseAI : public ScriptedAI
                 }
             }
 
-            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : 0))
+            if (Creature* mantidController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MANTID_SPOILS_2) : ObjectGuid::Empty))
             {
                 if (mantidController2->AI()->GetData(TYPE_LEVER_DATA) == IN_PROGRESS)
                 {
@@ -1129,7 +1129,7 @@ struct spoils_baseAI : public ScriptedAI
 
                         if (IsHeroic())
                         {
-                            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : 0))
+                            if (Creature* moguController2 = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_MOGU_SPOILS_2) : ObjectGuid::Empty))
                                 moguController2->CastSpell(sparkSpawnRoomPos[3].GetPositionX() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[3].GetPositionY() + frand(-8.0f, 8.0f), sparkSpawnRoomPos[3].GetPositionZ(), SPELL_UNSTABLE_SPARK_MISSLE, true);
                         }
                     }

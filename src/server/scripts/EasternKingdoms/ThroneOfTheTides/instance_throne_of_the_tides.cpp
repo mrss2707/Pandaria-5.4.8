@@ -245,7 +245,7 @@ class instance_throne_of_the_tides : public InstanceMapScript
                     case DATA_CORALES:
                         return uiCoralesGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

@@ -1351,7 +1351,7 @@ public:
             if (!shen)
                 return;
 
-            if (Player* plr = sObjectAccessor->FindPlayer(playerGuid))
+            if (Player* plr = ObjectAccessor::FindPlayer(playerGuid))
             {
                 Creature *head = me->GetMap()->GetCreature(headGUID);
                 if (!head)
@@ -1401,7 +1401,7 @@ public:
                     break;
                 case 15:
                 {
-                    if (Player* plr = sObjectAccessor->FindPlayer(playerGuid))
+                    if (Player* plr = ObjectAccessor::FindPlayer(playerGuid))
                         me->CastSpell(plr, SPELL_CREDIT_2, true);
                     break;
                 }
@@ -1429,7 +1429,7 @@ public:
                     }
                     case EVENT_AISA_TALK_3:
                         if (Creature *head = me->GetMap()->GetCreature(headGUID))
-                            if (Player* plr = sObjectAccessor->FindPlayer(playerGuid))
+                            if (Player* plr = ObjectAccessor::FindPlayer(playerGuid))
                             {
                                 plr->CastSpell(plr, SPELL_HEAD_ANIM_RISE, false);    //17:25:31.000
                                 head->SetUInt32Value(UNIT_FIELD_NPC_EMOTESTATE, 0);  //hack

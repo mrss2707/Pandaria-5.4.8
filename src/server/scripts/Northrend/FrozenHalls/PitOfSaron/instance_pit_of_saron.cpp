@@ -304,7 +304,7 @@ class instance_pit_of_saron : public InstanceMapScript
                         break;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

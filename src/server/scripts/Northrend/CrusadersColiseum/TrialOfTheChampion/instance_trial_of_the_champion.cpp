@@ -42,14 +42,14 @@ class instance_trial_of_the_champion : public InstanceMapScript
             ObjectGuid announcerGUID;
             ObjectGuid mainGateGUID;
             ObjectGuid portcullisGUID;
-            uint64 grandChampion1GUID;
-            uint64 grandChampion2GUID;
-            uint64 grandChampion3GUID;
+            ObjectGuid grandChampion1GUID;
+            ObjectGuid grandChampion2GUID;
+            ObjectGuid grandChampion3GUID;
             ObjectGuid championLootGUID;
             ObjectGuid argentChampionGUID;
             ObjectGuid blackKnightGUID;
 
-            std::list<uint64> vehicleList;
+            std::list<ObjectGuid> vehicleList;
             std::string str_data;
 
             void Initialize() override
@@ -66,9 +66,9 @@ class instance_trial_of_the_champion : public InstanceMapScript
                 announcerGUID = ObjectGuid::Empty;
                 mainGateGUID = ObjectGuid::Empty;
                 portcullisGUID = ObjectGuid::Empty;
-                grandChampion1GUID = 0;
-                grandChampion2GUID = 0;
-                grandChampion3GUID = 0;
+                grandChampion1GUID = ObjectGuid::Empty;
+                grandChampion2GUID = ObjectGuid::Empty;
+                grandChampion3GUID = ObjectGuid::Empty;
                 championLootGUID = ObjectGuid::Empty;
                 argentChampionGUID = ObjectGuid::Empty;
                 blackKnightGUID = ObjectGuid::Empty;
@@ -388,7 +388,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
                     case DATA_BLACK_KNIGHT:            return blackKnightGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void SetGuidData(uint32 type, ObjectGuid data) override

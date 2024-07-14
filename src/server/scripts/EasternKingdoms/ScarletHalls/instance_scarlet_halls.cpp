@@ -151,7 +151,7 @@ class instance_scarlet_halls : public InstanceMapScript
                         return HoodedGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

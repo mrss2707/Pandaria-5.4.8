@@ -125,7 +125,7 @@ public:
         ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == DATA_NARALEX)return NaralexGUID;
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

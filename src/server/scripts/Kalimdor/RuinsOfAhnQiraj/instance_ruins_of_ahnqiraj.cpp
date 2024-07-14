@@ -98,7 +98,7 @@ class instance_ruins_of_ahnqiraj : public InstanceMapScript
                         return _paralyzedGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

@@ -109,8 +109,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                 DeathbringerSaurfangDoorGUID = ObjectGuid::Empty;
                 DeathbringerSaurfangEventGUID = ObjectGuid::Empty;
                 DeathbringersCacheGUID = ObjectGuid::Empty;
-                BloodwingDoor                   = 0;
-                FrostwingDoor                   = 0;
+                BloodwingDoor                   = ObjectGuid::Empty;
+                FrostwingDoor                   = ObjectGuid::Empty;
                 PlagueSigilGUID = ObjectGuid::Empty;
                 BloodwingSigilGUID = ObjectGuid::Empty;
                 FrostwingSigilGUID = ObjectGuid::Empty;
@@ -147,11 +147,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                 FrostwyrmCount = 0;
                 SpinestalkerTrashCount = 0;
                 RimefangTrashCount = 0;
-                FrostyEdgeInner = 0;
-                FrostyEdgeOuter = 0;
-                EdgeDestroyWarning = 0;
-                FrozenLavaman = 0;
-                LavamanPillars = 0;
+                FrostyEdgeInner = ObjectGuid::Empty;
+                FrostyEdgeOuter = ObjectGuid::Empty;
+                EdgeDestroyWarning = ObjectGuid::Empty;
+                FrozenLavaman = ObjectGuid::Empty;
+                LavamanPillars = ObjectGuid::Empty;
                 IsBonedEligible = true;
                 IsOozeDanceEligible = true;
                 IsNauseaEligible = true;
@@ -216,12 +216,12 @@ class instance_icecrown_citadel : public InstanceMapScript
                     // Ensure all traps are loaded
                     instance->LoadGrid(-250.0f, 2211.0f);
                     instance->LoadGrid(4357.0f, 3028.0f);
-                    auto randomizeTraps = [this](std::list<uint64>& guids, uint32 count)
+                    auto randomizeTraps = [this](std::list<ObjectGuid>& guids, uint32 count)
                     {
                         if (guids.size() <= count)
                             return;
 
-                        std::list<uint64> remove = guids;
+                        std::list<ObjectGuid> remove = guids;
                         Trinity::Containers::RandomResizeList(remove, remove.size() - count);
                         for (auto&& guid : remove)
                         {
@@ -246,7 +246,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     // Ensure all traps are loaded
                     instance->LoadGrid(-250.0f, 2211.0f);
                     instance->LoadGrid(4357.0f, 3028.0f);
-                    auto deleteTraps = [this](std::list<uint64>& guids)
+                    auto deleteTraps = [this](std::list<ObjectGuid>& guids)
                     {
                         for (auto&& guid : guids)
                             if (GameObject* trap = instance->GetGameObject(guid))
@@ -495,7 +495,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                         LightsHammerTheLichKingGUID = creature->GetGUID();
                         break;
                     default:
-                        if (creature->IsGuardian() && IS_PLAYER_GUID(creature->GetOwnerGUID()))
+                        if (creature->IsGuardian() && creature->GetOwnerGUID().IsPlayer())
                             ApplyIccBuff(creature);
                         break;
                 }
@@ -1062,7 +1062,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                         break;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override
@@ -1988,31 +1988,31 @@ class instance_icecrown_citadel : public InstanceMapScript
             ObjectGuid DeathbringerSaurfangGbGUID;
             ObjectGuid MuradinBronzebeardGbGUID;
             ObjectGuid GbBattleMageGUID;
-            uint64 GunshipArmoryGUID = 0;
+            ObjectGuid GunshipArmoryGUID;
             ObjectGuid DeathbringerSaurfangGUID;
             ObjectGuid DeathbringerSaurfangDoorGUID;
             ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
             ObjectGuid DeathbringersCacheGUID;
             ObjectGuid PlagueSigilGUID;
-            uint64 BloodwingDoor;
-            uint64 FrostwingDoor;
+            ObjectGuid BloodwingDoor;
+            ObjectGuid FrostwingDoor;
             ObjectGuid BloodwingSigilGUID;
             ObjectGuid FrostwingSigilGUID;
-            uint64 PutricideValveGUIDs[2];
+            ObjectGuid PutricideValveGUIDs[2];
             bool PutricideValveState[2];
-            uint64 PutricidePipeGUIDs[2];
-            uint64 PutricideGateGUIDs[2];
+            ObjectGuid PutricidePipeGUIDs[2];
+            ObjectGuid PutricideGateGUIDs[2];
             ObjectGuid PutricideCollisionGUID;
             ObjectGuid FestergutGUID;
             ObjectGuid RotfaceGUID;
             ObjectGuid ProfessorPutricideGUID;
             ObjectGuid PutricideTableGUID;
-            uint64 BloodCouncilGUIDs[3];
+            ObjectGuid BloodCouncilGUIDs[3];
             ObjectGuid BloodCouncilControllerGUID;
             ObjectGuid BloodQueenLanaThelCouncilGUID;
             ObjectGuid BloodQueenLanaThelGUID;
             ObjectGuid CrokScourgebaneGUID;
-            uint64 CrokCaptainGUIDs[4];
+            ObjectGuid CrokCaptainGUIDs[4];
             ObjectGuid SisterSvalnaGUID;
             ObjectGuid ValithriaDreamwalkerGUID;
             ObjectGuid ValithriaLichKingGUID;
@@ -2032,11 +2032,11 @@ class instance_icecrown_citadel : public InstanceMapScript
             ObjectGuid FrozenBolvarGUID;
             ObjectGuid PillarsChainedGUID;
             ObjectGuid PillarsUnchainedGUID;
-            uint64 FrostyEdgeInner;
-            uint64 FrostyEdgeOuter;
-            uint64 EdgeDestroyWarning;
-            uint64 FrozenLavaman;
-            uint64 LavamanPillars;
+            ObjectGuid FrostyEdgeInner;
+            ObjectGuid FrostyEdgeOuter;
+            ObjectGuid EdgeDestroyWarning;
+            ObjectGuid FrozenLavaman;
+            ObjectGuid LavamanPillars;
             ObjectGuid GunShipControllerGUID;
             ObjectGuid GBMuradinGUID;
             ObjectGuid GBSaurfangGUID;
@@ -2064,19 +2064,19 @@ class instance_icecrown_citadel : public InstanceMapScript
             bool IsOrbWhispererEligible;
             bool ZoneBuffState;
             bool isPrepared;
-            std::map<uint32, std::list<uint64>> TrapGUIDs;
+            std::map<uint32, std::list<ObjectGuid>> TrapGUIDs;
             bool TrapsRandomized = false;
             bool TrapsDeleted = false;
             bool LightsHammerNPCsLeft = false;
             bool QuestNPCsSpawned = false;
             WeeklyIndexICC WeeklyIndex = WeeklyIndexICC::None;
             bool ValithriaQuestgiveSpawned = false;
-            uint64 KorkronLieutenantGUID = 0;
+            ObjectGuid KorkronLieutenantGUID;
             EncounterState RottingFrostGiantState = NOT_STARTED;
-            uint64 ScourgeTransporterLightsHammerGUID = 0;
-            uint64 ScourgeTransporterDeathbringersRiseGUID = 0;
-            uint64 ScourgeTransporterUpperSpireGUID = 0;
-            uint64 ScourgeTransporterTheLickKingGUID = 0;
+            ObjectGuid ScourgeTransporterLightsHammerGUID;
+            ObjectGuid ScourgeTransporterDeathbringersRiseGUID;
+            ObjectGuid ScourgeTransporterUpperSpireGUID;
+            ObjectGuid ScourgeTransporterTheLickKingGUID;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const

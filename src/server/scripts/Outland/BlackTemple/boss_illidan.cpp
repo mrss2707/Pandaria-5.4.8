@@ -389,7 +389,7 @@ class npc_flame_of_azzinoth : public CreatureScript
                 }
             }
 
-            void SetGlaiveGUID(uint64 guid)
+            void SetGlaiveGUID(ObjectGuid guid)
             {
                 GlaiveGUID = guid;
             }
@@ -465,7 +465,7 @@ class boss_illidan_stormrage : public CreatureScript
                 {
                     for (uint8 i = 0; i < 2; ++i)
                         if (summon->GetGUID() == FlameGUID[i])
-                            FlameGUID[i] = 0;
+                            FlameGUID[i] = ObjectGuid::Empty;
 
                     if (!FlameGUID[0] && !FlameGUID[1] && Phase != PHASE_ILLIDAN_NULL)
                     {
@@ -530,7 +530,7 @@ class boss_illidan_stormrage : public CreatureScript
                 instance->SetData(DATA_ILLIDAN_STORMRAGE_EVENT, DONE); // Completed
 
                 for (uint8 i = DATA_GAMEOBJECT_ILLIDAN_DOOR_R; i < DATA_GAMEOBJECT_ILLIDAN_DOOR_L + 1; ++i)
-                    instance->HandleGameObject(instance->GetData64(i), true);
+                    instance->HandleGameObject(instance->GetGuidData(i), true);
             }
 
             void KilledUnit(Unit* victim) override
@@ -851,7 +851,7 @@ class boss_illidan_stormrage : public CreatureScript
                                     glaive->SetVisible(false);
                                     glaive->setDeathState(JUST_DIED); // Despawn the Glaive
                                 }
-                                GlaiveGUID[i] = 0;
+                                GlaiveGUID[i] = ObjectGuid::Empty;
                             }
                         }
                         Timer[EVENT_FLIGHT_SEQUENCE] = 2000;
@@ -1140,7 +1140,7 @@ class boss_maiev_shadowsong : public CreatureScript
             void MoveInLineOfSight(Unit* /*who*/) override { }
             void EnterEvadeMode() override { }
 
-            void GetIllidanGUID(uint64 guid)
+            void GetIllidanGUID(ObjectGuid guid)
             {
                 IllidanGUID = guid;
             }
@@ -1422,13 +1422,13 @@ class npc_akama_illidan : public CreatureScript
                 {
                     IllidanGUID = ObjectGuid::Empty;
                     GateGUID = ObjectGuid::Empty;
-                    DoorGUID[0] = 0;
-                    DoorGUID[1] = 0;
+                    DoorGUID[0] = ObjectGuid::Empty;
+                    DoorGUID[1] = ObjectGuid::Empty;
                 }
 
                 ChannelGUID = ObjectGuid::Empty;
-                SpiritGUID[0] = 0;
-                SpiritGUID[1] = 0;
+                SpiritGUID[0] = ObjectGuid::Empty;
+                SpiritGUID[1] = ObjectGuid::Empty;
 
                 Phase = PHASE_AKAMA_NULL;
                 Timer = 0;
@@ -1849,8 +1849,8 @@ void boss_illidan_stormrage::boss_illidan_stormrageAI::Reset()
     MaievGUID = ObjectGuid::Empty;
     for (uint8 i = 0; i < 2; ++i)
     {
-        FlameGUID[i] = 0;
-        GlaiveGUID[i] = 0;
+        FlameGUID[i] = ObjectGuid::Empty;
+        GlaiveGUID[i] = ObjectGuid::Empty;
     }
 
     Phase = PHASE_ILLIDAN_NULL;

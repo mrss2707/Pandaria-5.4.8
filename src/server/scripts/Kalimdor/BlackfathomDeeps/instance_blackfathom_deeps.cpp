@@ -252,7 +252,7 @@ public:
                     return mainDoorGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
     };
 };

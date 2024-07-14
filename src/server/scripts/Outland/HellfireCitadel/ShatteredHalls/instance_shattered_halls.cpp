@@ -110,7 +110,7 @@ class instance_shattered_halls : public InstanceMapScript
                 if (data == NPC_GRAND_WARLOCK_NETHEKURSE)
                     return nethekurseGUID;
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

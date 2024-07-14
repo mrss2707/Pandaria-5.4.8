@@ -179,7 +179,7 @@ class instance_bastion_of_twilight : public InstanceMapScript
                     case DATA_CHOGALL:
                         return uiChogallGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             uint32 GetData(uint32 type) const override

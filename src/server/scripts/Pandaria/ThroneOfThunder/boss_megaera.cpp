@@ -1375,7 +1375,7 @@ struct npc_torrent_of_ice : public ScriptedAI
     ObjectGuid targetGUID;
     ObjectGuid summonerGUID;
 
-    void SetGUID(uint64 guid, int32 /*value*/) override
+    void SetGUID(ObjectGuid guid, int32 /*value*/) override
     {
         targetGUID = guid;
     }

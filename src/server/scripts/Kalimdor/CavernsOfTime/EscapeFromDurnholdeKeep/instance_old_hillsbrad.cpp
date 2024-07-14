@@ -233,7 +233,7 @@ public:
             case DATA_EPOCH:
             return EpochGUID;
             }
-            return 0;
+            return ObjectGuid::Empty;
         }
     };
 

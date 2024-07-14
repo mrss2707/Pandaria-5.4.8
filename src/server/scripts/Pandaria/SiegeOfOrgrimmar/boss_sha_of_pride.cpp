@@ -581,7 +581,7 @@ class boss_sha_of_pride : public CreatureScript
                 berserkerEvents.ScheduleEvent(EVENT_CHECK_EVADE, 1 * IN_MILLISECONDS);
                 HandleExecuteSwellingPride();
 
-                if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_NORUSHEN_2) : 0))
+                if (Creature* norushen = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_NORUSHEN_2) : ObjectGuid::Empty))
                     norushen->AI()->DoAction(ACTION_START_INTRO);
 
                 if (IsHeroic())

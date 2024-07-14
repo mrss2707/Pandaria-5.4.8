@@ -337,7 +337,7 @@ class boss_siegecrafter_blackfuse : public CreatureScript
             void KilledUnit(Unit* victim) override
             {
                 if (victim && victim->GetTypeId() == TYPEID_PLAYER)
-                    if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : 0))
+                    if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : ObjectGuid::Empty))
                         mySiegecrafter->AI()->Talk(TALK_SLAY);
             }
 
@@ -348,7 +348,7 @@ class boss_siegecrafter_blackfuse : public CreatureScript
                 me->SetReactState(REACT_AGGRESSIVE);
                 DoCast(me, SPELL_ENERGIZING_DEFENSIVE_MATRIX); // remove players from conveyor on encounter combat
 
-                if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : 0))
+                if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : ObjectGuid::Empty))
                     mySiegecrafter->AI()->Talk(TALK_AGGRO);
 
                 if (instance)
@@ -438,7 +438,7 @@ class boss_siegecrafter_blackfuse : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : 0))
+                if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : ObjectGuid::Empty))
                     mySiegecrafter->AI()->Talk(TALK_DEATH);
 
                 Talk(TALK_AGGRO); // announce: crossfire door are open
@@ -501,7 +501,7 @@ class boss_siegecrafter_blackfuse : public CreatureScript
                             events.ScheduleEvent(EVENT_ELECTROSTATIC_CHARGE, 16 * IN_MILLISECONDS);
                             break;
                         case EVENT_SHREDDER:
-                            if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : 0))
+                            if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : ObjectGuid::Empty))
                             {
                                 mySiegecrafter->AI()->Talk(TALK_SHREDDER_ANN);
                                 mySiegecrafter->AI()->Talk(TALK_SHREDDER);
@@ -985,7 +985,7 @@ struct npc_soo_siegecrafter_helper : public ScriptedAI
                     if (++conveyorSeq > 12)
                         conveyorSeq = 13; // Mega Turret!
 
-                    if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : 0))
+                    if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : ObjectGuid::Empty))
                         mySiegecrafter->AI()->Talk(TALK_CONVEYOR_ANN);
 
                     // Remix Beams (always active 3 in normal, in heroic another algorithm)
@@ -1248,7 +1248,7 @@ struct npc_soo_deactivated_weapons : public ScriptedAI
                 helper->AI()->SetData(TYPE_CONVEYOR_WEAPON_DESTROYED, 1);
             }
 
-            if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : 0))
+            if (Creature* mySiegecrafter = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_SIEGECRAFTER_BLACKFUSE_1) : ObjectGuid::Empty))
                 mySiegecrafter->AI()->Talk(TALK_WEAPON_DEATH);
 
             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);

@@ -531,7 +531,7 @@ class boss_sindragosa : public CreatureScript
                                 Talk(EMOTE_WARN_FROZEN_ORB, target);
                                 DoCast(target, SPELL_ICE_TOMB_DUMMY, true);
 
-                                uint64 targetGuid = target->GetGUID();
+                                ObjectGuid targetGuid = target->GetGUID();
                                 me->m_Events.Schedule(500, [this, targetGuid]()
                                 {
                                     if (Unit* target = ObjectAccessor::GetUnit(*me, targetGuid))
@@ -648,7 +648,7 @@ class npc_ice_tomb : public CreatureScript
                 DoCast(me, 26586, true); // Birth
             }
 
-            void SetGUID(uint64 guid, int32 type/* = 0 */) override
+            void SetGUID(ObjectGuid guid, int32 type/* = 0 */) override
             {
                 if (type == DATA_TRAPPED_PLAYER)
                 {
@@ -1431,7 +1431,7 @@ class spell_sindragosa_ice_tomb : public SpellScriptLoader
 
                 caster->CastSpell(target, SPELL_ICE_TOMB_DUMMY, true);
 
-                uint64 targetGuid = target->GetGUID();
+                ObjectGuid targetGuid = target->GetGUID();
                 caster->m_Events.Schedule(500, [caster, targetGuid]()
                 {
                     if (Unit* target = ObjectAccessor::GetUnit(*caster, targetGuid))

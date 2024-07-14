@@ -68,8 +68,8 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 _malGanisGUID = ObjectGuid::Empty;
                 _infiniteGUID = ObjectGuid::Empty;
                 _shkafGateGUID = ObjectGuid::Empty;
-                _malGanisGate1GUID = 0;
-                _malGanisGate2GUID = 0;
+                _malGanisGate1GUID = ObjectGuid::Empty;
+                _malGanisGate2GUID = ObjectGuid::Empty;
                 _exitGateGUID = ObjectGuid::Empty;
                 _malGanisChestGUID = ObjectGuid::Empty;
                 _genericBunnyGUID = ObjectGuid::Empty;
@@ -401,7 +401,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     case DATA_MAL_GANIS_CHEST:
                         return _malGanisChestGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Update(uint32 diff) override
@@ -483,8 +483,8 @@ class instance_culling_of_stratholme : public InstanceMapScript
             ObjectGuid _malGanisGUID;
             ObjectGuid _infiniteGUID;
             ObjectGuid _shkafGateGUID;
-            uint64 _malGanisGate1GUID;
-            uint64 _malGanisGate2GUID;
+            ObjectGuid _malGanisGate1GUID;
+            ObjectGuid _malGanisGate2GUID;
             ObjectGuid _exitGateGUID;
             ObjectGuid _malGanisChestGUID;
             ObjectGuid _genericBunnyGUID;
@@ -496,8 +496,8 @@ class instance_culling_of_stratholme : public InstanceMapScript
             uint8 _killedZombieCount;
             uint32 _zombieTimer;
             std::list<Position> _citizensPosList;
-            std::list<uint64> _citizensList;
-            std::list<uint64> _zombiesList;
+            std::list<ObjectGuid> _citizensList;
+            std::list<ObjectGuid> _zombiesList;
             uint32 _eventTimer;
             uint32 _lastTimer;
             bool debug;

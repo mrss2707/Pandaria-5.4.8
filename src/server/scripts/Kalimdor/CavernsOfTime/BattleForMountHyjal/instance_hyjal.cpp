@@ -138,7 +138,7 @@ public:
                 case DATA_TYRANDEWHISPERWIND: return TyrandeWhisperwind;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override

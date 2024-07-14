@@ -43,36 +43,36 @@ class instance_utgarde_pinnacle : public InstanceMapScript
         {
             instance_pinnacle(Map* map) : InstanceScript(map) { }
 
-            uint64 uiSvalaSorrowgrave;
-            uint64 uiGortokPalehoof;
-            uint64 uiSkadiTheRuthless;
-            uint64 uiGrauf;
-            uint64 uiKingYmiron;
+            ObjectGuid uiSvalaSorrowgrave;
+            ObjectGuid uiGortokPalehoof;
+            ObjectGuid uiSkadiTheRuthless;
+            ObjectGuid uiGrauf;
+            ObjectGuid uiKingYmiron;
 
-            uint64 uiSkadiTheRuthlessDoor;
-            uint64 uiKingYmironDoor;
-            uint64 uiGortokPalehoofSphere;
+            ObjectGuid uiSkadiTheRuthlessDoor;
+            ObjectGuid uiKingYmironDoor;
+            ObjectGuid uiGortokPalehoofSphere;
 
-            uint64 uiFrenziedWorgen;
-            uint64 uiRavenousFurbolg;
-            uint64 uiFerociousRhino;
-            uint64 uiMassiveJormungar;
-            uint64 uiPalehoofOrb;
+            ObjectGuid uiFrenziedWorgen;
+            ObjectGuid uiRavenousFurbolg;
+            ObjectGuid uiFerociousRhino;
+            ObjectGuid uiMassiveJormungar;
+            ObjectGuid uiPalehoofOrb;
 
-            uint64 uiSvala;
-            uint64 uiFlameBrazier_1;
-            uint64 uiFlameBrazier_2;
+            ObjectGuid uiSvala;
+            ObjectGuid uiFlameBrazier_1;
+            ObjectGuid uiFlameBrazier_2;
 
             uint32 m_auiEncounter[MAX_ENCOUNTER];
         
-            uint64 uiDoodad_Utgarde_Mirror_FX01;
+            ObjectGuid uiDoodad_Utgarde_Mirror_FX01;
 
             std::string str_data;
 
             void Initialize() override
             {
                 SetBossNumber(MAX_ENCOUNTER);
-                uiFlameBrazier_1 = 0;
+                uiFlameBrazier_1 = ObjectGuid::Empty;
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                    m_auiEncounter[i] = NOT_STARTED;
             }
@@ -244,7 +244,7 @@ class instance_utgarde_pinnacle : public InstanceMapScript
                     case DATA_DOODAD_UTGARDE_MIRROR_FX01:  return uiDoodad_Utgarde_Mirror_FX01;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

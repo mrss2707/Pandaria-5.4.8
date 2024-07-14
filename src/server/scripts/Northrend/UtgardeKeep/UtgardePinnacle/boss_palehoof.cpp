@@ -888,11 +888,11 @@ class npc_palehoof_orb : public CreatureScript
                        Creature* pNext = NULL;
                        switch (currentPhase)
                        {
-                            case PHASE_FRENZIED_WORGEN:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FRENZIED_WORGEN)   : 0); break;
-                            case PHASE_RAVENOUS_FURLBORG: pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_RAVENOUS_FURBOLG)  : 0); break;
+                           case PHASE_FRENZIED_WORGEN:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FRENZIED_WORGEN)   : ObjectGuid::Empty); break;
+                            case PHASE_RAVENOUS_FURLBORG: pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_RAVENOUS_FURBOLG)  : ObjectGuid::Empty); break;
                             case PHASE_MASSIVE_JORMUNGAR: pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_MASSIVE_JORMUNGAR) : ObjectGuid::Empty); break;
-                            case PHASE_FEROCIOUS_RHINO:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FEROCIOUS_RHINO)   : 0); break;
-                            case PHASE_GORTOK_PALEHOOF:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_GORTOK_PALEHOOF)       : 0); break;
+                            case PHASE_FEROCIOUS_RHINO:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FEROCIOUS_RHINO)   : ObjectGuid::Empty); break;
+                            case PHASE_GORTOK_PALEHOOF:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_GORTOK_PALEHOOF)       : ObjectGuid::Empty); break;
                             default: break;
                        }
 
@@ -924,11 +924,11 @@ class npc_palehoof_orb : public CreatureScript
 
                 switch (pointId)
                 {
-                    case PHASE_FRENZIED_WORGEN:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FRENZIED_WORGEN)   : 0); break;
-                    case PHASE_RAVENOUS_FURLBORG: pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_RAVENOUS_FURBOLG)  : 0); break;
+                    case PHASE_FRENZIED_WORGEN:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FRENZIED_WORGEN)   : ObjectGuid::Empty); break;
+                    case PHASE_RAVENOUS_FURLBORG: pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_RAVENOUS_FURBOLG)  : ObjectGuid::Empty); break;
                     case PHASE_MASSIVE_JORMUNGAR: pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_MASSIVE_JORMUNGAR) : ObjectGuid::Empty); break;
-                    case PHASE_FEROCIOUS_RHINO:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FEROCIOUS_RHINO)   : 0); break;
-                    case PHASE_GORTOK_PALEHOOF:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_GORTOK_PALEHOOF)       : 0); break;
+                    case PHASE_FEROCIOUS_RHINO:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_NPC_FEROCIOUS_RHINO)   : ObjectGuid::Empty); break;
+                    case PHASE_GORTOK_PALEHOOF:   pNext = Unit::GetCreature(*me, instance ? instance->GetGuidData(DATA_GORTOK_PALEHOOF)       : ObjectGuid::Empty); break;
                     default: break;
                 }
 

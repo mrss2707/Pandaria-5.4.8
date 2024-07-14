@@ -232,9 +232,8 @@ class instance_firelands : public InstanceMapScript
                     case DATA_RAGNAROS_CACHE_25: return uiRagnarosCache25;
                     case DATA_VOLCANO: return volcanoGUID;
                     case DATA_FIRELANDS_EVENT_BUNNY: return firelandsEventBunnyGUID;
-                    default: return 0;
+                    default: return ObjectGuid::Empty;
                 }
-                return 0;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

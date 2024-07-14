@@ -189,7 +189,7 @@ class AbominationDespawner
     public:
         explicit AbominationDespawner(Unit* owner) : _owner(owner) { }
 
-        bool operator()(uint64 guid)
+        bool operator()(ObjectGuid guid)
         {
             if (Unit* summon = ObjectAccessor::GetUnit(*_owner, guid))
             {
@@ -802,7 +802,7 @@ class boss_professor_putricide : public CreatureScript
                 events.SetPhase(newPhase);
             }
 
-            uint64 _oozeFloodDummyGUIDs[4];
+            ObjectGuid _oozeFloodDummyGUIDs[4];
             Phases _phase;          // external of EventMap because event phase gets reset on evade
             float const _baseSpeed;
             uint8 _oozeFloodStage;
@@ -1347,7 +1347,7 @@ class spell_putricide_unstable_experiment : public SpellScriptLoader
                 uint32 stage = GetCaster()->ToCreature()->AI()->GetData(DATA_EXPERIMENT_STAGE);
                 Creature* target = nullptr;
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (uint64 guid = instance->GetData64(stage ? DATA_UNSTABLE_EXPERIMENT_STALKER_RED : DATA_UNSTABLE_EXPERIMENT_STALKER_GREEN))
+                    if (ObjectGuid guid = instance->GetGuidData(stage ? DATA_UNSTABLE_EXPERIMENT_STALKER_RED : DATA_UNSTABLE_EXPERIMENT_STALKER_GREEN))
                         target = instance->instance->GetCreature(guid);
                 /*std::list<Creature*> creList;
                 GetCreatureListWithEntryInGrid(creList, GetCaster(), NPC_ABOMINATION_WING_MAD_SCIENTIST_STALKER, 200.0f);

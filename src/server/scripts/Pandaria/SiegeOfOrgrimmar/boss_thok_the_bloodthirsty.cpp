@@ -1646,7 +1646,7 @@ class spell_thok_clump_check : public SpellScript
 
         // second phase
         if (m_targets.size() >= targetCount)
-            if (Creature* thok = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetData64(DATA_THOK_THE_BLOODTHIRSTY) : 0))
+            if (Creature* thok = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(DATA_THOK_THE_BLOODTHIRSTY) : 0))
                 thok->AI()->DoAction(ACTION_FRENZY);
     }
 

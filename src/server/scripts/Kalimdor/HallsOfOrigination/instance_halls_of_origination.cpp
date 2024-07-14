@@ -171,7 +171,7 @@ class instance_halls_of_origination : public InstanceMapScript
                     case DATA_ANRAPHET_BOSS_DOOR:
                         return uiAnraphetBossDoorGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

@@ -117,7 +117,7 @@ class instance_the_vortex_pinnacle : public InstanceMapScript
                     case DATA_ASAAD:
                         return uiAsaadGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

@@ -79,11 +79,11 @@ class instance_ulduar : public InstanceMapScript
             ObjectGuid OrbitalSupportGUID;
             ObjectGuid IgnisGUID;
             ObjectGuid RazorscaleGUID;
-            uint64 RazorscaleController;
+            ObjectGuid RazorscaleController;
             ObjectGuid ExpeditionCommanderGUID;
-            uint64 XT002GUID;
-            uint64 XTToyPileGUIDs[4];
-            uint64 AssemblyGUIDs[3];
+            ObjectGuid XT002GUID;
+            ObjectGuid XTToyPileGUIDs[4];
+            ObjectGuid AssemblyGUIDs[3];
             ObjectGuid KologarnGUID;
             ObjectGuid AuriayaGUID;
             ObjectGuid HodirGUID;
@@ -92,14 +92,14 @@ class instance_ulduar : public InstanceMapScript
             ObjectGuid RunicColossusGUID;
             ObjectGuid RuneGiantGUID;
             ObjectGuid FreyaGUID;
-            uint64 ElderGUIDs[3];
+            ObjectGuid ElderGUIDs[3];
             ObjectGuid MimironGUID;
             ObjectGuid LeviathanMKIIGUID;
-            uint64 VX001GUID;
+            ObjectGuid VX001GUID;
             ObjectGuid AerialUnitGUID;
             ObjectGuid VezaxGUID;
             ObjectGuid YoggSaronGUID;
-            uint64 KeeperGUIDs[4];
+            ObjectGuid KeeperGUIDs[4];
             ObjectGuid VoiceOfYoggSaronGUID;
             ObjectGuid SaraGUID;
             ObjectGuid BrainOfYoggSaronGUID;
@@ -113,12 +113,12 @@ class instance_ulduar : public InstanceMapScript
             ObjectGuid TowerofFlamesCrystalGUID;
             ObjectGuid TowerofFrostCrystalGUID;
             ObjectGuid TowerofLifeCrystalGUID;
-            uint64 RazorHarpoonGUIDs[4];
+            ObjectGuid RazorHarpoonGUIDs[4];
             ObjectGuid KologarnChestGUID;
             ObjectGuid KologarnBridgeGUID;
-            uint64 ActivateTramGUID = 0;
-            uint64 CallTramLastGUID = 0;
-            uint64 CallTramFirstGUID = 0;
+            ObjectGuid ActivateTramGUID;
+            ObjectGuid CallTramLastGUID;
+            ObjectGuid CallTramFirstGUID;
             ObjectGuid MimironTrainGUID;
             ObjectGuid MimironElevatorGUID;
             ObjectGuid MimironChestGUID;
@@ -132,7 +132,7 @@ class instance_ulduar : public InstanceMapScript
             ObjectGuid ThorimChestHardGUID;
             ObjectGuid ThorimDarkIronPortCullisGUID;
             ObjectGuid AlgalonSigilDoorGUID[3];
-            uint64 BrainRoomDoorGUIDs[3];
+            ObjectGuid BrainRoomDoorGUIDs[3];
             ObjectGuid AlgalonFloorGUID[2];
             ObjectGuid AlgalonUniverseGUID;
             ObjectGuid AlgalonTrapdoorGUID;
@@ -186,9 +186,9 @@ class instance_ulduar : public InstanceMapScript
                 OrbitalSupportGUID = ObjectGuid::Empty;
                 IgnisGUID = ObjectGuid::Empty;
                 RazorscaleGUID = ObjectGuid::Empty;
-                RazorscaleController             = 0;
+                RazorscaleController             = ObjectGuid::Empty;
                 ExpeditionCommanderGUID = ObjectGuid::Empty;
-                XT002GUID                        = 0;
+                XT002GUID                        = ObjectGuid::Empty;
                 KologarnGUID = ObjectGuid::Empty;
                 AuriayaGUID = ObjectGuid::Empty;
                 MimironGUID = ObjectGuid::Empty;
@@ -216,7 +216,7 @@ class instance_ulduar : public InstanceMapScript
                 GiftOfTheObserverGUID = ObjectGuid::Empty;
                 MimironTrainGUID = ObjectGuid::Empty;
                 LeviathanMKIIGUID = ObjectGuid::Empty;
-                VX001GUID                        = 0;
+                VX001GUID                        = ObjectGuid::Empty;
                 AerialUnitGUID = ObjectGuid::Empty;
                 MimironElevatorGUID = ObjectGuid::Empty;
                 TramData                         = 0;
@@ -639,7 +639,7 @@ class instance_ulduar : public InstanceMapScript
                         for (uint8 i = 0; i < 4; ++i)
                             if (XTToyPileGUIDs[i] == creature->GetGUID())
                             {
-                                XTToyPileGUIDs[i] = 0;
+                                XTToyPileGUIDs[i] = ObjectGuid::Empty;
                                 break;
                             }
                         break;
@@ -664,57 +664,57 @@ class instance_ulduar : public InstanceMapScript
                         if (teleportPosX > -708.0f && teleportPosX < -704.0f)
                         {
                             TeleporterBaseCampGUID = go->GetGUID();
-                            HandleGameObject(0, (GetData(DATA_COLOSSUS) == 2 || GetBossState(BOSS_LEVIATHAN) == DONE), go);
+                            HandleGameObject(ObjectGuid::Empty, (GetData(DATA_COLOSSUS) == 2 || GetBossState(BOSS_LEVIATHAN) == DONE), go);
                             go->ApplyModFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE, !(GetData(DATA_COLOSSUS) == 2 || GetBossState(BOSS_LEVIATHAN) == DONE));
                         }
                         // Teleport to the Formation Grounds
                         else if (teleportPosX > 130.0f && teleportPosX < 132.0f)
                         {
                             TeleporterGroundsGUID = go->GetGUID();
-                            HandleGameObject(0, (GetData(DATA_COLOSSUS) == 2 || GetBossState(BOSS_LEVIATHAN) == DONE), go);
+                            HandleGameObject(ObjectGuid::Empty, (GetData(DATA_COLOSSUS) == 2 || GetBossState(BOSS_LEVIATHAN) == DONE), go);
                             go->ApplyModFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE, !(GetData(DATA_COLOSSUS) == 2 || GetBossState(BOSS_LEVIATHAN) == DONE));
                         }
                         // Teleport to the Colossal Forge
                         else if (teleportPosX > 552.0f && teleportPosX < 554.0f)
                         {
                             TeleporterForgeGUID = go->GetGUID();
-                            HandleGameObject(0, GetBossState(BOSS_LEVIATHAN) == DONE, go);
+                            HandleGameObject(ObjectGuid::Empty, GetBossState(BOSS_LEVIATHAN) == DONE, go);
                         }
                         // Teleport to the Scrapyard
                         else if (teleportPosX > 925.0f && teleportPosX < 927.0f)
                         {
                             TeleporterScrapyardGUID = go->GetGUID();
-                            HandleGameObject(0, GetBossState(BOSS_XT002) == DONE, go);
+                            HandleGameObject(ObjectGuid::Empty, GetBossState(BOSS_XT002) == DONE, go);
                         }
                         // Teleport to the Antechamber of Ulduar
                         else if (teleportPosX > 1497.0f && teleportPosX < 1499.0f)
                         {
                             TeleporterAntchemberGUID = go->GetGUID();
-                            HandleGameObject(0, GetBossState(BOSS_XT002) == DONE, go);
+                            HandleGameObject(ObjectGuid::Empty, GetBossState(BOSS_XT002) == DONE, go);
                         }
                         // Teleport to the Shattered Walkway
                         else if (teleportPosX > 1858.0f && teleportPosX < 1860.0f)
                         {
                             TeleporterShatteredGUID = go->GetGUID();
-                            HandleGameObject(0, GetBossState(BOSS_KOLOGARN) == DONE, go);
+                            HandleGameObject(ObjectGuid::Empty, GetBossState(BOSS_KOLOGARN) == DONE, go);
                         }
                         // Teleport to the Conservatory of Life
                         else if (teleportPosX > 2085.0f && teleportPosX < 2087.0f)
                         {
                             TeleporterConservatoryGUID = go->GetGUID();
-                            HandleGameObject(0, GetBossState(BOSS_AURIAYA) == DONE, go);
+                            HandleGameObject(ObjectGuid::Empty, GetBossState(BOSS_AURIAYA) == DONE, go);
                         }
                         // Teleport to the Spark of Imagination
                         else if (teleportPosX > 2516.0f && teleportPosX < 2518.0f)
                         {
                             TeleporterImaginationGUID = go->GetGUID();  // NIY
-                            HandleGameObject(0, (GetData(DATA_TRAM) == DONE || GetBossState(BOSS_MIMIRON) == DONE), go);
+                            HandleGameObject(ObjectGuid::Empty, (GetData(DATA_TRAM) == DONE || GetBossState(BOSS_MIMIRON) == DONE), go);
                         }
                         // Teleport to the Descent into Madness
                         else if (teleportPosX > 1854.0f && teleportPosX < 1856.0f)
                         {
                             TeleporterDescentGUID = go->GetGUID();
-                            HandleGameObject(0, GetBossState(BOSS_VEZAX) == DONE, go);
+                            HandleGameObject(ObjectGuid::Empty, GetBossState(BOSS_VEZAX) == DONE, go);
                         }
                         break;
                     }
@@ -1486,7 +1486,7 @@ class instance_ulduar : public InstanceMapScript
                         return BrannBronzebeardAlgGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             uint32 GetData(uint32 type) const override
@@ -1813,7 +1813,7 @@ class instance_ulduar : public InstanceMapScript
             uint32 _maxWeaponItemLevel;
             uint32 _CoUAchivePlayerDeathMask;
             std::vector<ObjectGuid> vehiclesGUIDs;
-            uint64 _ancientGateOfTheKeepersGUID = 0;
+            ObjectGuid _ancientGateOfTheKeepersGUID;
             std::set<uint32> triggeredAreaTriggers;
         };
 

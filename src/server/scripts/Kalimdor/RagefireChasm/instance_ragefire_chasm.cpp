@@ -83,7 +83,7 @@ class instance_ragefire_chasm : public InstanceMapScript
                         return GordothGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

@@ -2105,7 +2105,7 @@ struct npc_shadowed_loa_spirit : public ScriptedAI
         events.ScheduleEvent(EVENT_MOVE_COUNCILLOR, 0.5 * IN_MILLISECONDS);
     }
 
-    void SetGUID(uint64 guid, int32 /*value*/) override
+    void SetGUID(ObjectGuid guid, int32 /*value*/) override
     {
         uiTargetGuid = guid;
     }

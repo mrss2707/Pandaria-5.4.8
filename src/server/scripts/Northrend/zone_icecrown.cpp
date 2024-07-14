@@ -602,10 +602,10 @@ public:
 
         SummonList Summons;
 
-        uint64 guidDalfors;
-        uint64 guidPriest[3];
-        uint64 guidMason[3];
-        uint64 guidHalof;
+        ObjectGuid guidDalfors;
+        ObjectGuid guidPriest[3];
+        ObjectGuid guidMason[3];
+        ObjectGuid guidHalof;
 
         void Reset() override
         {
@@ -996,7 +996,7 @@ class npc_margrave_dhakar : public CreatureScript
 
         struct npc_margrave_dhakarAI : public ScriptedAI
         {
-            npc_margrave_dhakarAI(Creature* creature) : ScriptedAI(creature) , _summons(me), _lichKingGuid(0) { }
+            npc_margrave_dhakarAI(Creature* creature) : ScriptedAI(creature) , _summons(me), _lichKingGuid() { }
 
             void Reset() override
             {

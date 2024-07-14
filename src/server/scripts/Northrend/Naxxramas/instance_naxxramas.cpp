@@ -382,7 +382,7 @@ class instance_naxxramas : public InstanceMapScript
                         return millitaryPortalGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 id, EncounterState state) override
@@ -406,11 +406,11 @@ class instance_naxxramas : public InstanceMapScript
                     case BOSS_LOATHEB:
                     case BOSS_HORSEMEN:
                         if (GetBossState(BOSS_THADDIUS) == DONE && GetBossState(BOSS_MAEXXNA) == DONE && GetBossState(BOSS_HORSEMEN) == DONE && GetBossState(BOSS_LOATHEB) == DONE)
-                            if (GameObject* go = instance->GetGameObject(GetData64(GO_ORB_OF_NAXXRAMAS)))
+                            if (GameObject* go = instance->GetGameObject(GetGuidData(GO_ORB_OF_NAXXRAMAS)))
                                 go->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND);
 
                         // Unlock portals
-                        if (GameObject* portal = instance->GetGameObject(GetData64(invPortalType.find(id)->second)))
+                        if (GameObject* portal = instance->GetGameObject(GetGuidData(invPortalType.find(id)->second)))
                             portal->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         break;
                 }
@@ -425,7 +425,7 @@ class instance_naxxramas : public InstanceMapScript
                     if (i == section)
                         continue;
 
-                    for (std::set<uint64>::const_iterator itr = HeiganEruptionGUID[i].begin(); itr != HeiganEruptionGUID[i].end(); ++itr)
+                    for (std::set<ObjectGuid>::const_iterator itr = HeiganEruptionGUID[i].begin(); itr != HeiganEruptionGUID[i].end(); ++itr)
                     {
                         if (GameObject* heiganEruption = instance->GetGameObject(*itr))
                         {
@@ -553,7 +553,7 @@ class instance_naxxramas : public InstanceMapScript
 
             /* The Plague Quarter */
             // Heigan the Unclean
-            std::set<uint64> HeiganEruptionGUID[4];
+            std::set<ObjectGuid> HeiganEruptionGUID[4];
             ObjectGuid HeiganGUID;
 
             /* The Military Quarter */

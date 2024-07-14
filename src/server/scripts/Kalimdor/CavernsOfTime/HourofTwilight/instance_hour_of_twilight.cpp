@@ -90,7 +90,7 @@ class instance_hour_of_twilight : public InstanceMapScript
                         return BenedictusGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

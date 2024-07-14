@@ -218,7 +218,7 @@ class instance_blood_furnace : public InstanceMapScript
                      case DATA_PRISON_CELL8:         return PrisonCell8GUID;
                      case DATA_BROGGOK_LEVER:        return BroggokLeverGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void SetData(uint32 type, uint32 data) override

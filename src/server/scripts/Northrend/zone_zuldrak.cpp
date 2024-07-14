@@ -285,7 +285,7 @@ public:
             _removeFlag = false;
         }
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             _playerGUID = guid;
         }
@@ -373,12 +373,12 @@ public:
                             uiPhase = 0;
                             break;
                         case 6:
-                            Talk(SAY_GURGTHOCK_7, sObjectAccessor->FindPlayer(_playerGUID));
+                            Talk(SAY_GURGTHOCK_7, ObjectAccessor::FindPlayer(_playerGUID));
                             uiTimer = 5000;
                             uiPhase = 9;
                             break;
                         case 7:
-                            Talk(SAY_GURGTHOCK_9, sObjectAccessor->FindPlayer(_playerGUID));
+                            Talk(SAY_GURGTHOCK_9, ObjectAccessor::FindPlayer(_playerGUID));
                             uiTimer = 3000;
                             uiPhase = 8;
                             break;
@@ -388,7 +388,7 @@ public:
                             uiPhase = 11;
                             break;
                         case 9:
-                            Talk(SAY_QUEST_AMPHITHEATER_ANGUISH_YGGDRAS, sObjectAccessor->FindPlayer(_playerGUID));
+                            Talk(SAY_QUEST_AMPHITHEATER_ANGUISH_YGGDRAS, ObjectAccessor::FindPlayer(_playerGUID));
                             uiTimer = 10000;
                             uiPhase = 10;
                             break;
@@ -403,7 +403,7 @@ public:
                             uiPhase = 0;
                             break;
                         case 12:
-                            Talk(SAY_GURGTHOCK_9, sObjectAccessor->FindPlayer(_playerGUID));
+                            Talk(SAY_GURGTHOCK_9, ObjectAccessor::FindPlayer(_playerGUID));
                             uiTimer = 5000;
                             uiPhase = 13;
                             break;
@@ -631,7 +631,7 @@ public:
     {
         npc_korrak_bloodragerAI(Creature* creature) : npc_escortAI(creature)
         {
-            Start(true, true, 0, NULL);
+            Start(true, true, ObjectGuid::Empty, NULL);
             SetDespawnAtEnd(false);
         }
 
@@ -824,7 +824,7 @@ public:
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_PASSIVE);
-            Start(true, true, 0, NULL);
+            Start(true, true, ObjectGuid::Empty, NULL);
             SetDespawnAtEnd(false);
         }
 
@@ -945,7 +945,7 @@ public:
     {
         npc_elemental_lordAI(Creature* creature) : ScriptedAI(creature) { }
 
-        std::list<uint64> SummonList;
+        std::list<ObjectGuid> SummonList;
 
         uint32 uiElementalSpellTimer;
 
@@ -993,7 +993,7 @@ public:
         void JustEngagedWith(Unit* unit) override
         {
             if (!SummonList.empty())
-                for (std::list<uint64>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
+                for (std::list<ObjectGuid>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
                 {
                     if (Creature* temp = Unit::GetCreature(*me, *itr))
                     {
@@ -1036,7 +1036,7 @@ public:
             if (!bAddAttack && !HealthAbovePct(20))
             {
                 if (!SummonList.empty())
-                    for (std::list<uint64>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
+                    for (std::list<ObjectGuid>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
                     {
                         if (Creature* temp = Unit::GetCreature(*me, *itr))
                         {
@@ -1057,7 +1057,7 @@ public:
         void JustDied(Unit* killer) override
         {
             if (!SummonList.empty())
-                for (std::list<uint64>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
+                for (std::list<ObjectGuid>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
                     if (Creature* temp = Unit::GetCreature(*me, *itr))
                         temp->DespawnOrUnsummon();
 
@@ -1481,7 +1481,7 @@ public:
                             _events.ScheduleEvent(EVENT_TURN_TO_POT, urand(25000, 41000));
                             break;
                         case EVENT_EASY_123:
-                            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                            if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
                             {
                                 Talk(SAY_EASY_123, player);
                                 DoCast(player, SPELL_RANDOM_INGREDIENT_EASY_AURA);
@@ -1530,7 +1530,7 @@ public:
 
         private:
             EventMap _events;
-            uint64   _playerGUID;
+            ObjectGuid _playerGUID;
             uint8    _getingredienttry;
         };
 

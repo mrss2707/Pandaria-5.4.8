@@ -237,9 +237,8 @@ class instance_end_time : public InstanceMapScript
                     case DATA_HOURGLASS:
                         return uiHourglassGUID;
                     default:
-                        return 0;
+                        return ObjectGuid::Empty;
                 }
-                return 0;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

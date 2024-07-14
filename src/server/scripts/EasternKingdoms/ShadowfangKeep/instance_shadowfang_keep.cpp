@@ -283,7 +283,7 @@ class instance_shadowfang_keep : public InstanceMapScript
                     case DATA_FOLLOWER:
                         return followerGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void Load(const char* in) override

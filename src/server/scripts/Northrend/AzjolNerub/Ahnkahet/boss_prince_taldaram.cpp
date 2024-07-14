@@ -125,7 +125,7 @@ class boss_taldaram : public CreatureScript
                 uiEmbraceTakenDamage = 0;
                 Phase = NORMAL;
                 uiPhaseTimer = 0;
-                uiEmbraceTarget = 0;
+                uiEmbraceTarget = ObjectGuid::Empty;
 
                 if (instance)
                 instance->SetData(DATA_PRINCE_TALDARAM_EVENT, NOT_STARTED);
@@ -218,7 +218,7 @@ class boss_taldaram : public CreatureScript
                         case FEEDING:
                             Phase = NORMAL;
                             uiPhaseTimer = 0;
-                            uiEmbraceTarget = 0;
+                            uiEmbraceTarget = ObjectGuid::Empty;
                             break;
                         case NORMAL:
                             if (uiBloodthirstTimer <= diff)
@@ -282,7 +282,7 @@ class boss_taldaram : public CreatureScript
                   {
                       Phase = NORMAL;
                       uiPhaseTimer = 0;
-                      uiEmbraceTarget = 0;
+                      uiEmbraceTarget = ObjectGuid::Empty;
                       me->CastStop();
                   }
                 }
@@ -307,7 +307,7 @@ class boss_taldaram : public CreatureScript
                 {
                     Phase = NORMAL;
                     uiPhaseTimer = 0;
-                    uiEmbraceTarget = 0;
+                    uiEmbraceTarget = ObjectGuid::Empty;
                 }
                 Talk(SAY_SLAY);
             }
@@ -317,7 +317,7 @@ class boss_taldaram : public CreatureScript
                 if (!instance)
                     return false;
 
-                uint64 uiSphereGuids[2];
+                ObjectGuid uiSphereGuids[2];
                 uiSphereGuids[0] = instance->GetGuidData(DATA_SPHERE1);
                 uiSphereGuids[1] = instance->GetGuidData(DATA_SPHERE2);
 
@@ -357,7 +357,7 @@ class boss_taldaram : public CreatureScript
                     Talk(SAY_WARNING);
                     warning = true;
                 }
-                uint64 prison_GUID = instance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM);
+                ObjectGuid prison_GUID = instance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM);
                 instance->HandleGameObject(prison_GUID,true);
             }
         };

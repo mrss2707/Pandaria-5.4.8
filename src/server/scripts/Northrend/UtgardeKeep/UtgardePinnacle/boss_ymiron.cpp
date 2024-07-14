@@ -380,7 +380,7 @@ class boss_ymiron : public CreatureScript
                     instance->SetData(DATA_KING_YMIRON_EVENT, DONE);
             }
 
-            void DespawnBoatGhosts(uint64 creatureGUID)
+            void DespawnBoatGhosts(ObjectGuid creatureGUID)
             {
                 if (creatureGUID)
                     if (Creature* despawnCreature = ObjectAccessor::GetCreature(*me, creatureGUID))

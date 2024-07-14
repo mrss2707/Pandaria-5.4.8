@@ -184,8 +184,8 @@ public:
         }
 
         private:
-            uint64   _RavenousworgGUID;
-            uint64   _mrfloppyGUID;
+            ObjectGuid   _RavenousworgGUID;
+            ObjectGuid   _mrfloppyGUID;
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override

@@ -350,7 +350,7 @@ struct npc_archmage_landalock : public ScriptedAI
 
                 uint32 newEntry = GetImageEntry(questId);
 
-                if (GUID_ENPART(_summonGUID) != newEntry)
+                if (_summonGUID.GetEntry() != newEntry)
                 {
                     if (Creature* image = ObjectAccessor::GetCreature(*me, _summonGUID))
                         image->DespawnOrUnsummon();

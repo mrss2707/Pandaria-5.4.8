@@ -81,7 +81,7 @@ class boss_drakkari_colossus : public CreatureScript
                 _instance = creature->GetInstanceScript();
 
                 for (uint8 i = 0; i < 5; ++i)
-                    _mojoGUID[i] = 0;
+                    _mojoGUID[i] = ObjectGuid::Empty;
             }
 
             void Reset() override
@@ -118,7 +118,7 @@ class boss_drakkari_colossus : public CreatureScript
                         if (Creature* mojo = ObjectAccessor::GetCreature(*me, _mojoGUID[i]))
                             if (mojo->IsAlive())
                                 mojo->DespawnOrUnsummon();
-                    _mojoGUID[i] = 0;
+                    _mojoGUID[i] = ObjectGuid::Empty;
                 }
             }
 

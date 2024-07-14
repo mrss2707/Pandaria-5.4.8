@@ -117,7 +117,7 @@ class instance_shadow_labyrinth : public InstanceMapScript
                     default:
                         break;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             std::string GetSaveData() override

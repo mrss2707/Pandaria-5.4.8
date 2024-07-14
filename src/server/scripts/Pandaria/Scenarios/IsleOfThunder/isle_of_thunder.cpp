@@ -5281,7 +5281,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                         {
                             Talk(TALK_SPECIAL_11);
 
-                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_THUNDER_FORGE_2) : 0))
+                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_THUNDER_FORGE_2) : ObjectGuid::Empty))
                                 anvil->AI()->DoAction(ACTION_START_INTRO);
                         });
 
@@ -5323,7 +5323,7 @@ class npc_wrathion_thunder_forge : public CreatureScript
                             Talk(TALK_SPECIAL_15);
 
                             // Summon Almagmation
-                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_THUNDER_FORGE_2) : 0))
+                            if (Creature* anvil = ObjectAccessor::GetCreature(*me, instance ? instance->GetGuidData(NPC_THUNDER_FORGE_2) : ObjectGuid::Empty))
                                 anvil->CastSpell(anvil, SPELL_SHA_COSMETIC_SPAWN, true);
                         });
                         break;

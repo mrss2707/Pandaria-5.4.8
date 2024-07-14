@@ -163,7 +163,7 @@ class instance_lost_city_of_the_tolvir : public InstanceMapScript
                     case DATA_SIAMAT:
                         return uiSiamatGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void SetGuidData(uint32 type, ObjectGuid data) override

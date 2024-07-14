@@ -132,7 +132,7 @@ class instance_mogu_shan_palace : public InstanceMapScript
                 switch (type)
                 {
                     case DATA_GEKKAN:
-                        HandleGameObject(0, state == DONE, GetGameObjectFromStorage(GO_DOOR_AFTER_TRIAL));
+                        HandleGameObject(ObjectGuid::Empty, state == DONE, GetGameObjectFromStorage(GO_DOOR_AFTER_TRIAL));
                         if (GameObject* pTreasure = instance->GetGameObject(m_uiAncientTreasureGuid))
                             pTreasure->RemoveFlag(GAMEOBJECT_FIELD_FLAGS, GO_FLAG_INTERACT_COND);
                         break;
@@ -319,8 +319,8 @@ class instance_mogu_shan_palace : public InstanceMapScript
                         break;
                     }
                     case TYPE_XIN:
-                        HandleGameObject(0, type != IN_PROGRESS, GetGameObjectFromStorage(GO_DOOR_BEFORE_KING));
-                        HandleGameObject(0, type != IN_PROGRESS, GetGameObjectFromStorage(GO_DOOR_BEFORE_KING2));
+                        HandleGameObject(ObjectGuid::Empty, type != IN_PROGRESS, GetGameObjectFromStorage(GO_DOOR_BEFORE_KING));
+                        HandleGameObject(ObjectGuid::Empty, type != IN_PROGRESS, GetGameObjectFromStorage(GO_DOOR_BEFORE_KING2));
                         break;
                 }
             }

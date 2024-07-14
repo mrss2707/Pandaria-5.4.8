@@ -257,7 +257,7 @@ class instance_black_temple : public InstanceMapScript
                     case DATA_BLOOD_ELF_COUNCIL_VOICE:     return BloodElfCouncilVoice;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void HandleTempleDoor()

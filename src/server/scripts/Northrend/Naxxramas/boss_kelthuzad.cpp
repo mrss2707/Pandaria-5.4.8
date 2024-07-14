@@ -275,7 +275,7 @@ public:
         uint8  nAbomination;
         uint8  nWeaver;
 
-        std::map<uint64, float> chained;
+        std::map<ObjectGuid, float> chained;
 
         ObjectGuid PortalsGUID[4];
         ObjectGuid KTTriggerGUID;
@@ -284,7 +284,7 @@ public:
 
         void ResetPlayerScale()
         {
-            std::map<uint64, float>::const_iterator itr;
+            std::map<ObjectGuid, float>::const_iterator itr;
             for (itr = chained.begin(); itr != chained.end(); ++itr)
             {
                 if (Player* charmed = ObjectAccessor::GetPlayer(*me, itr->first))
@@ -298,7 +298,7 @@ public:
         {
             _Reset();
 
-            PortalsGUID[0] = PortalsGUID[1] = PortalsGUID[2] = PortalsGUID[3] = 0;
+            PortalsGUID[0] = PortalsGUID[1] = PortalsGUID[2] = PortalsGUID[3] = ObjectGuid::Empty;
             KTTriggerGUID = ObjectGuid::Empty;
 
             me->SetFaction(35);
@@ -376,10 +376,10 @@ public:
 
         void FindGameObjects()
         {
-            PortalsGUID[0] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL01) : 0;
-            PortalsGUID[1] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL02) : 0;
-            PortalsGUID[2] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL03) : 0;
-            PortalsGUID[3] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL04) : 0;
+            PortalsGUID[0] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL01) : ObjectGuid::Empty;
+            PortalsGUID[1] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL02) : ObjectGuid::Empty;
+            PortalsGUID[2] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL03) : ObjectGuid::Empty;
+            PortalsGUID[3] = instance ? instance->GetGuidData(DATA_KELTHUZAD_PORTAL04) : ObjectGuid::Empty;
             KTTriggerGUID = instance ? instance->GetGuidData(DATA_KELTHUZAD_TRIGGER) : ObjectGuid::Empty;
         }
 
@@ -521,7 +521,7 @@ public:
                         }
                         case EVENT_CHAINED_SPELL:
                         {
-                            std::map<uint64, float>::iterator itr;
+                            std::map<ObjectGuid, float>::iterator itr;
                             for (itr = chained.begin(); itr != chained.end();)
                             {
                                 if (Unit* player = ObjectAccessor::GetPlayer(*me, itr->first))
@@ -529,7 +529,7 @@ public:
                                     if (!player->IsCharmed())
                                     {
                                         player->SetObjectScale(itr->second);
-                                        std::map<uint64, float>::iterator next = itr;
+                                        std::map<ObjectGuid, float>::iterator next = itr;
                                         ++next;
                                         chained.erase(itr);
                                         itr = next;

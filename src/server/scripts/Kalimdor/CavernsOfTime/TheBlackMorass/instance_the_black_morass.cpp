@@ -256,7 +256,7 @@ public:
             if (data == DATA_MEDIVH)
                 return _medivhGUID;
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         Creature* SummonedPortalBoss(Creature* me)

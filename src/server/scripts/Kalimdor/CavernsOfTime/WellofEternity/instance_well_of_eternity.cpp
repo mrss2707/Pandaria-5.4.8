@@ -251,10 +251,8 @@ class instance_well_of_eternity : public InstanceMapScript
                     case DATA_MANNOROTH:
                         return uiMannorothGUID;
                     default:
-                        return 0;
+                        return ObjectGuid::Empty;
                 }
-
-                return 0;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

@@ -2166,7 +2166,7 @@ class sat_maze : public IAreaTriggerAura
 
         if (AreaTrigger* at = GetAreaTrigger())
         {
-            if (Creature* durumu = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetData64(DATA_DURUMU_THE_FORGOTTEN) : 0))
+            if (Creature* durumu = ObjectAccessor::GetCreature(*GetCaster(), GetCaster()->GetInstanceScript() ? GetCaster()->GetInstanceScript()->GetGuidData(DATA_DURUMU_THE_FORGOTTEN) : 0))
             {
                 switch (at->GetEntry())
                 {

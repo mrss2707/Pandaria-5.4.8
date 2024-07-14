@@ -129,7 +129,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                 case DATA_MAGTHERIDON:
                     return MagtheridonGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void SetData(uint32 type, uint32 data) override

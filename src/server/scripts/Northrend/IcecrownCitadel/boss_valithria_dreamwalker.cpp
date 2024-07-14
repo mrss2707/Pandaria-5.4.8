@@ -197,7 +197,7 @@ class DelayedCastEvent : public BasicEvent
 
     private:
         Creature* _trigger;
-        uint64 _originalCaster;
+        ObjectGuid _originalCaster;
         uint32 _spellId;
         uint32 _despawnTime;
 };
@@ -972,7 +972,7 @@ class npc_suppresser : public CreatureScript
 
             void MovementInform(uint32 type, uint32 pointId) override
             {
-                if (type == CHASE_MOTION_TYPE && pointId == GUID_LOPART(_instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
+                if (type == CHASE_MOTION_TYPE && pointId == _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER).GetCounter())
                     _events.RescheduleEvent(EVENT_SUPPRESSION, 1);
             }
 
@@ -1431,7 +1431,7 @@ class spell_dreamwalker_summoner : public SpellScriptLoader
                 if (!GetHitUnit())
                     return;
 
-                GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetData64(DATA_VALITHRIA_LICH_KING));
+                GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
             }
 
             void Register() override
@@ -1513,7 +1513,7 @@ class spell_dreamwalker_summon_suppresser_effect : public SpellScriptLoader
                 if (!GetHitUnit())
                     return;
 
-                GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetData64(DATA_VALITHRIA_LICH_KING));
+                GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
             }
 
             void Register() override

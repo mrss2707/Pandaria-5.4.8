@@ -251,7 +251,7 @@ class instance_arcatraz : public InstanceMapScript
                     case TYPE_SOCCOTHRATES:     return SoccothratesGUID;
                     case TYPE_ZEREKETH:         return ZerekethGUID;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
         };
 

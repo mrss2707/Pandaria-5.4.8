@@ -98,7 +98,7 @@ class instance_ramparts : public InstanceMapScript
                 if (type == NPC_VAZRUDEN_HERALD)
                     return vazrudenHeraldGUID;
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             bool SetBossState(uint32 type, EncounterState state) override

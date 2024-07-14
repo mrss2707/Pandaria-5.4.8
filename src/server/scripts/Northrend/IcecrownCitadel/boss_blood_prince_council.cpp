@@ -327,12 +327,12 @@ class boss_blood_council_controller : public CreatureScript
         private:
             struct InvocationData
             {
-                uint64 guid;
+                ObjectGuid guid;
                 uint32 spellId;
                 uint32 textId;
                 uint32 visualSpell;
 
-                InvocationData(uint64 _guid, uint32 _spellId, uint32 _textId, uint32 _visualSpell)
+                InvocationData(ObjectGuid _guid, uint32 _spellId, uint32 _textId, uint32 _visualSpell)
                 {
                     guid = _guid;
                     spellId = _spellId;
@@ -340,7 +340,7 @@ class boss_blood_council_controller : public CreatureScript
                     visualSpell = _visualSpell;
                 }
 
-                InvocationData() : guid(0), spellId(0), textId(0), visualSpell(0) { }
+                InvocationData() : guid(), spellId(0), textId(0), visualSpell(0) { }
             } _invocationOrder[3];
 
             uint32 _invocationStage;
@@ -1165,7 +1165,7 @@ class npc_ball_of_flame : public CreatureScript
 
             void MovementInform(uint32 type, uint32 pointId) override
             {
-                if (type == CHASE_MOTION_TYPE && pointId == GUID_LOPART(_chaseGUID) && _chaseGUID)
+                if (type == CHASE_MOTION_TYPE && pointId == _chaseGUID.GetCounter() && _chaseGUID)
                 {
                     me->RemoveAurasDueToSpell(SPELL_BALL_OF_FLAMES_PERIODIC);
                     DoCast(me, SPELL_FLAMES);
@@ -1192,7 +1192,7 @@ class npc_ball_of_flame : public CreatureScript
                             if (TempSummon* summon = me->ToTempSummon())
                                 if (Unit* summoner = summon->GetSummoner())
                                     if (summoner && summoner->IsAIEnabled && summoner->GetTypeId() == TYPEID_UNIT)
-                                        if (Unit* unit = sObjectAccessor->GetUnit(*me, _chaseGUID))
+                                        if (Unit* unit = ObjectAccessor::GetUnit(*me, _chaseGUID))
                                         summoner->ToCreature()->AI()->Talk(EMOTE_TALDARAM_FLAME, unit);
                         }
                         if (Player* target = ObjectAccessor::GetPlayer(*me, _chaseGUID))

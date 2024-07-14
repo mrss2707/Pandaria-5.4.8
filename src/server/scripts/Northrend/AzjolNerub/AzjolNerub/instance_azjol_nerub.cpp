@@ -52,21 +52,21 @@ class instance_azjol_nerub : public InstanceMapScript
         {
             instance_azjol_nerub_InstanceScript(Map* map) : InstanceScript(map) { }
 
-            uint64 uiKrikthir;
-            uint64 uiHadronox;
-            uint64 uiAnubarak;
-            uint64 uiWatcherGashra;
-            uint64 uiWatcherSilthik;
-            uint64 uiWatcherNarjil;
-            uint64 uiAnubarakDoor[3];
+            ObjectGuid uiKrikthir;
+            ObjectGuid uiHadronox;
+            ObjectGuid uiAnubarak;
+            ObjectGuid uiWatcherGashra;
+            ObjectGuid uiWatcherSilthik;
+            ObjectGuid uiWatcherNarjil;
+            ObjectGuid uiAnubarakDoor[3];
 
-            uint64 uiKrikthirDoor;
+            ObjectGuid uiKrikthirDoor;
             ObjectGuid questGiverGUID;
             ObjectGuid questEnderGUID;
 
-            std::list<uint64> hadronoxTrash;
-            std::list<uint64> questCreatures;
-            uint64 hadronoxDoors[3];
+            std::list<ObjectGuid> hadronoxTrash;
+            std::list<ObjectGuid> questCreatures;
+            ObjectGuid hadronoxDoors[3];
             bool hadronoxAchievementFailed;
             bool crushersSpawned;
             uint32 trashLeft;
@@ -81,15 +81,15 @@ class instance_azjol_nerub : public InstanceMapScript
                 memset(&uiAnubarakDoor, 0, sizeof(uiAnubarakDoor));
                 memset(&hadronoxDoors, 0, sizeof(hadronoxDoors));
 
-                uiKrikthir = 0;
-                uiHadronox = 0;
-                uiAnubarak = 0;
+                uiKrikthir = ObjectGuid::Empty;
+                uiHadronox = ObjectGuid::Empty;
+                uiAnubarak = ObjectGuid::Empty;
                 questGiverGUID = ObjectGuid::Empty;
                 questEnderGUID = ObjectGuid::Empty;
-                uiWatcherGashra = 0;
-                uiWatcherSilthik = 0;
-                uiWatcherNarjil = 0;
-                uiKrikthirDoor = 0;
+                uiWatcherGashra = ObjectGuid::Empty;
+                uiWatcherSilthik = ObjectGuid::Empty;
+                uiWatcherNarjil = ObjectGuid::Empty;
+                uiKrikthirDoor = ObjectGuid::Empty;
 
                 hadronoxAchievementFailed = false;
                 crushersSpawned = false;
@@ -167,7 +167,7 @@ class instance_azjol_nerub : public InstanceMapScript
                 switch (creature->GetEntry())
                 {
                     case NPC_HADRONOX:
-                        uiHadronox = 0;
+                        uiHadronox = ObjectGuid::Empty;
                         break;
                     case NPC_ANUBAR_CHAMPION:
                     case NPC_ANUBAR_CRYPT_FIEND:
@@ -186,7 +186,7 @@ class instance_azjol_nerub : public InstanceMapScript
                     case GO_KRIKTHIR_DOOR:
                         uiKrikthirDoor = go->GetGUID();
                         if (auiEncounter[0] == DONE)
-                            HandleGameObject(0,true,go);
+                            HandleGameObject(ObjectGuid::Empty,true,go);
                         break;
                     case GO_ANUBARAK_DOOR_1:
                         uiAnubarakDoor[0] = go->GetGUID();
@@ -218,7 +218,7 @@ class instance_azjol_nerub : public InstanceMapScript
                     case NPC_RECLAIMER_AZAK + 1:            return questEnderGUID;
                 }
 
-                return 0;
+                return ObjectGuid::Empty;
             }
 
             void SetData(uint32 type, uint32 data) override

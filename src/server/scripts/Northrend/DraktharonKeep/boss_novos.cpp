@@ -277,7 +277,7 @@ class boss_novos : public CreatureScript
             void SetSummonerStatus(bool active)
             {
                 for (auto&& summoner : summoners)
-                    if (uint64 guid = instance->GetData64(summoner.data))
+                    if (ObjectGuid guid = instance->GetGuidData(summoner.data))
                         if (Creature* crystalChannelTarget = ObjectAccessor::GetCreature(*me, guid))
                         {
                             if (active)
