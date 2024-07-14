@@ -225,7 +225,7 @@ void SpellCastTargets::Write(ByteBuffer& data)
     if (m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM))
     {
         if (m_itemTarget)
-            data.append(m_itemTarget->GetPackGUID());
+            data << m_itemTarget->GetPackGUID();
         else
             data << uint8(0);
     }

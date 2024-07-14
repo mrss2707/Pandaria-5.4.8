@@ -246,7 +246,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
 
     ByteBuffer buf;
     buf << uint8(updateType);
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
     buf << uint8(m_objectTypeId);
 
     BuildMovementUpdate(&buf, flags);
@@ -270,7 +270,7 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) c
     ByteBuffer buf;
 
     buf << uint8(UPDATETYPE_VALUES);
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
 
     BuildValuesUpdate(UPDATETYPE_VALUES, &buf, target);
 

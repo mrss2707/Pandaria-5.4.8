@@ -6282,8 +6282,8 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo)
     size_t datapos = data.wpos();
 
     data << uint32(damageInfo->HitInfo);
-    data.append(damageInfo->attacker->GetPackGUID());
-    data.append(damageInfo->target->GetPackGUID());
+    data << damageInfo->attacker->GetPackGUID();
+    data << damageInfo->target->GetPackGUID();
     data << uint32(damageInfo->damage);                     // Full damage
     int32 overkill = damageInfo->damage - damageInfo->target->GetHealth();
     data << uint32(overkill < 0 ? 0 : overkill);            // Overkill
