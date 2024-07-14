@@ -393,16 +393,13 @@ void PoolGroup<Creature>::Spawn1Object(ActivePoolData& spawns, PoolObject* obj)
 {
     if (CreatureData const* data = sObjectMgr->GetCreatureData(obj->guid))
     {
-        sObjectMgr->AddCreatureToGrid(obj->guid, data);
-
         // Spawn if necessary (loaded grids only)
-        Map* map = sMapMgr->CreateBaseMap(data->mapId);
         // We use spawn coords to spawn
-        if (!map->Instanceable() && map->IsGridLoaded(data->posX, data->posY))
+        if (spawns.GetMap()->IsGridLoaded(data->posX, data->posY))
         {
             Creature* creature = new Creature;
             //TC_LOG_DEBUG("pool", "Spawning creature %u", guid);
-            if (!creature->LoadCreatureFromDB(obj->guid, map))
+            if (!creature->LoadCreatureFromDB(obj->guid, spawns.GetMap()))
             {
                 delete creature;
                 return;
@@ -417,24 +414,22 @@ void PoolGroup<GameObject>::Spawn1Object(ActivePoolData& spawns, PoolObject* obj
 {
     if (GameObjectData const* data = sObjectMgr->GetGOData(obj->guid))
     {
-        sObjectMgr->AddGameobjectToGrid(obj->guid, data);
         // Spawn if necessary (loaded grids only)
-        // this base map checked as non-instanced and then only existed
-        Map* map = sMapMgr->CreateBaseMap(data->mapid);
         // We use current coords to unspawn, not spawn coords since creature can have changed grid
-        if (!map->Instanceable() && map->IsGridLoaded(data->posX, data->posY))
+        if (spawns.GetMap()->IsGridLoaded(data->posX, data->posY))
         {
-            GameObject* pGameobject = new GameObject;
+            GameObject* go = new GameObject;
             //TC_LOG_DEBUG("pool", "Spawning gameobject %u", guid);
-            if (!pGameobject->LoadGameObjectFromDB(obj->guid, map, false))
+            if (!go->LoadGameObjectFromDB(obj->guid, spawns.GetMap(), false))
             {
-                delete pGameobject;
+                delete go;
                 return;
             }
             else
             {
-                if (pGameobject->isSpawnedByDefault())
-                    map->AddToMap(pGameobject);
+                if (go->isSpawnedByDefault())
+                    if (!spawns.GetMap()->AddToMap(go))
+                        delete go;
             }
         }
     }

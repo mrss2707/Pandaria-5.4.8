@@ -366,7 +366,7 @@ struct MovementInfo
     void RemoveExtraMovementFlag(uint16 flag) { flags2 &= ~flag; }
     bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
 
-    void SetFallTime(uint32 time) { jump.fallTime = time; }
+    void SetFallTime(uint32 ft) { jump.fallTime = ft; }
 
     void ResetTransport()
     {
@@ -464,7 +464,7 @@ namespace CustomVisibility
         CustomVisibility::Importance Importance;
         std::string Comment;
     };
-};
+}
 
 class TC_GAME_API WorldObject : public Object, public WorldLocation
 {
@@ -666,7 +666,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         void UpdateStealthVisibility(uint32 diff);
         void UpdatePositionData();
         
-        void BuildUpdate(UpdateDataMapType&);
+        void BuildUpdate(UpdateDataMapType&) override;
 
         bool isActiveObject() const { return m_isActive; }
         void setActive(bool on, ActiveFlags flag = ActiveFlags::InCombat);
