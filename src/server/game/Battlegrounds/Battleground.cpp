@@ -1386,6 +1386,11 @@ void Battleground::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
         if (IsSoloQueueMatch())
             player->setFactionForRace(player->GetRace());
     }
+    else
+    {
+        CharacterDatabaseTransaction trans(nullptr);
+        Player::OfflineResurrect(guid, trans);
+    }
 
     RemovePlayer(player, guid, team);                           // BG subclass specific code
 

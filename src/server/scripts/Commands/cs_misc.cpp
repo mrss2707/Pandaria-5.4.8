@@ -828,10 +828,10 @@ public:
             target->SaveToDB();
         }
         else
-            // will resurrected at login without corpse
-            // TODO: ObjectGuid
-            //sObjectAccessor->ConvertCorpseForPlayer(targetGuid);
-            {}
+        {
+            CharacterDatabaseTransaction trans(nullptr);
+            Player::OfflineResurrect(targetGuid, trans);
+        }
 
         return true;
     }

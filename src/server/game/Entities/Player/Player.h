@@ -606,6 +606,7 @@ enum AtLoginFlags
     AT_LOGIN_CHANGE_RACE        = 0x80,
     AT_LOGIN_LEARN_CLASS_SPELLS = 0x100,
     AT_LOGIN_POST_AUTOTRANSFER  = 0x200,
+    AT_LOGIN_RESURRECT          = 0x400,
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -2396,6 +2397,7 @@ public:
     void SpawnCorpseBones(bool triggerSave = true);
     Corpse* CreateCorpse();
     void KillPlayer();
+    static void OfflineResurrect(ObjectGuid const& guid, CharacterDatabaseTransaction trans);
     bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
     WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();

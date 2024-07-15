@@ -1633,6 +1633,9 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
     if (playerFlags & PLAYER_FLAGS_HIDE_CLOAK)
         charFlags |= CHARACTER_FLAG_HIDE_CLOAK;
 
+    if (atLoginFlags & AT_LOGIN_RESURRECT)
+        playerFlags &= ~PLAYER_FLAGS_GHOST;
+
     if (playerFlags & PLAYER_FLAGS_GHOST)
         charFlags |= CHARACTER_FLAG_GHOST;
 
@@ -5214,6 +5217,15 @@ void Player::KillPlayer()
 
     // update visibility
     UpdateObjectVisibility();
+}
+
+void Player::OfflineResurrect(ObjectGuid const& guid, CharacterDatabaseTransaction trans)
+{
+    Corpse::DeleteFromDB(guid, trans);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+    stmt->setUInt16(0, uint16(AT_LOGIN_RESURRECT));
+    stmt->setUInt32(1, guid.GetCounter());
+    CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
 
 Corpse* Player::CreateCorpse()
@@ -19584,21 +19596,22 @@ void Player::_LoadGlyphAuras()
 
 void Player::LoadCorpse(PreparedQueryResult result)
 {
-    if (IsAlive())
+    if (IsAlive() || HasAtLoginFlag(AT_LOGIN_RESURRECT))
         SpawnCorpseBones(false);
 
     if (!IsAlive())
     {
-        if (result)
+        if (HasAtLoginFlag(AT_LOGIN_RESURRECT))
+            ResurrectPlayer(0.5f);
+        else if (result)
         {
             Field* fields = result->Fetch();
             _corpseLocation.WorldRelocate(fields[0].GetUInt16(), fields[1].GetFloat(), fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetFloat());
             ApplyModFlag(PLAYER_FIELD_LIFETIME_MAX_RANK, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(_corpseLocation.GetMapId())->Instanceable());
         }
-        else
-            // Prevent Dead Player login without corpse
-            ResurrectPlayer(0.5f);
     }
+
+    RemoveAtLoginFlag(AT_LOGIN_RESURRECT);
 }
 
 void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)

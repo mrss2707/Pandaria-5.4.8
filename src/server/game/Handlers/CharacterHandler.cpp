@@ -2305,9 +2305,10 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         }
     }
 
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
     // resurrect the character in case he's dead
-    // TODO: ObjectGuid
-    //sObjectAccessor->ConvertCorpseForPlayer(guid);
+    Player::OfflineResurrect(guid, trans);
 
     if (oldName != newName)
         usedAtLoginFlags = AtLoginFlags(usedAtLoginFlags | AT_LOGIN_RENAME);
@@ -2317,13 +2318,11 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     Player::Customize(guid, gender, skin, face, hairStyle, hairColor, facialHair);
 
-    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
     // Update name, race and at_login flag in the db
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_FACTION_OR_RACE);
     stmt->setString(0, newName);
     stmt->setUInt8(1, race);
-    stmt->setUInt16(2, usedAtLoginFlags);
+    stmt->setUInt16(2, uint16(usedAtLoginFlags | AT_LOGIN_RESURRECT));
     stmt->setUInt32(3, guid.GetCounter());
     trans->Append(stmt);
 
