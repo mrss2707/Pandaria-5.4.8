@@ -289,14 +289,13 @@ void Map::ScriptsProcess()
         ScriptAction const& step = iter->second;
 
         Object* source = nullptr;
-        if (step.sourceGUID)
+        if (!step.sourceGUID.IsEmpty())
         {
             switch (step.sourceGUID.GetHigh())
             {
                 case HighGuid::Item: // as well as HIGHGUID_CONTAINER
                     if (Player* player = GetPlayer(step.ownerGUID))
-                        if (player->GetMap() == this)
-                            source = player->GetItemByGuid(step.sourceGUID);
+                        source = player->GetItemByGuid(step.sourceGUID);
                     break;
                 case HighGuid::Unit:
                 case HighGuid::Vehicle:
@@ -324,11 +323,6 @@ void Map::ScriptsProcess()
                     break;
             }
         }
-
-        // TODO: ObjectGuid is this needed?
-        if (source && !step.sourceGUID.IsItem())
-            if (((WorldObject const*)source)->GetMap() != this)
-                source = nullptr;
 
         WorldObject* target = nullptr;
         if (step.targetGUID)
@@ -361,9 +355,6 @@ void Map::ScriptsProcess()
                     break;
             }
         }
-
-        if (target && target->GetMap() != this)
-            target = nullptr;
 
         switch (step.script->command)
         {

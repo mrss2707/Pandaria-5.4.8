@@ -6550,7 +6550,6 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
             // randomize position for multiple summons
             pos = m_caster->GetRandomPoint(*destTarget, radius);
 
-        // TODO: ObjectGuid visibleBySummonerOnly??
         TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, caster, m_spellInfo->Id, 0, ObjectGuid(uint64(visibleBySummonerOnly)));
         if (!summon)
             return;
@@ -6612,7 +6611,6 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
 TempSummon* Spell::SummonTotem(uint32 entry, SummonPropertiesEntry const* properties, uint32 duration, bool visibleBySummonerOnly /*= false*/)
 {
-    // TODO: ObjectGuid visibleBySummonerOnly??
     auto summon = m_caster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, m_originalCaster, m_spellInfo->Id, 0, ObjectGuid(uint64(visibleBySummonerOnly)));
     if (!summon || !summon->IsTotem())
         return nullptr;
