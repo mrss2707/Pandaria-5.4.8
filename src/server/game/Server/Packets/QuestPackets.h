@@ -45,6 +45,16 @@ namespace WorldPackets
             QuestGiverStatus Status = QuestGiverStatus::None;
         };
 
+        class QuestUpdateComplete final : public ServerPacket
+        {
+        public:
+            QuestUpdateComplete() : ServerPacket(SMSG_QUEST_UPDATE_COMPLETE, 4) { }
+
+            WorldPacket const* Write() override;
+
+            int32 QuestID = 0;
+        };
+
         class QuestGiverStatusMultiple final : public ServerPacket
         {
         public:

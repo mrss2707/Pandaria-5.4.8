@@ -52,3 +52,10 @@ WorldPacket const* WorldPackets::Quest::QuestGiverStatusMultiple::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Quest::QuestUpdateComplete::Write()
+{
+    _worldPacket << uint32(QuestID);
+
+    return &_worldPacket;
+}

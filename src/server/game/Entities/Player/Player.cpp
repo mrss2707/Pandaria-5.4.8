@@ -18133,10 +18133,9 @@ void Player::SendQuestComplete(Quest const* quest)
 {
     if (quest)
     {
-        WorldPacket data(SMSG_QUESTUPDATE_COMPLETE, 4);
-        data << uint32(quest->GetQuestId());
-        GetSession()->SendPacket(&data);
-        TC_LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = %u", quest->GetQuestId());
+        WorldPackets::Quest::QuestUpdateComplete packet;
+        packet.QuestID = quest->GetQuestId();
+        SendDirectMessage(packet.Write());
     }
 }
 
@@ -25279,9 +25278,9 @@ void Player::SendInitialPacketsAfterAddToMap()
     SendAurasForTarget(this);
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
+    SendQuestGiverStatusMultiple();
 
-                                                            // Send difficulties on login.
-
+    // Send difficulties on login.
     SendDungeonDifficulty(GetDungeonDifficulty() < DUNGEON_DIFFICULTY_NORMAL ? DUNGEON_DIFFICULTY_NORMAL : GetDungeonDifficulty());
 
     // Raid downscaling.
