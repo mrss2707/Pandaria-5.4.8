@@ -1016,42 +1016,6 @@ namespace LuaGlobalFunctions
         return 1;
     }
 
-    int AddCorpse(lua_State* L)
-    {
-        Corpse* corpse = sEluna->CHECK_CORPSE(L, 1);
-        if (!corpse)
-            return 0;
-
-        // TODO: ObjectGuid
-        //sObjectAccessor->AddCorpse(corpse);
-        return 0;
-    }
-
-    int RemoveCorpse(lua_State* L)
-    {
-        Corpse* corpse = sEluna->CHECK_CORPSE(L, 1);
-        // TODO: ObjectGuid
-        //sObjectAccessor->RemoveCorpse(corpse);
-        return 1;
-    }
-
-    int ConvertCorpseForPlayer(lua_State* L)
-    {
-        uint64 guid = sEluna->CHECK_ULONG(L, 1);
-        bool insignia = luaL_optbool(L, 2, false);
-
-        // TODO: ObjectGuid
-        //sEluna->Push(L, sObjectAccessor->ConvertCorpseForPlayer(guid, insignia));
-        return 0;
-    }
-
-    int RemoveOldCorpses(lua_State* L)
-    {
-        // TODO: ObjectGuid
-        //sObjectAccessor->RemoveOldCorpses();
-        return 0;
-    }
-
     static int FindWeather(lua_State* L)
     {
         uint32 zoneId = luaL_checkunsigned(L, 1);
