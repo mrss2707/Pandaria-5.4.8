@@ -4639,11 +4639,6 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             charDelete_method = CHAR_DELETE_REMOVE;
     }
 
-    // convert corpse to bones if exist (to prevent exiting Corpse in World without DB entry)
-    // bones will be deleted by corpse/bones deleting thread shortly
-    // TODO: ObjectGuid
-    //sObjectAccessor->ConvertCorpseForPlayer(playerguid);
-
     if (uint32 guildId = GetGuildIdFromDB(playerguid))
         if (Guild* guild = sGuildMgr->GetGuildById(guildId))
             guild->DeleteMember(playerguid, false, false, true);
@@ -4940,6 +4935,8 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
+            Corpse::DeleteFromDB(playerguid, trans);
+
             CharacterDatabase.CommitTransaction(trans);
             break;
         }
@@ -5064,15 +5061,15 @@ void Player::BuildPlayerRepop()
     // there we must send 888 opcode
 
     // the player cannot have a corpse already, only bones which are not returned by GetCorpse
-    if (GetCorpse())
+    WorldLocation corpseLocation = GetCorpseLocation();
+    if (corpseLocation.GetMapId() == GetMapId())
     {
         TC_LOG_ERROR("entities.player", "BuildPlayerRepop: player %s(%d) already has a corpse", GetName().c_str(), GetGUID().GetCounter());
         return;
     }
 
     // create a corpse and place it at the player's location
-    CreateCorpse();
-    Corpse* corpse = GetCorpse();
+    Corpse* corpse = CreateCorpse();
     if (!corpse)
     {
         TC_LOG_ERROR("entities.player", "Error creating corpse for Player %s [%u]", GetName().c_str(), GetGUID().GetCounter());
@@ -5090,7 +5087,10 @@ void Player::BuildPlayerRepop()
     // BG - remove insignia related
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
-//    SendCorpseReclaimDelay();
+    int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
+
+    if (corpseReclaimDelay >= 0)
+        SendCorpseReclaimDelay(corpseReclaimDelay);
 
     // to prevent cheating
     corpse->ResetGhostTime();
@@ -5205,7 +5205,10 @@ void Player::KillPlayer()
     m_deathTimer = 6 * MINUTE * IN_MILLISECONDS;
 
     UpdateCorpseReclaimDelay();                             // dependent at use SetDeathPvP() call before kill
-    //SendCorpseReclaimDelay();
+
+    int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
+    if (corpseReclaimDelay >= 0)
+        SendCorpseReclaimDelay(corpseReclaimDelay);
 
     // don't create corpse at this moment, player might be falling
 
@@ -5213,7 +5216,7 @@ void Player::KillPlayer()
     UpdateObjectVisibility();
 }
 
-void Player::CreateCorpse()
+Corpse* Player::CreateCorpse()
 {
     // prevent existence 2 corpse for player
     SpawnCorpseBones();
@@ -5226,8 +5229,10 @@ void Player::CreateCorpse()
     if (!corpse->Create(GetMap()->GenerateLowGuid<HighGuid::Corpse>(), this))
     {
         delete corpse;
-        return;
+        return nullptr;
     }
+
+    _corpseLocation.WorldRelocate(*this);
 
     _uf = GetRace();
     _pb = GetUInt32Value(PLAYER_FIELD_HAIR_COLOR_ID);
@@ -5273,27 +5278,26 @@ void Player::CreateCorpse()
     }
 
     // register for player, but not show
-    // TODO: ObjectGuid
-    //ObjectAccessor::AddCorpse(corpse);
+    GetMap()->AddCorpse(corpse);
 
     // we do not need to save corpses for BG/arenas
     if (!GetMap()->IsBattlegroundOrArena())
         corpse->SaveToDB();
+
+    return corpse;
 }
 
-void Player::SpawnCorpseBones()
+void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
 {
-    // TODO: ObjectGuid
-//    if (sObjectAccessor->ConvertCorpseForPlayer(GetGUID()))
-//        if (!GetSession()->PlayerLogoutWithSave())          // at logout we will already store the player
-//            SaveToDB();                                     // prevent loading as ghost without corpse
+    _corpseLocation.WorldRelocate();
+    if (GetMap()->ConvertCorpseToBones(GetGUID()))
+        if (triggerSave && !GetSession()->PlayerLogoutWithSave()) // at logout we will already store the player
+            SaveToDB();                                           // prevent loading as ghost without corpse
 }
 
 Corpse* Player::GetCorpse() const
 {
-    return nullptr;
-    // TODO: ObjectGuid
-//    return sObjectAccessor->GetCorpseForPlayerGUID(GetGUID());
+    return GetMap()->GetCorpseByPlayer(GetGUID());
 }
 
 void Player::DurabilityLossAll(double percent, bool inventory)
@@ -9287,9 +9291,11 @@ void Player::RemovedInsignia(Player* looterPlr)
         RepopAtGraveyard();
     }
 
+    _corpseLocation.WorldRelocate();
+
     // We have to convert player corpse to bones, not to be able to resurrect there
     // SpawnCorpseBones isn't handy, 'cos it saves player while he in BG
-    Corpse* bones = nullptr; // TODO: ObjectGuid sObjectAccessor->ConvertCorpseForPlayer(GetGUID(), true);
+    Corpse* bones = GetMap()->ConvertCorpseToBones(GetGUID(), true);
     if (!bones)
         return;
 
@@ -19576,19 +19582,21 @@ void Player::_LoadGlyphAuras()
     }
 }
 
-void Player::LoadCorpse()
+void Player::LoadCorpse(PreparedQueryResult result)
 {
     if (IsAlive())
+        SpawnCorpseBones(false);
+
+    if (!IsAlive())
     {
-        // TODO: ObjectGuid
-        //sObjectAccessor->ConvertCorpseForPlayer(GetGUID());
-    }
-    else
-    {
-        if (Corpse* corpse = GetCorpse())
-            ApplyModFlag(PLAYER_FIELD_LIFETIME_MAX_RANK, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStore.LookupEntry(corpse->GetMapId())->Instanceable());
+        if (result)
+        {
+            Field* fields = result->Fetch();
+            _corpseLocation.WorldRelocate(fields[0].GetUInt16(), fields[1].GetFloat(), fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetFloat());
+            ApplyModFlag(PLAYER_FIELD_LIFETIME_MAX_RANK, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(_corpseLocation.GetMapId())->Instanceable());
+        }
         else
-            //Prevent Dead Player login without corpse
+            // Prevent Dead Player login without corpse
             ResurrectPlayer(0.5f);
     }
 }
@@ -26905,50 +26913,49 @@ void Player::UpdateCorpseReclaimDelay()
         m_deathExpireTime = now+DEATH_EXPIRE_STEP;
 }
 
-void Player::SendCorpseReclaimDelay(bool load)
+int32 Player::CalculateCorpseReclaimDelay(bool load) const
 {
     Corpse* corpse = GetCorpse();
+
     if (load && !corpse)
-        return;
+        return -1;
 
-    bool pvp;
-    if (corpse)
-        pvp = (corpse->GetType() == CORPSE_RESURRECTABLE_PVP);
-    else
-        pvp = (m_ExtraFlags & PLAYER_EXTRA_PVP_DEATH);
+    bool pvp = corpse ? corpse->GetType() == CORPSE_RESURRECTABLE_PVP : (m_ExtraFlags & PLAYER_EXTRA_PVP_DEATH) != 0;
 
-    time_t delay;
+    uint32 delay;
+
     if (load)
     {
         if (corpse->GetGhostTime() > m_deathExpireTime)
-            return;
+            return -1;
 
-        uint64 count;
+        uint64 count = 0;
+
         if ((pvp && sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVP)) ||
-           (!pvp && sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE)))
+            (!pvp && sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE)))
         {
-            count = (m_deathExpireTime-corpse->GetGhostTime())/DEATH_EXPIRE_STEP;
+            count = (m_deathExpireTime - corpse->GetGhostTime()) / DEATH_EXPIRE_STEP;
+
             if (count >= MAX_DEATH_COUNT)
-                count = MAX_DEATH_COUNT-1;
+                count = MAX_DEATH_COUNT - 1;
         }
-        else
-            count=0;
 
-        time_t expected_time = corpse->GetGhostTime()+copseReclaimDelay[count];
+        time_t expected_time = corpse->GetGhostTime() + copseReclaimDelay[count];
+        time_t now = time(nullptr);
 
-        time_t now = time(NULL);
         if (now >= expected_time)
-            return;
+            return -1;
 
-        delay = expected_time-now;
+        delay = expected_time - now;
     }
     else
         delay = GetCorpseReclaimDelay(pvp);
 
-    if (!delay)
-        return;
+    return delay * IN_MILLISECONDS;
+}
 
-    //! corpse reclaim delay 30 * 1000ms or longer at often deaths
+void Player::SendCorpseReclaimDelay(uint32 delay)
+{
     WorldPacket data(SMSG_CORPSE_RECLAIM_DELAY, 4);
     data.WriteBit(delay == 0);
 

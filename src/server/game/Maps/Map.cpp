@@ -504,12 +504,17 @@ bool Map::AddPlayerToMap(Player* player)
     player->AddToWorld();
 
     SendInitSelf(player);
+
     SendInitTransports(player);
     SendZoneDynamicInfo(player);
 
     player->m_clientGUIDs.clear();
-    player->UpdatePhasing();
+
     player->UpdateObjectVisibility(false);
+    player->UpdatePhasing();
+
+    if (player->IsAlive())
+        ConvertCorpseToBones(player->GetGUID());
 
     player->RestoreCombatWithInstance();
 
@@ -3702,8 +3707,11 @@ void InstanceMap::UnloadAll()
 {
     ASSERT(!HavePlayers());
 
-    if (m_resetAfterUnload == true)
+    if (m_resetAfterUnload)
+    {
         DeleteRespawnTimes();
+        DeleteCorpseData();
+    }
 
     Map::UnloadAll();
 }
@@ -4040,6 +4048,162 @@ time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
     }
 
     return time_t(0);
+}
+
+void Map::LoadCorpseData()
+{
+    // TODO: corpse phase ids
+
+    PreparedStatement<CharacterDatabaseConnection>* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSES);
+    stmt->setUInt32(0, GetId());
+    stmt->setUInt32(1, GetInstanceId());
+
+    //        0     1     2     3            4      5          6          7       8       9      10        11    12          13          14         15          16
+    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, phaseMask, corpseGuid, guid FROM corpse WHERE mapId = ? AND instanceId = ?
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        CorpseType type = CorpseType(fields[12].GetUInt8());
+        ObjectGuid::LowType guid = fields[15].GetUInt32();
+        if (type >= MAX_CORPSE_TYPE || type == CORPSE_BONES)
+        {
+            TC_LOG_ERROR("misc", "Corpse (guid: " UI64FMTD ") have wrong corpse type (%u), not loading.", uint64(guid), type);
+            continue;
+        }
+
+        Corpse* corpse = new Corpse(type);
+        if (!corpse->LoadCorpseFromDB(GenerateLowGuid<HighGuid::Corpse>(), fields))
+        {
+            delete corpse;
+            continue;
+        }
+
+        AddCorpse(corpse);
+    } while (result->NextRow());
+}
+
+void Map::DeleteCorpseData()
+{
+    // DELETE FROM corpse WHERE mapId = ? AND instanceId = ?
+    PreparedStatement<CharacterDatabaseConnection>* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSES_FROM_MAP);
+    stmt->setUInt32(0, GetId());
+    stmt->setUInt32(1, GetInstanceId());
+    CharacterDatabase.Execute(stmt);
+}
+
+void Map::AddCorpse(Corpse *corpse)
+{
+    corpse->SetMap(this);
+
+    _corpsesByCell[corpse->GetCellCoord().GetId()].insert(corpse);
+    if (corpse->GetType() != CORPSE_BONES)
+        _corpsesByPlayer[corpse->GetOwnerGUID()] = corpse;
+    else
+        _corpseBones.insert(corpse);
+}
+
+void Map::RemoveCorpse(Corpse *corpse)
+{
+    ASSERT(corpse);
+
+    corpse->DestroyForNearbyPlayers();
+    if (corpse->IsInGrid())
+        RemoveFromMap(corpse, false);
+    else
+    {
+        corpse->RemoveFromWorld();
+        corpse->ResetMap();
+    }
+
+    _corpsesByCell[corpse->GetCellCoord().GetId()].erase(corpse);
+    if (corpse->GetType() != CORPSE_BONES)
+        _corpsesByPlayer.erase(corpse->GetOwnerGUID());
+    else
+        _corpseBones.erase(corpse);
+}
+
+Corpse* Map::ConvertCorpseToBones(const ObjectGuid &ownerGuid, bool insignia /*= false*/)
+{
+    Corpse* corpse = GetCorpseByPlayer(ownerGuid);
+    if (!corpse)
+        return nullptr;
+
+    RemoveCorpse(corpse);
+
+    // remove corpse from DB
+    auto trans = CharacterDatabase.BeginTransaction();
+    corpse->DeleteFromDB(trans);
+    CharacterDatabase.CommitTransaction(trans);
+
+    Corpse* bones = NULL;
+
+    // create the bones only if the map and the grid is loaded at the corpse's location
+    // ignore bones creation option in case insignia
+    if ((insignia ||
+            (IsBattlegroundOrArena() ? sWorld->getBoolConfig(CONFIG_DEATH_BONES_BG_OR_ARENA) : sWorld->getBoolConfig(CONFIG_DEATH_BONES_WORLD))) &&
+            !IsRemovalGrid(corpse->GetPositionX(), corpse->GetPositionY()))
+    {
+        // Create bones, don't change Corpse
+        bones = new Corpse();
+        bones->Create(corpse->GetGUID().GetCounter());
+
+        for (uint8 i = OBJECT_FIELD_GUID + 4; i < CORPSE_END; ++i)
+            bones->SetUInt32Value(i, corpse->GetUInt32Value(i));
+
+        bones->SetCellCoord(corpse->GetCellCoord());
+        bones->Relocate(corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetOrientation());
+
+        bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
+        bones->SetGuidValue(CORPSE_FIELD_OWNER, ObjectGuid::Empty);
+        bones->SetGuidValue(OBJECT_FIELD_DATA, ObjectGuid::Empty);
+
+        for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+            if (corpse->GetUInt32Value(CORPSE_FIELD_ITEMS + i))
+                bones->SetUInt32Value(CORPSE_FIELD_ITEMS + i, 0);
+
+        // TODO: copy phase (ids)
+        bones->SetPhaseMask(corpse->GetPhaseMask(), false);
+
+        AddCorpse(bones);
+
+        // add bones in grid store if grid loaded where corpse placed
+        AddToMap(bones);
+    }
+
+    // all references to the corpse should be removed at this point
+    delete corpse;
+
+    return bones;
+}
+
+void Map::RemoveOldCorpses()
+{
+    time_t now = time(nullptr);
+
+    std::vector<ObjectGuid> corpses;
+    corpses.reserve(_corpsesByPlayer.size());
+
+    for (auto const& p : _corpsesByPlayer)
+        if (p.second->IsExpired(now))
+            corpses.push_back(p.first);
+
+    for (ObjectGuid const& ownerGuid : corpses)
+        ConvertCorpseToBones(ownerGuid);
+
+    std::vector<Corpse*> expiredBones;
+    for (Corpse* bones : _corpseBones)
+        if (bones->IsExpired(now))
+            expiredBones.push_back(bones);
+
+    for (Corpse* bones : expiredBones)
+    {
+        RemoveCorpse(bones);
+        delete bones;
+    }
 }
 
 void Map::SendZoneDynamicInfo(Player* player)

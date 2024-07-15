@@ -1054,7 +1054,6 @@ ElunaRegister<Corpse> CorpseMethods[] =
     {"GetType", &LuaCorpse::GetType},                       // :GetType() - Returns the (CorpseType) of a corpse
     {"ResetGhostTime", &LuaCorpse::ResetGhostTime},         // :ResetGhostTime() - Resets the corpse's ghost time
     {"SaveToDB", &LuaCorpse::SaveToDB},                     // :SaveToDB() - Saves to database
-    {"DeleteBonesFromWorld", &LuaCorpse::DeleteBonesFromWorld},                                             // :DeleteBonesFromWorld() - Deletes all bones from the world
 
     {NULL, NULL}
 };

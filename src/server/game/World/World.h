@@ -1163,6 +1163,7 @@ class TC_GAME_API World
         bool IsGuidWarning() { return _guidWarn; }
         bool IsGuidAlert() { return _guidAlert; }
 
+        void RemoveOldCorpses();
 
     protected:
         void _UpdateGameTime();

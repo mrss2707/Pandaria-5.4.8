@@ -152,14 +152,11 @@ void WorldSession::HandleMoveWorldportAck()
     }
 
     // resurrect character at enter into instance where his corpse exist after add to map
-    Corpse* corpse = GetPlayer()->GetCorpse();
-    if (corpse && corpse->GetType() != CORPSE_BONES && corpse->GetMapId() == GetPlayer()->GetMapId())
+    if (mEntry->IsDungeon() && !GetPlayer()->IsAlive())
+        if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
     {
-        if (mEntry->IsDungeon())
-        {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
-            GetPlayer()->SpawnCorpseBones();
-        }
+        GetPlayer()->ResurrectPlayer(0.5f, false);
+        GetPlayer()->SpawnCorpseBones();
     }
 
     bool allowMount = !mEntry->IsDungeon() || mEntry->IsBattlegroundOrArena();

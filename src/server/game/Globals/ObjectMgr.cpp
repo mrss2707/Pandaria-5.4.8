@@ -7361,48 +7361,6 @@ uint64 ObjectMgr::GenerateVoidStorageItemId()
     return ++_voidItemId;
 }
 
-void ObjectMgr::LoadCorpses()
-{
-    //        0     1     2     3            4      5          6          7       8       9      10        11    12          13          14          15         16
-    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, phaseMask, corpseGuid, guid FROM corpse WHERE corpseType <> 0
-
-    uint32 oldMSTime = getMSTime();
-
-    PreparedQueryResult result = CharacterDatabase.Query(CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSES));
-    if (!result)
-    {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 corpses. DB table `corpse` is empty.");
-        return;
-    }
-
-    uint32 count = 0;
-    do
-    {
-        Field* fields = result->Fetch();
-        uint32 guid = fields[15].GetUInt32();
-        CorpseType type = CorpseType(fields[12].GetUInt8());
-        if (type >= MAX_CORPSE_TYPE)
-        {
-            TC_LOG_ERROR("misc", "Corpse (guid: %u) have wrong corpse type (%u), not loading.", guid, type);
-            continue;
-        }
-
-        Corpse* corpse = new Corpse(type);
-        if (!corpse->LoadCorpseFromDB(guid, fields))
-        {
-            delete corpse;
-            continue;
-        }
-
-        // TODO: ObjectGuid
-        //sObjectAccessor->AddCorpse(corpse);
-        ++count;
-    }
-    while (result->NextRow());
-
-    TC_LOG_INFO("server.loading", ">> Loaded %u corpses in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-}
-
 void ObjectMgr::LoadReputationRewardRate()
 {
     uint32 oldMSTime = getMSTime();
@@ -7882,20 +7840,6 @@ void ObjectMgr::DeleteGOData(uint32 guid)
         RemoveGameobjectFromGrid(guid, data);
 
     _gameObjectDataStore.erase(guid);
-}
-
-void ObjectMgr::AddCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid, uint32 instance)
-{
-    // corpses are always added to spawn mode 0 and they are spawned by their instance id
-    CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(mapid, 0)][cellid];
-    cell_guids.corpses[player_guid] = instance;
-}
-
-void ObjectMgr::DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid)
-{
-    // corpses are always added to spawn mode 0 and they are spawned by their instance id
-    CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(mapid, 0)][cellid];
-    cell_guids.corpses.erase(player_guid);
 }
 
 void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, QuestRelationsReverse* reversedMap, std::string const& table, bool starter, bool go)

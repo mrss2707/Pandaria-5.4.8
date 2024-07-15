@@ -467,9 +467,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_CORPSE_QUERY");
 
-    Corpse* corpse = GetPlayer()->GetCorpse();
-
-    if (!corpse)
+    if (!_player->HasCorpse())
     {
         WorldPacket data(SMSG_CORPSE_QUERY, 1);
         data.WriteBits(0, 9); // Not found + guid stream
@@ -479,11 +477,12 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
         return;
     }
 
-    uint32 mapId = corpse->GetMapId();
-    float x = corpse->GetPositionX();
-    float y = corpse->GetPositionY();
-    float z = corpse->GetPositionZ();
-    uint32 corpseMapId = mapId;
+    WorldLocation corpseLocation = _player->GetCorpseLocation();
+    uint32 corpseMapId = corpseLocation.GetMapId();
+    uint32 mapId = corpseLocation.GetMapId();
+    float x = corpseLocation.GetPositionX();
+    float y = corpseLocation.GetPositionY();
+    float z = corpseLocation.GetPositionZ();
 
     // if corpse at different map
     if (mapId != _player->GetMapId())
@@ -505,8 +504,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
         }
     }
 
-    _player->SendCorpseReclaimDelay();
-
+    // this might be transport guid?
     ObjectGuid corpseGuid = ObjectGuid::Empty; // need correct condition, guid shouldn't always be sent to player (corpse->GetGUID())
 
     WorldPacket data(SMSG_CORPSE_QUERY, 9 + 1 + (4 * 5));

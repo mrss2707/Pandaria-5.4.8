@@ -899,6 +899,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_BONUS_ROLL,
     PLAYER_LOGIN_QUERY_LOAD_DESERTER_INFO,
     PLAYER_LOGIN_QUERY_LOAD_BATTLGEROUND_STATS,
+    PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1630,7 +1631,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     void AddItemDurations(Item* item);
     void RemoveItemDurations(Item* item);
     void SendItemDurations();
-    void LoadCorpse();
+    void LoadCorpse(PreparedQueryResult result);
     void LoadPet();
 
     bool AddItem(uint32 itemId, uint32 count);
@@ -2392,9 +2393,11 @@ public:
     void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr);
 
     Corpse* GetCorpse() const;
-    void SpawnCorpseBones();
-    void CreateCorpse();
+    void SpawnCorpseBones(bool triggerSave = true);
+    Corpse* CreateCorpse();
     void KillPlayer();
+    bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
+    WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
     void ResurrectPlayer(float restore_percent, bool applySickness = false);
     void BuildPlayerRepop();
@@ -2557,13 +2560,11 @@ public:
     }
     static DrunkenState GetDrunkenstateByValue(uint8 value);
 
-    uint32 GetDeathTimer() const
-    {
-        return m_deathTimer;
-    }
+    uint32 GetDeathTimer() const { return m_deathTimer; }
     uint32 GetCorpseReclaimDelay(bool pvp) const;
     void UpdateCorpseReclaimDelay();
-    void SendCorpseReclaimDelay(bool load = false);
+    int32 CalculateCorpseReclaimDelay(bool load = false) const;
+    void SendCorpseReclaimDelay(uint32 delay);
 
     uint32 GetBlockPercent() const
     {
@@ -3683,6 +3684,8 @@ protected:
 
     uint32 totalBGCount = 0;
     uint32 totalBGWins = 0;
+
+    WorldLocation _corpseLocation;
 };
 
 void AddItemsSetItem(Player*player, Item* item);

@@ -227,6 +227,10 @@ bool LoginQueryHolder::Initialize()
     stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_CURRENCY, stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSE_LOCATION);
+    stmt->setUInt32(0, lowGuid);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION, stmt);
+
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_BATTLE_PETS);
     stmt->setUInt32(0, m_accountId);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_BATTLE_PETS, stmt);
@@ -1134,7 +1138,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     sSocialMgr->SendFriendStatus(pCurrChar, FRIEND_ONLINE, pCurrChar->GetGUID(), true);
 
     // Place character in world (and load zone) before some object loading
-    pCurrChar->LoadCorpse();
+    pCurrChar->LoadCorpse(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION));
 
     // setting Ghost+speed if dead
     if (pCurrChar->m_deathState != ALIVE)

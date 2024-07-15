@@ -3483,10 +3483,13 @@ bool Group::IsGuildGroup(uint32 guildId, Player* refPlayer, float* outXpMultipli
     float xpMul = 1.0f;
     // First we populate the array
     for (auto&& player : *this)
+    {
+        WorldLocation corpseLocation = player->GetCorpseLocation();
         if (player->GetGuildId() == guildId && // If player is in the same guild
             ((player->FindMap() && player->GetMap()->GetId() == mapId && player->GetMap()->GetInstanceId() == InstanceId) || // If player is in the same map
-            (player->GetCorpse() && player->GetCorpse()->FindMap() && player->GetCorpse()->GetMap()->GetId() == mapId && player->GetCorpse()->GetMap()->GetInstanceId() == InstanceId))) // Or their corpse is in the same map
+            (player->HasCorpse() && corpseLocation.GetMapId() == mapId && player->GetCorpse()->GetMap()->GetInstanceId() == InstanceId))) // Or their corpse is in the same map
             ++count;
+    }
 
     bool ret = false;
 

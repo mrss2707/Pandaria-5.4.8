@@ -119,6 +119,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
         {
             map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY);
             map->LoadRespawnTimes();
+            map->LoadCorpseData();
         }
 
         i_maps[id] = map;
@@ -294,10 +295,10 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
 
     if (!player->IsAlive())
     {
-        if (Corpse* corpse = player->GetCorpse())
+        if (player->HasCorpse())
         {
             // let enter in ghost mode in instance that connected to inner instance with corpse
-            uint32 corpseMap = corpse->GetMapId();
+            uint32 corpseMap = player->GetCorpseLocation().GetMapId();
             do
             {
                 if (corpseMap == mapid)

@@ -1746,11 +1746,6 @@ void World::SetInitialWorldSettings()
 
     LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realm.Id.Realm);      // One-time query
 
-    ///- Remove the bones (they should not exist in DB though) and old corpses after a restart
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_CORPSES);
-    stmt->setUInt32(0, 3 * DAY);
-    CharacterDatabase.Execute(stmt);
-
     ///- Load the DBC files
     TC_LOG_INFO("server.loading", "Initialize data stores...");
     LoadDBCStores(m_dataPath, m_availableDbcLocaleMask);
@@ -2062,9 +2057,6 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading pet level stats...");
     sObjectMgr->LoadPetLevelInfo();
-
-    TC_LOG_INFO("server.loading", "Loading Player Corpses...");
-    sObjectMgr->LoadCorpses();
 
     TC_LOG_INFO("server.loading", "Loading Player level dependent mail rewards...");
     sObjectMgr->LoadMailLevelRewards();
@@ -2686,9 +2678,10 @@ void World::Update(uint32 diff)
     if (m_timers[WUPDATE_CORPSES].Passed())
     {
         m_timers[WUPDATE_CORPSES].Reset();
-
-        // TODO: ObjectGuid
-        //sObjectAccessor->RemoveOldCorpses();
+        sMapMgr->DoForAllMaps([](Map* map)
+        {
+            map->RemoveOldCorpses();
+        });
     }
 
     ///- Process Game events when necessary
@@ -4418,6 +4411,11 @@ void World::InitServerAutoRestartTime()
 
 	if (!serverRestartTime)
 		sWorld->setWorldState(WS_AUTO_SERVER_RESTART_TIME, uint64(m_NextServerRestart));
+}
+
+void World::RemoveOldCorpses()
+{
+    m_timers[WUPDATE_CORPSES].SetCurrent(m_timers[WUPDATE_CORPSES].GetInterval());
 }
 
 Realm realm;
