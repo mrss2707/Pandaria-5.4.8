@@ -75,8 +75,6 @@ InstanceScript::InstanceScript(Map* map) : instance(map), completedEncounters(0)
     scenarioId = sScenarioMgr->GetScenarioIdForMap(map->GetId());
     beginningTime = 0;
 
-    // TODO: ObjectGuid - do we need a non-zero counter here?
-    instanceGuid = ObjectGuid(HighGuid::Instance, instance->GetInstanceId(), uint32(0));
     scenarioGuid = ObjectGuid(HighGuid::Scenario, instance->GetInstanceId(), scenarioId);
 }
 

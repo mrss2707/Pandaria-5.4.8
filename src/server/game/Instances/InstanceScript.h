@@ -425,8 +425,6 @@ class InstanceScript : public ZoneScript
         bool CanUseResurrection();
         void ResetResurrectionsCount() { resurrections = 0; }
 
-        ObjectGuid GetGUID() const { return instanceGuid; }
-
         ObjectGuid GetObjectGuid(uint32 type) const;
         virtual ObjectGuid GetGuidData(uint32 type) const override;
 
@@ -497,7 +495,6 @@ class InstanceScript : public ZoneScript
         ObjectGuid scenarioGuid;
         uint32 scenarioId;
 
-        ObjectGuid instanceGuid;
         std::vector<ObjectGuid> challengeDoorGuids;
         uint32 startChallengeTime;
         uint32 challengeTime;
