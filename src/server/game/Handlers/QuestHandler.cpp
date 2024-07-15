@@ -553,11 +553,6 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
     }
     else
         _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
-
-    // HACKALERT
-    // I fucking dunno why client does not send query for quest status.
-    if (quest->IsTurnIn())
-        _player->SendQuestGiverStatusMultiple();
 }
 
 void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)

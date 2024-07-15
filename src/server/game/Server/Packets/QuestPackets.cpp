@@ -20,7 +20,6 @@
 WorldPacket const* WorldPackets::Quest::QuestGiverStatusMultiple::Write()
 {
     _worldPacket.WriteBits(QuestGiver.size(), 21);
-    _worldPacket.FlushBits();
 
     for (QuestGiverInfo const& questGiver : QuestGiver)
     {
