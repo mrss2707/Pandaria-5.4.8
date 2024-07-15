@@ -91,7 +91,7 @@ public:
 
     void ShowGmEscalatedList(ChatHandler& handler) const;
     void SendGmTicket(WorldSession* session, GmTicket* ticket) const;
-    void SendGmTicketUpdate(Opcodes opcode, GMTicketResponse response, Player* player) const;
+    void SendGmTicketUpdate(OpcodeServer opcode, GMTicketResponse response, Player* player) const;
     void SendGmResponsee(WorldSession* session, GmTicket* ticket) const;
     void UpdateLastChange() { _lastChange = uint64(time(NULL)); }
 

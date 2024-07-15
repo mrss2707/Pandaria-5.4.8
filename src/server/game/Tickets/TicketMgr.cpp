@@ -364,7 +364,7 @@ void TicketMgr::SendGmResponsee(WorldSession* session, GmTicket* ticket) const
     }
 }
 
-void TicketMgr::SendGmTicketUpdate(Opcodes opcode, GMTicketResponse response, Player* player) const
+void TicketMgr::SendGmTicketUpdate(OpcodeServer opcode, GMTicketResponse response, Player* player) const
 {
     if (player && player->IsInWorld())
     {

@@ -33,7 +33,7 @@ class WorldPacket : public ByteBuffer
         {
         }
 
-        WorldPacket(Opcodes opcode, size_t res = 200) : ByteBuffer(res, Reserve{}), m_opcode(opcode)
+        WorldPacket(uint32 opcode, size_t res = 200) : ByteBuffer(res, Reserve{}), m_opcode(opcode)
         {
         }
 
@@ -71,23 +71,23 @@ class WorldPacket : public ByteBuffer
             return *this;
         }
 
-        WorldPacket(Opcodes opcode, MessageBuffer&& buffer) : ByteBuffer(std::move(buffer)), m_opcode(opcode) { }
+        WorldPacket(uint32 opcode, MessageBuffer&& buffer) : ByteBuffer(std::move(buffer)), m_opcode(opcode) { }
 
 
-        void Initialize(Opcodes opcode, size_t newres = 200)
+        void Initialize(uint32 opcode, size_t newres = 200)
         {
             clear();
             _storage.reserve(newres);
             m_opcode = opcode;
         }
 
-        Opcodes GetOpcode() const { return m_opcode; }
-        void SetOpcode(Opcodes opcode) { m_opcode = opcode; }
+        uint32 GetOpcode() const { return m_opcode; }
+        void SetOpcode(uint32 opcode) { m_opcode = opcode; }
 
         TimePoint GetReceivedTime() const { return m_receivedTime; }
 
     protected:
-        Opcodes m_opcode;
+        uint32 m_opcode;
         TimePoint m_receivedTime; // only set for a specific set of opcodes, for performance reasons.
         
 };

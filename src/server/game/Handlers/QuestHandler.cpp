@@ -31,6 +31,7 @@
 #include "ScriptMgr.h"
 #include "GameObjectAI.h"
 #include "PoolMgr.h"
+#include "QuestPackets.h"
 
 void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
 {
@@ -556,7 +557,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
     // HACKALERT
     // I fucking dunno why client does not send query for quest status.
     if (quest->IsTurnIn())
-        HandleQuestgiverStatusMultipleQuery(recvData);
+        _player->SendQuestGiverStatusMultiple();
 }
 
 void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)
@@ -915,98 +916,9 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPackets::Quest::QuestGiverStatusMultipleQuery& /*packet*/)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY");
 
-    uint32 count = 0;
-    ByteBuffer byteData;
-
-    WorldPacket data(SMSG_QUESTGIVER_STATUS_MULTIPLE, 3 + count * (1 + 8 + 4));
-
-    size_t pos = data.bitwpos();
-    data.WriteBits(count, 21);      // placeholder
-
-    for (Player::ClientGUIDs::const_iterator itr = _player->m_clientGUIDs.begin(); itr != _player->m_clientGUIDs.end(); ++itr)
-    {
-        QuestGiverStatus questStatus = QuestGiverStatus::None;
-
-        if ((*itr).IsCreatureOrVehicle() || (*itr).IsPet())
-        {
-            // need also pet quests case support
-            Creature* questgiver = ObjectAccessor::GetCreatureOrPetOrVehicle(*GetPlayer(), *itr);
-            if (!questgiver || questgiver->IsHostileTo(_player))
-                continue;
-            if (!questgiver->HasFlag(UNIT_FIELD_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
-                continue;
-            if (Optional<QuestGiverStatus> scriptStatus = sScriptMgr->GetDialogStatus(_player, questgiver))
-                questStatus = *scriptStatus;
-            else
-                questStatus = _player->GetQuestDialogStatus(questgiver);
-
-            ObjectGuid guid = questgiver->GetGUID();
-
-            data.WriteBit(guid[4]);
-            data.WriteBit(guid[0]);
-            data.WriteBit(guid[3]);
-            data.WriteBit(guid[6]);
-            data.WriteBit(guid[5]);
-            data.WriteBit(guid[7]);
-            data.WriteBit(guid[1]);
-            data.WriteBit(guid[2]);
-
-            byteData.WriteByteSeq(guid[6]);
-            byteData.WriteByteSeq(guid[2]);
-            byteData.WriteByteSeq(guid[7]);
-            byteData.WriteByteSeq(guid[5]);
-            byteData.WriteByteSeq(guid[4]);
-            byteData << uint32(questStatus);
-            byteData.WriteByteSeq(guid[1]);
-            byteData.WriteByteSeq(guid[3]);
-            byteData.WriteByteSeq(guid[0]);
-
-            ++count;
-        }
-        else if ((*itr).IsGameObject())
-        {
-            GameObject* questgiver = GetPlayer()->GetMap()->GetGameObject(*itr);
-            if (!questgiver)
-                continue;
-            if (questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
-                continue;
-            if (Optional<QuestGiverStatus> scriptStatus = sScriptMgr->GetDialogStatus(_player, questgiver))
-                questStatus = *scriptStatus;
-            else
-                questStatus = _player->GetQuestDialogStatus(questgiver);
-
-            ObjectGuid guid = questgiver->GetGUID();
-
-            data.WriteBit(guid[4]);
-            data.WriteBit(guid[0]);
-            data.WriteBit(guid[3]);
-            data.WriteBit(guid[6]);
-            data.WriteBit(guid[5]);
-            data.WriteBit(guid[7]);
-            data.WriteBit(guid[1]);
-            data.WriteBit(guid[2]);
-
-            byteData.WriteByteSeq(guid[6]);
-            byteData.WriteByteSeq(guid[2]);
-            byteData.WriteByteSeq(guid[7]);
-            byteData.WriteByteSeq(guid[5]);
-            byteData.WriteByteSeq(guid[4]);
-            byteData << uint32(questStatus);
-            byteData.WriteByteSeq(guid[1]);
-            byteData.WriteByteSeq(guid[3]);
-            byteData.WriteByteSeq(guid[0]);
-
-            ++count;
-        }
-    }
-
-    data.FlushBits();
-    data.PutBits(pos, count, 21);
-    data.append(byteData);
-
-    SendPacket(&data);
+    _player->SendQuestGiverStatusMultiple();
 }

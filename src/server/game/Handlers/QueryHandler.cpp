@@ -711,7 +711,9 @@ void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
 
 void WorldSession::HandleQuestNPCQuery(WorldPacket& recvData)
 {
-    std::map<uint32, std::vector<uint32>> quests;
+    // use set to remove duplicates
+    // proper fix would be inside GetCreatureQuestInvolvedRelationReverseBounds
+    std::map<uint32, std::set<uint32>> quests;
     for (int i = 0; i < 50; ++i)
     {
         uint32 questId;
@@ -722,11 +724,11 @@ void WorldSession::HandleQuestNPCQuery(WorldPacket& recvData)
 
         auto creatures = sObjectMgr->GetCreatureQuestInvolvedRelationReverseBounds(questId);
         for (auto it = creatures.first; it != creatures.second; ++it)
-            quests[questId].push_back(it->second);
+            quests[questId].emplace(it->second);
 
         auto gos = sObjectMgr->GetGOQuestInvolvedRelationReverseBounds(questId);
         for (auto it = gos.first; it != gos.second; ++it)
-            quests[questId].push_back(it->second | 0x80000000); // GO mask
+            quests[questId].emplace(it->second | 0x80000000); // GO mask
     }
 
     uint32 count;
@@ -737,8 +739,6 @@ void WorldSession::HandleQuestNPCQuery(WorldPacket& recvData)
 
     for (auto it = quests.begin(); it != quests.end(); ++it)
         data.WriteBits(it->second.size(), 22);
-
-    data.FlushBits();
 
     for (auto it = quests.begin(); it != quests.end(); ++it)
     {

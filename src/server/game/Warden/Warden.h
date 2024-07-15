@@ -182,7 +182,7 @@ class Warden
         std::string Penalty(WardenCheck* check = nullptr);
 
     private:
-        void SendPacket(Opcodes opcode, void const *data, size_t dataSize);
+        void SendPacket(OpcodeServer opcode, void const *data, size_t dataSize);
     private:
         WorldSession* _session;
         uint8 _inputKey[16];

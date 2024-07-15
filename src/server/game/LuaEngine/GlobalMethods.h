@@ -668,7 +668,7 @@ namespace LuaGlobalFunctions
             luaL_error(L, "Invalid opcode type (%d)", opcode);
         else
         {
-            WorldPacket* _packet = new WorldPacket((Opcodes)opcode, size);
+            WorldPacket* _packet = new WorldPacket(opcode, size);
             sEluna->Push(L, _packet);
             return 1;
         }

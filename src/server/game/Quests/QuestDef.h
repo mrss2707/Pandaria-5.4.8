@@ -26,6 +26,7 @@
 
 #include <string>
 #include <vector>
+#include <bitset>
 
 class Player;
 

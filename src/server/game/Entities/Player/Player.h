@@ -1759,6 +1759,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     void SendQuestUpdateAddCredit(Quest const* quest, QuestObjective const* objective, ObjectGuid guid, uint16 oldCount, uint16 addCount);
     void SendQuestUpdateAddCreditSimple(Quest const* quest, QuestObjective const* objective);
     void SendQuestUpdateAddPlayer(Quest const* quest, QuestObjective const* objective, uint16 oldCount, uint16 addCount);
+    void SendQuestGiverStatusMultiple();
 
     ObjectGuid GetDivider() const
     {
@@ -2627,7 +2628,7 @@ public:
 
     void SendInitWorldStates(uint32 zone, uint32 area);
     void SendUpdateWorldState(uint32 Field, uint32 Value);
-    void SendDirectMessage(WorldPacket* data);
+    void SendDirectMessage(WorldPacket const* data) const;
     void SendBGWeekendWorldStates();
     void SendBattlefieldWorldStates();
 
@@ -3093,7 +3094,6 @@ public:
     /*! These methods send different packets to the client in apply and unapply case.
         These methods are only sent to the current unit.
         */
-    void SendMovementSetCanTransitionBetweenSwimAndFly(bool apply);
     void SendMovementSetCollisionHeight(float height);
     void SendApplyMovementForce(bool apply, Position const &source, float force = 0.0f);
 

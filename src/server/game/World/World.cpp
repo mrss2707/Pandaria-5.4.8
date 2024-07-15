@@ -2385,8 +2385,7 @@ void World::SetInitialWorldSettings()
     sRatedPvpMgr->LoadFromDB();
 
     TC_LOG_INFO("misc", "Initializing Opcodes...");
-    serverOpcodeTable.InitializeServerTable();
-    clientOpcodeTable.InitializeClientTable();
+    opcodeTable.Initialize();
 
     TC_LOG_INFO("misc", "Loading hotfix info...");
     sObjectMgr->LoadHotfixData();
