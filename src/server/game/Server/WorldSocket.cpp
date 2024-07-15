@@ -606,7 +606,8 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             return ReadDataHandlerResult::Ok;
 
         case CMSG_TIME_SYNC_RESP:
-            packetToQueue = new WorldPacket(std::move(packet), std::chrono::steady_clock::now());
+            packet.SetReceiveTime(std::chrono::steady_clock::now());
+            packetToQueue = new WorldPacket(std::move(packet));
             break;
 
         default:
