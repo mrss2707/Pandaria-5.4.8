@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "GossipDef.h"
 #include "QuestDef.h"
+#include "QuestPools.h"
 #include "ObjectAccessor.h"
 #include "Group.h"
 #include "Battleground.h"
@@ -814,12 +815,12 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
 
     Player* const sender = GetPlayer();
 
-    // TODO: ObjectGuid
-//    if (sPoolMgr->IsPartOfAPool<Quest>(questId) && !sPoolMgr->IsSpawnedObject<Quest>(questId))
-//    {
-//        sender->SendPushToPartyResponse(sender, QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY);
-//        return;
-//    }
+    // in pool and not currently available (wintergrasp weekly, dalaran weekly) - can't share
+    if (!sQuestPoolMgr->IsQuestActive(questId))
+    {
+        sender->SendPushToPartyResponse(sender, QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY);
+        return;
+    }
 
     Group* group = sender->GetGroup();
     if (!group)

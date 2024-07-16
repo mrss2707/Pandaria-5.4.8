@@ -64,6 +64,7 @@
 #include "GitRevision.h"
 #include "GridNotifiersImpl.h"
 #include "PoolMgr.h"
+#include "QuestPools.h"
 #include "CellImpl.h"
 #include "InstanceSaveMgr.h"
 #include "Util.h"
@@ -1980,6 +1981,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Objects Pooling Data...");
     sPoolMgr->LoadFromDB();
 
+    TC_LOG_INFO("server.loading", "Loading Quest Pooling Data...");
+    sQuestPoolMgr->LoadFromDB();
+
     TC_LOG_INFO("server.loading", "Loading Game Event Data...");               // must be after loading pools fully
     sGameEventMgr->LoadHolidayDates();                           // Must be after loading DBC
     sGameEventMgr->LoadFromDB();                                 // Must be after loading holiday dates
@@ -3592,7 +3596,7 @@ void World::ResetDailyQuests()
     }
 
     // change available dailies
-    sPoolMgr->ChangeDailyQuests();
+    sQuestPoolMgr->ChangeDailyQuests();
 
     sAnticheatMgr->ResetDailyReportStates();
 }
@@ -3684,7 +3688,7 @@ void World::ResetWeeklyQuests()
     sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, uint64(m_NextWeeklyQuestReset));
 
     // change available weeklies
-    sPoolMgr->ChangeWeeklyQuests();
+    sQuestPoolMgr->ChangeWeeklyQuests();
 }
 
 void World::ResetMonthlyQuests()
@@ -3697,6 +3701,8 @@ void World::ResetMonthlyQuests()
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetMonthlyQuestStatus();
+
+    sQuestPoolMgr->ChangeMonthlyQuests();
 
     // generate time
     time_t curTime = time(NULL);

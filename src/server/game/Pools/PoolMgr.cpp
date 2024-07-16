@@ -442,132 +442,6 @@ void PoolGroup<Pool>::Spawn1Object(ActivePoolData& spawns, PoolObject* obj)
     sPoolMgr->SpawnPool(spawns, obj->guid);
 }
 
-// Same for 1 quest
-template<>
-void PoolGroup<Quest>::Spawn1Object(ActivePoolData& spawns, PoolObject* obj)
-{
-    // Creatures
-    QuestRelations* questMap = sObjectMgr->GetCreatureQuestRelationMap();
-    PooledQuestRelationBoundsNC qr = sPoolMgr->mQuestCreatureRelation.equal_range(obj->guid);
-    for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
-    {
-        TC_LOG_DEBUG("pool", "PoolGroup<Quest>: Adding quest %u to creature %u", itr->first, itr->second);
-        questMap->insert(QuestRelations::value_type(itr->second, itr->first));
-    }
-
-    // Gameobjects
-    questMap = sObjectMgr->GetGOQuestRelationMap();
-    qr = sPoolMgr->mQuestGORelation.equal_range(obj->guid);
-    for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
-    {
-        TC_LOG_DEBUG("pool", "PoolGroup<Quest>: Adding quest %u to GO %u", itr->first, itr->second);
-        questMap->insert(QuestRelations::value_type(itr->second, itr->first));
-    }
-}
-
-template <>
-void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom)
-{
-    TC_LOG_DEBUG("pool", "PoolGroup<Quest>: Spawning pool %u", poolId);
-    // load state from db
-    if (!triggerFrom)
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_POOL_QUEST_SAVE);
-
-        stmt->setUInt32(0, poolId);
-
-        PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-        if (result)
-        {
-            do
-            {
-                uint32 questId = result->Fetch()[0].GetUInt32();
-                spawns.ActivateObject<Quest>(questId, poolId);
-                PoolObject tempObj(questId, 0.0f);
-                Spawn1Object(spawns, &tempObj);
-                --limit;
-            } while (result->NextRow() && limit);
-            return;
-        }
-    }
-
-    typedef std::set<PoolObject*> PoolObjectPointers;
-    ActivePoolObjects currentQuests = spawns.GetActiveQuests();
-    PoolObjectPointers newQuests;
-
-    static auto const rollOne = [](PoolObjectPointers const& pointers, PoolObjectList const& poolObjects) -> PoolObjectPointers::value_type
-    {
-        float equalChance = 100.0f;
-        uint32 equalChancedCount = 0;
-        for (auto&& obj : poolObjects)
-        {
-            if (obj.chance == 0.0f)
-                ++equalChancedCount;
-            else
-                equalChance -= obj.chance;
-        }
-
-        if (equalChance < 0.0f)
-            equalChance = 0.0f;
-        else if (equalChancedCount)
-            equalChance /= equalChancedCount;
-
-        std::function<double(PoolObjectPointers::value_type const&)> weightExtractor = [equalChance](PoolObject* const& obj) -> double { return obj->chance == 0.0f ? equalChance : obj->chance; };
-        auto itr = Trinity::Containers::SelectRandomWeightedContainerElement(pointers, weightExtractor);
-        if (itr != pointers.end())
-            return *itr;
-
-        // Failsafe scenario, mostly for the case when every object in pointers container turns out having 0 weight (due to pool overall chance exceeding 100.0f limit)
-        return Trinity::Containers::SelectRandomContainerElement(pointers);
-    };
-
-    // always try to select different quests
-    for (PoolObjectList::iterator itr = EqualChanced.begin(); itr != EqualChanced.end(); ++itr)
-        if (!spawns.IsActiveObject<Quest>(itr->guid))
-            newQuests.insert(&*itr);
-
-    // clear the pool
-    DespawnObject(spawns);
-
-    // recycle minimal amount of quests if possible count is lower than limit
-    if (limit > newQuests.size() && !currentQuests.empty())
-    {
-        // Store pointers to quest pool objects that belong to this pool group
-        PoolObjectPointers currentQuestObjects;
-        for (auto&& id : currentQuests)
-        {
-            auto itr = std::find_if(EqualChanced.begin(), EqualChanced.end(), [id](PoolObject const& obj) { return obj.guid == id; });
-            if (itr != EqualChanced.end())
-                currentQuestObjects.insert(&*itr);
-        }
-
-        while (newQuests.size() < limit && !currentQuestObjects.empty())
-        {
-            PoolObject* obj = rollOne(currentQuestObjects, EqualChanced);
-            newQuests.insert(obj);
-            currentQuestObjects.erase(obj);
-        }
-    }
-
-    if (newQuests.empty())
-        return;
-
-    // activate <limit> random quests
-    do
-    {
-        PoolObject* obj = rollOne(newQuests, EqualChanced);
-        spawns.ActivateObject<Quest>(obj->guid, poolId);
-        Spawn1Object(spawns, obj);
-        newQuests.erase(obj);
-        --limit;
-    } while (limit && !newQuests.empty());
-
-    // if we are here it means the pool is initialized at startup and did not have previous saved state
-    if (!triggerFrom)
-        sPoolMgr->SaveQuestsToDB();
-}
-
 // Method that does the respawn job on the specified creature
 template <>
 void PoolGroup<Creature>::ReSpawn1Object(ActivePoolData& spawns, PoolObject* obj)
@@ -608,7 +482,6 @@ PoolMgr* PoolMgr::instance()
 
 void PoolMgr::Initialize()
 {
-    mQuestSearchMap.clear();
     mGameobjectSearchMap.clear();
     mCreatureSearchMap.clear();
 }
@@ -895,102 +768,6 @@ void PoolMgr::LoadFromDB()
         }
     }
 
-    TC_LOG_INFO("server.loading", "Loading Quest Pooling Data...");
-    {
-        uint32 oldMSTime = getMSTime();
-
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_QUEST_POOLS);
-        PreparedQueryResult result = WorldDatabase.Query(stmt);
-
-        if (!result)
-        {
-            TC_LOG_INFO("server.loading", ">> Loaded 0 quests in pools");
-        }
-        else
-        {
-            PooledQuestRelationBounds creBounds;
-            PooledQuestRelationBounds goBounds;
-
-            enum eQuestTypes
-            {
-                QUEST_NONE   = 0,
-                QUEST_DAILY  = 1,
-                QUEST_WEEKLY = 2
-            };
-
-            std::map<uint32, int32> poolTypeMap;
-            uint32 count = 0;
-            do
-            {
-                Field* fields = result->Fetch();
-
-                uint32 entry   = fields[0].GetUInt32();
-                uint32 pool_id = fields[1].GetUInt32();
-                float chance   = fields[2].GetFloat();
-
-                Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
-                if (!quest)
-                {
-                    TC_LOG_ERROR("sql.sql", "`pool_quest` has a non existing quest template (Entry: %u) defined for pool id (%u), skipped.", entry, pool_id);
-                    continue;
-                }
-
-                auto it = mPoolTemplate.find(pool_id);
-                if (it == mPoolTemplate.end())
-                {
-                    TC_LOG_ERROR("sql.sql", "`pool_quest` pool id (%u) is not in `pool_template`, skipped.", pool_id);
-                    continue;
-                }
-
-                if (chance < 0 || chance > 100)
-                {
-                    TC_LOG_ERROR("sql.sql", "`pool_quest` has an invalid chance (%f) for quest (%u) in pool id (%u), skipped.", chance, entry, pool_id);
-                    continue;
-                }
-
-                if (!quest->IsDailyOrWeekly())
-                {
-                    TC_LOG_ERROR("sql.sql", "`pool_quest` has an quest (%u) which is not daily or weekly in pool id (%u), use ExclusiveGroup instead, skipped.", entry, pool_id);
-                    continue;
-                }
-
-                if (poolTypeMap[pool_id] == QUEST_NONE)
-                    poolTypeMap[pool_id] = quest->IsDaily() ? QUEST_DAILY : QUEST_WEEKLY;
-
-                int32 currType = quest->IsDaily() ? QUEST_DAILY : QUEST_WEEKLY;
-
-                if (poolTypeMap[pool_id] != currType)
-                {
-                    TC_LOG_ERROR("sql.sql", "`pool_quest` quest %u is %s but pool (%u) is specified for %s, mixing not allowed, skipped.",
-                                     entry, currType == QUEST_DAILY ? "QUEST_DAILY" : "QUEST_WEEKLY", pool_id, poolTypeMap[pool_id] == QUEST_DAILY ? "QUEST_DAILY" : "QUEST_WEEKLY");
-                    continue;
-                }
-
-                creBounds = mQuestCreatureRelation.equal_range(entry);
-                goBounds = mQuestGORelation.equal_range(entry);
-
-                if (creBounds.first == creBounds.second && goBounds.first == goBounds.second)
-                {
-                    TC_LOG_ERROR("sql.sql", "`pool_quest` lists entry (%u) as member of pool (%u) but is not started anywhere, skipped.", entry, pool_id);
-                    continue;
-                }
-
-                PoolTemplateData* pPoolTemplate = &mPoolTemplate[pool_id];
-                PoolObject plObject = PoolObject(entry, chance);
-                PoolGroup<Quest>& questgroup = mPoolQuestGroups[pool_id];
-                questgroup.SetPoolId(pool_id);
-                questgroup.AddEntry(plObject, pPoolTemplate->MaxLimit);
-                SearchPair p(entry, pool_id);
-                mQuestSearchMap.insert(p);
-
-                ++count;
-            }
-            while (result->NextRow());
-
-            TC_LOG_INFO("server.loading", ">> Loaded %u quests in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        }
-    }
-
     for (auto const& [poolId, templateData] : mPoolTemplate)
     {
         if (IsEmpty(poolId))
@@ -1051,70 +828,6 @@ void PoolMgr::LoadFromDB()
     }
 }
 
-// TODO: ObjectGuid
-//void PoolMgr::LoadQuestPools()
-//{
-//}
-//
-//void PoolMgr::SaveQuestsToDB()
-//{
-//    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-//
-//    for (PoolGroupQuestMap::iterator itr = mPoolQuestGroups.begin(); itr != mPoolQuestGroups.end(); ++itr)
-//    {
-//        if (itr->isEmpty())
-//            continue;
-//        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_POOL_SAVE);
-//        stmt->setUInt32(0, itr->GetPoolId());
-//        trans->Append(stmt);
-//    }
-//
-//    for (SearchMap::iterator itr = mQuestSearchMap.begin(); itr != mQuestSearchMap.end(); ++itr)
-//    {
-//        if (IsSpawnedObject<Quest>(itr->first))
-//        {
-//            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
-//            stmt->setUInt32(0, itr->second);
-//            stmt->setUInt32(1, itr->first);
-//            trans->Append(stmt);
-//        }
-//    }
-//
-//    CharacterDatabase.CommitTransaction(trans);
-//}
-//
-//void PoolMgr::ChangeDailyQuests()
-//{
-//    for (PoolGroupQuestMap::iterator itr = mPoolQuestGroups.begin(); itr != mPoolQuestGroups.end(); ++itr)
-//    {
-//        if (Quest const* quest = sObjectMgr->GetQuestTemplate(itr->second.GetFirstEqualChancedObjectId()))
-//        {
-//            if (quest->IsWeekly())
-//                continue;
-//
-//            UpdatePool<Quest>(itr->second.GetPoolId(), 1);    // anything non-zero means don't load from db
-//        }
-//    }
-//
-//    SaveQuestsToDB();
-//}
-//
-//void PoolMgr::ChangeWeeklyQuests()
-//{
-//    for (PoolGroupQuestMap::iterator itr = mPoolQuestGroups.begin(); itr != mPoolQuestGroups.end(); ++itr)
-//    {
-//        if (Quest const* quest = sObjectMgr->GetQuestTemplate(itr->second.GetFirstEqualChancedObjectId()))
-//        {
-//            if (quest->IsDaily())
-//                continue;
-//
-//            UpdatePool<Quest>(itr->second.GetPoolId(), 1);
-//        }
-//    }
-//
-//    SaveQuestsToDB();
-//}
-
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
 // If it's same, the creature is respawned only (added back to map)
 template<>
@@ -1145,21 +858,11 @@ void PoolMgr::SpawnPool<Pool>(ActivePoolData& activePoolData, uint32 pool_id, ui
         it->second.SpawnObject(activePoolData, mPoolTemplate[pool_id].MaxLimit, sub_pool_id);
 }
 
-// Call to spawn a pool
-template<>
-void PoolMgr::SpawnPool<Quest>(ActivePoolData& activePoolData, uint32 pool_id, uint32 quest_id)
-{
-    auto it = mPoolQuestGroups.find(pool_id);
-    if (it != mPoolQuestGroups.end() && !it->second.isEmpty())
-        it->second.SpawnObject(activePoolData, mPoolTemplate[pool_id].MaxLimit, quest_id);
-}
-
 void PoolMgr::SpawnPool(ActivePoolData& activePoolData, uint32 pool_id)
 {
     SpawnPool<Pool>(activePoolData, pool_id, 0);
     SpawnPool<GameObject>(activePoolData, pool_id, 0);
     SpawnPool<Creature>(activePoolData, pool_id, 0);
-    SpawnPool<Quest>(activePoolData, pool_id, 0);
 }
 
 // Call to despawn a pool, all gameobjects/creatures in this pool are removed
@@ -1178,11 +881,6 @@ void PoolMgr::DespawnPool(ActivePoolData& activePoolData, uint32 pool_id)
     {
         auto it = mPoolPoolGroups.find(pool_id);
         if (it != mPoolPoolGroups.end() && !it->second.isEmpty())
-            it->second.DespawnObject(activePoolData, 0);
-    }
-    {
-        auto it = mPoolQuestGroups.find(pool_id);
-        if (it != mPoolQuestGroups.end() && !it->second.isEmpty())
             it->second.DespawnObject(activePoolData, 0);
     }
 }
@@ -1205,11 +903,6 @@ bool PoolMgr::CheckPool(uint32 pool_id) const
         if (it != mPoolPoolGroups.end() && !it->second.CheckPool())
             return false;
     }
-    {
-        auto it = mPoolQuestGroups.find(pool_id);
-        if (it != mPoolQuestGroups.end() && !it->second.CheckPool())
-            return false;
-    }
     return true;
 }
 
@@ -1230,11 +923,6 @@ bool PoolMgr::IsEmpty(uint32 pool_id) const
         if (it != mPoolPoolGroups.end() && !it->second.isEmptyDeepCheck())
             return false;
     }
-    {
-        auto it = mPoolQuestGroups.find(pool_id);
-        if (it != mPoolQuestGroups.end() && !it->second.isEmptyDeepCheck())
-            return false;
-    }
     return true;
 }
 
@@ -1253,7 +941,6 @@ void PoolMgr::UpdatePool(ActivePoolData& activePoolData, uint32 pool_id, uint32 
 template void PoolMgr::UpdatePool<Pool>(ActivePoolData& activePoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
 template void PoolMgr::UpdatePool<GameObject>(ActivePoolData& activePoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
 template void PoolMgr::UpdatePool<Creature>(ActivePoolData& activePoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
-template void PoolMgr::UpdatePool<Quest>(ActivePoolData& activePoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
 
 std::unique_ptr<ActivePoolData> PoolMgr::InitPoolsForMap(Map* map)
 {

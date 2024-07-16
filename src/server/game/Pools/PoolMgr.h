@@ -119,10 +119,6 @@ class PoolMgr
         static PoolMgr* instance();
         void LoadFromDB();
 
-        // TODO: ObjectGuid
-        void LoadQuestPools() { }
-        void SaveQuestsToDB() { }
-
         void Initialize();
 
         template<typename T>
@@ -140,10 +136,6 @@ class PoolMgr
         template<typename T>
         void UpdatePool(ActivePoolData& activePoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
 
-        // TODO: ObjectGuid
-        void ChangeDailyQuests() { }
-        void ChangeWeeklyQuests() { }
-
         PooledQuestRelation mQuestCreatureRelation;
         PooledQuestRelation mQuestGORelation;
 
@@ -159,19 +151,16 @@ class PoolMgr
         typedef std::unordered_map<uint32, PoolGroup<Creature>>   PoolGroupCreatureMap;
         typedef std::unordered_map<uint32, PoolGroup<GameObject>> PoolGroupGameObjectMap;
         typedef std::unordered_map<uint32, PoolGroup<Pool>>       PoolGroupPoolMap;
-        typedef std::unordered_map<uint32, PoolGroup<Quest>>       PoolGroupQuestMap;
-        typedef std::pair<uint32, uint32>           SearchPair;
-        typedef std::map<uint32, uint32>            SearchMap;
+        typedef std::pair<uint64, uint32> SearchPair;
+        typedef std::map<uint32, uint32> SearchMap;
 
         PoolTemplateDataMap    mPoolTemplate;
         PoolGroupCreatureMap   mPoolCreatureGroups;
         PoolGroupGameObjectMap mPoolGameobjectGroups;
         PoolGroupPoolMap       mPoolPoolGroups;
-        PoolGroupQuestMap      mPoolQuestGroups;
         SearchMap mCreatureSearchMap;
         SearchMap mGameobjectSearchMap;
         SearchMap mPoolSearchMap;
-        SearchMap mQuestSearchMap;
         std::unordered_map<uint32, std::vector<uint32>> mAutoSpawnPoolsPerMap;
 };
 
@@ -194,17 +183,6 @@ inline uint32 PoolMgr::IsPartOfAPool<GameObject>(uint32 db_guid) const
 {
     SearchMap::const_iterator itr = mGameobjectSearchMap.find(db_guid);
     if (itr != mGameobjectSearchMap.end())
-        return itr->second;
-
-    return 0;
-}
-
-// Method that tell if the quest is part of another pool and return the pool id if yes
-template<>
-inline uint32 PoolMgr::IsPartOfAPool<Quest>(uint32 pool_id) const
-{
-    SearchMap::const_iterator itr = mQuestSearchMap.find(pool_id);
-    if (itr != mQuestSearchMap.end())
         return itr->second;
 
     return 0;
