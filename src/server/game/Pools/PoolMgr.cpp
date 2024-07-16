@@ -282,49 +282,6 @@ void PoolGroup<Pool>::Despawn1Object(ActivePoolData& spawns, uint32 child_pool_i
     sPoolMgr->DespawnPool(spawns, child_pool_id);
 }
 
-// Same on one quest
-template<>
-void PoolGroup<Quest>::Despawn1Object(ActivePoolData& spawns, uint32 quest_id)
-{
-    // Creatures
-    QuestRelations* questMap = sObjectMgr->GetCreatureQuestRelationMap();
-    PooledQuestRelationBoundsNC qr = sPoolMgr->mQuestCreatureRelation.equal_range(quest_id);
-    for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
-    {
-        QuestRelations::iterator qitr = questMap->find(itr->second);
-        if (qitr == questMap->end())
-            continue;
-        QuestRelations::iterator lastElement = questMap->upper_bound(itr->second);
-        for (; qitr != lastElement; ++qitr)
-        {
-            if (qitr->first == itr->second && qitr->second == itr->first)
-            {
-                questMap->erase(qitr);                  // iterator is now no more valid
-                break;                                  // but we can exit loop since the element is found
-            }
-        }
-    }
-
-    // Gameobjects
-    questMap = sObjectMgr->GetGOQuestRelationMap();
-    qr = sPoolMgr->mQuestGORelation.equal_range(quest_id);
-    for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
-    {
-        QuestRelations::iterator qitr = questMap->find(itr->second);
-        if (qitr == questMap->end())
-            continue;
-        QuestRelations::iterator lastElement = questMap->upper_bound(itr->second);
-        for (; qitr != lastElement; ++qitr)
-        {
-            if (qitr->first == itr->second && qitr->second == itr->first)
-            {
-                questMap->erase(qitr);                  // iterator is now no more valid
-                break;                                  // but we can exit loop since the element is found
-            }
-        }
-    }
-}
-
 // Method for a pool only to remove any found record causing a circular dependency loop
 template<>
 void PoolGroup<Pool>::RemoveOneRelation(uint32 child_pool_id)

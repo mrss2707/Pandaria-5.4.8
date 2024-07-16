@@ -720,13 +720,11 @@ void WorldSession::HandleQuestNPCQuery(WorldPacket& recvData)
         if (!sObjectMgr->GetQuestTemplate(questId))
             continue;
 
-        auto creatures = sObjectMgr->GetCreatureQuestInvolvedRelationReverseBounds(questId);
-        for (auto it = creatures.first; it != creatures.second; ++it)
-            quests[questId].emplace(it->second);
+        for (auto const& creatures : sObjectMgr->GetCreatureQuestInvolvedRelationReverseBounds(questId))
+            quests[questId].emplace(creatures.second);
 
-        auto gos = sObjectMgr->GetGOQuestInvolvedRelationReverseBounds(questId);
-        for (auto it = gos.first; it != gos.second; ++it)
-            quests[questId].emplace(it->second | 0x80000000); // GO mask
+        for (auto const& gos : sObjectMgr->GetGOQuestInvolvedRelationReverseBounds(questId))
+            quests[questId].emplace(gos.second | 0x80000000); // GO mask
     }
 
     uint32 count;

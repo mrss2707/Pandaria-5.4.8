@@ -136,9 +136,6 @@ class PoolMgr
         template<typename T>
         void UpdatePool(ActivePoolData& activePoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
 
-        PooledQuestRelation mQuestCreatureRelation;
-        PooledQuestRelation mQuestGORelation;
-
         std::unique_ptr<ActivePoolData> InitPoolsForMap(Map* map);
 
         PoolTemplateData const* GetPoolTemplate(uint16 pool_id) const;

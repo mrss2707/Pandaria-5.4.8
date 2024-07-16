@@ -338,11 +338,10 @@ struct npc_archmage_landalock : public ScriptedAI
         if (_switchImageTimer > MINUTE*IN_MILLISECONDS)
         {
             _switchImageTimer = 0;
-            QuestRelationBounds objectQR = sObjectMgr->GetCreatureQuestRelationBounds(me->GetEntry());
+            QuestRelationResult objectQR = sObjectMgr->GetCreatureQuestRelations(me->GetEntry());
 
-            for (QuestRelations::const_iterator i = objectQR.first; i != objectQR.second; ++i)
+            for (uint32 questId : objectQR)
             {
-                uint32 questId = i->second;
                 Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
 
                 if (!quest || !quest->IsWeekly())
