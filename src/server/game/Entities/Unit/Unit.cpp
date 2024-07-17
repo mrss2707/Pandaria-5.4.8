@@ -1,5 +1,5 @@
 /*
-* This file is part of the Pandaria 5.4.8 Project. See THANKS file for Copyright information
+* This file is part of the Legends of Azeroth Pandaria Project. See THANKS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -70,8 +70,6 @@
 #include "SpellScript.h"
 #include "PetBattle.h"
 #include "GameEventMgr.h"
-
-bool AFDRoyaleIsSpecialAuraHook(Aura const* aura, Unit const* target);
 
 float baseMoveSpeed [MAX_MOVE_TYPE] =
 {
@@ -623,7 +621,7 @@ void Unit::GetRandomContactPoint(const Unit* obj, float &x, float &y, float &z, 
 {
     float combat_reach = GetCombatReach();
     if (combat_reach < 0.1f) // sometimes bugged for players
-        combat_reach = DEFAULT_COMBAT_REACH;
+        combat_reach = DEFAULT_PLAYER_COMBAT_REACH;
 
     uint32 attacker_number = getAttackers().size();
     if (attacker_number > 0)
@@ -4779,7 +4777,6 @@ void Unit::RemoveArenaAuras()
         if (!(aura->GetSpellInfo()->AttributesEx4 & SPELL_ATTR4_UNK21) // don't remove stances, shadowform, pally/hunter auras
             && !aura->IsPassive()                               // don't remove passive auras
             && !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_PERSISTENT)
-            && !AFDRoyaleIsSpecialAuraHook(aura, this)
             && (aurApp->IsPositive() || !(aura->GetSpellInfo()->AttributesEx3 & SPELL_ATTR3_DEATH_PERSISTENT))) // not negative death persistent auras
             RemoveAura(iter);
         else
@@ -13905,6 +13902,7 @@ void Unit::AddToWorld()
     {
         WorldObject::AddToWorld();
     }
+    RebuildTerrainSwaps();
 }
 
 void Unit::RemoveFromWorld()
@@ -18417,7 +18415,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     Position pos;
     if (!exitPosition)                           // Exit position not specified
-        m_vehicle->GetBase()->GetPosition(&pos);
+        pos = m_vehicle->GetBase()->GetPosition(); // This should use passenger's current position, leaving it as it is now
     else
         pos = *exitPosition;
 

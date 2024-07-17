@@ -62,8 +62,6 @@
 #include "WorldSession.h"
 #include "zlib.h"
 
-bool AFDRoyaleRepopRequestHook(Player* player);
-
 #ifdef ELUNA
 #include "HookMgr.h"
 #endif
@@ -78,9 +76,6 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
 
     if (GetPlayer()->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
         return; // silently return, client should display the error by itself
-
-    if (AFDRoyaleRepopRequestHook(GetPlayer()))
-        return;
 
     // the world update order is sessions, players, creatures
     // the netcode runs in parallel with all of these
@@ -1184,13 +1179,13 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recvData)
                 uint16 slot = player->FindQuestSlot(questId);
                 if (quest && slot < MAX_QUEST_LOG_SIZE && player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
                 {
-                    for (auto objective: quest->m_questObjectives)
+                    for (const auto& objective : quest->Objectives)
                     {
-                        if (objective->Type == QUEST_OBJECTIVE_TYPE_AREATRIGGER)
+                        if (objective.Type == QUEST_OBJECTIVE_AREATRIGGER)
                         {
-                            player->m_questObjectiveStatus[objective->Id] += 1;
-                            player->MarkQuestObjectiveToSave(questId, objective->Id);
-                            player->SendQuestUpdateAddCreditSimple(quest, objective);
+                            player->m_questObjectiveStatus[objective.ID] += 1;
+                            player->MarkQuestObjectiveToSave(questId, objective.ID);
+                            player->SendQuestUpdateAddCreditSimple(quest, &objective);
                             break;
                         }
                     }
@@ -1417,9 +1412,9 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recvData)
     TC_LOG_DEBUG("network", "CMSG_SET_ACTION_BUTTON slotId: %u actionId: %u", slotId, button->id);
 
     if (!button->id)
-        GetPlayer()->removeActionButton(slotId);
+        GetPlayer()->RemoveActionButton(slotId);
     else
-        GetPlayer()->addActionButton(slotId, button->id, button->type);
+        GetPlayer()->AddActionButton(slotId, button->id, button->type);
 }
 
 void WorldSession::HandleCompleteCinematic(WorldPacket& /*recvData*/)

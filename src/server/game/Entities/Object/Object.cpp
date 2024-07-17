@@ -1,5 +1,5 @@
 /*
-* This file is part of the Pandaria 5.4.8 Project. See THANKS file for Copyright information
+* This file is part of the Legends of Azeroth Pandaria Project. See THANKS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -1514,14 +1514,6 @@ float WorldObject::GetDistanceZ(const WorldObject* obj) const
     return (dist > 0 ? dist : 0);
 }
 
-float WorldObject::GetDistanceZ(Position const* obj) const
-{
-    float dz = fabs(GetPositionZ() - obj->GetPositionZ());
-    float sizefactor = GetObjectSize();
-    float dist = dz - sizefactor;
-    return (dist > 0 ? dist : 0);
-}
-
 bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius, bool incTargetRadius) const
 {
     float sizefactor = GetObjectSize() + obj->GetObjectSize();
@@ -1619,6 +1611,11 @@ bool WorldObject::IsWithinDist2d(const Position* pos, float dist) const
 bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D /*= true*/) const
 {
     return obj && _IsWithinDist(obj, dist2compare, is3D);
+}
+
+bool WorldObject::IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D /*= true*/, bool incOwnRadius /*= true*/, bool incTargetRadius /*= true*/) const
+{
+    return obj && IsInMap(obj) && InSamePhase(obj) && _IsWithinDist(obj, dist2compare, is3D, incOwnRadius, incTargetRadius);
 }
 
 Position WorldObject::GetHitSpherePointFor(Position const& dest) const
@@ -1833,7 +1830,7 @@ void Position::RelocateOffset(const Position & offset)
 
 void Position::RelocateOffset(float angle, float distance, float offsetZ)
 {
-    angle += m_orientation;
+    angle += GetOrientation();
     m_positionX += cos(angle) * distance;
     m_positionY += sin(angle) * distance;
     m_positionZ += offsetZ;
@@ -1898,7 +1895,7 @@ bool Position::HasInArc(float arc, const Position* obj, float border) const
     arc = NormalizeOrientation(arc);
 
     float angle = GetAngle(obj);
-    angle -= m_orientation;
+    angle -= GetOrientation();
 
     // move angle to range -pi ... +pi
     angle = NormalizeOrientation(angle);
@@ -1978,11 +1975,11 @@ void WorldObject::GetRandomPoint(const Position &pos, float distance, float &ran
     UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
 }
 
-void WorldObject::GetRandomPoint(const Position &srcPos, float distance, Position &pos) const
+Position WorldObject::GetRandomPoint(const Position &srcPos, float distance) const
 {
     float x, y, z;
     GetRandomPoint(srcPos, distance, x, y, z);
-    pos.Relocate(x, y, z, GetOrientation());
+    return Position(x, y, z, GetOrientation());
 }
 
 void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
@@ -2087,7 +2084,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z, float* grou
 
 bool Position::IsPositionValid() const
 {
-    return Trinity::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
+    return Trinity::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, GetOrientation());
 }
 
 float WorldObject::GetGridActivationRange() const
@@ -2144,6 +2141,26 @@ float WorldObject::GetSightRange(const WorldObject* target) const
     return 0.0f;
 }
 
+bool WorldObject::CheckPrivateObjectOwnerVisibility(WorldObject const* seer) const
+{
+    if (!IsPrivateObject())
+        return true;
+
+    // Owner of this private object
+    if (_privateObjectOwner == seer->GetGUID())
+        return true;
+
+    // Another private object of the same owner
+    if (_privateObjectOwner == seer->GetPrivateObjectOwner())
+        return true;
+
+    if (Player const* playerSeer = seer->ToPlayer())
+        if (playerSeer->IsInGroup(_privateObjectOwner))
+            return true;
+
+    return false;
+}
+
 bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, bool distanceCheck) const
 {
     if (this == obj)
@@ -2154,6 +2171,9 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     if (obj->IsAlwaysVisibleFor(this) || CanAlwaysSee(obj))
         return true;
+
+    if (!obj->CheckPrivateObjectOwnerVisibility(this))
+        return false;
 
     bool corpseVisibility = false;
     if (distanceCheck)
@@ -2178,11 +2198,6 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         if (Player const* player = this->ToPlayer())
         {
             viewpoint = player->m_seer;
-
-            if (Creature const* creature = obj->ToCreature())
-                if (TempSummon const* tempSummon = creature->ToTempSummon())
-                    if (tempSummon->IsVisibleBySummonerOnly() && GetGUID() != tempSummon->GetSummonerGUID())
-                        return false;
 
             // Check Allow visible by entry
             if (auto info = sObjectMgr->GetObjectVisibilityStateData(obj->GetEntry()))
@@ -2672,7 +2687,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= NULL*/, uint32 duration /*= 0*/, Unit* summoner /*= NULL*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, bool visibleBySummonerOnly /*= false*/)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= NULL*/, uint32 duration /*= 0*/, Unit* summoner /*= NULL*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, uint64 privateObjectOwner /*= 0*/)
 {
     if (!Trinity::IsValidMapCoord(pos.GetPositionX(), pos.GetPositionY()))
     {
@@ -2785,7 +2800,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 
     summon->InitStats(duration);
 
-    summon->SetVisibleBySummonerOnly(visibleBySummonerOnly);
+    summon->SetPrivateObjectOwner(privateObjectOwner);
 
     AddToMap(summon->ToCreature());
     summon->UpdateCastingSpeed();
@@ -2844,11 +2859,11 @@ void WorldObject::SetZoneScript()
     }
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempSummonType spwtype, uint32 duration, uint32 vehId, bool visibleBySummonerOnly /*= false*/)
+TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempSummonType spwtype, uint32 duration, uint32 vehId, uint64 privateObjectOwner /*= 0*/)
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, duration, ToUnit(), 0, vehId, visibleBySummonerOnly))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, duration, ToUnit(), 0, vehId, privateObjectOwner))
         {
             summon->SetTempSummonType(spwtype);
             return summon;
@@ -2858,7 +2873,7 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempS
     return NULL;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang /*= 0*/, TempSummonType spwtype /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despwtime /*= 0*/, bool visibleBySummonerOnly /*= false*/)
+TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang /*= 0*/, TempSummonType spwtype /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despwtime /*= 0*/, uint64 privateObjectOwner /*= 0*/)
 {
     if (!x && !y && !z)
     {
@@ -2867,7 +2882,7 @@ TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, fl
     }
     Position pos;
     pos.Relocate(x, y, z, ang);
-    return SummonCreature(id, pos, spwtype, despwtime, 0, visibleBySummonerOnly);
+    return SummonCreature(id, pos, spwtype, despwtime, 0, privateObjectOwner);
 }
 
 GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 respawnTime, GOSummonType summonType)
@@ -3189,9 +3204,8 @@ void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float abs
 
 void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const
 {
-    Position pos;
-    GetPosition(&pos);
-    const_cast<WorldObject*>(this)->MovePositionToFirstCollision(pos, distance2d + searcher_size, absAngle - m_orientation);
+    Position pos = GetPosition();
+    const_cast<WorldObject*>(this)->MovePositionToFirstCollision(pos, distance2d + searcher_size, absAngle - GetOrientation());
     pos.GetPosition(x, y);
     //GetNearPoint2D(x,y,distance2d+searcher_size,absAngle);
     z = GetPositionZ();
@@ -3205,34 +3219,31 @@ void WorldObject::GetClosePoint(float &x, float &y, float &z, float size, float 
     GetNearPoint(NULL, x, y, z, size, distance2d, GetOrientation() + angle);
 }
 
-void WorldObject::GetNearPosition(Position &pos, float dist, float angle)
+Position WorldObject::GetNearPosition(float dist, float angle)
 {
-    GetPosition(&pos);
+    Position pos = GetPosition();
     MovePosition(pos, dist, angle);
+    return pos;
 }
 
-void WorldObject::GetFirstCollisionPosition(Position &pos, float dist, float angle)
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
 {
-    GetPosition(&pos);
+    Position pos = GetPosition();
     MovePositionToFirstCollision(pos, dist, angle);
+    return pos;
 }
 
-void WorldObject::GetRandomNearPosition(Position &pos, float radius)
+Position WorldObject::GetRandomNearPosition(float radius)
 {
-    GetPosition(&pos);
+    Position pos = GetPosition();
     MovePosition(pos, radius * (float)rand_norm(), (float)rand_norm() * static_cast<float>(2 * M_PI));
+    return pos;
 }
 
 void WorldObject::GetContactPoint(const WorldObject* obj, float &x, float &y, float &z, float distance2d /*= CONTACT_DISTANCE*/) const
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
-}
-
-void WorldObject::GetBlinkPosition(Position& pos, float dist, float angle)
-{
-    GetPosition(&pos);
-    MovePositionToFirstCollosionBySteps(pos, dist, angle);
 }
 
 void WorldObject::MovePositionToFirstCollosionBySteps(Position& pos, float dist, float angle, float heightCheckInterval, bool allowInAir)
@@ -3244,7 +3255,7 @@ void WorldObject::MovePositionToFirstCollosionBySteps(Position& pos, float dist,
     Map* map = GetMap();
     float destx, desty, destz;
 
-    angle += m_orientation;
+    angle += GetOrientation();
     pos.GetPosition(destx, desty, destz);
     Position lastGroundPos = pos;
 
@@ -3325,7 +3336,7 @@ void WorldObject::MovePositionToFirstCollosionBySteps(Position& pos, float dist,
         if (!skippingAir)
             destz = NormalizeZforCollision(this, destx, desty, destz);
 
-        pos.Relocate(destx, desty, destz, m_orientation);
+        pos.Relocate(destx, desty, destz, GetOrientation());
     }
 
     // If we've encountered a drop before - restore last grounded position
@@ -3335,13 +3346,13 @@ void WorldObject::MovePositionToFirstCollosionBySteps(Position& pos, float dist,
         Trinity::NormalizeMapCoord(pos.m_positionX);
         Trinity::NormalizeMapCoord(pos.m_positionY);
         UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-        pos.m_orientation = m_orientation;
+        pos.SetOrientation(GetOrientation());
     }
 }
 
 float WorldObject::GetObjectSize() const
 {
-    return (m_valuesCount > UNIT_FIELD_COMBAT_REACH) ? m_floatValues[UNIT_FIELD_COMBAT_REACH] : DEFAULT_WORLD_OBJECT_SIZE;
+    return (m_valuesCount > UNIT_FIELD_COMBAT_REACH) ? m_floatValues[UNIT_FIELD_COMBAT_REACH] : DEFAULT_PLAYER_BOUNDING_RADIUS;
 }
 
 void WorldObject::MovePosition(Position &pos, float dist, float angle)
@@ -3388,13 +3399,6 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
     Trinity::NormalizeMapCoord(pos.m_positionY);
     UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
     pos.SetOrientation(GetOrientation());
-}
-
-Position WorldObject::GetNearPositionAlternate(float dist, float angle)
-{
-    Position pos = GetPositionAlternate();
-    MovePosition(pos, dist, angle);
-    return pos;
 }
 
 void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float angle, float offsetZ)
@@ -3499,6 +3503,66 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
         UpdateObjectVisibility();
 }
 
+void WorldObject::RebuildTerrainSwaps()
+{
+    // Clear all terrain swaps, will be rebuilt below
+    // Reason for this is, multiple phases can have the same terrain swap, we should not remove the swap if another phase still use it
+    _terrainSwaps.clear();
+
+    // Check all applied phases for terrain swap and add it only once
+    for (uint32 phaseId : _phases)
+    {
+        if (std::vector<uint32> const* swaps = sObjectMgr->GetPhaseTerrainSwaps(phaseId))
+        {
+            for (uint32 const& swap : *swaps)
+            {
+                // only add terrain swaps for current map
+                MapEntry const* mapEntry = sMapStore.LookupEntry(swap);
+                if (!mapEntry || mapEntry->rootPhaseMap != int32(GetMapId()))
+                    continue;
+
+                if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, swap, this))
+                    _terrainSwaps.insert(swap);
+            }
+        }
+    }
+
+    // get default terrain swaps, only for current map always
+    if (std::vector<uint32> const* mapSwaps = sObjectMgr->GetDefaultTerrainSwaps(GetMapId()))
+        for (uint32 const& swap : *mapSwaps)
+            if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, swap, this))
+                _terrainSwaps.insert(swap);
+
+    // online players have a game client with world map display
+    if (GetTypeId() == TYPEID_PLAYER)
+        RebuildWorldMapAreaSwaps();
+}
+
+void WorldObject::RebuildWorldMapAreaSwaps()
+{
+    // Clear all world map area swaps, will be rebuilt below
+    _worldMapSwaps.clear();
+
+    // get ALL default terrain swaps, if we are using it (condition is true) 
+    // send the worldmaparea for it, to see swapped worldmaparea in client from other maps too, not just from our current
+    TerrainPhaseInfo const& defaults = sObjectMgr->GetDefaultTerrainSwapStore();
+    for (TerrainPhaseInfo::const_iterator itr = defaults.begin(); itr != defaults.end(); ++itr)
+        for (uint32 const& swap : itr->second)
+            if (std::vector<uint32> const* uiMapSwaps = sObjectMgr->GetTerrainWorldMaps(swap))
+                if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, swap, this))
+                    for (uint32 worldMapAreaId : *uiMapSwaps)
+                        _worldMapSwaps.insert(worldMapAreaId);
+
+    // Check all applied phases for world map area swaps
+    for (uint32 phaseId : _phases)
+        if (std::vector<uint32> const* swaps = sObjectMgr->GetPhaseTerrainSwaps(phaseId))
+            for (uint32 const& swap : *swaps)
+                if (std::vector<uint32> const* uiMapSwaps = sObjectMgr->GetTerrainWorldMaps(swap))
+                    if (sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_TERRAIN_SWAP, swap, this))
+                        for (uint32 worldMapAreaId : *uiMapSwaps)
+                            _worldMapSwaps.insert(worldMapAreaId);
+}
+
 // Updates Area based phases, does not remove phases from auras
 // Phases from gm commands are not taken into calculations, they can be lost!!
 void WorldObject::UpdateAreaAndZonePhase()
@@ -3585,6 +3649,8 @@ bool WorldObject::SetPhased(uint32 id, bool update, bool apply)
         }
     }
 
+    RebuildTerrainSwaps();
+
     if (update && IsInWorld())
         UpdateObjectVisibility();
 
@@ -3594,6 +3660,8 @@ bool WorldObject::SetPhased(uint32 id, bool update, bool apply)
 void WorldObject::ClearPhases(bool update)
 {
     _phases.clear();
+
+    RebuildTerrainSwaps();
 
     if (update && IsInWorld())
         UpdateObjectVisibility();

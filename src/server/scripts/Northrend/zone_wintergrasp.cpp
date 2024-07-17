@@ -1,5 +1,5 @@
 /*
-* This file is part of the Pandaria 5.4.8 Project. See THANKS file for Copyright information
+* This file is part of the Legends of Azeroth Pandaria Project. See THANKS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -424,7 +424,7 @@ class npc_wg_quest_giver : public CreatureScript
                             break;
                     }
 
-                    if (quest->IsAutoComplete())
+                    if (quest->IsTurnIn())
                         qm.AddMenuItem(questId, 4);
                     else if (player->GetQuestStatus(questId) == QUEST_STATUS_NONE)
                         qm.AddMenuItem(questId, 2);
@@ -573,8 +573,7 @@ public:
         {
             if (Unit* target = GetHitUnit())
             {
-                WorldLocation loc;
-                target->GetPosition(&loc);
+                WorldLocation loc = target->GetWorldLocation();
                 SetExplTargetDest(loc);
             }
         }

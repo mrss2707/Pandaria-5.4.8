@@ -735,6 +735,8 @@ enum SpellAttr11
     SPELL_ATTR11_USABLE_WHILE_STUNNED           = 0x04000000,
 };
 
+#define MAX_SPECIALIZATIONS         5
+
 enum Roles
 {
     ROLES_DEFAULT   = 0,
@@ -1069,7 +1071,7 @@ enum SpellEffects
     SPELL_EFFECT_168                                = 168,
     SPELL_EFFECT_DESTROY_ITEM                       = 169,
     SPELL_EFFECT_UPDATE_ZONE_AURAS_AND_PHASES       = 170,
-    SPELL_EFFECT_171                                = 171, // Summons gamebject
+    SPELL_EFFECT_SUMMON_PERSONAL_GAMEOBJECT         = 171, // Summons gamebject
     SPELL_EFFECT_RESURRECT_WITH_AURA                = 172,
     SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB             = 173, // Guild tab unlocked (guild perk)
     SPELL_EFFECT_APPLY_AREA_AURA_ENTRY              = 174,
@@ -3400,22 +3402,35 @@ enum HolidayIds
     HOLIDAY_CALL_TO_ARMS_DG_3D       = 516,
 };
 
-// values based at QuestInfo.dbc
-enum QuestTypes
+enum QuestType
 {
-    QUEST_TYPE_GROUP               = 1,
-    QUEST_TYPE_CLASS               = 21,
-    QUEST_TYPE_PVP                 = 41,
-    QUEST_TYPE_RAID                = 62,
-    QUEST_TYPE_DUNGEON             = 81,
-    QUEST_TYPE_WORLD_EVENT         = 82,
-    QUEST_TYPE_LEGENDARY           = 83,
-    QUEST_TYPE_ESCORT              = 84,
-    QUEST_TYPE_HEROIC              = 85,
-    QUEST_TYPE_RAID_10             = 88,
-    QUEST_TYPE_RAID_25             = 89,
-    QUEST_TYPE_SCENARIO            = 98,
-    QUEST_TYPE_ACCOUNT             = 102,
+    QUEST_TYPE_TURNIN               = 0,
+    QUEST_TYPE_WITH_MAX_LEVEL       = 1,
+    QUEST_TYPE_NORMAL               = 2,
+    QUEST_TYPE_TASK                 = 3,
+    MAX_DB_ALLOWED_QUEST_TYPES      = 4,
+
+    // values used in quest menu packets
+    QUEST_TYPE_IN_PROGRESS          = 4,
+    QUEST_TYPE_TASK_IN_PROGRESS     = 5
+};
+
+// values based at QuestInfo.dbc
+enum QuestInfo
+{
+    QUEST_INFO_GROUP               = 1,
+    QUEST_INFO_CLASS               = 21,
+    QUEST_INFO_PVP                 = 41,
+    QUEST_INFO_RAID                = 62,
+    QUEST_INFO_DUNGEON             = 81,
+    QUEST_INFO_WORLD_EVENT         = 82,
+    QUEST_INFO_LEGENDARY           = 83,
+    QUEST_INFO_ESCORT              = 84,
+    QUEST_INFO_HEROIC              = 85,
+    QUEST_INFO_RAID_10             = 88,
+    QUEST_INFO_RAID_25             = 89,
+    QUEST_INFO_SCENARIO            = 98,
+    QUEST_INFO_ACCOUNT             = 102,
 };
 
 // values based at QuestSort.dbc

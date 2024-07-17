@@ -273,6 +273,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(GameEventScript);
     SCR_CLEAR(UnitScript);
     SCR_CLEAR(SceneScript);
+    SCR_CLEAR(QuestScript);
 
     #undef SCR_CLEAR
 
@@ -952,20 +953,19 @@ bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* q
     return tmpscript->OnQuestReward(player, creature, quest, opt);
 }
 
-uint32 ScriptMgr::GetDialogStatus(Player* player, Creature* creature)
+Optional<QuestGiverStatus> ScriptMgr::GetDialogStatus(Player* player, Creature* creature)
 {
     ASSERT(player);
     ASSERT(creature);
 #ifdef ELUNA
-    if (uint32 dialogid = sHookMgr->GetDialogStatus(player, creature))
+    if (Optional<QuestGiverStatus> status = sHookMgr->GetDialogStatus(player, creature))
     {
         player->PlayerTalkClass->ClearMenus();
-        return dialogid;
+        return *status;
     }
 #endif
 
-    /// @todo 100 is a funny magic number to have hanging around here...
-    GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, 100);
+    GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, std::nullopt);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->GetDialogStatus(player, creature);
 }
@@ -1085,20 +1085,19 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
     return tmpscript->OnQuestReward(player, go, quest, opt);
 }
 
-uint32 ScriptMgr::GetDialogStatus(Player* player, GameObject* go)
+Optional<QuestGiverStatus> ScriptMgr::GetDialogStatus(Player* player, GameObject* go)
 {
     ASSERT(player);
     ASSERT(go);
 #ifdef ELUNA
-    if (uint32 dialogid = sHookMgr->GetDialogStatus(player, go))
+    if (Optional<QuestGiverStatus> status = sHookMgr->GetDialogStatus(player, go))
     {
         player->PlayerTalkClass->ClearMenus();
-        return dialogid;
+        return *status;
     }
 #endif
 
-    /// @todo 100 is a funny magic number to have hanging around here...
-    GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, 100);
+    GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, std::nullopt);
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->GetDialogStatus(player, go);
 }
@@ -1993,6 +1992,24 @@ void ScriptMgr::OnSceneComplete(Player* player, uint32 sceneInstanceID, SceneTem
     tmpscript->OnSceneComplete(player, sceneInstanceID, sceneTemplate);
 }
 
+void ScriptMgr::OnQuestStatusChange(Player* player, Quest const* quest, QuestStatus oldStatus, QuestStatus newStatus)
+{
+    ASSERT(player);
+    ASSERT(quest);
+
+    GET_SCRIPT(QuestScript, quest->GetScriptId(), tmpscript);
+    tmpscript->OnQuestStatusChange(player, quest, oldStatus, newStatus);
+}
+
+void ScriptMgr::OnQuestObjectiveChange(Player* player, Quest const* quest, QuestObjective const* objective, int32 oldAmount, int32 newAmount)
+{
+    ASSERT(player);
+    ASSERT(quest);
+
+    GET_SCRIPT(QuestScript, quest->GetScriptId(), tmpscript);
+    tmpscript->OnQuestObjectiveChange(player, quest, objective, oldAmount, newAmount);
+}
+
 bool ScriptMgr::CanHavePetAI(Creature* creature)
 {
     return creature->GetCharmInfo() != nullptr;
@@ -2170,6 +2187,12 @@ SceneScript::SceneScript(const char* name)
     ScriptRegistry<SceneScript>::Instance()->AddScript(this);
 }
 
+QuestScript::QuestScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<QuestScript>::Instance()->AddScript(this);
+}
+
 GameEventScript::GameEventScript(const char* name)
     : ScriptObject(name)
 {
@@ -2214,6 +2237,7 @@ template class ScriptRegistry<GroupScript>;
 template class ScriptRegistry<GameEventScript>;
 template class ScriptRegistry<UnitScript>;
 template class ScriptRegistry<SceneScript>;
+template class ScriptRegistry<QuestScript>;
 
 // Undefine utility macros.
 #undef GET_SCRIPT_RET

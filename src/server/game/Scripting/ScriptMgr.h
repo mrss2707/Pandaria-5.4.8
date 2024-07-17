@@ -28,6 +28,7 @@
 #include "Weather.h"
 #include "ItemPrototype.h"
 #include "WorldStateBuilder.h"
+#include "QuestDef.h"
 
 class AreaTrigger;
 class AuctionHouseObject;
@@ -63,6 +64,9 @@ class WorldPacket;
 class WorldSocket;
 class WorldObject;
 
+enum class QuestGiverStatus : uint32;
+enum QuestStatus : uint8;
+
 struct AuctionEntry;
 struct ConditionSourceInfo;
 struct Condition;
@@ -70,6 +74,7 @@ struct ItemTemplate;
 struct OutdoorPvPData;
 struct SceneTemplate;
 struct GameEventData;
+struct QuestObjective;
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
@@ -448,7 +453,7 @@ class CreatureScript : public ScriptObject
         virtual bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
 
         // Called when the dialog status between a player and the creature is requested.
-        virtual uint32 GetDialogStatus(Player* /*player*/, Creature* /*creature*/) { return 100; }
+        virtual Optional<QuestGiverStatus> GetDialogStatus(Player* /*player*/, Creature* /*creature*/) { return {}; }
 
         // Called when a CreatureAI object is needed for the creature.
         virtual CreatureAI* GetAI(Creature* /*creature*/) const { return NULL; }
@@ -484,7 +489,7 @@ class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
         virtual bool OnQuestReward(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
 
         // Called when the dialog status between a player and the gameobject is requested.
-        virtual uint32 GetDialogStatus(Player* /*player*/, GameObject* /*go*/) { return 100; }
+        virtual Optional<QuestGiverStatus> GetDialogStatus(Player* /*player*/, GameObject* /*go*/) { return {}; }
 
         // Called when the game object is destroyed (destructible buildings only).
         virtual void OnDestroyed(GameObject* /*go*/, Player* /*player*/) { }
@@ -885,6 +890,21 @@ class SceneScript : public ScriptObject
         virtual void OnSceneComplete(Player* /*player*/, uint32 /*sceneInstanceID*/, SceneTemplate const* /*sceneTemplate*/) { }
 };
 
+class QuestScript : public ScriptObject
+{
+    protected:
+
+        QuestScript(const char* name);
+
+    public:
+
+        // Called when a quest status change
+        virtual void OnQuestStatusChange(Player* /*player*/, Quest const* /*quest*/, QuestStatus /*oldStatus*/, QuestStatus /*newStatus*/) { }
+
+        // Called when a quest objective data change
+        virtual void OnQuestObjectiveChange(Player* /*player*/, Quest const* /*quest*/, QuestObjective const* /*objective*/, int32 /*oldAmount*/, int32 /*newAmount*/) { }
+};
+
 class GameEventScript : public ScriptObject
 {
     protected:
@@ -1047,7 +1067,7 @@ class TC_GAME_API ScriptMgr
         bool OnQuestSelect(Player* player, Creature* creature, Quest const* quest);
         bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest);
         bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt);
-        uint32 GetDialogStatus(Player* player, Creature* creature);
+        Optional<QuestGiverStatus> GetDialogStatus(Player* player, Creature* creature);
         CreatureAI* GetCreatureAI(Creature* creature);
 
     public: /* GameObjectScript */
@@ -1059,7 +1079,7 @@ class TC_GAME_API ScriptMgr
         bool OnGossipSelectCode(Player* player, GameObject* go, uint32 sender, uint32 action, const char* code);
         bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest);
         bool OnQuestReward(Player* player, GameObject* go, Quest const* quest, uint32 opt);
-        uint32 GetDialogStatus(Player* player, GameObject* go);
+        Optional<QuestGiverStatus> GetDialogStatus(Player* player, GameObject* go);
         void OnGameObjectDestroyed(GameObject* go, Player* player);
         void OnGameObjectDamaged(GameObject* go, Player* player);
         void OnGameObjectLootStateChanged(GameObject* go, uint32 state, Unit* unit);
@@ -1227,6 +1247,10 @@ class TC_GAME_API ScriptMgr
         void OnSceneTrigger(Player* player, uint32 sceneInstanceID, SceneTemplate const* sceneTemplate, std::string const& triggerName);
         void OnSceneCancel(Player* player, uint32 sceneInstanceID, SceneTemplate const* sceneTemplate);
         void OnSceneComplete(Player* player, uint32 sceneInstanceID, SceneTemplate const* sceneTemplate);
+
+    public: /* QuestScript */
+        void OnQuestStatusChange(Player* player, Quest const* quest, QuestStatus oldStatus, QuestStatus newStatus);
+        void OnQuestObjectiveChange(Player* player, Quest const* quest, QuestObjective const* objective, int32 oldAmount, int32 newAmount);
 
     public:
         static bool CanHavePetAI(Creature* creature);

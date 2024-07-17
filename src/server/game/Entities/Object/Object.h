@@ -1,5 +1,5 @@
 /*
-* This file is part of the Pandaria 5.4.8 Project. See THANKS file for Copyright information
+* This file is part of the Legends of Azeroth Pandaria Project. See THANKS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -413,7 +413,7 @@ struct MovementInfo
     void OutDebug();
 };
 
-template <class T_VALUES, class T_FLAGS, class FLAG_TYPE, uint8 ARRAY_SIZE>
+template <class T_VALUES, class T_FLAGS, class FLAG_TYPE, size_t ARRAY_SIZE>
 class FlaggedValuesArray32
 {
     public:
@@ -505,7 +505,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
     public:
         virtual ~WorldObject();
 
-        virtual void Update (uint32 /*time_diff*/) { }
+        virtual void Update(uint32 /*time_diff*/) { }
 
         void _Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask, std::set<uint32> const& phaseIds);
         void AddToWorld() override;
@@ -515,8 +515,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const;
         void GetClosePoint(float &x, float &y, float &z, float size, float distance2d = 0, float angle = 0) const;
         void MovePosition(Position &pos, float dist, float angle);
-        void GetNearPosition(Position &pos, float dist, float angle);
-        Position GetNearPositionAlternate(float dist, float angle);
+        Position GetNearPosition(float dist, float angle);
         Position GetPositionAlternate() const
         {
             return *this;
@@ -528,12 +527,11 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
             float ground_z = GetMap()->GetHeight(m_phaseMask, m_positionX, m_positionY, MAX_HEIGHT, true);
             return fabs(z - ground_z) < 1.0f;
         }
-        void GetFirstCollisionPosition(Position &pos, float dist, float angle);
-        void GetRandomNearPosition(Position &pos, float radius);
+        Position GetFirstCollisionPosition(float dist, float angle);
+        Position GetRandomNearPosition(float radius);
         void GetContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const;
 
         virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
-        void GetBlinkPosition(Position& pos, float dist, float angle);
         void MovePositionToFirstCollosionBySteps(Position& pos, float dist, float angle, float heightCheckInterval = 2.0f, bool allowInAir = false);
 
         float GetObjectSize() const;
@@ -541,7 +539,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         void UpdateAllowedPositionZ(float x, float y, float &z, float* groundZ = nullptr) const;
 
         void GetRandomPoint(Position const &srcPos, float distance, float &rand_x, float &rand_y, float &rand_z) const;
-        void GetRandomPoint(Position const &srcPos, float distance, Position &pos) const;
+        Position GetRandomPoint(Position const &srcPos, float distance) const;
 
         uint32 GetInstanceId() const { return m_InstanceId; }
 
@@ -563,6 +561,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         bool SetWorldMapSwap(uint32 id, bool update, bool apply);
         bool IsWorldMapSwaped(uint32 worldMapSwap) const { return _worldMapSwaps.find(worldMapSwap) != _worldMapSwaps.end(); }
         std::set<uint32> const& GetWorldMapSwaps() const { return _worldMapSwaps; }
+        void RebuildTerrainSwaps();
+        void RebuildWorldMapAreaSwaps();
         void ClearWorldMapSwap(bool update = false);
         void UpdateAreaAndZonePhase();
 
@@ -586,7 +586,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         float GetDistance2d(WorldObject const* obj) const;
         float GetDistance2d(float x, float y) const;
         float GetDistanceZ(WorldObject const* obj) const;
-        float GetDistanceZ(Position const* obj) const;
 
         bool IsSelfOrInSameMap(WorldObject const* obj) const;
         bool IsInMap(WorldObject const* obj) const;
@@ -596,10 +595,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         bool IsWithinDist2d(Position const* pos, float dist) const;
         // use only if you will sure about placing both object at same map
         bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true) const;
-        bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true) const
-        {
-            return obj && IsInMap(obj) && InSamePhase(obj) && _IsWithinDist(obj, dist2compare, is3D);
-        }
+        bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
         bool IsWithinLOS(float x, float y, float z, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing) const;
         bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing) const;
         Position GetHitSpherePointFor(Position const& dest) const;
@@ -608,8 +604,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
         bool IsInRange2d(float x, float y, float minRange, float maxRange) const;
         bool IsInRange3d(float x, float y, float z, float minRange, float maxRange) const;
-        bool isInFront(WorldObject const* target, float arc = M_PI) const;
-        bool isInBack(WorldObject const* target, float arc = M_PI) const;
+        bool isInFront(WorldObject const* target, float arc = float(M_PI)) const;
+        bool isInBack(WorldObject const* target, float arc = float(M_PI)) const;
 
         bool IsInBetween(Position const* obj1, Position const* obj2, float size = 0) const;
         bool IsInAxe(const WorldObject* obj1, const WorldObject* obj2, float size = 0) const;
@@ -671,8 +667,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         void SetZoneScript();
         ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
-        TempSummon* SummonCreature(uint32 id, Position const &pos, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint32 vehId = 0, bool visibleBySummonerOnly = false);
-        TempSummon* SummonCreature(uint32 id, float x, float y, float z, float ang = 0, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, bool visibleBySummonerOnly = false);
+        TempSummon* SummonCreature(uint32 id, Position const &pos, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint32 vehId = 0, uint64 privateObjectOwner = 0);
+        TempSummon* SummonCreature(uint32 id, float x, float y, float z, float ang = 0, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint64 privateObjectOwner = 0);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 respawnTime, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
 
         Creature* SummonTrigger(float x, float y, float z, float ang, uint32 dur, CreatureAI* (*GetAI)(Creature*) = NULL);
@@ -759,6 +755,12 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         virtual uint16 GetMovementAnimKitId() const { return 0; }
         virtual uint16 GetMeleeAnimKitId() const { return 0; }
 
+        // Watcher
+        bool IsPrivateObject() const { return _privateObjectOwner != 0; }
+        uint64 GetPrivateObjectOwner() const { return _privateObjectOwner; }
+        void SetPrivateObjectOwner(uint64 owner) { _privateObjectOwner = owner; }
+        bool CheckPrivateObjectOwnerVisibility(WorldObject const* seer) const;
+
         void AddToUpdate() override;
         void RemoveFromUpdate() override;
 
@@ -810,6 +812,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         std::set<uint32> _terrainSwaps;
         std::set<uint32> _worldMapSwaps;
 
+        uint64 _privateObjectOwner;
+
         bool m_hasCustomVisibility = false;
         float m_customVisibilityDistance = 0;
         bool m_customVisibilityZoneOnly = false;
@@ -826,9 +830,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         uint64 m_explicitSeerGuid;
         TimeTrackerSmall m_stealthVisibilityUpdateTimer;
 };
-
-
-
 
 namespace Trinity
 {

@@ -506,7 +506,7 @@ struct GossipMenuItemsLocale
 
 typedef std::unordered_map<std::pair<uint32, uint32>, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef std::unordered_map<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
-typedef std::unordered_map<uint32, QuestObjectiveLocale> QuestObjectiveLocaleContainer;
+typedef std::unordered_map<uint32, QuestObjectivesLocale> QuestObjectivesLocaleContainer;
 
 typedef std::multimap<uint32, uint32> QuestRelations; // unit/go -> quest
 typedef std::multimap<uint32, uint32> QuestRelationsReverse; // quest -> unit/go
@@ -570,13 +570,13 @@ struct RepSpilloverTemplate
 
 struct PointOfInterest
 {
-    uint32 entry;
-    float x;
-    float y;
-    uint32 icon;
-    uint32 flags;
-    uint32 data;
-    std::string icon_name;
+    uint32 ID;
+    float PositionX;
+    float PositionY;
+    uint32 Icon;
+    uint32 Flags;
+    uint32 Importance;
+    std::string Name;
 };
 
 struct GossipMenuItems
@@ -676,6 +676,8 @@ typedef std::vector<PlayerCreateInfoSkill> PlayerCreateInfoSkills;
 
 typedef std::list<uint32> PlayerCreateSkillRaceClassList;
 
+typedef std::vector<uint32> PlayerCreateInfoSpells;
+
 struct PlayerCreateInfoAction
 {
     PlayerCreateInfoAction() : button(0), type(0), action(0)
@@ -705,6 +707,7 @@ struct PlayerInfo
     uint16 displayId_m;
     uint16 displayId_f;
     PlayerCreateInfoItems item;
+    PlayerCreateInfoSpells castSpells;
     //PlayerCreateInfoSkills skills;      // Not skill id - index from SkillRaceClassInfo.dbc 
     PlayerCreateSkillRaceClassList skills;
     PlayerCreateInfoActions action;
@@ -812,6 +815,8 @@ struct PhaseInfoStruct
     ConditionContainer Conditions;
 };
 
+typedef std::unordered_map<uint32, std::vector<uint32 /*id*/>> TerrainPhaseInfo;
+typedef std::unordered_map<uint32, std::vector<uint32>> TerrainUIPhaseInfo;
 typedef std::unordered_map<uint32, std::vector<PhaseInfoStruct>> PhaseAreaInfo;
 
 struct ResearchProjectRequirements
@@ -1153,7 +1158,6 @@ class ObjectMgr
         }
 
         void LoadQuests();
-        void LoadQuestObjectives();
         void LoadQuestObjectiveVisualEffects();
         void LoadQuestStartersAndEnders();
         void LoadGameobjectQuestStarters();
@@ -1290,17 +1294,36 @@ class ObjectMgr
         void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
 
         void LoadPhaseDefinitions();
+        void LoadTerrainPhaseInfo();
+        void LoadTerrainSwapDefaults();
+        void LoadTerrainWorldMaps();
         void LoadAreaPhases();
         void LoadSpellPhaseInfo();
 
         PhaseDefinitionStore const* GetPhaseDefinitionStore() { return &_PhaseDefinitionStore; }
         SpellPhaseStore const* GetSpellPhaseStore() { return &_SpellPhaseStore; }
 
+        std::vector<uint32> const* GetPhaseTerrainSwaps(uint32 phaseid) const
+        {
+            auto itr = _terrainPhaseInfoStore.find(phaseid);
+            return itr != _terrainPhaseInfoStore.end() ? &itr->second : nullptr;
+        }
+        std::vector<uint32> const* GetDefaultTerrainSwaps(uint32 mapid) const
+        {
+            auto itr = _terrainMapDefaultStore.find(mapid);
+            return itr != _terrainMapDefaultStore.end() ? &itr->second : nullptr;
+        }
+        std::vector<uint32> const* GetTerrainWorldMaps(uint32 terrainId) const
+        {
+            auto itr = _terrainWorldMapStore.find(terrainId);
+            return itr != _terrainWorldMapStore.end() ? &itr->second : nullptr;
+        }
         std::vector<PhaseInfoStruct> const* GetPhasesForArea(uint32 area) const
         {
             auto itr = _areaPhases.find(area);
             return itr != _areaPhases.end() ? &itr->second : nullptr;
         }
+        TerrainPhaseInfo const& GetDefaultTerrainSwapStore() const { return _terrainMapDefaultStore; }
         PhaseAreaInfo const& GetAreaAndZonePhases() const { return _areaPhases; }
         // condition loading helpers
         std::vector<PhaseInfoStruct>* GetPhasesForAreaOrZoneForLoading(uint32 areaOrZone)
@@ -1393,7 +1416,7 @@ class ObjectMgr
         typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
         typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
 
-        ExclusiveQuestGroups mExclusiveQuestGroups;
+        ExclusiveQuestGroups _exclusiveQuestGroups;
 
         MailLevelReward const* GetMailLevelReward(uint32 level, uint32 raceMask)
         {
@@ -1847,6 +1870,9 @@ class ObjectMgr
         InstanceTemplateContainer _instanceTemplateStore;
 
         PhaseDefinitionStore _PhaseDefinitionStore;
+        TerrainPhaseInfo _terrainPhaseInfoStore;
+        TerrainPhaseInfo _terrainMapDefaultStore;
+        TerrainUIPhaseInfo _terrainWorldMapStore;
         PhaseAreaInfo _areaPhases;
         SpellPhaseStore _SpellPhaseStore;
 
@@ -1862,7 +1888,7 @@ class ObjectMgr
 
     private:
         void LoadScripts(ScriptsType type);
-        void LoadQuestRelationsHelper(QuestRelations& map, std::string const& table, bool starter, bool go);
+        void LoadQuestRelationsHelper(QuestRelations& map, QuestRelationsReverse* reversedMap, std::string const& table, bool starter, bool go);
         void PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint32 itemId, int32 count);
 
         MailLevelRewardContainer _mailLevelRewardStore;

@@ -36,8 +36,6 @@
 #include "Vehicle.h"
 #include "SpellHistory.h"
 
-bool AFDRoyaleIsSpecialAuraHook(Aura const* aura, Unit const* target);
-
 AuraApplication::AuraApplication(Unit* target, Unit* caster, Aura* aura, uint32 effMask):
 _target(target), _base(aura), _removeMode(AURA_REMOVE_NONE), _slot(MAX_AURAS),
 _flags(AFLAG_NONE), _effectsToApply(effMask), _needClientUpdate(false), _effMask(0)
@@ -1381,9 +1379,25 @@ bool Aura::CanBeSaved() const
     if (IsPassive())
         return false;
 
+    if (GetSpellInfo()->IsChanneled())
+        return false;
+
+    // Check if aura is single target, not only spell info
     if (GetCasterGUID() != GetOwner()->GetGUID())
+    {
+        for (SpellEffectInfo const& spellEffectInfo : GetSpellInfo()->GetEffects())
+        {
+            if (!spellEffectInfo.IsEffect())
+                continue;
+
+            if (spellEffectInfo.IsTargetingArea() || spellEffectInfo.IsAreaAuraEffect())
+                return false;
+        }
+
+        // TODO: if (IsSingleTarget() || GetSpellInfo()->IsSingleTarget())
         if (GetSpellInfo()->IsSingleTarget())
             return false;
+    }
 
     // Can't be saved - aura handler relies on calculated amount and changes it
     if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
@@ -1399,9 +1413,6 @@ bool Aura::CanBeSaved() const
 
     if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_DONT_SAVE_AURA_TO_DB)
         return false;
-
-    //if (AFDRoyaleIsSpecialAuraHook(this, target))
-    //    return false;
 
     // don't save auras removed by proc system
     if (IsUsingCharges() && !GetCharges())

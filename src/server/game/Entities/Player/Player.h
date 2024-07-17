@@ -801,9 +801,10 @@ class InstanceSave;
 
 enum RestFlag
 {
-    REST_FLAG_NONE = 0,
-    REST_FLAG_IN_TAVERN = 1,
-    REST_FLAG_IN_CITY = 2
+    REST_FLAG_NONE            = 0,
+    REST_FLAG_IN_TAVERN       = 1,
+    REST_FLAG_IN_CITY         = 2,
+    REST_FLAG_IN_FACTION_AREA = 4
 };
 
 enum TeleportToOptions
@@ -1246,8 +1247,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     void SetObjectScale(float scale)
     {
         Unit::SetObjectScale(scale);
-        SetFloatValue(UNIT_FIELD_BOUNDING_RADIUS, scale * DEFAULT_WORLD_OBJECT_SIZE);
-        SetFloatValue(UNIT_FIELD_COMBAT_REACH, scale * DEFAULT_COMBAT_REACH);
+        SetFloatValue(UNIT_FIELD_BOUNDING_RADIUS, scale * DEFAULT_PLAYER_BOUNDING_RADIUS);
+        SetFloatValue(UNIT_FIELD_COMBAT_REACH, scale * DEFAULT_PLAYER_COMBAT_REACH);
     }
 
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0);
@@ -1350,6 +1351,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
     void GiveXP(uint32 xp, Unit* victim, float group_rate = 1.0f);
     void GiveLevel(uint8 level);
+    bool IsMaxLevel() const;
 
     void InitStatsForLevel(bool reapplyMods = false);
     void RemoveSpecializationSpells();
@@ -1666,17 +1668,20 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     bool CanCompleteQuest(uint32 quest_id);
     bool CanCompleteRepeatableQuest(Quest const* quest);
     bool CanRewardQuest(Quest const* quest, bool msg);
-    bool CanRewardQuest(Quest const* quest, uint32 reward, bool msg);
+    bool CanRewardQuest(Quest const* quest, uint32 rewardId, bool msg);
     void AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver);
     void AddQuest(Quest const* quest, Object* questGiver);
     void CompleteQuest(uint32 quest_id, bool completely = false, bool fromCommand = false);
     void IncompleteQuest(uint32 quest_id);
+    bool CanSelectQuestPackageItem(QuestPackageItemEntry const* questPackageItem) const;
     void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true);
     void FailQuest(uint32 quest_id);
     bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLevel(Quest const* qInfo, bool msg);
     bool SatisfyQuestLog(bool msg);
-    bool SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg);
+    bool SatisfyQuestDependentQuests(Quest const* qInfo, bool msg) const;
+    bool SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const;
+    bool SatisfyQuestDependentPreviousQuests(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestClass(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestRace(Quest const* qInfo, bool msg);
     bool SatisfyQuestReputation(Quest const* qInfo, bool msg);
@@ -1684,8 +1689,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     bool SatisfyQuestConditions(Quest const* qInfo, bool msg);
     bool SatisfyQuestTimed(Quest const* qInfo, bool msg);
     bool SatisfyQuestExclusiveGroup(Quest const* qInfo, bool msg);
-    bool SatisfyQuestNextChain(Quest const* qInfo, bool msg);
-    bool SatisfyQuestPrevChain(Quest const* qInfo, bool msg);
     bool SatisfyQuestDay(Quest const* qInfo, bool msg);
     bool SatisfyQuestWeek(Quest const* qInfo, bool msg);
     bool SatisfyQuestMonth(Quest const* qInfo, bool msg);
@@ -1695,6 +1698,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     bool GetQuestRewardStatus(uint32 quest_id) const;
     QuestStatus GetQuestStatus(uint32 quest_id) const;
     void SetQuestStatus(uint32 quest_id, QuestStatus status, bool update = true);
+    QuestGiverStatus GetQuestDialogStatus(Object const* questgiver);
     void RemoveActiveQuest(uint32 quest_id, bool update = true, bool removeFromQuestLog = false);
     void RemoveRewardedQuest(uint32 quest_id, bool update = true);
     void SendQuestUpdate(uint32 questId);
@@ -2141,8 +2145,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     uint8 getCinematic() const { return m_cinematic; }
     void setCinematic(uint8 cine) { m_cinematic = cine; }
 
-    ActionButton* addActionButton(uint8 button, uint32 action, uint8 type);
-    void removeActionButton(uint8 button);
+    ActionButton* AddActionButton(uint8 button, uint32 action, uint8 type);
+    void RemoveActionButton(uint8 button);
     ActionButton const* GetActionButton(uint8 button);
     void SendInitialActionButtons() const
     {
@@ -2833,6 +2837,8 @@ public:
 
     template<class T>
     void UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& visibleNow);
+    void UpdatePhasing();
+    void PlayerSendSetPhaseShift(std::set<uint32> const& phaseIds);
 
     uint8 m_forced_speed_changes [MAX_MOVE_TYPE];
 
@@ -2932,6 +2938,7 @@ public:
         return m_group[uint32(slot)].getTarget();
     }
 
+    bool IsInGroup(ObjectGuid groupGuid) const;
     void SetGroup(GroupSlot slot, Group* group, int8 subgroup = -1);
     void SetSubGroup(GroupSlot slot, uint8 subgroup)
     {

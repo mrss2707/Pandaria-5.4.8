@@ -1,5 +1,5 @@
 /*
-* This file is part of the Pandaria 5.4.8 Project. See THANKS file for Copyright information
+* This file is part of the Legends of Azeroth Pandaria Project. See THANKS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -1874,6 +1874,8 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
 
     if (Player* player = target->ToPlayer())
     {
+        target->SetPhased(GetMiscValueB(), false, apply);
+
         if (apply)
             player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
         else
@@ -1905,6 +1907,9 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
         // drop flag at invisibiliy in bg
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
     }
+
+    if (Player* player = target->ToPlayer())
+        player->UpdatePhasing();
 
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
     if (target->IsVisible())
@@ -5969,8 +5974,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                     {
                         for (uint8 i = 0; i < 2; ++i)
                         {
-                            Position pos;
-                            caster->GetNearPosition(pos, 40.0f, frand(0.0f, 2 * M_PI));
+                            Position pos = caster->GetNearPosition(40.0f, frand(0.0f, 2 * M_PI));
                             if (caster->GetDistance(pos) >= 20.0f)
                                 caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 103177, true);
                         }

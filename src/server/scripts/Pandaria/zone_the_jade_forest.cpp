@@ -1,5 +1,5 @@
 /*
-* This file is part of the Pandaria 5.4.8 Project. See THANKS file for Copyright information
+* This file is part of the Legends of Azeroth Pandaria Project. See THANKS file for Copyright information
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -3143,8 +3143,7 @@ class spell_q29637 : public SpellScriptLoader
                     {
                         for (uint8 i = 0; i < (j == 0 ? combatantCount : bruteCount); i++)
                         {
-                            Position pos;
-                            player->GetRandomNearPosition(pos, 15.0f);
+                            Position pos = player->GetRandomNearPosition(15.0f);
                             if (Creature* spawn = myang->SummonCreature(j == 0 ? NPC_RUMPUS_COMBATANT : NPC_RUMPUS_BRUTE, pos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
                             {
                                 spawn->SetFaction(14); // hack, with default faction npcs cant be attackable
@@ -3358,8 +3357,7 @@ class npc_wounded_pilot : public CreatureScript
                         me->m_Events.KillAllEvents(true);
                         me->m_Events.Schedule(delay += 5000, [this]()
                         {
-                            Position pos;
-                            me->GetRandomNearPosition(pos, 15.0f);
+                            Position pos = me->GetRandomNearPosition(15.0f);
                             me->GetMotionMaster()->MovePoint(0, pos, true);
                         });
                     }
@@ -3763,7 +3761,7 @@ struct npc_lorewalker_cho_peering_into_past : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        me->ToTempSummon()->SetVisibleBySummonerOnly(true);
+        me->ToTempSummon()->SetPrivateObjectOwner(summoner->GetGUID());
         summonerGUID = summoner->GetGUID();
         delay = 1000;
 
@@ -3956,7 +3954,7 @@ struct npc_prince_anduin_decision : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        me->ToTempSummon()->SetVisibleBySummonerOnly(true);
+        me->ToTempSummon()->SetPrivateObjectOwner(summoner->GetGUID());
         summonerGUID = summoner->GetGUID();
         delay = 1000;
 
@@ -4106,7 +4104,7 @@ struct npc_prince_anduin_decision_helpers : public customCreatureAI
 
     void IsSummonedBy(Unit* summoner) override
     {
-        me->ToTempSummon()->SetVisibleBySummonerOnly(true);
+        me->ToTempSummon()->SetPrivateObjectOwner(summoner->GetGUID());
         summonerGUID = summoner->GetGUID();
 
         if (me->GetEntry() == NPC_SULLY || me->GetEntry() == NPC_KAERLEN)
