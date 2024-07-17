@@ -530,7 +530,7 @@ enum OpcodeClient : uint16
     CMSG_ENABLE_NAGLE                                     = 0x00B3,
 };
 
-enum OpcodeServer
+enum OpcodeServer : uint16
 {
     SMSG_ACCOUNT_CRITERIA_UPDATE                                 = 0x189E,
     SMSG_ACCOUNT_CRITERIA_UPDATE_ALL                             = 0x0A9E,
