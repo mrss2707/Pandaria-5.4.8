@@ -2255,13 +2255,14 @@ namespace AprilFoolsDay
                     creature->SetPhaseMask(data->phaseMask, true);
                     creature->SetVisible(true);
                 }
-                guidToOriginalData.clear();
 
                 if (GameObject *portal = map->GetGameObject(ObjectGuid(HighGuid::GameObject, uint32(195141), uint32(161561))))
                   portal->SetFaction(1802);
                 if (GameObject *portal = map->GetGameObject(ObjectGuid(HighGuid::GameObject, uint32(195142), uint32(163187))))
                   portal->SetFaction(1801);
             });
+
+            guidToOriginalData.clear();
         }
 
         if (GameObjectTemplate* protoS = const_cast<GameObjectTemplate*>(sObjectMgr->GetGameObjectTemplate(176296))) // Portal to Stormwind
