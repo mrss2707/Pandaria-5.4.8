@@ -2138,88 +2138,88 @@ namespace AprilFoolsDay
 
         if (activate)
         {
-            // TODO: ObjectGuid fix this
+            sMapMgr->DoForAllMaps([](Map* map)
+            {
+                for (auto pair : map->GetCreatureBySpawnIdStore())
+                {
+                    Creature* creature = pair.second;
+                    if (!creature->IsInWorld())
+                        continue;
 
-//            std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Creature>::GetLock());
-//            for (auto ref : ObjectAccessor::GetCreatures())
-//            {
-//                Creature* creature = ref.second;
-//                if (!creature->IsInWorld())
-//                    continue;
-//
-//                CreatureData* data = const_cast<CreatureData*>(creature->GetCreatureData());
-//                if (!data)
-//                    continue;
-//
-//                TeamId sourceTeam;
-//                switch (creature->GetZoneId())
-//                {
-//                    case ZONE_DUROTAR:
-//                    case ZONE_THE_BARRENS:
-//                        if (creature->GetExactDist2d(1370.175781f, -4370.808594f) > 100.0f &&
-//                            creature->GetExactDist2d(1669.299194f, -3874.211426f) > 100.0f)
-//                            continue;
-//                        // no break
-//                    case ZONE_ORGRIMMAR:
-//                        sourceTeam = TEAM_HORDE;
-//                        break;
-//                    case ZONE_ELWYNN_FOREST:
-//                        if (creature->GetExactDist2d(-9120.416992f, 394.218079f) > 100.0f)
-//                            continue;
-//                        // no break
-//                    case ZONE_STORMWIND_CITY:
-//                        sourceTeam = TEAM_ALLIANCE;
-//                        break;
-//                    default:
-//                        continue;
-//                }
-//
-//                auto itr = creatureConversions[sourceTeam].find(data->id);
-//                if (itr == creatureConversions[sourceTeam].end())
-//                    continue;
-//
-//                guidToOriginalData[creature->GetDBTableGUIDLow()] = std::make_pair(sourceTeam, *data);
-//
-//                // Force hide flightmasters, otherwise players will be able to unlock other faction's taxi nodes
-//                uint32 newEntry = itr->second;
-//                if (CreatureTemplate const* proto = sObjectMgr->GetCreatureTemplate(newEntry))
-//                    if (proto->npcflag & UNIT_NPC_FLAG_FLIGHTMASTER)
-//                        newEntry = 0;
-//
-//                if (creature->IsInCombat() && creature->IsAIEnabled)
-//                    creature->AI()->EnterEvadeMode();
-//
-//                if (newEntry)
-//                {
-//                    if (CreatureTemplate* proto = const_cast<CreatureTemplate*>(sObjectMgr->GetCreatureTemplate(newEntry)))
-//                    {
-//                        if (entryToOriginalTemplate.find(newEntry) == entryToOriginalTemplate.end())
-//                            entryToOriginalTemplate[newEntry] = *proto;
-//
-//                        proto->minlevel = proto->maxlevel = 93;
-//                        proto->dmg_multiplier = 50;
-//                        proto->ModHealth = 100;
-//                        proto->ModMana = 100;
-//                    }
-//
-//                    data->id = newEntry;
-//                    data->displayid = 0;
-//                    data->equipmentId = 0;
-//                    creature->UpdateEntry(newEntry, sourceTeam == TEAM_HORDE ? ALLIANCE : HORDE, data);
-//                    creature->SetOriginalEntry(newEntry);
-//                }
-//                else
-//                {
-//                    data->phaseMask = 0;
-//                    creature->SetPhaseMask(0, true);
-//                    creature->SetVisible(false);
-//                }
-//            }
+                    TeamId sourceTeam;
+                    switch (creature->GetZoneId())
+                    {
+                        case ZONE_DUROTAR:
+                        case ZONE_THE_BARRENS:
+                            if (creature->GetExactDist2d(1370.175781f, -4370.808594f) > 100.0f &&
+                                creature->GetExactDist2d(1669.299194f, -3874.211426f) > 100.0f)
+                                continue;
+                            // no break
+                        case ZONE_ORGRIMMAR:
+                            sourceTeam = TEAM_HORDE;
+                            break;
+                        case ZONE_ELWYNN_FOREST:
+                            if (creature->GetExactDist2d(-9120.416992f, 394.218079f) > 100.0f)
+                                continue;
+                            // no break
+                        case ZONE_STORMWIND_CITY:
+                            sourceTeam = TEAM_ALLIANCE;
+                            break;
+                        default:
+                            continue;
+                    }
 
-//            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195141), uint32(161561))))
-//                portal->SetFaction(1801);
-//            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195142), uint32(163187))))
-//                portal->SetFaction(1802);
+                    CreatureData* data = const_cast<CreatureData*>(creature->GetCreatureData());
+                    if (!data)
+                        continue;
+
+                    auto itr = creatureConversions[sourceTeam].find(data->id);
+                    if (itr == creatureConversions[sourceTeam].end())
+                        continue;
+
+                    guidToOriginalData[creature->GetDBTableGUIDLow()] = std::make_pair(sourceTeam, *data);
+
+                    // Force hide flightmasters, otherwise players will be able to unlock other faction's taxi nodes
+                    uint32 newEntry = itr->second;
+                    if (CreatureTemplate const* proto = sObjectMgr->GetCreatureTemplate(newEntry))
+                        if (proto->npcflag & UNIT_NPC_FLAG_FLIGHTMASTER)
+                            newEntry = 0;
+
+                    if (creature->IsInCombat() && creature->IsAIEnabled)
+                        creature->AI()->EnterEvadeMode();
+
+                    if (newEntry)
+                    {
+                        if (CreatureTemplate* proto = const_cast<CreatureTemplate*>(sObjectMgr->GetCreatureTemplate(newEntry)))
+                        {
+                            if (entryToOriginalTemplate.find(newEntry) == entryToOriginalTemplate.end())
+                                entryToOriginalTemplate[newEntry] = *proto;
+
+                            proto->minlevel = proto->maxlevel = 93;
+                            proto->dmg_multiplier = 50;
+                            proto->ModHealth = 100;
+                            proto->ModMana = 100;
+                        }
+
+                        data->id = newEntry;
+                        data->displayid = 0;
+                        data->equipmentId = 0;
+                        creature->UpdateEntry(newEntry, sourceTeam == TEAM_HORDE ? ALLIANCE : HORDE, data);
+                        creature->SetOriginalEntry(newEntry);
+                    }
+                    else
+                    {
+                        data->phaseMask = 0;
+                        creature->SetPhaseMask(0, true);
+                        creature->SetVisible(false);
+                    }
+                }
+
+                if (GameObject* portal = map->GetGameObject(ObjectGuid(HighGuid::GameObject, uint32(195141), uint32(161561))))
+                    portal->SetFaction(1801);
+                if (GameObject* portal = map->GetGameObject(ObjectGuid(HighGuid::GameObject, uint32(195142), uint32(163187))))
+                    portal->SetFaction(1802);
+            });
         }
         else
         {
@@ -2228,39 +2228,40 @@ namespace AprilFoolsDay
                     *proto = pair.second;
             entryToOriginalTemplate.clear();
 
-            // TODO: ObjectGuid: fix this
-//            std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Creature>::GetLock());
-//            for (auto ref : ObjectAccessor::GetCreatures())
-//            {
-//                Creature* creature = ref.second;
-//                if (!creature->IsInWorld())
-//                    continue;
-//
-//                CreatureData* data = const_cast<CreatureData*>(creature->GetCreatureData());
-//                if (!data)
-//                    continue;
-//
-//                auto oitr = guidToOriginalData.find(creature->GetDBTableGUIDLow());
-//                if (oitr == guidToOriginalData.end())
-//                    continue;
-//
-//                TeamId sourceTeam = oitr->second.first;
-//
-//                *data = oitr->second.second;
-//
-//                if (creature->IsInCombat() && creature->IsAIEnabled)
-//                    creature->AI()->EnterEvadeMode();
-//
-//                creature->UpdateEntry(data->id, sourceTeam == TEAM_HORDE ? HORDE : ALLIANCE, data);
-//                creature->SetPhaseMask(data->phaseMask, true);
-//                creature->SetVisible(true);
-//            }
-//            guidToOriginalData.clear();
+            sMapMgr->DoForAllMaps([](Map* map)
+            {
+                for (auto pair : map->GetCreatureBySpawnIdStore())
+                {
+                    Creature *creature = pair.second;
+                    if (!creature->IsInWorld())
+                        continue;
 
-//            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195141), uint32(161561))))
-//                portal->SetFaction(1802);
-//            if (GameObject* portal = HashMapHolder<GameObject>::Find(ObjectGuid(HighGuid::GameObject, uint32(195142), uint32(163187))))
-//                portal->SetFaction(1801);
+                    auto oitr = guidToOriginalData.find(creature->GetDBTableGUIDLow());
+                    if (oitr == guidToOriginalData.end())
+                        continue;
+
+                    CreatureData *data = const_cast<CreatureData *>(creature->GetCreatureData());
+                    if (!data)
+                        continue;
+
+                    TeamId sourceTeam = oitr->second.first;
+
+                    *data = oitr->second.second;
+
+                    if (creature->IsInCombat() && creature->IsAIEnabled)
+                        creature->AI()->EnterEvadeMode();
+
+                    creature->UpdateEntry(data->id, sourceTeam == TEAM_HORDE ? HORDE : ALLIANCE, data);
+                    creature->SetPhaseMask(data->phaseMask, true);
+                    creature->SetVisible(true);
+                }
+                guidToOriginalData.clear();
+
+                if (GameObject *portal = map->GetGameObject(ObjectGuid(HighGuid::GameObject, uint32(195141), uint32(161561))))
+                  portal->SetFaction(1802);
+                if (GameObject *portal = map->GetGameObject(ObjectGuid(HighGuid::GameObject, uint32(195142), uint32(163187))))
+                  portal->SetFaction(1801);
+            });
         }
 
         if (GameObjectTemplate* protoS = const_cast<GameObjectTemplate*>(sObjectMgr->GetGameObjectTemplate(176296))) // Portal to Stormwind

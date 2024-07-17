@@ -139,7 +139,6 @@ void ObjectGuidGeneratorBase::HandleCounterOverflow(HighGuid high)
 
 void ObjectGuidGeneratorBase::CheckGuidTrigger(ObjectGuid::LowType guidlow)
 {
-    // TODO: ObjectGuid implement this
 //    if (!sWorld->IsGuidAlert() && guidlow > sWorld->getIntConfig(CONFIG_RESPAWN_GUIDALERTLEVEL))
 //        sWorld->TriggerGuidAlert();
 //    else if (!sWorld->IsGuidWarning() && guidlow > sWorld->getIntConfig(CONFIG_RESPAWN_GUIDWARNLEVEL))
