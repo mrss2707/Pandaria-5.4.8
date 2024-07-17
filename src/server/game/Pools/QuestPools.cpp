@@ -65,8 +65,8 @@ void QuestPoolMgr::LoadFromDB()
 
     // load template data from world DB
     {
-        //        0         1              2              3
-        // SELECT pq.entry, pq.pool_entry, pq.pool_index, pt.max_limit FROM (select pq.entry, pq.pool_entry, row_number() over (partition by pq.pool_entry order by pq.entry) - 1 as pool_index from pool_quest pq) as pq LEFT JOIN pool_template pt ON pq.pool_entry = pt.entry
+        //        0         1              2
+        // SELECT pq.entry, pq.pool_entry, pt.max_limit FROM pool_quest pq LEFT JOIN pool_template pt ON pq.pool_entry = pt.entry
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_QUEST_POOLS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (!result)
@@ -78,7 +78,7 @@ void QuestPoolMgr::LoadFromDB()
         do
         {
             Field* fields = result->Fetch();
-            if (fields[3].IsNull())
+            if (fields[2].IsNull())
             {
                 TC_LOG_ERROR("sql.sql", "Table `pool_quest` contains reference to non-existing pool %u. Skipped.", fields[1].GetUInt32());
                 continue;
@@ -86,8 +86,8 @@ void QuestPoolMgr::LoadFromDB()
 
             uint32 questId = fields[0].GetUInt32();
             uint32 poolId = fields[1].GetUInt32();
-            uint32 poolIndex = fields[2].GetUInt32();
-            uint32 numActive = fields[3].GetUInt32();
+            //uint32 poolIndex = fields[2].GetUInt32();
+            uint32 numActive = fields[2].GetUInt32();
 
             Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
             if (!quest)
@@ -114,9 +114,10 @@ void QuestPoolMgr::LoadFromDB()
             }
 
             QuestPool::Members& members = (*pair.first)[pair.second].members;
-            if (poolIndex >= members.size())
-                members.resize(poolIndex + 1);
-            members[poolIndex].push_back(questId);
+//            if (poolIndex >= members.size())
+//                members.resize(poolIndex + 1);
+//            members[poolIndex].push_back(questId);
+            members.push_back(std::vector<uint32>(1, questId));
         } while (result->NextRow());
     }
 
