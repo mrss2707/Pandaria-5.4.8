@@ -93,6 +93,8 @@ endif()
 if( USE_SCRIPTPCH AND MSVC )
   set(scripts_STAT_SRCS
     ${scripts_STAT_SRCS}
+          Custom/ReagentBank.cpp
+          Custom/ReagentBank.h
   )
 endif()
 
