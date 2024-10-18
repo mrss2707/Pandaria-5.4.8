@@ -2146,7 +2146,7 @@ void AddCustomScripts()
 //AddSC_boost_profession();
 //AddSC_custom_items();
 	AddSC_solocraft_system();
-    AddSC_reagent_bank();
+    AddSC_reagent_bankScripts();
 #endif
     AddSC_Anticheat();
 }
