@@ -2134,7 +2134,7 @@ void AddSC_custom_reward();
 void AddSC_boost_profession();
 void AddSC_custom_items();
 void AddSC_solocraft_system();
-void AddSC_reagent_bank();
+void AddSC_reagent_bankScripts();
 
 void AddCustomScripts()
 {
