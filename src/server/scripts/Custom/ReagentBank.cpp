@@ -103,7 +103,7 @@ private:
         }
     }
 
-    static void UpdateItemCount(std::map<uint32, uint32>& entryToAmountMap, std::map<uint32, uint32>& entryToSubclassMap, Item* pItem, Player* player, uint32 bagSlot, uint32 itemSlot)
+    static void UpdateItemCount(std::map<uint32, uint32>& entryToAmountMap, std::map<uint32, uint32>& entryToSubclassMap, const Item* pItem, Player* player, uint32 bagSlot, uint32 itemSlot)
     {
         uint32 count = pItem->GetCount();
         ItemTemplate const* itemTemplate = pItem->GetTemplate();
@@ -254,7 +254,7 @@ public:
         }
     }
 
-    static void ShowReagentItems(Player* player, Creature* creature, uint32 item_subclass, uint16 gossipPageNumber)
+    static void ShowReagentItems(Player* player, const Creature* creature, uint32 item_subclass, uint16 gossipPageNumber)
     {
         WorldSession* session = player->GetSession();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS2);
