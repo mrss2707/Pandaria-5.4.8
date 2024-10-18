@@ -210,8 +210,7 @@ public:
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(10940, 30, 30, -18, 0) + "Enchanting", creature->GetGUID(), ITEM_SUBCLASS_ENCHANTING);
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(23572, 30, 30, -18, 0) + "Nether Material", creature->GetGUID(), ITEM_SUBCLASS_MATERIAL);
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(2604, 30, 30, -18, 0) + "Other Trade Goods", creature->GetGUID(), ITEM_SUBCLASS_TRADE_GOODS_OTHER);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(38682, 30, 30, -18, 0) + "Armor Vellum", creature->GetGUID(), ITEM_SUBCLASS_ENCHANTMENT);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(39349, 30, 30, -18, 0) + "Weapon Vellum", creature->GetGUID(), ITEM_SUBCLASS_ENCHANTMENT);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(38682, 30, 30, -18, 0) + "Vellums", creature->GetGUID(), ITEM_SUBCLASS_ENCHANTMENT);
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Deposit All Reagents", creature->GetGUID(), DEPOSIT_ALL_REAGENTS);
         SendGossipMenuFor(player, NPC_TEXT_ID, creature->GetGUID());
         return true;
