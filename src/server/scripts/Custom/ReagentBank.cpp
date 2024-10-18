@@ -137,7 +137,7 @@ private:
         WorldSession* session = player->GetSession();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS);
         stmt->setUInt32(0, player->GetSession()->GetAccountId());
-        session->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(stmt).WithCallback([=,this](QueryResult result) {
+        QueryResult result = LoginDatabase.Execute(stmt);
             std::map<uint32, uint32> entryToAmountMap;
             std::map<uint32, uint32> entryToSubclassMap;
             if (result)
@@ -187,7 +187,6 @@ private:
                 }
                 LoginDatabase.CommitTransaction(trans);
             }
-            }));
         ChatHandler(player->GetSession()).PSendSysMessage("All reagents deposited successfully.");
         CloseGossipMenuFor(player);
     }
@@ -259,7 +258,7 @@ public:
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS2);
         stmt->setUInt64(0, player->GetSession()->GetAccountId());
         stmt->setUInt16(1, item_subclass);    
-        session->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(stmt).WithCallback([=](QueryResult result) {
+        QueryResult result = LoginDatabase.Execute(stmt);
                 uint32 startValue = (gossipPageNumber * (MAX_OPTIONS));
                 uint32 endValue = (gossipPageNumber + 1) * (MAX_OPTIONS)-1;
                 std::map<uint32, uint32> entryToAmountMap;
@@ -291,7 +290,6 @@ public:
                 }
                 AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", MAIN_MENU, 0);
                 SendGossipMenuFor(player, NPC_TEXT_ID, creature->GetGUID());
-            }));
     }
 };
 
