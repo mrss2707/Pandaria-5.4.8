@@ -194,13 +194,12 @@ public:
             { "replace",        SEC_ADMINISTRATOR, true, replaceCommandTable        },
             { "checkladder",    SEC_ADMINISTRATOR,  true,   &HandleCheckLadderCommand   },
             { "wordfilter",         SEC_ADMINISTRATOR,      false, wordFilterCommandTable },
+            { "xprate",         SEC_PLAYER,         false,  &HandleXPRateCommand,         },
             { "deleteditem",    SEC_ADMINISTRATOR,  true,
             {
                 { "list",      SEC_ADMINISTRATOR,   true,   &HandleDeletedItemListCommand,    },
                 { "restore",   SEC_ADMINISTRATOR,   true,   &HandleDeletedItemRestoreCommand, },
-            },
-            { "xprate",         SEC_PLAYER,         false,  &HandleXPRateCommand         },
-            },
+            }},
         };
         return commandTable;
     }
