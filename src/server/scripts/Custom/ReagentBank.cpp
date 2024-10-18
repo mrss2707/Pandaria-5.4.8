@@ -137,7 +137,7 @@ private:
         WorldSession* session = player->GetSession();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS);
         stmt->setUInt32(0, player->GetSession()->GetAccountId());
-        QueryResult result = LoginDatabase.PExecute(stmt);
+        QueryResult result = LoginDatabase.Query(stmt);
             std::map<uint32, uint32> entryToAmountMap;
             std::map<uint32, uint32> entryToSubclassMap;
             if (result)
@@ -258,7 +258,7 @@ public:
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS2);
         stmt->setUInt64(0, player->GetSession()->GetAccountId());
         stmt->setUInt16(1, item_subclass);    
-        QueryResult result = LoginDatabase.PExecute(stmt);
+        QueryResult result = LoginDatabase.Query(stmt);
                 uint32 startValue = (gossipPageNumber * (MAX_OPTIONS));
                 uint32 endValue = (gossipPageNumber + 1) * (MAX_OPTIONS)-1;
                 std::map<uint32, uint32> entryToAmountMap;
