@@ -199,7 +199,7 @@ public:
                 { "list",      SEC_ADMINISTRATOR,   true,   &HandleDeletedItemListCommand,    },
                 { "restore",   SEC_ADMINISTRATOR,   true,   &HandleDeletedItemRestoreCommand, },
             },
-            { "xprate",         SEC_PLAYER,         false,  &HandleXPRateCommand,         },
+            { "xprate",         SEC_PLAYER,         false,  &HandleXPRateCommand         },
             },
         };
         return commandTable;
