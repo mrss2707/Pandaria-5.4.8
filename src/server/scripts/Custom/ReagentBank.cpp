@@ -103,7 +103,7 @@ private:
         }
     }
 
-    static void UpdateItemCount(std::map<uint32, uint32>& entryToAmountMap, std::map<uint32, uint32>& entryToSubclassMap, const Item* pItem, Player* player, uint32 bagSlot, uint32 itemSlot)
+    static void UpdateItemCount(std::map<uint32, uint32>& entryToAmountMap, std::map<uint32, uint32>& entryToSubclassMap, Item* pItem, Player* player, uint32 bagSlot, uint32 itemSlot)
     {
         uint32 count = pItem->GetCount();
         ItemTemplate const* itemTemplate = pItem->GetTemplate();
@@ -254,13 +254,13 @@ public:
         }
     }
 
-    static void ShowReagentItems(Player* player, const Creature* creature, uint32 item_subclass, uint16 gossipPageNumber)
+    static void ShowReagentItems(Player* player, Creature* creature, uint32 item_subclass, uint16 gossipPageNumber)
     {
         WorldSession* session = player->GetSession();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS2);
         stmt->setUInt64(0, player->GetSession()->GetAccountId());
         stmt->setUInt16(1, item_subclass);    
-        session->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(stmt).WithCallback([=](QueryResult result)
+        if (QueryResult result = LoginDatabase.PQuery(stmt))
         {
             uint32 startValue = (gossipPageNumber * (MAX_OPTIONS));
             uint32 endValue = (gossipPageNumber + 1) * (MAX_OPTIONS)-1;
@@ -293,7 +293,7 @@ public:
             }
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", MAIN_MENU, 0);
             SendGossipMenuFor(player, NPC_TEXT_ID, creature->GetGUID());
-        }));
+        }
     }
 };
 
