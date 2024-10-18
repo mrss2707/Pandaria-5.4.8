@@ -2,11 +2,10 @@
 .vscode*/
 /out/build
 /.vs
-build/
 .DS_Store
 .idea/
 /doc
 /contrib/ScriptsConverter
-/cmake-build-release-visual-studio
-/cmake-build-debug
-/build-rel
+/cmake*
+/build*
+.github/

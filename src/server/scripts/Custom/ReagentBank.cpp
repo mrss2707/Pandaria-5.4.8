@@ -16,7 +16,7 @@
 class npc_reagent_banker : public CreatureScript
 {
 private:
-    std::string GetItemLink(uint32 entry, WorldSession* session) const
+    static std::string GetItemLink(uint32 entry, WorldSession* session)
     {
         LocaleConstant loc_idx = session->GetSessionDbLocaleIndex();
         const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
@@ -32,7 +32,7 @@ private:
         return oss.str();
     }
 
-    std::string GetItemIcon(uint32 entry, uint32 width, uint32 height, int x, int y) const
+    static std::string GetItemIcon(uint32 entry, uint32 width, uint32 height, int x, int y)
     {
         std::ostringstream ss;
         ss << "|TInterface";
@@ -50,7 +50,7 @@ private:
         return ss.str();
     }
 
-    void WithdrawItem(Player* player, uint32 entry)
+    static void WithdrawItem(Player* player, uint32 entry)
     {
         // This query can be changed to async to improve performance, but there will be some visual bugs because the query will not be done executing when the menu refreshes
         QueryResult result = LoginDatabase.PQuery("SELECT amount FROM reagent_bank WHERE account_id = " + std::to_string(player->GetSession()->GetAccountId()) + " AND item_entry = " + std::to_string(entry));
@@ -103,7 +103,7 @@ private:
         }
     }
 
-    void UpdateItemCount(std::map<uint32, uint32>& entryToAmountMap, std::map<uint32, uint32>& entryToSubclassMap, Item* pItem, Player* player, uint32 bagSlot, uint32 itemSlot)
+    static void UpdateItemCount(std::map<uint32, uint32>& entryToAmountMap, std::map<uint32, uint32>& entryToSubclassMap, Item* pItem, Player* player, uint32 bagSlot, uint32 itemSlot)
     {
         uint32 count = pItem->GetCount();
         ItemTemplate const* itemTemplate = pItem->GetTemplate();
@@ -133,7 +133,7 @@ private:
         player->DestroyItem(bagSlot, itemSlot, true);
     }
 
-    void DepositAllReagents(Player* player) {
+    static void DepositAllReagents(Player* player) {
         WorldSession* session = player->GetSession();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS);
         stmt->setUInt32(0, player->GetSession()->GetAccountId());
@@ -254,7 +254,7 @@ public:
         }
     }
 
-    void ShowReagentItems(Player* player, Creature* creature, uint32 item_subclass, uint16 gossipPageNumber)
+    static void ShowReagentItems(Player* player, Creature* creature, uint32 item_subclass, uint16 gossipPageNumber)
     {
         WorldSession* session = player->GetSession();
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS2);
