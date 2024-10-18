@@ -147,8 +147,8 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_DEL_REAGENT1, "DELETE FROM reagent_bank WHERE account_id = ? AND item_entry = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_REAGENTBANK, "UPDATE reagent_bank SET amount = ? WHERE account_id = ? AND item_entry = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_REAGENTS, "SELECT item_entry, item_subclass, amount FROM reagent_bank WHERE account_id = ?", CONNECTION_ASYNC);
-    PrepareStatement(LOGIN_REP_REAGENTS, "REPLACE INTO reagent_bank (account_id, item_entry, item_subclass, amount) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
-    PrepareStatement(LOGIN_SEL_REAGENTS2, "SELECT item_entry, amount FROM reagent_bank WHERE account_id = ? AND item_subclass = ? ORDER BY item_entry", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_REP_REAGENTS, "REPLACE INTO reagent_bank (account_id, item_entry, item_subclass, amount) VALUES (?, ?, ?, ?)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_REAGENTS2, "SELECT item_entry, amount FROM reagent_bank WHERE account_id = ? AND item_subclass = ? ORDER BY item_entry", CONNECTION_ASYNC);
 }
 
 LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo, ConnectionFlags connectionFlags) : MySQLConnection(connInfo, connectionFlags)
