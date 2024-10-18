@@ -638,6 +638,9 @@ enum CharacterDatabaseStatements : uint32
 
     CHAR_UPD_CHAR_LAST_LOGIN,
 
+    // Custom
+    CHAR_UPD_XPRATE,
+
     MAX_CHARACTERDATABASE_STATEMENTS
 };
 

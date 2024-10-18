@@ -6868,9 +6868,18 @@ void Player::CheckAreaExploreAndOutdoor()
             {
                 int32 diff = int32(GetLevel()) - areaEntry->area_level;
                 uint32 XP = 0;
+                uint32 guid = Player::GetGUID();
+                uint32 newrate = 0;
+                ;
+                if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid)) {
+                    newrate = result->Fetch()->GetUInt32();
+                    if (newrate == 0);
+                }
+                else
+                    newrate = sWorld->getRate(Rates::RATE_XP_EXPLORE);
                 if (diff < -5)
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel()+5)*sWorld->getRate(RATE_XP_EXPLORE, this));
+                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel()+5)*newrate);
                 }
                 else if (diff > 5)
                 {
@@ -6878,11 +6887,11 @@ void Player::CheckAreaExploreAndOutdoor()
                     if (exploration_percent < 0)
                         exploration_percent = 0;
 
-                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*exploration_percent/100*sWorld->getRate(RATE_XP_EXPLORE, this));
+                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*exploration_percent/100*newrate);
                 }
                 else
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*sWorld->getRate(RATE_XP_EXPLORE, this));
+                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*newrate);
                 }
 
                 GiveXP(XP, NULL);
@@ -16669,7 +16678,15 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         SetQuestSlot(log_slot, 0);
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = IsQuestRewarded(quest_id) ? 0 : uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST, this));
+    uint32 guid = Player::GetGUID();
+    uint32 newrate = 0;
+    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid)) {
+        newrate = result->Fetch()->GetUInt32();
+    }
+    else
+        newrate = sWorld->getRate(Rates::RATE_XP_QUEST);
+
+    uint32 XP = IsQuestRewarded(quest_id) ? 0 : uint32(quest->XPValue(this) * newrate);
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);

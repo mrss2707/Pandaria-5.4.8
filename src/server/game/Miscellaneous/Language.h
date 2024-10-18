@@ -1563,6 +1563,9 @@ enum TrinityStrings
     LANG_WORD_FILTER_FOUND_BAD_WORD_IN_CHAT = 21000,
     LANG_WORD_FILTER_FOUND_BAD_WORD_IN_MAIL = 21001,
 
+    // Custom
+    LANG_CHAR_XPRATE                        = 185,
+
     // For other tables maybe             2000010000-2147483647 (max index)
 };
 #endif
