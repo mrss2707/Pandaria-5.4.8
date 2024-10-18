@@ -1566,6 +1566,7 @@ void World::LoadRates(bool loading)
         { RATE_XP_EXPLORE,                              "Rate.XP.Explore",                              1.0f,   false },
         { RATE_XP_EXPLORE_PREMIUM,                      "Rate.XP.Explore.Premium",                      1.0f,   false },
         { RATE_XP_GATHER,                               "Rate.XP.Gather",                               1.0f,   false },
+        { RATE_XP_MAX,                                  "Rate.XP.Max",                                  1.0f,   false },
         { RATE_REPAIRCOST,                              "Rate.RepairCost",                              1.0f,   true  },
         { RATE_REPUTATION_GAIN,                         "Rate.Reputation.Gain",                         1.0f,   false },
         { RATE_REPUTATION_GAIN_PREMIUM,                 "Rate.Reputation.Premium",                      1.0f,   false },
