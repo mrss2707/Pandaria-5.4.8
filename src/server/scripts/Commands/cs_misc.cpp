@@ -229,19 +229,23 @@ public:
         uint32 guid = player->GetGUID();
 
         if (!*args) {
-            QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid);
-            size_t size = result ? (*result)[0].GetUInt32() : 0;
+            uint8 rate = player->GetXPRate(guid);
+            if (!rate) {
+                QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid);
+                size_t size = result ? (*result)[0].GetUInt32() : 0;
 
-            if (size) {
-                uint32 currate = (*result)[0].GetUInt32();
+                if (size) {
+                    uint32 currate = (*result)[0].GetUInt32();
 
-                if (currate)
-                    handler->PSendSysMessage(LANG_CHAR_XPRATE, currate);
-                return true;
+                    if (currate)
+                        handler->PSendSysMessage(LANG_CHAR_XPRATE, currate);
+                    return true;
+                }
+                else
+                    return false;
             }
-            else {
-                return false;
-            }
+            else
+                handler->PSendSysMessage(LANG_CHAR_XPRATE, rate);
             return false;
         }
 
@@ -262,6 +266,7 @@ public:
         stmt->setUInt32(2, newrate);
         CharacterDatabase.Execute(stmt);
         handler->PSendSysMessage("New Rates set to: %u", newrate);
+        player->SetXPRate(newrate);
         return true;
     }
 

@@ -135,14 +135,7 @@ void KillRewarder::RewardXP(Player* player, float rate)
 {
     uint32 xp(_xp);
     uint32 guid = player->GetGUID();
-    uint32 newrate = 0;
-    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid)) {
-        newrate = result->Fetch()->GetUInt32();
-        if (newrate == 0)
-            xp = 0;
-    }
-    else
-        newrate = sWorld->getRate(Rates::RATE_XP_KILL);
+    uint32 newrate = player->GetXPRate(guid);
     if (_group)
     {
         // 4.2.1. If player is in group, adjust XP:
