@@ -10,6 +10,7 @@
 #include "DatabaseEnv.h"
 #include "LoginDatabase.h"
 #include "ReagentBank.h"
+#include "Log.h"
 #include <map>
 
 // Add player scripts
@@ -260,40 +261,42 @@ public:
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS2);
         stmt->setUInt64(0, player->GetSession()->GetAccountId());
         stmt->setUInt16(1, item_subclass);    
+        TC_LOG_INFO("misc", "About to enter into the callback.");
         session->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(stmt).WithCallback([=](QueryResult result)
+        {
+            uint32 startValue = (gossipPageNumber * (MAX_OPTIONS));
+            uint32 endValue = (gossipPageNumber + 1) * (MAX_OPTIONS)-1;
+            std::map<uint32, uint32> entryToAmountMap;
+            std::vector<uint32> itemEntries;
+            TC_LOG_INFO("misc", "We have entered the callback.");
+            if (result) {
+                do {
+                    uint32 itemEntry = (*result)[0].GetUInt32();
+                    uint32 itemAmount = (*result)[1].GetUInt32();
+                    entryToAmountMap[itemEntry] = itemAmount;
+                    itemEntries.push_back(itemEntry);
+                } while (result->NextRow());
+            }
+            for (uint32 i = startValue; i <= endValue; i++)
             {
-                uint32 startValue = (gossipPageNumber * (MAX_OPTIONS));
-                uint32 endValue = (gossipPageNumber + 1) * (MAX_OPTIONS)-1;
-                std::map<uint32, uint32> entryToAmountMap;
-                std::vector<uint32> itemEntries;
-                if (result) {
-                    do {
-                        uint32 itemEntry = (*result)[0].GetUInt32();
-                        uint32 itemAmount = (*result)[1].GetUInt32();
-                        entryToAmountMap[itemEntry] = itemAmount;
-                        itemEntries.push_back(itemEntry);
-                    } while (result->NextRow());
-                }
-                for (uint32 i = startValue; i <= endValue; i++)
+                if (itemEntries.empty() || i > itemEntries.size() - 1)
                 {
-                    if (itemEntries.empty() || i > itemEntries.size() - 1)
-                    {
-                        break;
-                    }
-                    uint32 itemEntry = itemEntries.at(i);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(itemEntry, 30, 30, -18, 0) + GetItemLink(itemEntry, session) + " (" + std::to_string(entryToAmountMap.find(itemEntry)->second) + ")", itemEntry, gossipPageNumber);
+                    break;
                 }
-                if (gossipPageNumber > 0)
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", item_subclass, gossipPageNumber - 1);
-                }
-                if (endValue < entryToAmountMap.size())
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", item_subclass, gossipPageNumber + 1);
-                }
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", MAIN_MENU, 0);
-                SendGossipMenuFor(player, NPC_TEXT_ID, creature->GetGUID());
-            }));
+                uint32 itemEntry = itemEntries.at(i);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetItemIcon(itemEntry, 30, 30, -18, 0) + GetItemLink(itemEntry, session) + " (" + std::to_string(entryToAmountMap.find(itemEntry)->second) + ")", itemEntry, gossipPageNumber);
+            }
+            if (gossipPageNumber > 0)
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", item_subclass, gossipPageNumber - 1);
+            }
+            if (endValue < entryToAmountMap.size())
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", item_subclass, gossipPageNumber + 1);
+            }
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", MAIN_MENU, 0);
+            SendGossipMenuFor(player, NPC_TEXT_ID, creature->GetGUID());
+        }));
     }
 };
 
