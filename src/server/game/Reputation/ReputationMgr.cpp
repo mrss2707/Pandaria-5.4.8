@@ -18,6 +18,7 @@
 #include "DatabaseEnv.h"
 #include "ReputationMgr.h"
 #include "DBCStores.h"
+#include "ItemMethods.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "World.h"
@@ -608,6 +609,25 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
             }
         }
         while (result->NextRow());
+
+        if (QueryResult result2 = LoginDatabase.PQuery("SELECT * FROM account_factions WHERE guid = '%u'", _player->GetGUID()))
+        {
+            do
+            {
+                Field* fields = result2->Fetch();
+                FactionEntry const* factionEntry = sFactionStore.LookupEntry(fields[0].GetUInt16());
+
+                if (factionEntry && (factionEntry->reputationListID >= 0))
+                {
+                    FactionState* faction = &_factions[factionEntry->reputationListID];
+                    faction->Standing = 42000;
+                    int32 BaseRep = GetBaseReputation(factionEntry);
+                    ReputationRank old_rank = ReputationToRank(BaseRep);
+                    ReputationRank new_rank = ReputationToRank(BaseRep + faction->Standing);
+                    UpdateRankCounters(old_rank, new_rank);
+                }
+            } while (result2->NextRow());
+        }
     }
 }
 
@@ -628,6 +648,19 @@ void ReputationMgr::SaveToDB(CharacterDatabaseTransaction trans)
             stmt->setFloat(2, itr->second.Standing);
             stmt->setUInt16(3, uint16(itr->second.Flags));
             trans->Append(stmt);
+            if (itr->second.Standing >= 38900 && itr->second.Standing <= 42001)
+            {
+                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCFACTIONS);
+                stmt->setUInt32(0, _player->GetSession()->GetAccountId());
+                stmt->setUInt32(1, uint16(itr->second.ID));
+                stmt->setUInt32(2, 42000);
+                stmt->setUInt16(3, uint16(itr->second.Flags));
+                stmt->setUInt32(4, _player->GetSession()->GetAccountId());
+                stmt->setUInt32(5, uint16(itr->second.ID));
+                stmt->setUInt32(6, 42000);
+                stmt->setUInt16(7, uint16(itr->second.Flags));
+                LoginDatabase.DirectExecute(stmt);
+            }
 
             itr->second.needSave = false;
         }
