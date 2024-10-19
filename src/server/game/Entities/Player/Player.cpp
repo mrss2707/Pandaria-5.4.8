@@ -6873,7 +6873,7 @@ void Player::CheckAreaExploreAndOutdoor()
                 uint32 XP = 0;
                 if (diff < -5)
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel()+5)*GetXPRate());
+                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel()+5)*GetXPRate(GetGUID()));
                 }
                 else if (diff > 5)
                 {
@@ -6881,7 +6881,7 @@ void Player::CheckAreaExploreAndOutdoor()
                     if (exploration_percent < 0)
                         exploration_percent = 0;
 
-                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*exploration_percent/100*GetXPRate());
+                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*exploration_percent/100*GetXPRate(GetGUID()));
                 }
                 else
                 {
@@ -27361,10 +27361,10 @@ bool Player::isTotalImmune()
     return false;
 }
 
-uint8 Player::GetXPRate(uint32 guidlow)
+uint32 Player::GetXPRate(uint32 guid)
 {
     uint8 rate = 0;
-    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guidlow))
+    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid))
         rate = (*result)[0].GetUInt32();
     else
         rate = sWorld->getRate(RATE_XP_KILL);
