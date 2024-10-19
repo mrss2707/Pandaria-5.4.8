@@ -19328,7 +19328,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     _LoadBattlegroundStats(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BATTLGEROUND_STATS));
 
     if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid))
-        m_xprate = result->Fetch()->GetUInt8();
+        m_xprate = result->Fetch()->GetUInt32();
     else
         m_xprate = sWorld->getRate(RATE_XP_KILL);
 
@@ -27372,7 +27372,7 @@ uint8 Player::GetXPRate(uint32 guidlow)
     return rate;
 }
 
-void Player::SetXPRate(int rate)
+void Player::SetXPRate(uint32 rate)
 {
     m_xprate = rate;
     return;
