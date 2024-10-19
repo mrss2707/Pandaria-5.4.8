@@ -261,16 +261,18 @@ public:
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REAGENTS2);
         stmt->setUInt64(0, player->GetSession()->GetAccountId());
         stmt->setUInt16(1, item_subclass);    
-        TC_LOG_DEBUG("misc", "About to enter into the callback.");
+        TC_LOG_INFO("misc", "About to enter into the callback.");
         session->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(stmt).WithCallback([=](QueryResult result)
         {
             uint32 startValue = (gossipPageNumber * (MAX_OPTIONS));
             uint32 endValue = (gossipPageNumber + 1) * (MAX_OPTIONS)-1;
             std::map<uint32, uint32> entryToAmountMap;
             std::vector<uint32> itemEntries;
-            TC_LOG_DEBUG("misc", "We have entered the callback.");
+            TC_LOG_INFO("misc", "We have entered the callback.");
             if (result) {
+                TC_LOG_INFO("misc", "About to enter the while loop");
                 do {
+                    TC_LOG_INFO("misc", "While loop");
                     uint32 itemEntry = (*result)[0].GetUInt32();
                     uint32 itemAmount = (*result)[1].GetUInt32();
                     entryToAmountMap[itemEntry] = itemAmount;
@@ -279,6 +281,7 @@ public:
             }
             for (uint32 i = startValue; i <= endValue; i++)
             {
+                TC_LOG_INFO("misc", "For loop");
                 if (itemEntries.empty() || i > itemEntries.size() - 1)
                 {
                     break;
