@@ -3070,7 +3070,7 @@ public:
     void CompletedAchievement(AchievementEntry const* entry);
     void RemoveAchievement(AchievementEntry const* entry);
     void SetXPRate(uint32 rate);
-    uint8 GetXPRate(uint32 guid);
+    uint32 GetXPRate(uint32 guid);
     bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const
     {
