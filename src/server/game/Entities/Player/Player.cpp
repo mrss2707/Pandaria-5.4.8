@@ -6885,7 +6885,7 @@ void Player::CheckAreaExploreAndOutdoor()
                 }
                 else
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*GetXPRate());
+                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*GetXPRate(GetGUID()));
                 }
 
                 GiveXP(XP, NULL);
@@ -16672,7 +16672,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         SetQuestSlot(log_slot, 0);
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = IsQuestRewarded(quest_id) ? 0 : uint32(quest->XPValue(this) * GetXPRate());
+    uint32 XP = IsQuestRewarded(quest_id) ? 0 : uint32(quest->XPValue(this) * GetXPRate(GetGUID()));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
