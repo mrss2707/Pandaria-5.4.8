@@ -610,7 +610,7 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
         }
         while (result->NextRow());
 
-        if (QueryResult result2 = LoginDatabase.PQuery("SELECT * FROM account_factions WHERE guid = '%u'", _player->GetGUID()))
+        if (QueryResult result2 = LoginDatabase.PQuery("SELECT * FROM account_factions WHERE id = '%u'", _player->GetGUID()))
         {
             do
             {
