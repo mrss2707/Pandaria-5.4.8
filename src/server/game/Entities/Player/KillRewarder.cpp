@@ -136,6 +136,7 @@ void KillRewarder::RewardXP(Player* player, float rate)
     uint32 xp(_xp);
     uint32 guid = player->GetGUID();
     uint32 newrate = player->GetXPRate(guid);
+    TC_LOG_ERROR("misc", "KillRewarder::RewardXP: guid=" << guid + " XPRate=" << newrate);
     if (_group)
     {
         // 4.2.1. If player is in group, adjust XP:
