@@ -570,7 +570,7 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
             {
                 FactionState* faction = &_factions[factionEntry->reputationListID];
 
-                if (QueryResult result2 = LoginDatabase.PQuery("SELECT faction FROM account_factions WHERE id = '%u' and faction = '%u'", _player->GetGUID(), fields[0].GetUInt16()))
+                if (QueryResult result2 = LoginDatabase.PQuery("SELECT faction FROM account_factions WHERE id = '%u' and faction = '%u'", _player->GetSession()->GetAccountId(), fields[0].GetUInt16()))
                     faction->Standing = 42000;
                 else  // update standing to current
                     faction->Standing = fields[1].GetFloat();
