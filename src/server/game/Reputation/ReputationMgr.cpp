@@ -570,8 +570,10 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
             {
                 FactionState* faction = &_factions[factionEntry->reputationListID];
 
-                // update standing to current
-                faction->Standing = fields[1].GetFloat();
+                if (QueryResult result2 = LoginDatabase.PQuery("SELECT faction FROM account_factions WHERE id = '%u' and faction = '%u'", _player->GetGUID(), factionEntry->reputationListID))
+                    faction->Standing = 42000;
+                else  // update standing to current
+                    faction->Standing = fields[1].GetFloat();
 
                 // update counters
                 int32 BaseRep = GetBaseReputation(factionEntry);
@@ -606,28 +608,12 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
                     faction->needSend = false;
                     faction->needSave = false;
                 }
+
             }
         }
         while (result->NextRow());
 
-        if (QueryResult result2 = LoginDatabase.PQuery("SELECT faction FROM account_factions WHERE id = '%u'", _player->GetGUID()))
-        {
-            do
-            {
-                Field* fields = result2->Fetch();
-                FactionEntry const* factionEntry = sFactionStore.LookupEntry(fields[0].GetUInt16());
 
-                if (factionEntry && (factionEntry->reputationListID >= 0))
-                {
-                    FactionState* faction = &_factions[factionEntry->reputationListID];
-                    faction->Standing = 42000;
-                    int32 BaseRep = GetBaseReputation(factionEntry);
-                    ReputationRank old_rank = ReputationToRank(BaseRep);
-                    ReputationRank new_rank = ReputationToRank(BaseRep + faction->Standing);
-                    UpdateRankCounters(old_rank, new_rank);
-                }
-            } while (result2->NextRow());
-        }
     }
 }
 
