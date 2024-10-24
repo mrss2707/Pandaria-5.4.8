@@ -3581,6 +3581,7 @@ protected:
 
     // Custom
     uint32 m_xprate;
+    std::vector<int> m_attunementXP;
 
     private:
     // internal common parts for CanStore/StoreItem functions
@@ -3801,4 +3802,5 @@ bool Player::DoForEachItem(Func func, bool inventory /*= true*/, bool bags /*= t
     return false;
 }
 
+void Player::GiveIXP(Player* player, uint32 xp);
 #endif

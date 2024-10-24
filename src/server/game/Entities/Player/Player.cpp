@@ -416,6 +416,8 @@ Player::Player(WorldSession* session) : Unit(true), phaseMgr(this), hasForcedMov
     m_dynamicValuesCount = PLAYER_DYNAMIC_END;
 
     m_xprate = sWorld->getRate(RATE_XP_KILL);
+
+    std::vector<int> m_attunementXP;
 }
 
 Player::~Player()
@@ -460,6 +462,8 @@ Player::~Player()
     ClearResurrectRequestData();
 
     sWorld->DecreasePlayerCount();
+
+    m_attunementXP.clear();
 }
 
 void Player::CleanupsBeforeDelete(bool finalCleanup)
@@ -732,6 +736,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
             {
                 RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                 EquipItem(eDest, pItem, true);
+                if (QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u" pItem->GetGUID(), getGUID()))
+                    m_attunementXP[i] = (*result)[0].GetUInt32();
             }
             // move other items to more appropriate slots
             else
@@ -32087,4 +32093,31 @@ void Player::PlayerSendSetPhaseShift(std::set<uint32> const& phaseIds)
     RebuildTerrainSwaps(); // to set default map swaps
 
     GetSession()->SendSetPhaseShift(phaseIds, GetTerrainSwaps(), GetWorldMapSwaps());
+}
+
+void Player::GiveIXP(Player* player, uint32 xp)
+{
+    uint32 entryList[EQUIPMENT_SLOT_END];
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        {
+            uint32 itemEntry = item->GetEntry();
+
+            if (itemEntry->CanPlayerAttune(player, item))
+                entryList[slot] = item->GetGUID();
+        }
+    }
+
+    for (int i = 0; i < sizeof(entryList); i++)
+    {
+        if (QueryResult result = LoginDatabase.Execute("SELECT experience FROM attunement WHERE id = " + entryList[i] + " AND id = " + player->GetGUID()))  // TODO: Store this on the player instead
+        {
+            uint32 experience = (*result)[0].GetUInt32();
+            if (experience < 100)
+            {
+
+            }
+        }
+    }
 }

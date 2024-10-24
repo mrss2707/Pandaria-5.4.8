@@ -1016,5 +1016,10 @@ namespace LuaGlobalFunctions
         return 1;
     }
 
+    int CanAttune(lua_State* L)
+    {
+        lua_pushboolean(L, true);
+        return 1;
+    }
 }
 #endif

@@ -18,6 +18,8 @@
 #ifndef TRINITYCORE_ITEM_H
 #define TRINITYCORE_ITEM_H
 
+#include <lua.h>
+
 #include "Common.h"
 #include "Object.h"
 #include "LootMgr.h"
@@ -401,6 +403,9 @@ class Item : public Object
         void SetHasDeletedItemRecord(bool value) { m_hasDeletedItemRecord = value; }
 
         bool IsEyeOfTheBlackPrinceAllowed() const;
+
+        static bool CanPlayerAttune(Player* player, Item* item);
+        static bool isAttunable(uint32 item);
 
     protected:
         void AddToUpdate() override;
