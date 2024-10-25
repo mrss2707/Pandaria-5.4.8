@@ -736,7 +736,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
             {
                 RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                 EquipItem(eDest, pItem, true);
-                if (QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u" pItem->GetGUID(), getGUID()))
+                QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u", pItem->GetGUID(), guidlow);
+                if (result)
                     m_attunementXP[i] = (*result)[0].GetUInt32();
             }
             // move other items to more appropriate slots
@@ -753,7 +754,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
         }
     }
     // all item positions resolved
-    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guidlow))
+    QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guidlow);
+    if (result)
         return false;
     return true;
 }
@@ -32102,16 +32104,14 @@ void Player::GiveIXP(Player* player, uint32 xp)
     {
         if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
-            uint32 itemEntry = item->GetEntry();
-
-            if (itemEntry->CanPlayerAttune(player, item))
+            if (item->CanPlayerAttune(player, item))
                 entryList[slot] = item->GetGUID();
         }
     }
 
     for (int i = 0; i < sizeof(entryList); i++)
     {
-        if (QueryResult result = LoginDatabase.Execute("SELECT experience FROM attunement WHERE id = " + entryList[i] + " AND id = " + player->GetGUID()))  // TODO: Store this on the player instead
+        if (QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE id = %u AND id = %u", entryList[i], player->GetGUID()))  // TODO: Store this on the player instead
         {
             uint32 experience = (*result)[0].GetUInt32();
             if (experience < 100)

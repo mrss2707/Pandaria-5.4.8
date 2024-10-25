@@ -1016,9 +1016,33 @@ namespace LuaGlobalFunctions
         return 1;
     }
 
-    int CanAttune(lua_State* L)
+    int isAttunable(lua_State* L)
     {
-        lua_pushboolean(L, true);
+        lua_pushboolean(L, false);
+        return 1;
+    }
+
+    int isAttunablePlayer(lua_State* L)
+    {
+        lua_pushboolean(L, false);
+        return 1;
+    }
+
+    int isAttunableAccount(lua_State* L)
+    {
+        lua_pushboolean(L, false);
+        return 1;
+    }
+
+    int isAttuned(lua_State* L)
+    {
+        lua_pushboolean(L, false);
+        return 1;
+    }
+
+    int getAttunementXP(lua_State* L)
+    {
+        lua_pushboolean(L, false);
         return 1;
     }
 }

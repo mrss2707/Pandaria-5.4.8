@@ -2856,6 +2856,9 @@ public:
     void UpdatePhasing();
     void PlayerSendSetPhaseShift(std::set<uint32> const& phaseIds);
 
+    // Custom
+    void Player::GiveIXP(Player* player, uint32 xp);
+
     uint8 m_forced_speed_changes [MAX_MOVE_TYPE];
 
     bool HasAtLoginFlag(AtLoginFlags f) const
@@ -3802,5 +3805,4 @@ bool Player::DoForEachItem(Func func, bool inventory /*= true*/, bool bags /*= t
     return false;
 }
 
-void Player::GiveIXP(Player* player, uint32 xp);
 #endif

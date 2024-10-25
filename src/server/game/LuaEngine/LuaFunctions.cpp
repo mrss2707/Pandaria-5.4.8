@@ -97,7 +97,11 @@ void RegisterGlobals(lua_State* L)
     lua_register(L, "AddTaxiPath", &LuaGlobalFunctions::AddTaxiPath);                                       // AddTaxiPath(pathTable, mountA, mountH[, price, pathId]) - Adds a new taxi path. Returns the path's ID. Will replace an existing path if pathId provided and already used. path table structure: T = {{map, x, y, z[, actionFlag, delay, arrivalEvId, departEvId]}, {...}, ...} UDOCUMENTED
 
     // Custom
-    lua_register(L, "CanAttune", &LuaGlobalFunctions::CanAttune);
+    lua_register(L, "isAttunable", &LuaGlobalFunctions::isAttunable);                                       // isAttunable(item) - Is item elligible for attunement
+    lua_register(L, "isAttunablePlayer", &LuaGlobalFunctions::IsAttunablePlayer);                           // isAttunablePlayer(item, player) - Can the item be attuned by the player
+    lua_register(L, "isAttunableAcc", &LuaGlobalFunctions::isAttunableAcc);                                 // isAttunableAcc(item, accountID) - Can anyone on the account attune the item
+    lua_register(L, "isAttuned", &LuaGlobalFunctions::IsAttuned);                                           // isAttuned(item, accountID) - Is item attuned by players account
+    lua_register(L, "getAttunementXP", &LuaGlobalFunctions::GetAttunementProgress);                         // getAttunementXP(item, player) - Get players attunement experience with the item
 }
 
 ElunaRegister<Object> ObjectMethods[] =

@@ -19,6 +19,7 @@
 #include "Item.h"
 
 #include <lstate.h>
+#include <cmath>
 
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
@@ -2179,21 +2180,23 @@ std::size_t ItemTemplate::CalculateItemSpecBit(ChrSpecializationEntry const* spe
     return (spec->classId - 1) * MAX_SPECIALIZATIONS + spec->TabPage;
 }
 
-static bool Item::CanPlayerAttune(Player* player, Item* item)
+bool Item::CanPlayerAttune(Player* player, Item* item)
 {
-    guid = item->GetGuid();
+    int guid = item->GetGUID();
     if (!player->CanUseItem(item))
         return false;
-    if (!(QueryResult result = LoginDatabase.Execute("SELECT EXISTS(SELECT id FROM attunement WHERE id = " + player->GetGUID() + " AND experience < 100)")))  // TODO: Make this a prepared statement
+    QueryResult result = LoginDatabase.PQuery("SELECT EXISTS(SELECT id FROM attunement WHERE id = %u AND experience < 100)", player->GetGUID()); // TODO: Make this a prepared statement
+    if (!result)
         return false;
     if (!isAttunable(item))
         return false;
     return true;
 }
 
-static bool Item::isAttunable(uint32 item)
+bool Item::isAttunable(Item* item)
 {
-    if(!(QueryResult result = WorldDatabase.Execute("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = " item->GetGUID() + ")")))   // TODO: Make this a prepared statement
+    QueryResult result = WorldDatabase.PQuery("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = %u)", item->GetGUID()); // TODO: Make this a prepared statement
+    if(!result)
         return false;
     return true;
 }

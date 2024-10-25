@@ -18,8 +18,6 @@
 #ifndef TRINITYCORE_ITEM_H
 #define TRINITYCORE_ITEM_H
 
-#include <lua.h>
-
 #include "Common.h"
 #include "Object.h"
 #include "LootMgr.h"
@@ -404,8 +402,8 @@ class Item : public Object
 
         bool IsEyeOfTheBlackPrinceAllowed() const;
 
-        static bool CanPlayerAttune(Player* player, Item* item);
-        static bool isAttunable(uint32 item);
+        bool CanPlayerAttune(Player* player, Item* item);
+        bool isAttunable(Item* item);
 
     protected:
         void AddToUpdate() override;
