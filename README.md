@@ -12,9 +12,9 @@ Client exe files" https://mega.nz/file/xUJDkIDA#I3TMdPymMw8ISNwIUgSaXLl5oHJHYFxA
 + MySQL = 5.7 / 8.0-8.1
 + CMake ≥ 3.27.2 
 + OpenSSL = 1.1.1 / 3.0-3.1.1 (3.2.0 not supported) (MySQL >= 8.0.33)
-+ Boost ≥ 1.74.0_msvc 14.2 x64
++ Boost ≥ 1.78.0_msvc 14.2 x64
 + Windows SDK version 10.0.22621
-+ MS Visual Studio (Community) ≥ 16.4 (2019) (Desktop) (Not previews) 
++ MS Visual Studio (Community) ≥ 16.4 (2019) (Desktop w/ C++ development) (Not previews) 
 + GCC >= 8.0, Clang >= 12.0 
 
 ## Copyright
