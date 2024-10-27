@@ -13167,7 +13167,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
     m_attunementXP[slot][0] = pItem->GetGUID();
-    QueryResult* result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetGUID(), this->m_session->GetAccountId());
+    QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetGUID(), this->m_session->GetAccountId());
     m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
 
 
@@ -21211,11 +21211,11 @@ void Player::SaveToDB(bool create /*=false*/)
 
     for (int i = 0; i < sizeof(m_attunementXP); i++)
     {
-        Item* item = this->GetItemByGuid(m_attunementXP[i][0]);
+        QueryResult result = WorldDatabase.PQuery("SELECT it.subclass FROM item_instance ii JOIN item_template it ON ii.itemEntry = it.entry WHERE ii.guid = %u", m_attunementXP[i][0]);
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SAV_IXP);
         stmt->setUInt32(0, m_session->GetAccountId());
         stmt->setUInt32(1, m_attunementXP[i][0]);
-        stmt->setUInt32(2, item->GetTemplate()->GetSubClass());
+        stmt->setUInt32(2, (*result)[0].GetUInt32());
         stmt->setUInt8(3, m_attunementXP[i][1]);
         stmt->setUInt8(4, m_attunementXP[i][1]);
         LoginDatabase.Execute(stmt);
