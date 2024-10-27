@@ -417,7 +417,7 @@ Player::Player(WorldSession* session) : Unit(true), phaseMgr(this), hasForcedMov
 
     m_xprate = sWorld->getRate(RATE_XP_KILL);
 
-    std::vector<std::vector<uint32>> m_attunementXP(19, std::vector<uint32>(2));
+    m_attunementXP = m_attunementXP(19, std::vector<uint32>(2));
 }
 
 Player::~Player()
@@ -736,11 +736,25 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
             {
                 RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                 EquipItem(eDest, pItem, true);
-                QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u", pItem->GetGUID(), guidlow);
-                if (result)
+                QueryResult attuneResult = WorldDatabase.PQuery("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = %u)", pItem->GetGUID());
+                if ((*attuneResult)[0].GetUInt8() == 1)
+                {
+                    QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u", pItem->GetGUID(), m_session->GetAccountId());
+                    if (result)
+                    {
+                        m_attunementXP[i][0] = pItem->GetGUID();
+                        m_attunementXP[i][1] = (*result)[0].GetUInt32();
+                    }
+                    else
+                    {
+                        m_attunementXP[i][0] = pItem->GetGUID();
+                        m_attunementXP[i][1] = 0;
+                    }
+                }
+                else
                 {
                     m_attunementXP[i][0] = pItem->GetGUID();
-                    m_attunementXP[i][1] = (*result)[0].GetUInt32();
+                    m_attunementXP[i][1] = 101;
                 }
             }
             // move other items to more appropriate slots
@@ -4954,6 +4968,11 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_BATTLEGROUND_STATS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_XPRATE);
+            stmt->setUInt32(0, guid);
+            trans->Append(stmt);
+
 
             Corpse::DeleteFromDB(playerguid, trans);
 
@@ -13147,6 +13166,11 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
+    m_attunementXP[slot][0] = pItem->GetGUID();
+    QueryResult* result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetGUID(), this->m_session->GetAccountId());
+    m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
+
+
     sLFGMgr->InitializeLockedDungeons(this);
 
     return pItem;
@@ -13328,6 +13352,16 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
 
             if (slot < EQUIPMENT_SLOT_END)
                 SetVisibleItemSlot(slot, NULL);
+
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SAV_IXP);
+            stmt->setUInt32(0, this->m_session->GetAccountId());
+            stmt->setUInt32(1, m_attunementXP[slot][0]);
+            stmt->setUInt32(2, pItem->GetTemplate()->GetSubClass());
+            stmt->setUInt32(3, m_attunementXP[slot][1]);
+            stmt->setUInt32(4, m_attunementXP[slot][1]);
+            LoginDatabase.Execute(stmt);
+            m_attunementXP[slot][0] = 0;
+            m_attunementXP[slot][1] = 101;
         }
         else if (Bag* pBag = GetBagByPos(bag))
             pBag->RemoveItem(slot, update);
@@ -21173,6 +21207,18 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, GetLootSpecialization());
         // Index
         stmt->setUInt32(index++, GetGUID().GetCounter());
+    }
+
+    for (int i = 0; i < sizeof(m_attunementXP); i++)
+    {
+        Item* item = this->GetItemByGuid(m_attunementXP[i][0]);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SAV_IXP);
+        stmt->setUInt32(0, m_session->GetAccountId());
+        stmt->setUInt32(1, m_attunementXP[i][0]);
+        stmt->setUInt32(2, item->GetTemplate()->GetSubClass());
+        stmt->setUInt8(3, m_attunementXP[i][1]);
+        stmt->setUInt8(4, m_attunementXP[i][1]);
+        LoginDatabase.Execute(stmt);
     }
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -32111,7 +32157,7 @@ void Player::GiveIXP(Player* player, uint32 xp)
     {
         if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
-            if (item->CanPlayerAttune(player, item))
+            if (m_attunementXP[i][1] < 100)
             {
                 entryList[slot] = item;
                 sharecounter += 1;
@@ -32119,6 +32165,9 @@ void Player::GiveIXP(Player* player, uint32 xp)
         }
     }
     double sharedXP = xp / sharecounter;
+    if (sharedXP > 100)
+        sharedXP = 100;
+
     for (int i = 0; i < EQUIPMENT_SLOT_END; i++)
     {
         QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE id = %u and itemID = %u", player->GetSession()->GetAccountId(), entryList[i]->GetGUID());
@@ -32127,7 +32176,11 @@ void Player::GiveIXP(Player* player, uint32 xp)
         if (result)
         {
             double curXP = (*result)[0].GetDouble();
-            double newXP = curXP + sharedXP;
+            double newXP;
+            if (curXP + sharedXP > 100)
+                newXP = 100;
+            else
+                newXP = curXP + sharedXP;
 
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_IXP);
             stmt->setDouble(0, newXP);

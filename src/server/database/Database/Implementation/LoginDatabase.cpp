@@ -147,6 +147,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_UPD_ACCFACTIONS, "INSERT INTO account_factions (id, faction, standing, flags) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=?, faction=?, standing=?, flags=?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_INS_IXP, "INSERT INTO attunement (id, itemID, type, experience) VALUES (?, ?, ?, ?)", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_IXP, "UPDATE attunement SET experience = ? WHERE id = ? AND itemID = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SAV_IXP, "INSERT INTO attunement (id, itemID, type, experience) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE experience=?", CONNECTION_SYNCH);
 }
 
 LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo, ConnectionFlags connectionFlags) : MySQLConnection(connInfo, connectionFlags)
