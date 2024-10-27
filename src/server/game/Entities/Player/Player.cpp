@@ -417,7 +417,7 @@ Player::Player(WorldSession* session) : Unit(true), phaseMgr(this), hasForcedMov
 
     m_xprate = sWorld->getRate(RATE_XP_KILL);
 
-    m_attunementXP = m_attunementXP(19, std::vector<uint32>(2));
+    std::vector<std::vector<uint32>> m_attunementXP(19, std::vector<uint32>(2));
 }
 
 Player::~Player()
