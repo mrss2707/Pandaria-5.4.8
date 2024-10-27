@@ -32157,7 +32157,7 @@ void Player::GiveIXP(Player* player, uint32 xp)
     {
         if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
-            if (m_attunementXP[i][1] < 100)
+            if (m_attunementXP[slot][1] < 100)
             {
                 entryList[slot] = item;
                 sharecounter += 1;
