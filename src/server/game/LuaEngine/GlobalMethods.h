@@ -1015,35 +1015,5 @@ namespace LuaGlobalFunctions
         sEluna->Push(L, oss.str());
         return 1;
     }
-
-    int isAttunable(lua_State* L)
-    {
-        lua_pushboolean(L, false);
-        return 1;
-    }
-
-    int isAttunablePlayer(lua_State* L)
-    {
-        lua_pushboolean(L, false);
-        return 1;
-    }
-
-    int isAttunableAccount(lua_State* L)
-    {
-        lua_pushboolean(L, false);
-        return 1;
-    }
-
-    int isAttuned(lua_State* L)
-    {
-        lua_pushboolean(L, false);
-        return 1;
-    }
-
-    int getAttunementXP(lua_State* L)
-    {
-        lua_pushboolean(L, false);
-        return 1;
-    }
 }
 #endif

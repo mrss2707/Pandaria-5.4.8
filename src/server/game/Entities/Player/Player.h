@@ -3584,7 +3584,7 @@ protected:
 
     // Custom
     uint32 m_xprate;
-    std::vector<int> m_attunementXP;
+    std::vector<std::vector<uint32>> m_attunementXP;
 
     private:
     // internal common parts for CanStore/StoreItem functions

@@ -135,6 +135,8 @@ enum LoginDatabaseStatements : uint32
 
     // Custom
     LOGIN_UPD_ACCFACTIONS,
+    LOGIN_INS_IXP,
+    LOGIN_UPD_IXP,
 
     MAX_LOGINDATABASE_STATEMENTS
 };

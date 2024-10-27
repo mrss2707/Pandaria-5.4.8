@@ -135,7 +135,10 @@ void KillRewarder::RewardHonor(Player* player)
 
 double KillRewarder::getVictimXP(int level)
 {
-    double base_xp = 1.0, double max_xp = 70.0, int max_level = 93;
+    double base_xp = 1.0;
+    double max_xp = 70.0;
+    int max_level = 93;
+
     if (level > max_level)
         level = max_level;
 
@@ -176,7 +179,7 @@ void KillRewarder::RewardXP(Player* player, float rate)
             AddPct(xp, (*i)->GetAmount());
 
         int32 diff = _victim->GetLevel() - player->GetLevel();
-        auto ixp = (uint32)round(getVictimXP(_victim->GetLevel()));
+        double ixp = getVictimXP(_victim->GetLevel());
         player->GiveIXP(player, ixp);
         xp *= diff > int32(sWorld->getIntConfig(CONFIG_XP_KILL_LEVEL_DIFFERENCE)) ? 0 : newrate;
 

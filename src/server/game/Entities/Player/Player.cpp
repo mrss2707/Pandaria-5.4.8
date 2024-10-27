@@ -417,7 +417,7 @@ Player::Player(WorldSession* session) : Unit(true), phaseMgr(this), hasForcedMov
 
     m_xprate = sWorld->getRate(RATE_XP_KILL);
 
-    std::vector<int> m_attunementXP;
+    std::vector<std::vector<uint32>> m_attunementXP(19, std::vector<uint32>(2));
 }
 
 Player::~Player()
@@ -738,7 +738,10 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
                 EquipItem(eDest, pItem, true);
                 QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u", pItem->GetGUID(), guidlow);
                 if (result)
-                    m_attunementXP[i] = (*result)[0].GetUInt32();
+                {
+                    m_attunementXP[i][0] = pItem->GetGUID();
+                    m_attunementXP[i][1] = (*result)[0].GetUInt32();
+                }
             }
             // move other items to more appropriate slots
             else
@@ -755,8 +758,11 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     }
     // all item positions resolved
     QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guidlow);
-    if (result)
-        return false;
+    if (!result)
+        m_xprate = sWorld->getRate(RATE_XP_KILL);
+    else
+        m_xprate = result->Fetch()->GetUInt32();
+
     return true;
 }
 
@@ -32099,25 +32105,46 @@ void Player::PlayerSendSetPhaseShift(std::set<uint32> const& phaseIds)
 
 void Player::GiveIXP(Player* player, uint32 xp)
 {
-    uint32 entryList[EQUIPMENT_SLOT_END];
+    int sharecounter = 0;
+    Object* entryList[EQUIPMENT_SLOT_END];
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
             if (item->CanPlayerAttune(player, item))
-                entryList[slot] = item->GetGUID();
-        }
-    }
-
-    for (int i = 0; i < sizeof(entryList); i++)
-    {
-        if (QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE id = %u AND id = %u", entryList[i], player->GetGUID()))  // TODO: Store this on the player instead
-        {
-            uint32 experience = (*result)[0].GetUInt32();
-            if (experience < 100)
             {
-
+                entryList[slot] = item;
+                sharecounter += 1;
             }
         }
     }
+    double sharedXP = xp / sharecounter;
+    for (int i = 0; i < EQUIPMENT_SLOT_END; i++)
+    {
+        QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE id = %u and itemID = %u", player->GetSession()->GetAccountId(), entryList[i]->GetGUID());
+
+        // TODO: Change this entire thing to use the new session variables on player m_attunementXP[itemID][ixp]
+        if (result)
+        {
+            double curXP = (*result)[0].GetDouble();
+            double newXP = curXP + sharedXP;
+
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_IXP);
+            stmt->setDouble(0, newXP);
+            stmt->setUInt32(1, player->GetGUID());
+            stmt->setUInt32(2, entryList[i]->GetGUID());
+            LoginDatabase.Execute(stmt);
+        }
+        else
+        {
+            Item* item = player->GetItemByGuid(entryList[i]->GetGUID());
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IXP);
+            stmt->setUInt32(0, player->GetGUID());
+            stmt->setUInt32(1, entryList[i]->GetGUID());
+            stmt->setUInt32(2, item->GetTemplate()->SubClass);
+            stmt->setDouble(3, sharedXP);
+            LoginDatabase.Execute(stmt);
+        }
+    }
+
 }
