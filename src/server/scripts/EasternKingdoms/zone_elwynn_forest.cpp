@@ -1216,9 +1216,204 @@ public:
     }
 };
 
+// CUSTOM
+class npc_catchup_leveler : public CreatureScript
+{
+public:
+    npc_catchup_leveler() : CreatureScript("npc_catchup_leveler") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+        if (action == 1003)
+        {
+            if (player->GetLevel() >= 85)
+            {
+                creature->Whisper("You are to high of level to use this boost!", LANG_UNIVERSAL, player);
+                return false;
+            }
+            player->GiveLevel(85);
+            player->StoreNewItemInBestSlots(67387, 4); // 14 slot bag.
+            player->LearnSpell(34090, false);  // Expert Riding
+            player->LearnSpell(90267, false);  // Flight Master's License
+            player->LearnSpell(54197, false);  // Cold Weather Flying
+            player->LearnSpell(115913, false);  // Wisdom of Pandaria
+
+            // Mounts
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                player->AddItem(25472, 1); // Snowy Gryphon
+                player->AddQuest(sObjectMgr->GetQuestTemplate(29547), nullptr); // The King's Command
+            }
+            else
+            {
+                player->AddItem(25475, 1); // Blue wind rider
+                player->AddQuest(sObjectMgr->GetQuestTemplate(29611), nullptr); // The Art of War
+            }
+
+            if (player->GetClass() == CLASS_MAGE || player->GetClass() == CLASS_WARLOCK || player->GetClass() == CLASS_PRIEST) //Cloth
+            {
+                player->AddItem(56460, 1); // Head
+                player->AddItem(56311, 1); // Chest
+                player->AddItem(56348, 1); // Feet
+                player->AddItem(56286, 1); // Hands
+                player->AddItem(56413, 1); // Legs
+                player->AddItem(56399, 1); // Shoulders
+                player->AddItem(56305, 1); // Waist
+                player->AddItem(56389, 1); // Wrist
+                player->AddItem(56267, 1); // Cloak
+                player->AddItem(56461, 1); //weapon
+                player->AddItem(56380, 1); // finger 1
+                player->AddItem(56432, 1); // finger 2
+                player->AddItem(56400, 1); // trink 1
+                player->AddItem(56320, 1); // trink 2
+                player->AddItem(56385, 1); // Neck
+            }
+            if (player->GetClass() == CLASS_DRUID || player->GetClass() == CLASS_ROGUE || player->GetClass() == CLASS_MONK) // Leather
+            {
+                player->AddItem(56344, 1); // Head
+                player->AddItem(56455, 1); // Chest
+                player->AddItem(56395, 1); // Feet
+                player->AddItem(56368, 1); // Hands
+                player->AddItem(56309, 1); // Legs
+                player->AddItem(56273, 1); // Shoulders
+                player->AddItem(56429, 1); // Waist
+                player->AddItem(56409, 1); // Wrist
+                player->AddItem(56315, 1); // Cloak
+                player->AddItem(56310, 1); // finger 1
+                player->AddItem(56445, 1); // finger 2
+                player->AddItem(56295, 1); // trink 1
+                player->AddItem(56440, 1); // trink 2
+                player->AddItem(56422, 1); // Neck
+                if (player->GetClass() == CLASS_ROGUE)
+                {
+                    player->StoreNewItemInBestSlots(56302, 2);
+                }
+                else
+                    player->StoreNewItemInBestSlots(56382, 1);
+            }
+            if (player->GetClass() == CLASS_HUNTER || player->GetClass() == CLASS_SHAMAN) // Mail
+            {
+                player->AddItem(56298, 1); // Head
+                player->AddItem(56281, 1); // Chest
+                player->AddItem(57867, 1); // Feet
+                player->AddItem(56268, 1); // Hands
+                player->AddItem(56386, 1); // Legs
+                player->AddItem(56419, 1); // Shoulders
+                player->AddItem(56363, 1); // Waist
+                player->AddItem(56340, 1); // Wrist
+                player->AddItem(56315, 1); // Cloak
+                player->AddItem(56317, 1); //weapon
+                player->AddItem(56310, 1); // finger 1
+                player->AddItem(56445, 1); // finger 2
+                player->AddItem(56295, 1); // trink 1
+                player->AddItem(56440, 1); // trink 2
+                player->AddItem(56422, 1); // Neck
+            }
+            if (player->GetClass() == CLASS_WARRIOR || player->GetClass() == CLASS_PALADIN || player->GetClass() == CLASS_DEATH_KNIGHT) // Plate
+            {
+                player->AddItem(56278, 1); // Head
+                player->AddItem(56308, 1); // Chest
+                player->AddItem(63444, 1); // Feet
+                player->AddItem(56428, 1); // Hands
+                player->AddItem(56283, 1); // Legs
+                player->AddItem(56318, 1); // Shoulders
+                player->AddItem(56447, 1); // Waist
+                player->AddItem(56301, 1); // Wrist
+                player->AddItem(56275, 1); // Cloak
+                player->AddItem(56284, 1); //weapon
+                player->AddItem(56270, 1); // finger 1
+                player->AddItem(56299, 1); // finger 2
+                player->AddItem(56458, 1); // trink 1
+                player->AddItem(56345, 1); // trink 2
+                player->AddItem(56319, 1); // Neck
+                if (player->GetClass() == CLASS_WARRIOR || player->GetClass() == CLASS_PALADIN)
+                {
+                    player->AddItem(56430, 1); // shield
+                    player->AddItem(56426, 1); // wep
+                }
+                else
+                {
+                    player->AddItem(56430, 2); //dual wield weapon
+                    if (player->HasAura(51915))
+                    {
+                        player->RemoveAura(51915);
+                    }
+                    player->LearnSpell(50977, false); // Death Gate
+                }
+            }
+            // Racials for worgens
+            if (player->GetRace() == RACE_WORGEN)
+            {
+                player->LearnSpell(68992, false);
+                player->LearnSpell(87840, false);
+                player->LearnSpell(68996, false);
+                player->LearnSpell(68976, false);
+                player->LearnSpell(69978, false);
+                player->LearnSpell(68975, false);
+            }
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                player->BypassChecksTeleportTo(0, -8452.63f, 344.90f, 135.90f, 5.41f); // Stormwind City
+            }
+            else
+            {
+                player->BypassChecksTeleportTo(1, 1573.77f, -4395.17f, 15.97f, 0.5f); // Orgrimmar
+            }
+        }
+        if (action == 1004)
+        {
+            if (player->GetLevel() <= 84)
+            {
+                creature->Whisper("Your level is to low - use the character boost to 85 then use this!", LANG_UNIVERSAL, player);
+                return false;
+            }
+
+            QueryResult result = CharacterDatabase.PQuery("SELECT MAX(characters.level) FROM `characters` WHERE characters.account = %u", player->GetSession()->GetAccountId());
+            if (result)
+            {
+                Field* fields = result->Fetch();
+                uint32 minmax = fields[0].GetUInt32();
+                if (minmax >= 85)
+                {
+                    player->GiveLevel(minmax);
+                }
+                CloseGossipMenuFor(player);
+            }
+            return true;
+        }
+        if (action == 1005)
+        {
+            player->AddQuest(sObjectMgr->GetQuestTemplate(31450), nullptr);
+            player->ShowNeutralPlayerFactionSelectUI();
+            return true;
+        }
+
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetRace() == RACE_PANDAREN_NEUTRAL)
+        { 
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I would like to choose my faction and then boost.", GOSSIP_SENDER_MAIN, 1005, "Are you sure you want to choose a faction? After choosing you will be teleported to that faction city where you can boost to 85!", 0, false);
+        }
+        else
+        {
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I would like to boost my character to 85.", GOSSIP_SENDER_MAIN, 1003, "Are you sure you want to Level Boost to 85? You will be provided with equipment to begin adventures on Pandaria.", 0, false);
+        }
+        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "I'd like to synchronize my level to the highest character level on my account", GOSSIP_SENDER_MAIN, 1004, "Your level will be synchronized to your highest level on your account. Continue?", 0, false);
+
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+
+        return true;
+    }
+};
+
+
 void AddSC_elwynn_forest()
 {
-
+    new npc_catchup_leveler();
     RegisterCreatureAI(npc_stormwind_infantry);
     new creature_script<npc_blackrock_battle_worg>("npc_blackrock_battle_worg");
     RegisterCreatureAI(npc_brother_paxton);

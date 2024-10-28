@@ -1264,6 +1264,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         SetFloatValue(UNIT_FIELD_COMBAT_REACH, scale * DEFAULT_PLAYER_COMBAT_REACH);
     }
 
+    bool BypassChecksTeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0);
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0);
     bool TeleportTo(WorldLocation const &loc, uint32 options = 0);
     bool TeleportToBGEntryPoint();
