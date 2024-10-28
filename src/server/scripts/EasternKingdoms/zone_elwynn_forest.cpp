@@ -1374,7 +1374,7 @@ public:
             {
                 Field* fields = result->Fetch();
                 uint32 minmax = fields[0].GetUInt32();
-                if (minmax >= 85)
+                if (minmax > 85)
                 {
                     player->GiveLevel(minmax);
                 }
