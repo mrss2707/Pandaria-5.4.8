@@ -13354,7 +13354,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                 SetVisibleItemSlot(slot, NULL);
 
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SAV_IXP);
-            stmt->setUInt32(0, this->m_session->GetAccountId());
+            stmt->setUInt32(0, GetSession()->GetAccountId());
             stmt->setUInt32(1, m_attunementXP[slot][0]);
             stmt->setUInt32(2, pItem->GetTemplate()->GetSubClass());
             stmt->setUInt32(3, m_attunementXP[slot][1]);
@@ -32170,12 +32170,10 @@ void Player::GiveIXP(Player* player, uint32 xp)
 
     for (int i = 0; i < EQUIPMENT_SLOT_END; i++)
     {
-        QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE id = %u and itemID = %u", player->GetSession()->GetAccountId(), entryList[i]->GetGUID());
+        double curXP = m_attunementXP[i][1];
 
-        // TODO: Change this entire thing to use the new session variables on player m_attunementXP[itemID][ixp]
-        if (result)
+        if (curXP < 100)
         {
-            double curXP = (*result)[0].GetDouble();
             double newXP;
             if (curXP + sharedXP > 100)
                 newXP = 100;
@@ -32188,16 +32186,7 @@ void Player::GiveIXP(Player* player, uint32 xp)
             stmt->setUInt32(2, entryList[i]->GetGUID());
             LoginDatabase.Execute(stmt);
         }
-        else
-        {
-            Item* item = player->GetItemByGuid(entryList[i]->GetGUID());
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IXP);
-            stmt->setUInt32(0, player->GetGUID());
-            stmt->setUInt32(1, entryList[i]->GetGUID());
-            stmt->setUInt32(2, item->GetTemplate()->SubClass);
-            stmt->setDouble(3, sharedXP);
-            LoginDatabase.Execute(stmt);
-        }
+
     }
 
 }
