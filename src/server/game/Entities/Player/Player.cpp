@@ -21209,11 +21209,11 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, GetGUID().GetCounter());
     }
 
-    for (int i = 0; i < sizeof(m_attunementXP); i++)
+    for (int i = 0; i < m_attunementXP.size(); i++)
     {
         QueryResult result = WorldDatabase.PQuery("SELECT it.subclass FROM item_instance ii JOIN item_template it ON ii.itemEntry = it.entry WHERE ii.guid = %u", m_attunementXP[i][0]);
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SAV_IXP);
-        stmt->setUInt32(0, m_session->GetAccountId());
+        stmt->setUInt32(0, GetSession()->GetAccountId());
         stmt->setUInt32(1, m_attunementXP[i][0]);
         stmt->setUInt32(2, (*result)[0].GetUInt32());
         stmt->setUInt8(3, m_attunementXP[i][1]);
