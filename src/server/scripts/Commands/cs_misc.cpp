@@ -234,7 +234,7 @@ public:
             return false;
         }
 
-        for (int i = 0; i < EQUIPMENT_SLOT_END; ++i)
+        for (int i = 0; i < player->m_attunementXP.size(); i++)
         {
             handler->PSendSysMessage("Slot: %u  Item: %u  Exp: %u", i, player->m_attunementXP[i][0], player->m_attunementXP[i][1]);
         }
