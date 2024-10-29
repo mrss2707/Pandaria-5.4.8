@@ -155,7 +155,7 @@ void KillRewarder::RewardXP(Player* player, float rate)
     uint32 newrate = player->GetXPRate(guid);
     double ixp = getVictimXP(_victim->GetLevel());
     if(xp > 0)
-        player->GiveIXP(player, ixp);
+        player->GiveIXP(ixp);
 
     if (_group)
     {

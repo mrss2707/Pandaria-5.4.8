@@ -2857,7 +2857,7 @@ public:
     void PlayerSendSetPhaseShift(std::set<uint32> const& phaseIds);
 
     // Custom
-    void GiveIXP(Player* player, uint32 xp);
+    void GiveIXP(uint32 xp);
 
     uint8 m_forced_speed_changes [MAX_MOVE_TYPE];
 

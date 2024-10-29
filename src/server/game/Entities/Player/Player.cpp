@@ -32149,7 +32149,7 @@ void Player::PlayerSendSetPhaseShift(std::set<uint32> const& phaseIds)
     GetSession()->SendSetPhaseShift(phaseIds, GetTerrainSwaps(), GetWorldMapSwaps());
 }
 
-void Player::GiveIXP(Player* player, uint32 xp)
+void Player::GiveIXP(uint32 xp)
 {
     int sharecounter = 0;
     Object* entryList[EQUIPMENT_SLOT_END];
@@ -32180,11 +32180,9 @@ void Player::GiveIXP(Player* player, uint32 xp)
             else
                 newXP = curXP + sharedXP;
 
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_IXP);
-            stmt->setDouble(0, newXP);
-            stmt->setUInt32(1, player->GetGUID());
-            stmt->setUInt32(2, entryList[i]->GetGUID());
-            LoginDatabase.Execute(stmt);
+            Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            m_attunementXP[i][0] = item->GetGUID();
+            m_attunementXP[i][1] = newXP;
         }
 
     }
