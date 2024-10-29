@@ -195,6 +195,7 @@ public:
             { "checkladder",    SEC_ADMINISTRATOR,  true,   &HandleCheckLadderCommand   },
             { "wordfilter",         SEC_ADMINISTRATOR,      false, wordFilterCommandTable },
             { "xprate",         SEC_PLAYER,         false,  &HandleXPRateCommand,         },
+            { "dumpattune",     SEC_ADMINISTRATOR,  false,  &HandleDumpAttuneCommand,     },
             { "deleteditem",    SEC_ADMINISTRATOR,  true,
             {
                 { "list",      SEC_ADMINISTRATOR,   true,   &HandleDeletedItemListCommand,    },
@@ -222,6 +223,23 @@ public:
     static bool HandleToolSpawnGOCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::SpawnGO); }
     static bool HandleToolLOSCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::LOS); }
     static bool HandleToolMMapsCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::MMaps); }
+
+    static bool HandleDumpAttuneCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player)
+        {
+            handler->PSendSysMessage("Error: Player does not have a player!");
+            return false;
+        }
+
+        for (int i = 0; i < player->m_attunementXP.size(); i++)
+        {
+            handler->PSendSysMessage("Slot: %u  Item: %u  Exp: %u", i, player->m_attunementXP[i][0], player->m_attunementXP[i][1]);
+        }
+        return true;
+    }
 
     static bool HandleXPRateCommand(ChatHandler* handler, char const* args)
     {
