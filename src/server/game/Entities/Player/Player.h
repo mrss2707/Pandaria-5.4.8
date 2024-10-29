@@ -3284,7 +3284,6 @@ public:
     uint32 GetTotalBGWins() { return totalBGWins; }
 
     // Custom
-    uint32 m_xprate;
     std::vector<std::vector<uint32>> m_attunementXP;
 
 protected:
@@ -3585,6 +3584,9 @@ protected:
 
     //WorldFilter
     std::string m_sentMsgCache;
+
+    // Custom
+    uint32 m_xprate;
 
     private:
     // internal common parts for CanStore/StoreItem functions
