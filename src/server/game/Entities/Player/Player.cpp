@@ -13345,6 +13345,20 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
 
                     if (slot < EQUIPMENT_SLOT_END)
                         sLFGMgr->InitializeLockedDungeons(this);
+
+                    if (pItem->CanPlayerAttune(this, pItem))
+                    {
+                        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SAV_IXP);
+                        stmt->setUInt32(0, GetSession()->GetAccountId());
+                        stmt->setUInt32(1, m_attunementXP[slot][0]);
+                        stmt->setUInt32(2, pItem->GetTemplate()->GetSubClass());
+                        stmt->setUInt32(3, m_attunementXP[slot][1]);
+                        stmt->setUInt32(4, m_attunementXP[slot][1]);
+                        LoginDatabase.Execute(stmt);
+                        m_attunementXP[slot][0] = 0;
+                        m_attunementXP[slot][1] = 101;
+                    }
+
                 }
             }
 
@@ -13352,16 +13366,6 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
 
             if (slot < EQUIPMENT_SLOT_END)
                 SetVisibleItemSlot(slot, NULL);
-
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SAV_IXP);
-            stmt->setUInt32(0, GetSession()->GetAccountId());
-            stmt->setUInt32(1, m_attunementXP[slot][0]);
-            stmt->setUInt32(2, pItem->GetTemplate()->GetSubClass());
-            stmt->setUInt32(3, m_attunementXP[slot][1]);
-            stmt->setUInt32(4, m_attunementXP[slot][1]);
-            LoginDatabase.Execute(stmt);
-            m_attunementXP[slot][0] = 0;
-            m_attunementXP[slot][1] = 101;
         }
         else if (Bag* pBag = GetBagByPos(bag))
             pBag->RemoveItem(slot, update);
