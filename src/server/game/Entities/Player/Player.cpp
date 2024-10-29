@@ -13133,9 +13133,12 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             default:
                 break;
         }
-        m_attunementXP[slot][0] = pItem2->GetGUID();
-        QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem2->GetGUID(), GetSession()->GetAccountId());
-        m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
+        if (pItem->CanPlayerAttune(this, pItem))
+        {
+            m_attunementXP[slot][0] = pItem->GetGUID();
+            QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetGUID(), GetSession()->GetAccountId());
+            m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
+        }
     }
     else
     {
