@@ -13133,6 +13133,9 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             default:
                 break;
         }
+        m_attunementXP[slot][0] = pItem2->GetGUID();
+        QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem2->GetGUID(), GetSession()->GetAccountId());
+        m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
     }
     else
     {
@@ -13165,11 +13168,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     // only for full equip instead adding to stack
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
-
-    m_attunementXP[slot][0] = pItem->GetGUID();
-    QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetGUID(), this->m_session->GetAccountId());
-    m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
-
 
     sLFGMgr->InitializeLockedDungeons(this);
 
