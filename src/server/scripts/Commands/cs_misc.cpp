@@ -234,12 +234,18 @@ public:
             return false;
         }
 
-        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
+        if (!player->m_attunementXP.empty())
         {
-            if (player->m_attunementXP[i][0] != 0 || !player->m_attunementXP[i][0].empty())
-                handler->PSendSysMessage("Slot: %u  Item: %u  Exp: %u", i, player->m_attunementXP[i][0], player->m_attunementXP[i][1]);
+            for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
+            {
+                if (player->m_attunementXP[i][0] != 0)
+                    handler->PSendSysMessage("Slot: %u  Item: %u  Exp: %u", i, player->m_attunementXP[i][0], player->m_attunementXP[i][1]);
+            }
+            return true;
         }
-        return true;
+
+        handler->PSendSysMessage("Error: Player has no attunement array!");
+        return false;
     }
 
     static bool HandleXPRateCommand(ChatHandler* handler, char const* args)
