@@ -236,7 +236,8 @@ public:
 
         for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
         {
-            handler->PSendSysMessage("Slot: %u  Item: %u  Exp: %u", i, player->m_attunementXP[i][0], player->m_attunementXP[i][1]);
+            if (player->m_attunementXP[i][0] != 0 || !player->m_attunementXP[i][0].empty())
+                handler->PSendSysMessage("Slot: %u  Item: %u  Exp: %u", i, player->m_attunementXP[i][0], player->m_attunementXP[i][1]);
         }
         return true;
     }
