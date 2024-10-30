@@ -238,7 +238,8 @@ public:
         {
             Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
             if (item)
-                handler->PSendSysMessage("Slot: %u   Item GUID: %u", i, item->GetGUID());
+                handler->PSendSysMessage("Slot: %u   Item GUID: %u", i, item->GetEntry());
+
         }
         return true;
     }
