@@ -2184,7 +2184,7 @@ bool Item::CanPlayerAttune(Player* player, Item* item)
 {
     if (!player->CanUseItem(item))
         return false;
-    QueryResult result = LoginDatabase.PQuery("SELECT EXISTS(SELECT id FROM attunement WHERE id = %u AND itemID = %u AND experience < 100)", player->GetSession()->GetAccountId(), item->GetGUID()); // TODO: Make this a prepared statement
+    QueryResult result = LoginDatabase.PQuery("SELECT EXISTS(SELECT id FROM attunement WHERE id = %u AND itemID = %u AND experience < 100)", player->GetSession()->GetAccountId(), item->GetEntry()); // TODO: Make this a prepared statement
     if (result->Fetch()->GetInt8() == 0 || !result)
         return false;
     if (!isAttunable(item))
@@ -2194,7 +2194,7 @@ bool Item::CanPlayerAttune(Player* player, Item* item)
 
 bool Item::isAttunable(Item* item)
 {
-    QueryResult result = WorldDatabase.PQuery("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = %u)", item->GetGUID()); // TODO: Make this a prepared statement
+    QueryResult result = WorldDatabase.PQuery("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = %u)", item->GetEntry()); // TODO: Make this a prepared statement
     if(result->Fetch()->GetInt8() == 0 || !result)
         return false;
     return true;

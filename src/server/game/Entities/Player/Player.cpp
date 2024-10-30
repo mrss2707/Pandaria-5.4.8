@@ -742,18 +742,18 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
                     QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u", pItem->GetGUID(), m_session->GetAccountId());
                     if (result)
                     {
-                        m_attunementXP[i][0] = pItem->GetGUID();
+                        m_attunementXP[i][0] = pItem->GetEntry();
                         m_attunementXP[i][1] = (*result)[0].GetUInt32();
                     }
                     else
                     {
-                        m_attunementXP[i][0] = pItem->GetGUID();
+                        m_attunementXP[i][0] = pItem->GetEntry();
                         m_attunementXP[i][1] = 0;
                     }
                 }
                 else
                 {
-                    m_attunementXP[i][0] = pItem->GetGUID();
+                    m_attunementXP[i][0] = pItem->GetEntry();
                     m_attunementXP[i][1] = 101;
                 }
             }
@@ -13135,7 +13135,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         }
         if (pItem->CanPlayerAttune(this, pItem))
         {
-            m_attunementXP[slot][0] = pItem->GetGUID();
+            m_attunementXP[slot][0] = pItem->GetEntry();
             QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetGUID(), GetSession()->GetAccountId());
             m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
         }
@@ -32186,7 +32186,7 @@ void Player::GiveIXP(uint32 xp)
                 newXP = curXP + sharedXP;
 
             Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            m_attunementXP[i][0] = item->GetGUID();
+            m_attunementXP[i][0] = item->GetEntry();
             m_attunementXP[i][1] = newXP;
         }
 
