@@ -736,10 +736,10 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
             {
                 RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                 EquipItem(eDest, pItem, true);
-                QueryResult attuneResult = WorldDatabase.PQuery("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = %u)", pItem->GetGUID());
+                QueryResult attuneResult = WorldDatabase.PQuery("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = %u)", pItem->GetEntry());
                 if ((*attuneResult)[0].GetUInt8() == 1)
                 {
-                    QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u", pItem->GetGUID(), m_session->GetAccountId());
+                    QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u and id = %u", pItem->GetEntry(), m_session->GetAccountId());
                     if (result)
                     {
                         m_attunementXP[i][0] = pItem->GetEntry();
@@ -13136,7 +13136,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         if (pItem->CanPlayerAttune(this, pItem))
         {
             m_attunementXP[slot][0] = pItem->GetEntry();
-            QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetGUID(), GetSession()->GetAccountId());
+            QueryResult result = LoginDatabase.PQuery("SELECT experience FROM attunement WHERE itemID = %u AND id = %u", pItem->GetEntry(), GetSession()->GetAccountId());
             m_attunementXP[slot][1] = result ? (*result)[0].GetDouble() : 0;
         }
     }
