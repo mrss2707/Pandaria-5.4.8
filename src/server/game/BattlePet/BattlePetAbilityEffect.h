@@ -59,6 +59,7 @@ public:
     BattlePet* GetActiveOpponent();
     void AddTargets();
     void AddTarget(BattlePet* target);
+    uint32 GetPetType();
 
     uint32 CalculateDamage(uint32 damage);
     uint32 CalculateHeal(uint32 heal);
@@ -88,6 +89,20 @@ public:
     void HandleHealState();
     void HandleDamageNonLethal();
     void HandlePowerlessAura();
+    void HandleExtraAttack();
+    void HandleResurect();
+    void HandleHealOnSpecificWeather();
+    void HandleWeatherAura();
+    void HandleWeatherDamage();
+    void HandleDamagePercent();
+    void HandleHealLastHitTaken();
+    void HandleDamageCasterPercent();
+    void HandleDamagePercentTaken();
+    void HandleDamageStateBonus();
+    void HandleResetState();
+    void HandleHealCasterPercentNotState();
+    void HandleControlAura();
+    void HandleAuraCondAccuracyState();
 
 private:
     uint32 m_abilityId = 0;
@@ -104,6 +119,7 @@ private:
 
     bool m_reportFailAsImmune = false;
     bool m_chainFailure = false;
+    bool m_immortalOneRound = true;
 };
 
 #endif

@@ -71,6 +71,21 @@ enum PetBattleAbilityProcType
     PET_BATTLE_ABILITY_PROC_ON_SWAP_OUT                 = 11,
 };
 
+enum PetBattlePetTypes
+{
+    PET_BATTLE_PETTYPE_HUMANOID = 0,
+    PET_BATTLE_PETTYPE_DRAGONKIN = 1,
+    PET_BATTLE_PETTYPE_FLYING = 2,
+    PET_BATTLE_PETTYPE_UNDEAD = 3,
+    PET_BATTLE_PETTYPE_CRITTER = 4,
+    PET_BATTLE_PETTYPE_MAGIC = 5,
+    PET_BATTLE_PETTYPE_ELEMENTAL = 6,
+    PET_BATTLE_PETTYPE_BEAST = 7,
+    PET_BATTLE_PETTYPE_AQUATIC = 8,
+    PET_BATTLE_PETTYPE_MECHANICAL = 9,
+    NUM_BATTLEPET_PETTYPES
+};
+
 // -------------------------------------------------------------------------------
 
 // used to track abilities that last multiple turns

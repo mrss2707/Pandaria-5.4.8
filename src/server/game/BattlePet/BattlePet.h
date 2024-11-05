@@ -78,6 +78,8 @@ enum BattlePetStates
     BATTLE_PET_STATE_MOD_HEALING_TAKEN_PCT              = 66,
     BATTLE_PET_STATE_MECHANIC_INVISIBLE                 = 67,
     BATTLE_PET_STATE_UNKILLABLE                         = 68,
+    BATTLE_PET_STATE_ADD_FLATDAMAGETAKEN                = 71, // NYI
+    BATTLE_PET_STATE_ADD_FLATDAMAGEDEALT                = 72, // NYI
     BATTLE_PET_STATE_STAT_DODGE                         = 73,
     BATTLE_PET_STATE_MECHANIC_BLEEDING                  = 77,
     BATTLE_PET_STATE_MECHANIC_BLIND                     = 82,
@@ -340,6 +342,8 @@ public:
     uint16 GetSpeed() const;
     uint8 GetQuality() const { return m_quality; }
     uint8 GetBreed() const { return m_breed; }
+
+    uint32 isImmortal = 0;
 
     uint32 GetNpc() const { return m_npc; }
     uint32 GetDisplayId() const { return m_displayId; }

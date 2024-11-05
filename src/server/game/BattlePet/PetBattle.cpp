@@ -449,6 +449,8 @@ void PetBattle::EndBattle(PetBattleTeam* lostTeam, bool forfeit)
                 aura->OnExpire();
 
             battlePet->Auras.clear();
+            battlePet->States[BATTLE_PET_STATE_MOD_DAMAGE_DEALT_PCT] = 0;
+            battlePet->States[BATTLE_PET_STATE_MOD_DAMAGE_TAKEN_PCT] = 0;
 
             // remove any remaining mechanic states not cleaned up on aura removal
             battlePet->ResetMechanicStates();
@@ -1498,12 +1500,18 @@ void PetBattle::SendFinalRound(Player* player)
         data << uint32(0);                          // NpcCreatureID
 
     player->SendDirectMessage(&data);
+
+    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
+    player->SetControlled(false, UNIT_STATE_ROOT);
 }
 
 void PetBattle::SendFinished(Player* player)
 {
     WorldPacket data(SMSG_PET_BATTLE_FINISHED, 0);
     player->SendDirectMessage(&data);
+
+    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
+    player->SetControlled(false, UNIT_STATE_ROOT);
 }
 
 // -------------------------------------------------------------------------------
