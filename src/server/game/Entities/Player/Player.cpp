@@ -2654,6 +2654,23 @@ void Player::RegenerateAll()
 
 void Player::Regenerate(Powers power)
 {
+    if (!HasAura(139068))
+    {
+        AddAura(139068, this);
+        if (HasAura(139068))
+        {
+            GetAura(139068)->SetStackAmount(10);
+        }
+    }
+
+    if (HasSpell(125439)) // CUSTOM: Revive Battle Pets
+    {
+        if (HasSpellCooldown(125439) && GetSpellCooldownDelay(125439) >= 61000)
+        {
+            RemoveSpellCooldown(125439, true);
+        }
+    }
+
     uint32 maxValue = GetMaxPower(power);
     if (!maxValue)
         return;

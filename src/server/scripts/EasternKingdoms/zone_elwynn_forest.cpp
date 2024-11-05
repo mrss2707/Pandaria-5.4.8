@@ -18,6 +18,11 @@
 #include "ScriptPCH.h"
 #include "../AI/SmartScripts/SmartAI.h"
 #include "Random.h"
+#include "Group.h"
+#include "GroupMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "CreatureAI.h"
 
 enum ElwynnForest
 {
@@ -1410,9 +1415,1062 @@ public:
     }
 };
 
+// CUSTOM
+class npc_bot_menu_dunraid : public CreatureScript
+{
+public:
+    npc_bot_menu_dunraid() : CreatureScript("npc_bot_menu_dunraid") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+        if (action == 1001)
+        {
+            if (player)
+            {
+                if (creature->GetMapId() == 1050 || creature->GetMapId() == 1005 || creature->GetMapId() == 1051 || creature->GetMapId() == 1030 || creature->GetMapId() == 1095 || creature->GetMapId() == 1024 || creature->GetMapId() == 1048 || creature->GetMapId() == 1000)
+                {
+                    creature->Whisper("You can only have a healer bot in a Scenario!", LANG_UNIVERSAL, player);
+                    return false;
+                }
+
+                if (creature->FindNearestCreature(98000, 300.0f))
+                {
+                    creature->FindNearestCreature(98000, 300.0f)->DespawnOrUnsummon(1000);
+                    creature->Whisper("I've despawned a previously found tank bot, please talk to me again to summon a new bot!", LANG_UNIVERSAL, player);
+                    return false;
+                }
+
+                if (!creature->FindNearestCreature(98000, 300.0f))
+                {
+                    creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                    if (player->GetTeamId() == TEAM_ALLIANCE)
+                    {
+                        creature->FindNearestCreature(98000, 300.0f)->SetLevel(player->GetLevel());
+                        creature->FindNearestCreature(98000, 300.0f)->SetFaction(11);
+                        switch (urand(0, 6))
+                        {
+                        case 0:
+                            creature->FindNearestCreature(98000, 300.0f)->SetDisplayId(14492); // Human
+                            break;
+                        case 1:
+                            creature->FindNearestCreature(98000, 300.0f)->SetDisplayId(14396); // Dwarf
+                            break;
+                        case 2:
+                            creature->FindNearestCreature(98000, 300.0f)->SetDisplayId(17375); // Draenei
+                            break;
+                        case 3:
+                            creature->FindNearestCreature(98000, 300.0f)->SetDisplayId(39608); // Pandarian
+                            break;
+                        case 4:
+                            creature->FindNearestCreature(98000, 300.0f)->SetDisplayId(17373); // Draenei
+                            break;
+                        case 5:
+                            creature->FindNearestCreature(98000, 300.0f)->SetDisplayId(5446); // human f
+                            break;
+                        case 6:
+                            creature->FindNearestCreature(98000, 300.0f)->SetDisplayId(32680); // Dwarf f
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        creature->FindNearestCreature(98000, 300.0f)->SetFaction(85);
+                    }
+                    creature->FindNearestCreature(98000, 300.0f)->GetMotionMaster()->MoveFollow(player, 2.0f, 2.0f);
+                }
+            }
+        }
+        if (action == 1002)
+        {
+            if (player)
+            {
+                switch (urand(0, 1))
+                {
+                case 0: // Druid
+                    if (creature->FindNearestCreature(98003, 300.0f))
+                    {
+                        creature->FindNearestCreature(98003, 300.0f)->DespawnOrUnsummon(1000);
+                        creature->Whisper("I've despawned a previously found healer bot, please talk to me again to summon a new bot!", LANG_UNIVERSAL, player);
+                        return false;
+                    }
+
+                    if (!creature->FindNearestCreature(98003, 300.0f))
+                    {
+                        creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                        if (player->GetTeamId() == TEAM_ALLIANCE)
+                        {
+                            creature->FindNearestCreature(98003, 300.0f)->SetLevel(player->GetLevel());
+                            creature->FindNearestCreature(98003, 300.0f)->SetFaction(11);
+                        }
+                        else
+                        {
+                            creature->FindNearestCreature(98003, 300.0f)->SetFaction(85);
+                        }
+                        creature->FindNearestCreature(98003, 300.0f)->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
+                    }
+                    break;
+                case 1: // Priest
+                    if (creature->FindNearestCreature(98004, 300.0f))
+                    {
+                        creature->FindNearestCreature(98004, 300.0f)->DespawnOrUnsummon(1000);
+                        creature->Whisper("I've despawned a previously found healer bot, please talk to me again to summon a new bot!", LANG_UNIVERSAL, player);
+                        return false;
+                    }
+
+                    if (!creature->FindNearestCreature(98004, 300.0f))
+                    {
+                        creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                        if (player->GetTeamId() == TEAM_ALLIANCE)
+                        {
+                            creature->FindNearestCreature(98004, 300.0f)->SetLevel(player->GetLevel());
+                            creature->FindNearestCreature(98004, 300.0f)->SetFaction(11);
+                        }
+                        else
+                        {
+                            creature->FindNearestCreature(98004, 300.0f)->SetFaction(85);
+                        }
+                        creature->FindNearestCreature(98004, 300.0f)->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
+                    }
+                    break;
+                }
+            }
+        }
+        if (action == 1003)
+        {
+            if (player)
+            {
+                if (creature->GetMapId() == 1050 || creature->GetMapId() == 1005 || creature->GetMapId() == 1051 || creature->GetMapId() == 1030 || creature->GetMapId() == 1095 || creature->GetMapId() == 1024 || creature->GetMapId() == 1048 || creature->GetMapId() == 1000)
+                {
+                    creature->Whisper("You can only have a healer bot in a Scenario!", LANG_UNIVERSAL, player);
+                    return false;
+                }
+
+                switch (urand(0, 1))
+                {
+                case 0:
+                    if (creature->FindNearestCreature(98002, 300.0f))
+                    {
+                        creature->FindNearestCreature(98002, 300.0f)->DespawnOrUnsummon(1000);
+                        creature->Whisper("I've despawned a previously found dps bot, please talk to me again to summon a new bot!", LANG_UNIVERSAL, player);
+                        return false;
+                    }
+
+                    if (!creature->FindNearestCreature(98002, 300.0f))
+                    {
+                        creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                        if (player->GetTeamId() == TEAM_ALLIANCE)
+                        {
+                            creature->FindNearestCreature(98002, 300.0f)->SetLevel(player->GetLevel());
+                            creature->FindNearestCreature(98002, 300.0f)->SetFaction(11);
+                            switch (urand(0, 6))
+                            {
+                            case 0:
+                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(14492); // Human
+                                break;
+                            case 1:
+                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(14396); // Dwarf
+                                break;
+                            case 2:
+                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(17375); // Draenei
+                                break;
+                            case 3:
+                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(39608); // Pandarian
+                                break;
+                            case 4:
+                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(17373); // Draenei
+                                break;
+                            case 5:
+                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(5446); // human f
+                                break;
+                            case 6:
+                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(32680); // Dwarf f
+                                break;
+                            default:
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            creature->FindNearestCreature(98002, 300.0f)->SetFaction(85);
+                        }
+                        creature->FindNearestCreature(98002, 300.0f)->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
+                    }
+                    break;
+                case 1:
+                    if (creature->FindNearestCreature(98005, 300.0f))
+                    {
+                        creature->FindNearestCreature(98005, 300.0f)->DespawnOrUnsummon(1000);
+                        creature->Whisper("I've despawned a previously found dps bot, please talk to me again to summon a new bot!", LANG_UNIVERSAL, player);
+                        return false;
+                    }
+
+                    if (!creature->FindNearestCreature(98005, 300.0f))
+                    {
+                        creature->SummonCreature(98005, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                        if (player->GetTeamId() == TEAM_ALLIANCE)
+                        {
+                            creature->FindNearestCreature(98005, 300.0f)->SetLevel(player->GetLevel());
+                            creature->FindNearestCreature(98005, 300.0f)->SetFaction(11);
+                            switch (urand(0, 6))
+                            {
+                            case 0:
+                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(14492); // Human
+                                break;
+                            case 1:
+                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(14396); // Dwarf
+                                break;
+                            case 2:
+                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(17375); // Draenei
+                                break;
+                            case 3:
+                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(39608); // Pandarian
+                                break;
+                            case 4:
+                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(17373); // Draenei
+                                break;
+                            case 5:
+                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(5446); // human f
+                                break;
+                            case 6:
+                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(32680); // Dwarf f
+                                break;
+                            default:
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            creature->FindNearestCreature(98005, 300.0f)->SetFaction(85);
+                        }
+                        creature->FindNearestCreature(98005, 300.0f)->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
+                    }
+                    break;
+                }
+            }
+        }
+        if (action == 1004)
+        {
+            // 98000 - tank and 98002 - mage dps and 98003 - druid healer and 98004 - priest healer and 98005 - rogue dps
+            // 10 man (2 tanks, 4 healers, 4 dps)
+
+            Creature* cr1 = creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            Creature* cr2 = creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+
+            Creature* cr3 = creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            Creature* cr4 = creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            Creature* cr5 = creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            Creature* cr6 = creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+
+            Creature* cr7 = creature->SummonCreature(98005, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            Creature* cr8 = creature->SummonCreature(98005, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            Creature* cr9 = creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            Creature* cr10 = creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+
+            //Tank
+            if (cr1)
+            {
+                cr1->SetLevel(90);
+                cr1->GetMotionMaster()->MoveFollow(player, 2.0f, 2.0f);
+            }
+            if (cr2)
+            {
+                cr2->SetLevel(90);
+                cr2->GetMotionMaster()->MoveFollow(player, 2.0f, 2.0f);
+            }
+            // Healers
+            if (cr3)
+            {
+                cr3->SetLevel(90);
+                cr3->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
+            }
+            if (cr4)
+            {
+                cr4->SetLevel(90);
+                cr4->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
+            }
+            if (cr5)
+            {
+                cr5->SetLevel(90);
+                cr5->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
+            }
+            if (cr6)
+            {
+                cr6->SetLevel(90);
+                cr6->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
+            }
+            // DPS
+            if (cr7)
+            {
+                cr7->SetLevel(90);
+                cr7->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
+            }
+            if (cr8)
+            {
+                cr8->SetLevel(90);
+                cr8->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
+            }
+            if (cr9)
+            {
+                cr9->SetLevel(90);
+                cr9->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
+            }
+            if (cr10)
+            {
+                cr10->SetLevel(90);
+                cr10->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
+            }
+        }
+
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        AddGossipItemFor(player, GOSSIP_ICON_TALK, "I would like to hire a Tank NPCBOT for this dungeon or raid.", GOSSIP_SENDER_MAIN, 1001, "After leaving this dungeon this bot will dissapear!", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_TALK, "I would like to hire a Healer NPCBOT for this dungeon or raid.", GOSSIP_SENDER_MAIN, 1002, "After leaving this dungeon this bot will dissapear!", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_TALK, "I would like to hire a DPS NPCBOT for this dungeon or raid.", GOSSIP_SENDER_MAIN, 1003, "After leaving this dungeon this bot will dissapear!", 0, false);
+        if (creature->GetMap())
+        {
+            if (creature->GetMap()->IsRaid())
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Set-up a 10-man raid group.", GOSSIP_SENDER_MAIN, 1004, "After leaving this dungeon this bot will dissapear!", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Set-up a 25-man raid group.", GOSSIP_SENDER_MAIN, 1005, "After leaving this dungeon this bot will dissapear!", 0, false);
+            }
+        }
+
+        SendGossipMenuFor(player, 1, creature->GetGUID());
+
+        return true;
+    }
+};
+
+// Tank Bot 98000
+class npc_bot_tank : public CreatureScript
+{
+public:
+    npc_bot_tank() : CreatureScript("npc_bot_tank") { }
+
+    enum iSpells
+    {
+        SPELL_RIGHTEOUS_FURY = 25780,
+        SPELL_SEAL_OF_RIGHTEOUS = 20154,
+        SPELL_HAMMER_OF_RIGHTEOUS = 53595,
+        SPELL_CONSECRATION = 69930,
+        SPELL_TAUNT_BOT = 355,
+    };
+
+    enum iEvents
+    {
+        EVENT_RIGHTEOUS_FURY = 1,
+        EVENT_HAMMER_OF_RIGHTEOUS = 2,
+        EVENT_CONSECRATION = 3,
+        EVENT_TAUNT_CHECK = 4,
+        EVENT_TARGET_CHECK = 5,
+    };
+
+    struct npc_bot_tankAI : public BossAI
+    {
+        npc_bot_tankAI(Creature* creature) : BossAI(creature, 0) { }
+
+        void Reset() override
+        {
+            _Reset();
+
+            if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
+            {
+                me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 2.0f, 2.0f);
+            }
+
+            events.Reset();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _JustEngagedWith();
+
+            events.ScheduleEvent(EVENT_RIGHTEOUS_FURY, 1000);
+            events.ScheduleEvent(EVENT_HAMMER_OF_RIGHTEOUS, urand(2 * IN_MILLISECONDS, 3 * IN_MILLISECONDS));
+            events.ScheduleEvent(EVENT_CONSECRATION, 6 * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_TAUNT_CHECK, 8 * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_TARGET_CHECK, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_RIGHTEOUS_FURY:
+                    if (!me->HasAura(SPELL_RIGHTEOUS_FURY) || !me->HasAura(SPELL_SEAL_OF_RIGHTEOUS))
+                    {
+                        me->AddAura(SPELL_RIGHTEOUS_FURY, me);
+                        me->AddAura(SPELL_SEAL_OF_RIGHTEOUS, me);
+                    }
+                    break;
+                case EVENT_HAMMER_OF_RIGHTEOUS:
+                    if (Unit* vict = me->GetVictim())
+                        me->CastSpell(vict, SPELL_HAMMER_OF_RIGHTEOUS, false);
+
+                    events.ScheduleEvent(EVENT_HAMMER_OF_RIGHTEOUS, urand(2 * IN_MILLISECONDS, 5 * IN_MILLISECONDS));
+                    break;
+                case EVENT_CONSECRATION:
+                {
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    me->CastSpell(me, SPELL_CONSECRATION, false);
+                    events.ScheduleEvent(EVENT_CONSECRATION, urand(9 * IN_MILLISECONDS, 10 * IN_MILLISECONDS));
+                    break;
+                }
+                case EVENT_TAUNT_CHECK:
+                {
+                    std::list<Creature*> mobsinRange;
+                    me->GetCreaturesInRange(mobsinRange, 30.0f);
+                    for (auto unit : mobsinRange)
+                    {
+                        if (unit && unit->IsInCombat() && unit->GetVictim() != me)
+                        {
+                            me->CastSpell(unit, SPELL_TAUNT_BOT, true);
+                            unit->GetThreatManager().doAddThreatNoRedirect(me, 500000.0f);
+                        }
+                    }
+                    events.ScheduleEvent(EVENT_TAUNT_CHECK, urand(4 * IN_MILLISECONDS, 6 * IN_MILLISECONDS));
+                    break;
+                }
+                case EVENT_TARGET_CHECK:
+                {
+                    if (me->GetMapId() == 960) // Temple of Jade Serpent (56511)
+                    {
+                        if (me->FindNearestCreature(56792, 30.0f))
+                        {
+                            //Force change target
+                            if (me->FindNearestCreature(56792, 30.0f)->IsInCombat() && me->FindNearestCreature(56792, 30.0f)->GetHealthPct() >= 80)
+                                me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56792, 30.0f), 999999.0f);
+                        }
+                        if (me->HasAura(106653)) // Sha Residue
+                        {
+                            if (me->FindNearestPlayer(30.0f))
+                            {
+                                me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0, true);
+                            }
+                        }
+                        if (me->GetAreaId() == 6117)
+                        {
+                            if (me->FindNearestCreature(56511, 30.0f))
+                            {
+                                //Force change target
+                                if (me->FindNearestCreature(56511, 30.0f)->IsInCombat() && me->FindNearestCreature(56511, 30.0f)->GetHealthPct() >= 80)
+                                    me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56511, 30.0f), 999999.0f);
+                            }
+                        }
+                    }
+                    events.ScheduleEvent(EVENT_TARGET_CHECK, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                }
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bot_tankAI(creature);
+    }
+};
+
+// DPS Bot 98005
+class npc_bot_dps_rogue : public CreatureScript
+{
+public:
+    npc_bot_dps_rogue() : CreatureScript("npc_bot_dps_rogue") { }
+
+    enum iSpells
+    {
+        SPELL_SINISTER_STRIKE = 112931,
+        SPELL_MUTILATE = 145414,
+        SPELL_DEADLY_POISON = 145420,
+    };
+
+    enum iEvents
+    {
+        EVENT_ROGUE_SPELLS = 1,
+        EVENT_TARGET_CHECK = 2,
+    };
+
+    struct npc_bot_dps_rogueAI : public BossAI
+    {
+        npc_bot_dps_rogueAI(Creature* creature) : BossAI(creature, 0) { }
+
+        void Reset() override
+        {
+            _Reset();
+
+            if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
+            {
+                me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 4.0f, 4.0f);
+            }
+
+            events.Reset();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _JustEngagedWith();
+
+            if (!me->HasAura(35360))
+            {
+                me->AddAura(35360, me);
+            }
+            events.ScheduleEvent(EVENT_ROGUE_SPELLS, 750);
+            events.ScheduleEvent(EVENT_TARGET_CHECK, 3000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ROGUE_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_SINISTER_STRIKE, false);
+
+                            if (urand(0, 100) <= 10)
+                            {
+                                me->CastSpell(vict, SPELL_DEADLY_POISON, false);
+                            }
+
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_MUTILATE, false);
+
+                            if (urand(0, 100) <= 10)
+                            {
+                                me->CastSpell(vict, SPELL_DEADLY_POISON, false);
+                            }
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_ROGUE_SPELLS, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                case EVENT_TARGET_CHECK:
+                {
+                    if (me->GetMapId() == 960) // Temple of Jade Serpent (56511)
+                    {
+                        if (me->FindNearestCreature(56792, 30.0f))
+                        {
+                            //Force change target
+                            if (me->FindNearestCreature(56792, 30.0f)->IsInCombat() && me->FindNearestCreature(56792, 30.0f)->GetHealthPct() >= 80)
+                                me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56792, 30.0f), 999999.0f);
+                        }
+                        if (me->HasAura(106653)) // Sha Residue
+                        {
+                            if (me->FindNearestPlayer(30.0f))
+                            {
+                                me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0, true);
+                            }
+                        }
+                        if (me->GetAreaId() == 6117)
+                        {
+                            if (me->FindNearestCreature(56511, 30.0f))
+                            {
+                                //Force change target
+                                if (me->FindNearestCreature(56511, 30.0f)->IsInCombat() && me->FindNearestCreature(56511, 30.0f)->GetHealthPct() >= 80)
+                                    me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56511, 30.0f), 999999.0f);
+                            }
+                        }
+                    }
+                    events.ScheduleEvent(EVENT_TARGET_CHECK, 3 * IN_MILLISECONDS);
+                    break;
+                }
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bot_dps_rogueAI(creature);
+    }
+};
+
+// DPS Bot 98000
+class npc_bot_dps_mage : public CreatureScript
+{
+public:
+    npc_bot_dps_mage() : CreatureScript("npc_bot_dps_mage") { }
+
+    enum iSpells
+    {
+        SPELL_ARCANE_BLAST = 101816,
+        SPELL_ARCANE_BARRAGE = 145437,
+        SPELL_SCORCH = 75412,
+    };
+
+    enum iEvents
+    {
+        EVENT_ARCANE_SPELLS = 1,
+        EVENT_TARGET_CHECK = 2,
+    };
+
+    struct npc_bot_dps_mageAI : public BossAI
+    {
+        npc_bot_dps_mageAI(Creature* creature) : BossAI(creature, 0) { }
+
+        void Reset() override
+        {
+            _Reset();
+
+            if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
+            {
+                me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 4.0f, 4.0f);
+            }
+
+            me->SetControlled(false, UNIT_STATE_ROOT);
+
+            events.Reset();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _JustEngagedWith();
+
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            me->AddAura(35360, me);
+            events.ScheduleEvent(EVENT_ARCANE_SPELLS, 750);
+            events.ScheduleEvent(EVENT_TARGET_CHECK, 3000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ARCANE_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 2))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_ARCANE_BARRAGE, false);
+                            if (me->HasAura(102442))
+                            {
+                                me->RemoveAura(102442);
+                            }
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_ARCANE_BLAST, false);
+                            break;
+                        case 2:
+                            me->CastSpell(vict, SPELL_SCORCH, false);
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_ARCANE_SPELLS, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                case EVENT_TARGET_CHECK:
+                {
+                    if (me->GetMapId() == 960)
+                    {
+                        if (me->FindNearestCreature(56792, 30.0f))
+                        {
+                            //Force change target
+                            if (me->FindNearestCreature(56792, 30.0f)->IsInCombat() && me->FindNearestCreature(56792, 30.0f)->GetHealthPct() >= 80)
+                                me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56792, 30.0f), 999999.0f);
+                        }
+                        if (me->GetAreaId() == 6117)
+                        {
+                            if (me->FindNearestCreature(56511, 30.0f))
+                            {
+                                //Force change target
+                                if (me->FindNearestCreature(56511, 30.0f)->IsInCombat() && me->FindNearestCreature(56511, 30.0f)->GetHealthPct() >= 80)
+                                    me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56511, 30.0f), 999999.0f);
+                            }
+                        }
+                    }
+                }
+                    events.ScheduleEvent(EVENT_TARGET_CHECK, 3 * IN_MILLISECONDS);
+                    break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bot_dps_mageAI(creature);
+    }
+};
+
+// Heal Bot 98003
+class npc_bot_healer_druid : public CreatureScript
+{
+public:
+    npc_bot_healer_druid() : CreatureScript("npc_bot_healer_druid") { }
+
+    enum iSpells
+    {
+        SPELL_REGROWTH = 66067, // hEALS 55499 to 64500 and 11099 to 12900 every 3 seconds
+        SPELL_REJUV = 66065,
+        SPELL_LIFEBLOOM = 66093,
+    };
+
+    enum iEvents
+    {
+        EVENT_HEAL_CHECK_UNIT = 1,
+        EVENT_HEAL_CHECK_PLAYER = 2,
+    };
+
+    struct npc_bot_healer_druidAI : public BossAI
+    {
+        npc_bot_healer_druidAI(Creature* creature) : BossAI(creature, 0) 
+        { 
+           SetCombatMovement(false);
+        }
+
+        void Reset() override
+        {
+            _Reset();
+
+            if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
+            {
+                me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 3.0f, 3.0f);
+            }
+
+            events.Reset();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _JustEngagedWith();
+
+            me->AddAura(35360, me);
+
+            events.ScheduleEvent(EVENT_HEAL_CHECK_UNIT, 1000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_HEAL_CHECK_UNIT:
+                    // Check all friendly units in a 30 yard range
+                    events.ScheduleEvent(EVENT_HEAL_CHECK_UNIT, 750);
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    std::list<Player*> playerList;
+                    GetPlayerListInGrid(playerList, me, 30.0f);
+                    for (auto unit : playerList)
+                    {
+                        if (unit)
+                        {
+                            if (unit->IsPlayer() && !unit->isDead())
+                            {
+                                if (unit->GetHealthPct() <= 75)
+                                {
+                                    me->CastSpell(unit, SPELL_REGROWTH, true);
+                                    return;
+                                }
+                                if (unit->GetHealthPct() >= 76 && unit->GetHealthPct() <= 95)
+                                {
+                                    if (!unit->HasAura(SPELL_REJUV))
+                                    {
+                                        me->CastSpell(unit, SPELL_REJUV, false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                    {
+                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 80 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_REJUV, true);
+                            }
+                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_LIFEBLOOM, true);
+                                if (me->FindNearestCreature(98000, 30.0f) && me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                                {
+                                    me->FindNearestCreature(98000, 30.0f)->GetAura(SPELL_LIFEBLOOM)->SetStackAmount(3);
+                                }
+                            }
+                            me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_REGROWTH, false);
+                            return;
+                        }
+                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() >= 81 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_REJUV, false);
+                            }
+                        }
+                    }
+                    if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                    {
+                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 40 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_REJUV))
+                            {
+                                me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_REJUV, true);
+                            }
+                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_LIFEBLOOM, true);
+                                if (me->FindNearestCreature(98002, 30.0f) && me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                                {
+                                    me->FindNearestCreature(98002, 30.0f)->GetAura(SPELL_LIFEBLOOM)->SetStackAmount(3);
+                                }
+                            }
+                            me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_REGROWTH, false);
+                            return;
+                        }
+                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() >= 41 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_REJUV, false);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bot_healer_druidAI(creature);
+    }
+};
+
+// Heal Bot 98004
+class npc_bot_healer_priest : public CreatureScript
+{
+public:
+    npc_bot_healer_priest() : CreatureScript("npc_bot_healer_priest") { }
+
+    enum iSpells
+    {
+        SPELL_PENANCE = 69906,
+        SPELL_RENEW = 46543,
+        SPELL_FLASH_HEAL = 71782,
+        SPELL_POWER_WORD_SHIELD = 20697,
+    };
+
+    enum iEvents
+    {
+        EVENT_HEAL_CHECK_UNIT = 1,
+        EVENT_HEAL_CHECK_PLAYER = 2,
+    };
+
+    struct npc_bot_healer_priestAI : public BossAI
+    {
+        npc_bot_healer_priestAI(Creature* creature) : BossAI(creature, 0)
+        {
+            SetCombatMovement(false);
+        }
+
+        void Reset() override
+        {
+            _Reset();
+
+            if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
+            {
+                me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 3.0f, 3.0f);
+            }
+
+            events.Reset();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _JustEngagedWith();
+
+            events.ScheduleEvent(EVENT_HEAL_CHECK_PLAYER, 1000);
+            events.ScheduleEvent(EVENT_HEAL_CHECK_UNIT, 3000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_HEAL_CHECK_UNIT:
+                    events.ScheduleEvent(EVENT_HEAL_CHECK_UNIT, 3000);
+                    if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                    {
+                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 80 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_RENEW, true);
+                            }
+                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_POWER_WORD_SHIELD) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            {
+                                me->FindNearestCreature(98000, 30.0f)->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_POWER_WORD_SHIELD, true);
+                            }
+                            me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_FLASH_HEAL, true);
+                        }
+                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() >= 81 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_RENEW, true);
+                            }
+                        }
+                    }
+                    if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                    {
+                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 40 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_RENEW, true);
+                            }
+                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_POWER_WORD_SHIELD) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            {
+                                me->FindNearestCreature(98002, 30.0f)->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_POWER_WORD_SHIELD, true);
+                            }
+                            me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_FLASH_HEAL, true);
+                        }
+                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() >= 41 && me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        {
+                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            {
+                                me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_RENEW, false);
+                            }
+                        }
+                    }
+                    break;
+                case EVENT_HEAL_CHECK_PLAYER:
+                    // Check all friendly units in a 30 yard range
+                    events.ScheduleEvent(EVENT_HEAL_CHECK_PLAYER, 750);
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    std::list<Player*> PriestplayerList;
+                    GetPlayerListInGrid(PriestplayerList, me, 30.0f);
+                    for (auto unit : PriestplayerList)
+                    {
+                        if (unit)
+                        {
+                            if (unit->IsPlayer() && !unit->isDead())
+                            {
+                                if (unit->GetHealthPct() <= 75)
+                                {
+                                    me->CastSpell(unit, SPELL_FLASH_HEAL, false);
+                                    unit->AddAura(SPELL_POWER_WORD_SHIELD, unit);
+                                    return;
+                                }
+                                if (unit->GetHealthPct() >= 76 && unit->GetHealthPct() <= 95)
+                                {
+                                    if (!unit->HasAura(SPELL_RENEW))
+                                    {
+                                        me->CastSpell(unit, SPELL_RENEW, false);
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bot_healer_priestAI(creature);
+    }
+};
 
 void AddSC_elwynn_forest()
 {
+    new npc_bot_dps_rogue();
+    new npc_bot_healer_priest();
+    new npc_bot_healer_druid();
+    new npc_bot_dps_mage();
+    new npc_bot_tank();
+    new npc_bot_menu_dunraid();
     new npc_catchup_leveler();
     RegisterCreatureAI(npc_stormwind_infantry);
     new creature_script<npc_blackrock_battle_worg>("npc_blackrock_battle_worg");
