@@ -459,6 +459,18 @@ void ThreatManager::doAddThreat(Unit* victim, float threat)
     _addThreat(victim, threat);
 }
 
+void ThreatManager::doAddThreatNoRedirect(Unit* victim, float threat)
+{
+    if (victim->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetTypeId() == TYPEID_UNIT) // Is this needed?...
+        if (!GetOwner()->ToCreature()->HasNormalLootMode())
+            GetOwner()->ToCreature()->AddLootRecipient(victim->GetGUID());
+
+    if (threat > 0.0f)
+    {
+        _addThreat(victim, threat);
+    }
+}
+
 void ThreatManager::_addThreat(Unit* victim, float threat)
 {
     HostileReference* ref = iThreatContainer.addThreat(victim, threat);
