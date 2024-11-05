@@ -24,6 +24,55 @@
 #include "SpellHistory.h"
 #include "spell_common.h"
 
+
+ // 84342 - Loot-a-rang
+class spell_common_loot_a_rang : public SpellScript
+{
+    PrepareSpellScript(spell_common_loot_a_rang);
+
+    SpellCastResult CheckCast()
+    {
+        Player* plr = GetCaster()->ToPlayer();
+        if (!plr)
+            return SPELL_FAILED_DONT_REPORT;
+        if (Unit* target = plr->GetSelectedUnit())
+        {
+            if (!target->isDead())
+                return SPELL_FAILED_TARGET_NOT_DEAD;
+            if (target->IsPlayer())
+                return SPELL_FAILED_BAD_TARGETS;
+            if (target->ToCreature()->loot.empty())
+                return SPELL_FAILED_TARGET_NO_POCKETS;
+            if (!GetCaster()->IsWithinLOSInMap(target))
+                return SPELL_FAILED_LINE_OF_SIGHT;
+        }
+        else
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void LootTarget()
+    {
+        // See if we have a target to selected to loot.
+        if (Player* caster = GetCaster()->ToPlayer())
+        {
+            Unit* selectedTarget = caster->GetSelectedUnit();
+
+            if (selectedTarget)
+            {
+                caster->SendLoot(selectedTarget->GetTarget(), LootType::LOOT_CORPSE, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_common_loot_a_rang::CheckCast);
+        OnCast += SpellCastFn(spell_common_loot_a_rang::LootTarget);
+    }
+};
+
  // 134732 - Battle Fatigue
 class spell_common_battle_fatigue : public AuraScript
 {
@@ -717,6 +766,7 @@ class spell_preparation : public AuraScript
 
 void AddSC_common_spells_script()
 {
+    new spell_script<spell_common_loot_a_rang>("spell_common_loot_a_rang");
     new aura_script<spell_common_battle_fatigue>("spell_common_battle_fatigue");
     new aura_script<spell_common_battle_fatigue_fix>("spell_common_battle_fatigue_fix");
     new aura_script<spell_common_player_damage_reduction_fix>("spell_common_player_damage_reduction_fix");
