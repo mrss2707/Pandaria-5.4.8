@@ -390,6 +390,21 @@ PetBattle::PetBattle(uint32 battleId, PetBattleRequest const& request)
     {
         opponentTeam->AddWildBattlePet(request.Opponent->ToCreature());
 
+        //Custom: 35% chance to add 2nd pet, 10% chance for 3rd for battle pets within 30 yds.
+      /* std::list<Creature*> mobsinRange;
+        request.Challenger->GetCreaturesInRange(mobsinRange, 15.0f);
+        for (auto unit : mobsinRange)
+        {
+            if (urand(0, 100) <= 35 && unit)
+            {
+                if (unit->GetCreatureType() == 14)
+                {
+                    if (opponentTeam->BattlePets.size() < 3)
+                        opponentTeam->AddWildBattlePet(unit);
+                }
+            }
+        } */
+
         // TODO: nearby wild battle pets should join the pet battle as well
         // ...
     }
