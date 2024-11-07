@@ -23,6 +23,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "CreatureAI.h"
+#include "BattlePetMgr.h"
 
 enum ElwynnForest
 {
@@ -1393,6 +1394,25 @@ public:
             player->ShowNeutralPlayerFactionSelectUI();
             return true;
         }
+        if (action == 1006)
+        {
+                player->AddItem(32588, 1);
+                player->AddItem(34493, 1);
+                player->AddItem(79744, 1);
+                player->AddItem(72134, 1);
+                player->AddItem(93669, 1);
+                player->AddItem(23713, 1);
+                player->AddItem(34493, 1);
+                player->AddItem(68840, 1);
+                player->AddItem(67128, 1);
+                player->AddItem(68841, 1);
+                player->AddItem(71624, 1);
+                player->AddItem(34492, 1);
+                player->AddItem(72153, 1);
+                player->AddItem(49343, 1);
+                player->AddItem(49287, 1);
+            return true;
+        }
 
         return true;
     }
@@ -1408,6 +1428,7 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "I would like to boost my character to 85.", GOSSIP_SENDER_MAIN, 1003, "Are you sure you want to Level Boost to 85? You will be provided with equipment to begin adventures on Pandaria.", 0, false);
         }
         AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "I'd like to synchronize my level to the highest character level on my account", GOSSIP_SENDER_MAIN, 1004, "Your level will be synchronized to your highest level on your account. Continue?", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Add trading card game battle pets to my account", GOSSIP_SENDER_MAIN, 1006, "MAKE SURE YOU HAVE 15 IVENTORY SLOTS!! Continue?", 0, false);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 

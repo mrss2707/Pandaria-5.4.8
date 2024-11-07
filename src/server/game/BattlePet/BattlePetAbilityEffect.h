@@ -28,11 +28,11 @@ enum PetBattleAbilityTarget
     PET_BATTLE_ABILITY_TARGET_NONE                      = 0,
     PET_BATTLE_ABILITY_TARGET_CASTER                    = 1,
     PET_BATTLE_ABILITY_TARGET_TARGET                    = 2,
-    // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM               = 3,
+    //PET_BATTLE_ABILITY_TARGET_CASTER_TEAM               = 3,
     // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM_0             = 4,
     // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM_1             = 5,
     // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM_2             = 6,
-    // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM               = 7,
+    PET_BATTLE_ABILITY_TARGET_TARGET_TEAM               = 7,
     // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM_0             = 8,
     // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM_1             = 9,
     // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM_2             = 10,
@@ -103,6 +103,22 @@ public:
     void HandleHealCasterPercentNotState();
     void HandleControlAura();
     void HandleAuraCondAccuracyState();
+    void HandleSplittedDamage();
+    void HandleResetAuraDuration(); // Not handled
+    void HandleStopChainFailure();
+    void HandleKill();
+    void HandleCancellableAura();
+    void HandleStateDamage();
+    void HandleRemoveAura();
+    void HandleHealPercent();
+    void HandleWitchingDamage();
+    void HandleDamageRuthless();
+    void HandleEqualizeLife();
+    void HandleHealToggleAura();
+    void HandleInitialization();
+    void HandleHealStateToggleAura();
+    void HandleModState();
+    void HandleDamageAuraToggleAura();
 
 private:
     uint32 m_abilityId = 0;
