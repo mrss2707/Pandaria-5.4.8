@@ -488,7 +488,19 @@ QueueManager::QueueManager()
             dps  = sWorld->getIntConfig(CONFIG_LFG_DPS_NEEDED);
         }
         if (map && map->IsScenario() && scenarioDebug)
-            dps = 1;
+        {
+            QueryResult result = CharacterDatabase.PQuery("SELECT numPlayers FROM `scenario_playercount`");
+            if (!result)
+            {
+                dps = 1;
+            }
+            if (result)
+            {
+                Field* fields = result->Fetch();
+                uint32 playc = fields[0].GetUInt32();
+                dps = playc;
+            }
+        }
 
         if (sWorld->getBoolConfig(CONFIG_LFG_SOLO))
         {

@@ -314,6 +314,7 @@ Player::Player(WorldSession* session) : Unit(true), phaseMgr(this), hasForcedMov
     _restFlagMask = 0;
     ////////////////////Rest System/////////////////////
 
+    _hasBot = false;
     m_mailsLoaded = false;
     m_mailsUpdated = false;
     unReadMails = 0;
@@ -2659,8 +2660,23 @@ void Player::Regenerate(Powers power)
         AddAura(139068, this);
         if (HasAura(139068))
         {
-            GetAura(139068)->SetStackAmount(10);
+            GetAura(139068)->SetStackAmount(20);
         }
+    }
+
+    if (HasAura(71328) && !GetMap()->IsScenario() || !GetMap()->IsDungeon()) // Timeless Isle: Against rares cast Tidal Surge!
+    {
+        RemoveAura(71328);
+    }
+
+    if (!HasAura(76155) && GetMap()->IsRaid()) // Timeless Isle: Against rares cast Tidal Surge!
+    {
+        AddAura(76155, this);
+    }
+
+    if (HasAura(76155) && !GetMap()->IsRaid()) // Timeless Isle: Against rares cast Tidal Surge!
+    {
+        RemoveAura(76155);
     }
 
     if (HasSpell(125439)) // CUSTOM: Revive Battle Pets
@@ -8030,6 +8046,11 @@ uint32 Player::GetCurrencyWeekCap(CurrencyTypesEntry const* currency) const
 
     switch (currency->ID)
     {
+    case CURRENCY_TYPE_VALOR_POINTS:
+    {
+        cap = 7500000;
+        break;
+    }
         case CURRENCY_TYPE_CONQUEST_META_ARENA:        
         {
             cap = Trinity::Currency::ConquestRatingCalculator(GetMaxArenaRating()) * CURRENCY_PRECISION;
@@ -8063,6 +8084,11 @@ uint32 Player::GetCurrencyTotalCap(CurrencyTypesEntry const* currency) const
             uint32 justicecap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_JUSTICE_POINTS);
             if (justicecap > 0)
                 cap = justicecap;
+            break;
+        }
+        case CURRENCY_TYPE_VALOR_POINTS:
+        {
+            cap = 7500000;
             break;
         }
     }

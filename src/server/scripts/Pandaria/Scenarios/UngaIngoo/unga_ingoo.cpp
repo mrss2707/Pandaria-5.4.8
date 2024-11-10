@@ -918,6 +918,14 @@ struct npc_unga_pirate : public ScriptedAI
         }
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (me->GetInstanceScript() && me->GetInstanceScript()->GetData(DATA_BARRELS_PROGRESS) > 0)
+        {
+            me->GetInstanceScript()->SetData(DATA_BARRELS_PROGRESS, me->GetInstanceScript()->GetData(DATA_BARRELS_PROGRESS) + urand(1, 10));
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         nonCombatEvents.Update(diff);

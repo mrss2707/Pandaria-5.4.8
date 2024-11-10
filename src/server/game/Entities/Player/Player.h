@@ -1871,6 +1871,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
     bool m_mailsLoaded;
     bool m_mailsUpdated;
+    bool _hasBot;
 
     void SetBindPoint(ObjectGuid guid);
     void SendTalentWipeConfirm(ObjectGuid guid, bool resetType);

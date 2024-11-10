@@ -1257,6 +1257,74 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
         rangedattackpower = stats->RangedAttackPower;
     }
 
+    //HACKFIX damage override
+    if (level == 85 && expansion == 4 && rank == 0) // Non-elite
+    {
+        mindmg = 5625.0f;
+        maxdmg = 8438.0f;
+    }
+    if (level == 86 && expansion == 4 && rank == 0) // Non-elite
+    {
+        mindmg = 6043.0f;
+        maxdmg = 9065.0f;
+    }
+    if (level == 87 && expansion == 4 && rank == 0) // Non-elite
+    {
+        mindmg = 6443.0f;
+        maxdmg = 9465.0f;
+    }
+    if (level == 88 && expansion == 4 && rank == 0) // Non-elite
+    {
+        mindmg = 7043.0f;
+        maxdmg = 10065.0f;
+    }
+    if (level == 89 && expansion == 4 && rank == 0) // Non-elite
+    {
+        mindmg = 8043.0f;
+        maxdmg = 11065.0f;
+    }
+    if (level == 90 && expansion == 4 && rank == 0) // Non-elite
+    {
+        mindmg = 9625.0f;
+        maxdmg = 12438.0f;
+    }
+
+    if (level == 85 && expansion == 4 && rank >= 1) // Non-elite
+    {
+        mindmg = 6625.0f;
+        maxdmg = 9438.0f;
+    }
+    if (level == 86 && expansion == 4 && rank >= 1) // Non-elite
+    {
+        mindmg = 7043.0f;
+        maxdmg = 10065.0f;
+    }
+    if (level == 87 && expansion == 4 && rank >= 1) // Non-elite
+    {
+        mindmg = 7443.0f;
+        maxdmg = 10465.0f;
+    }
+    if (level == 88 && expansion == 4 && rank >= 1) // Non-elite
+    {
+        mindmg = 8043.0f;
+        maxdmg = 11065.0f;
+    }
+    if (level == 89 && expansion == 4 && rank >= 1) // Non-elite
+    {
+        mindmg = 9043.0f;
+        maxdmg = 12065.0f;
+    }
+    if (level == 90 && expansion == 4 && rank >= 1) // Non-elite
+    {
+        mindmg = 10625.0f;
+        maxdmg = 13438.0f;
+    }
+    if (level == 91 && expansion == 4 && rank >= 1) // Non-elite
+    {
+        mindmg = 10625.0f;
+        maxdmg = 13438.0f;
+    }
+
     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, mindmg);
     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, maxdmg);
 

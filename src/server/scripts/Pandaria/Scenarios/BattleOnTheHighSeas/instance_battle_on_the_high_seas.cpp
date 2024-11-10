@@ -80,15 +80,33 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                if (!factionId)
-                    factionId = player->GetTeam();
+                //if (!factionId)
+                    //factionId = player->GetTeam();
+                factionId = 1;
+
+                if (player->GetTeam() == ALLIANCE)
+                {
+                    player->AddAura(142783, player); // GOB SQUAD
+                    player->TeleportTo(1099, 2464.87f, -4095.67f, 9.04f, 2.18f);
+                }
 
                 // Init Scenario
-                sScenarioMgr->SendScenarioState(player, 1099, DATA_BOARDING_PARTY, 0, GetData(FACTION_DATA) ? CRITERIA_TREE_ID_BOARDING_PARTY_HORDE : CRITERIA_TREE_ID_BOARDING_PARTY_ALLIANCE, GetData(FACTION_DATA) ? SCENARIO_ID_NAVAL_BATTLE_HORDE : SCENARIO_ID_NAVAL_BATTLE_ALLIANCE);
+                sScenarioMgr->SendScenarioState(player, 1099, DATA_BOARDING_PARTY, 0, CRITERIA_TREE_ID_BOARDING_PARTY_HORDE, SCENARIO_ID_NAVAL_BATTLE_HORDE);
+                //sScenarioMgr->SendScenarioState(player, 1099, DATA_BOARDING_PARTY, 0, GetData(FACTION_DATA) ? CRITERIA_TREE_ID_BOARDING_PARTY_HORDE : CRITERIA_TREE_ID_BOARDING_PARTY_ALLIANCE, GetData(FACTION_DATA) ? SCENARIO_ID_NAVAL_BATTLE_HORDE : SCENARIO_ID_NAVAL_BATTLE_ALLIANCE);
             }
 
             void OnCreatureCreate(Creature* creature) override
             {
+                // HACK REMOVE WHEN ALLIANCE SUPPORT IS FIXED
+                            if (creature->GetFaction() == 83) // Horde to alliance
+                            {
+                                creature->SetFaction(11);
+                            }
+                            if (creature->GetFaction() == 84) // alliance to horde
+                            {
+                                creature->SetFaction(83);
+                            }
+
                 switch (creature->GetEntry())
                 {
                     case NPC_FIRE_BUNNY:
@@ -207,7 +225,8 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                         {
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())
-                                    sScenarioMgr->SendScenarioState(player, 1099, DATA_SMITHEREENS, 0, GetData(FACTION_DATA) ? CRITERIA_TREE_ID_SMITHEREENS_HORDE : CRITERIA_TREE_ID_SMITHEREENS_ALLIANCE, GetData(FACTION_DATA) ? SCENARIO_ID_NAVAL_BATTLE_HORDE : SCENARIO_ID_NAVAL_BATTLE_ALLIANCE);
+                                    sScenarioMgr->SendScenarioState(player, 1099, DATA_SMITHEREENS, 0, CRITERIA_TREE_ID_SMITHEREENS_HORDE, SCENARIO_ID_NAVAL_BATTLE_HORDE);
+                                    //sScenarioMgr->SendScenarioState(player, 1099, DATA_SMITHEREENS, 0, GetData(FACTION_DATA) ? CRITERIA_TREE_ID_SMITHEREENS_HORDE : CRITERIA_TREE_ID_SMITHEREENS_ALLIANCE, GetData(FACTION_DATA) ? SCENARIO_ID_NAVAL_BATTLE_HORDE : SCENARIO_ID_NAVAL_BATTLE_ALLIANCE);
 
                             // Allow to use plant Explosives
                             for (auto&& itr : plantGUIDs)
@@ -245,7 +264,8 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                         {
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())
-                                    sScenarioMgr->SendScenarioState(player, 1099, DATA_DEFEAT_THE_ADMIRAL, 0, GetData(FACTION_DATA) ? CRITERIA_TREE_ID_DEFEAT_ADMIRAL_HORDE : CRITERIA_TREE_ID_DEFEAT_ADMIRAL_ALLIANCE, GetData(FACTION_DATA) ? SCENARIO_ID_NAVAL_BATTLE_HORDE : SCENARIO_ID_NAVAL_BATTLE_ALLIANCE);
+                                    sScenarioMgr->SendScenarioState(player, 1099, DATA_DEFEAT_THE_ADMIRAL, 0, CRITERIA_TREE_ID_DEFEAT_ADMIRAL_HORDE, SCENARIO_ID_NAVAL_BATTLE_HORDE);
+                                    //sScenarioMgr->SendScenarioState(player, 1099, DATA_DEFEAT_THE_ADMIRAL, 0, GetData(FACTION_DATA) ? CRITERIA_TREE_ID_DEFEAT_ADMIRAL_HORDE : CRITERIA_TREE_ID_DEFEAT_ADMIRAL_ALLIANCE, GetData(FACTION_DATA) ? SCENARIO_ID_NAVAL_BATTLE_HORDE : SCENARIO_ID_NAVAL_BATTLE_ALLIANCE);
 
                             // Allow to use last transport cannon
                             if (Creature* transportCannon = instance->GetCreature(GetGuidData(NPC_TRANSPORT_CANNON_2_H_A_1)))
@@ -271,10 +291,12 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                     {
                         chapterFour = data;
                         SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_DEFEAT_ADMIRAL_HODGSON, 1, GetScenarioGUID(), time(NULL), 0, 0));
-                        uint32 scenarioEntryByDifficulty = GetData(FACTION_DATA) ? 654 : 655;
+                        uint32 scenarioEntryByDifficulty = 655;
+                        //uint32 scenarioEntryByDifficulty = GetData(FACTION_DATA) ? 654 : 655;
 
                         if (instance->GetDifficulty() == SCENARIO_DIFFICULTY_HEROIC)
-                            scenarioEntryByDifficulty = GetData(FACTION_DATA) ? 652 : 588;
+                            scenarioEntryByDifficulty = 588;
+                            //scenarioEntryByDifficulty = GetData(FACTION_DATA) ? 652 : 588;
 
                         DoFinishLFGDungeon(scenarioEntryByDifficulty);
                         break;
@@ -321,7 +343,8 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                     case DATA_DEFEAT_THE_ADMIRAL:
                         return chapterFour;
                     case FACTION_DATA:
-                        return factionId == HORDE ? 1 : 0;
+                        return 1;
+                        //return factionId == HORDE ? 1 : 0;
                 }
 
                 return 0;
@@ -360,7 +383,7 @@ class instance_battle_on_the_high_seas : public InstanceMapScript
                 {
                     if (eventId == 1)
                     {
-                        if (GetData(FACTION_DATA)) // Init horde scenario
+                        if (GetData(FACTION_DATA)) // Init horde scenario (FACTION_DATA)
                         {
                             if (Creature* hagman = instance->GetCreature(GetGuidData(NPC_ADMIRAL_HAGMAN)))
                             {

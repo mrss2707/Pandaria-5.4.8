@@ -218,6 +218,8 @@ _aiAnimKitId(0), _movementAnimKitId(0), _meleeAnimKitId(0)
 
     m_movementCounter = 0;
 
+    bot_Class = 0;
+
     m_state = 0;
     m_deathState = ALIVE;
 

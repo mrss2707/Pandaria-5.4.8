@@ -248,7 +248,21 @@ class instance_assault_on_zanvess : public InstanceMapScript
                         SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_DEFEAT_COMMANDER_TELVRAK, 1, GetScenarioGUID(), time(NULL), 0, 0));
 
                         // Scenario Complete
-                        uint32 lfgEntry = GetData(DATA_FACTION) ? 537 : 593;
+                        uint32 lfgEntry = 0;
+                        for (auto&& itr : instance->GetPlayers())
+                        {
+                            if (Player* player = itr.GetSource())
+                            {
+                                if (player->GetTeamId() == TEAM_ALLIANCE)
+                                {
+                                    lfgEntry = 537;
+                                }
+                                if (player->GetTeamId() == TEAM_HORDE)
+                                {
+                                    lfgEntry = 593;
+                                }
+                            }
+                        }
                         DoFinishLFGDungeon(lfgEntry);
                         break;
                 }

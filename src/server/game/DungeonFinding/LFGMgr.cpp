@@ -467,8 +467,8 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
             lockData = LFG_LOCKSTATUS_ATTUNEMENT_TOO_HIGH_LEVEL;
         */
 
-        if ((dungeon->id == 655 || dungeon->id == 588) && player->GetTeam() == ALLIANCE) // Battle on the High Seas (Alliance only)
-            lockStatus = LFG_LOCKSTATUS_NOT_IN_SEASON;
+        //if ((dungeon->id == 655 || dungeon->id == 588) && player->GetTeam() == ALLIANCE) // Battle on the High Seas (Alliance only)
+           // lockStatus = LFG_LOCKSTATUS_NOT_IN_SEASON;
 
         if (lockStatus)
             lock[dungeon->Entry()] = LfgLockInfoData(lockStatus, dungeon->requiredItemLevel, itemLevel);
@@ -2162,6 +2162,16 @@ void LFGMgr::FinishDungeon(ObjectGuid gguid, uint32 dungeonId, Map* map)
         LfgPlayerRewardData data = LfgPlayerRewardData(dungeon->Entry(), GetDungeon(gguid, false), done, quest, ctaQuest);
         player->GetSession()->SendLfgPlayerReward(data);
         player->RemoveAurasDueToSpell(LFG_SPELL_DUNGEON_COOLDOWN);
+
+        // Give random pet after completing any LFG scenario or dungeon
+// select entry from item_template where BagFamily = 4096;
+        QueryResult result = WorldDatabase.PQuery("select entry from item_template WHERE BagFamily = 4096 ORDER BY RAND() LIMIT 1");
+        if (result)
+        {
+            Field* fields = result->Fetch();
+            uint32 randomPetId = fields[0].GetUInt32();
+            player->AddItem(randomPetId, 1);
+        }
     }
 
     if (Group* group = sGroupMgr->GetGroupByGUID(gguid))

@@ -304,6 +304,11 @@ struct npc_high_seas_swashbuckler : public customCreatureAI
 
     void UpdateAI(uint32 diff) override
     {
+        // HACK!!! remove when alliance support
+        if (me->GetFaction() == 84 && me->GetEntry() == 69196 || me->GetEntry() == 71326)
+        {
+            me->SetFaction(83);
+        }
         scheduler.Update(diff);
 
         if (!UpdateVictim())
@@ -1078,6 +1083,11 @@ struct npc_high_seas_admiral_hodgson : public customCreatureAI
 
     void UpdateAI(uint32 diff) override
     {
+        // HACK!! remove when alliance support
+        if (me->GetFaction() != 83)
+        {
+            me->SetFaction(83);
+        }
         scheduler.Update(diff);
 
         if (!UpdateVictim())

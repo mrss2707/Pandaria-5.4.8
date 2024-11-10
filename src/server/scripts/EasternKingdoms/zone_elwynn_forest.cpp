@@ -1223,6 +1223,93 @@ public:
 };
 
 // CUSTOM
+class npc_shop_guy : public CreatureScript
+{
+public:
+    npc_shop_guy() : CreatureScript("npc_shop_guy") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        if (action == 1007)
+        {
+            if (player->GetCurrency(CURRENCY_TYPE_TIMELESS_COIN, false) < 1000)
+            {
+                creature->Whisper("You do not have enough Timeless Coins!", LANG_UNIVERSAL, player);
+                return false;
+            }
+
+            if (player->GetCurrency(CURRENCY_TYPE_TIMELESS_COIN, false) >= 1000)
+            {
+                // Give random pet after completing any LFG scenario or dungeon
+// select entry from item_template where BagFamily = 4096;
+                LoginDatabase.PExecute("UPDATE account SET dp = dp + %u WHERE id = %u", 100000, player->GetSession()->GetAccountId());
+                player->ModifyCurrency(777, -1000);
+                creature->Whisper("You've exchanged 1000 Timeless coins for 10 shop points!", LANG_UNIVERSAL, player);
+            }
+            return true;
+        }
+        if (action == 1008)
+        {
+            if (player->GetCurrency(738, false) < 100)
+            {
+                creature->Whisper("You do not have enough Lesser charms of Good Fortune!", LANG_UNIVERSAL, player);
+                return false;
+            }
+
+            if (player->GetCurrency(738, false) >= 100)
+            {
+                // Give random pet after completing any LFG scenario or dungeon
+// select entry from item_template where BagFamily = 4096;
+                LoginDatabase.PExecute("UPDATE account SET dp = dp + %u WHERE id = %u", 50000, player->GetSession()->GetAccountId());
+                player->ModifyCurrency(738, -100);
+                creature->Whisper("You've exchanged 100 Lesser charms of Good Fortune for 5 shop points!", LANG_UNIVERSAL, player);
+            }
+            return true;
+        }
+        if (action == 1009)
+        {
+            QueryResult result = LoginDatabase.PQuery("SELECT dp FROM `account` WHERE id = %u", player->GetSession()->GetAccountId());
+            if (result)
+            {
+                Field* fields = result->Fetch();
+                uint32 dp = fields[0].GetUInt32();
+                if (dp < 50000) // less than 5 donation points.
+                {
+                    return false;
+                }
+                else
+                {
+                    if (urand(0, 100) <= 20)
+                    {
+                        creature->Whisper("You've rolled the dice and... good luck has found you your shop points have been doubled.", LANG_UNIVERSAL, player);
+                        LoginDatabase.PExecute("UPDATE account SET dp = dp + %u WHERE id = %u", 100000, player->GetSession()->GetAccountId());
+                    }
+                    else
+                    {
+                        creature->Whisper("You've rolled the dice and... lost better luck next time! 5 points have been deducted from your balance.", LANG_UNIVERSAL, player);
+                        LoginDatabase.PExecute("UPDATE account SET dp = dp - %u WHERE id = %u", 50000, player->GetSession()->GetAccountId());
+                    }
+                }
+            }
+            return true;
+        }
+
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Exchange 1000 timeless coins for 10 shop points.", GOSSIP_SENDER_MAIN, 1007, "Continue?", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Exchange 100 Lesser Charms of Good Fortune for 5 shop points.", GOSSIP_SENDER_MAIN, 1008, "Continue?", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "I want to gamble and risk 5 shop points for a 20% chance to double it.", GOSSIP_SENDER_MAIN, 1009, "Continue?", 0, false);
+
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+
+        return true;
+    }
+};
+
+// CUSTOM
 class npc_catchup_leveler : public CreatureScript
 {
 public:
@@ -1316,56 +1403,56 @@ public:
                 player->AddItem(56440, 1); // trink 2
                 player->AddItem(56422, 1); // Neck
             }
-            if (player->GetClass() == CLASS_WARRIOR || player->GetClass() == CLASS_PALADIN || player->GetClass() == CLASS_DEATH_KNIGHT) // Plate
-            {
-                player->AddItem(56278, 1); // Head
-                player->AddItem(56308, 1); // Chest
-                player->AddItem(63444, 1); // Feet
-                player->AddItem(56428, 1); // Hands
-                player->AddItem(56283, 1); // Legs
-                player->AddItem(56318, 1); // Shoulders
-                player->AddItem(56447, 1); // Waist
-                player->AddItem(56301, 1); // Wrist
-                player->AddItem(56275, 1); // Cloak
-                player->AddItem(56284, 1); //weapon
-                player->AddItem(56270, 1); // finger 1
-                player->AddItem(56299, 1); // finger 2
-                player->AddItem(56458, 1); // trink 1
-                player->AddItem(56345, 1); // trink 2
-                player->AddItem(56319, 1); // Neck
-                if (player->GetClass() == CLASS_WARRIOR || player->GetClass() == CLASS_PALADIN)
-                {
-                    player->AddItem(56430, 1); // shield
-                    player->AddItem(56426, 1); // wep
-                }
-                else
-                {
-                    player->AddItem(56430, 2); //dual wield weapon
-                    if (player->HasAura(51915))
-                    {
-                        player->RemoveAura(51915);
-                    }
-                    player->LearnSpell(50977, false); // Death Gate
-                }
-            }
-            // Racials for worgens
-            if (player->GetRace() == RACE_WORGEN)
-            {
-                player->LearnSpell(68992, false);
-                player->LearnSpell(87840, false);
-                player->LearnSpell(68996, false);
-                player->LearnSpell(68976, false);
-                player->LearnSpell(69978, false);
-                player->LearnSpell(68975, false);
-            }
-            if (player->GetTeamId() == TEAM_ALLIANCE)
-            {
-                player->BypassChecksTeleportTo(0, -8452.63f, 344.90f, 135.90f, 5.41f); // Stormwind City
-            }
-            else
-            {
-                player->BypassChecksTeleportTo(1, 1573.77f, -4395.17f, 15.97f, 0.5f); // Orgrimmar
-            }
+if (player->GetClass() == CLASS_WARRIOR || player->GetClass() == CLASS_PALADIN || player->GetClass() == CLASS_DEATH_KNIGHT) // Plate
+{
+    player->AddItem(56278, 1); // Head
+    player->AddItem(56308, 1); // Chest
+    player->AddItem(63444, 1); // Feet
+    player->AddItem(56428, 1); // Hands
+    player->AddItem(56283, 1); // Legs
+    player->AddItem(56318, 1); // Shoulders
+    player->AddItem(56447, 1); // Waist
+    player->AddItem(56301, 1); // Wrist
+    player->AddItem(56275, 1); // Cloak
+    player->AddItem(56284, 1); //weapon
+    player->AddItem(56270, 1); // finger 1
+    player->AddItem(56299, 1); // finger 2
+    player->AddItem(56458, 1); // trink 1
+    player->AddItem(56345, 1); // trink 2
+    player->AddItem(56319, 1); // Neck
+    if (player->GetClass() == CLASS_WARRIOR || player->GetClass() == CLASS_PALADIN)
+    {
+        player->AddItem(56430, 1); // shield
+        player->AddItem(56426, 1); // wep
+    }
+    else
+    {
+        player->AddItem(56430, 2); //dual wield weapon
+        if (player->HasAura(51915))
+        {
+            player->RemoveAura(51915);
+        }
+        player->LearnSpell(50977, false); // Death Gate
+    }
+}
+// Racials for worgens
+if (player->GetRace() == RACE_WORGEN)
+{
+    player->LearnSpell(68992, false);
+    player->LearnSpell(87840, false);
+    player->LearnSpell(68996, false);
+    player->LearnSpell(68976, false);
+    player->LearnSpell(69978, false);
+    player->LearnSpell(68975, false);
+}
+if (player->GetTeamId() == TEAM_ALLIANCE)
+{
+    player->BypassChecksTeleportTo(0, -8452.63f, 344.90f, 135.90f, 5.41f); // Stormwind City
+}
+else
+{
+    player->BypassChecksTeleportTo(1, 1573.77f, -4395.17f, 15.97f, 0.5f); // Orgrimmar
+}
         }
         if (action == 1004)
         {
@@ -1383,6 +1470,7 @@ public:
                 if (minmax > 85)
                 {
                     player->GiveLevel(minmax);
+                    player->BypassChecksTeleportTo(870, 2093.72f, 4900.299f, 198.90f, 3.41f);
                 }
                 CloseGossipMenuFor(player);
             }
@@ -1396,21 +1484,38 @@ public:
         }
         if (action == 1006)
         {
-                player->AddItem(32588, 1);
-                player->AddItem(34493, 1);
-                player->AddItem(79744, 1);
-                player->AddItem(72134, 1);
-                player->AddItem(93669, 1);
-                player->AddItem(23713, 1);
-                player->AddItem(34493, 1);
-                player->AddItem(68840, 1);
-                player->AddItem(67128, 1);
-                player->AddItem(68841, 1);
-                player->AddItem(71624, 1);
-                player->AddItem(34492, 1);
-                player->AddItem(72153, 1);
-                player->AddItem(49343, 1);
-                player->AddItem(49287, 1);
+            player->AddItem(32588, 1);
+            player->AddItem(34493, 1);
+            player->AddItem(79744, 1);
+            player->AddItem(72134, 1);
+            player->AddItem(93669, 1);
+            player->AddItem(23713, 1);
+            player->AddItem(34493, 1);
+            player->AddItem(68840, 1);
+            player->AddItem(67128, 1);
+            player->AddItem(68841, 1);
+            player->AddItem(71624, 1);
+            player->AddItem(34492, 1);
+            player->AddItem(72153, 1);
+            player->AddItem(49343, 1);
+            player->AddItem(49287, 1);
+            return true;
+        }
+        if (action == 1007)
+        {
+            if (player->GetCurrency(CURRENCY_TYPE_TIMELESS_COIN, true) >= 500)
+            {
+                player->ModifyCurrency(777, -1000);
+                // Give random pet after completing any LFG scenario or dungeon
+// select entry from item_template where BagFamily = 4096;
+                QueryResult result = WorldDatabase.PQuery("select entry from item_template WHERE BagFamily = 4096 ORDER BY RAND() LIMIT 1");
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+                    uint32 randomPetId = fields[0].GetUInt32();
+                    player->AddItem(randomPetId, 1);
+                }
+            }
             return true;
         }
 
@@ -1569,9 +1674,6 @@ public:
                     return false;
                 }
 
-                switch (urand(0, 1))
-                {
-                case 0:
                     if (creature->FindNearestCreature(98002, 300.0f))
                     {
                         creature->FindNearestCreature(98002, 300.0f)->DespawnOrUnsummon(1000);
@@ -1584,34 +1686,7 @@ public:
                         creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                         if (player->GetTeamId() == TEAM_ALLIANCE)
                         {
-                            creature->FindNearestCreature(98002, 300.0f)->SetLevel(player->GetLevel());
                             creature->FindNearestCreature(98002, 300.0f)->SetFaction(11);
-                            switch (urand(0, 6))
-                            {
-                            case 0:
-                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(14492); // Human
-                                break;
-                            case 1:
-                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(14396); // Dwarf
-                                break;
-                            case 2:
-                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(17375); // Draenei
-                                break;
-                            case 3:
-                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(39608); // Pandarian
-                                break;
-                            case 4:
-                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(17373); // Draenei
-                                break;
-                            case 5:
-                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(5446); // human f
-                                break;
-                            case 6:
-                                creature->FindNearestCreature(98002, 300.0f)->SetDisplayId(32680); // Dwarf f
-                                break;
-                            default:
-                                break;
-                            }
                         }
                         else
                         {
@@ -1619,57 +1694,6 @@ public:
                         }
                         creature->FindNearestCreature(98002, 300.0f)->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
                     }
-                    break;
-                case 1:
-                    if (creature->FindNearestCreature(98005, 300.0f))
-                    {
-                        creature->FindNearestCreature(98005, 300.0f)->DespawnOrUnsummon(1000);
-                        creature->Whisper("I've despawned a previously found dps bot, please talk to me again to summon a new bot!", LANG_UNIVERSAL, player);
-                        return false;
-                    }
-
-                    if (!creature->FindNearestCreature(98005, 300.0f))
-                    {
-                        creature->SummonCreature(98005, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                        if (player->GetTeamId() == TEAM_ALLIANCE)
-                        {
-                            creature->FindNearestCreature(98005, 300.0f)->SetLevel(player->GetLevel());
-                            creature->FindNearestCreature(98005, 300.0f)->SetFaction(11);
-                            switch (urand(0, 6))
-                            {
-                            case 0:
-                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(14492); // Human
-                                break;
-                            case 1:
-                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(14396); // Dwarf
-                                break;
-                            case 2:
-                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(17375); // Draenei
-                                break;
-                            case 3:
-                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(39608); // Pandarian
-                                break;
-                            case 4:
-                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(17373); // Draenei
-                                break;
-                            case 5:
-                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(5446); // human f
-                                break;
-                            case 6:
-                                creature->FindNearestCreature(98005, 300.0f)->SetDisplayId(32680); // Dwarf f
-                                break;
-                            default:
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            creature->FindNearestCreature(98005, 300.0f)->SetFaction(85);
-                        }
-                        creature->FindNearestCreature(98005, 300.0f)->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
-                    }
-                    break;
-                }
             }
         }
         if (action == 1004)
@@ -1677,71 +1701,239 @@ public:
             // 98000 - tank and 98002 - mage dps and 98003 - druid healer and 98004 - priest healer and 98005 - rogue dps
             // 10 man (2 tanks, 4 healers, 4 dps)
 
-            Creature* cr1 = creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            Creature* cr2 = creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            std::list<Creature*> themobsinRange;
+            creature->GetCreaturesInRange(themobsinRange, 9999.0f);
+            for (auto Aunit : themobsinRange)
+            {
+                if (Aunit)
+                {
+                    if (Aunit->GetEntry() == 98000 || Aunit->GetEntry() == 98003 || Aunit->GetEntry() == 98004 || Aunit->GetEntry() == 98002)
+                    {
+                        Aunit->DespawnOrUnsummon(1000);
+                    }
+                }
+            }
 
-            Creature* cr3 = creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            Creature* cr4 = creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            Creature* cr5 = creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            Creature* cr6 = creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98000, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
 
-            Creature* cr7 = creature->SummonCreature(98005, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            Creature* cr8 = creature->SummonCreature(98005, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            Creature* cr9 = creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            Creature* cr10 = creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98003, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98004, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
 
-            //Tank
-            if (cr1)
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            creature->SummonCreature(98002, player->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+
+            std::list<Creature*> athemobsinRange;
+            creature->GetCreaturesInRange(athemobsinRange, 9999.0f);
+            for (auto aAunit : athemobsinRange)
             {
-                cr1->SetLevel(90);
-                cr1->GetMotionMaster()->MoveFollow(player, 2.0f, 2.0f);
-            }
-            if (cr2)
-            {
-                cr2->SetLevel(90);
-                cr2->GetMotionMaster()->MoveFollow(player, 2.0f, 2.0f);
-            }
-            // Healers
-            if (cr3)
-            {
-                cr3->SetLevel(90);
-                cr3->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
-            }
-            if (cr4)
-            {
-                cr4->SetLevel(90);
-                cr4->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
-            }
-            if (cr5)
-            {
-                cr5->SetLevel(90);
-                cr5->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
-            }
-            if (cr6)
-            {
-                cr6->SetLevel(90);
-                cr6->GetMotionMaster()->MoveFollow(player, 3.0f, 3.0f);
-            }
-            // DPS
-            if (cr7)
-            {
-                cr7->SetLevel(90);
-                cr7->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
-            }
-            if (cr8)
-            {
-                cr8->SetLevel(90);
-                cr8->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
-            }
-            if (cr9)
-            {
-                cr9->SetLevel(90);
-                cr9->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
-            }
-            if (cr10)
-            {
-                cr10->SetLevel(90);
-                cr10->GetMotionMaster()->MoveFollow(player, 4.0f, 4.0f);
+                if (aAunit)
+                {
+                    if (aAunit->GetEntry() == 98000 || aAunit->GetEntry() == 98003 || aAunit->GetEntry() == 98004 || aAunit->GetEntry() == 98002)
+                    {
+                        aAunit->SetLevel(90);
+                        aAunit->GetMotionMaster()->MoveFollow(player, urand(2.0f, 3.5f), urand(2.0f, 3.5f));
+                    }
+                }
             }
         }
 
@@ -1777,7 +1969,7 @@ public:
     enum iSpells
     {
         SPELL_RIGHTEOUS_FURY = 25780,
-        SPELL_SEAL_OF_RIGHTEOUS = 20154,
+        SPELL_SEAL_OF_RIGHTEOUS = 111351,
         SPELL_HAMMER_OF_RIGHTEOUS = 53595,
         SPELL_CONSECRATION = 69930,
         SPELL_TAUNT_BOT = 355,
@@ -1792,14 +1984,14 @@ public:
         EVENT_TARGET_CHECK = 5,
     };
 
-    struct npc_bot_tankAI : public BossAI
+    struct npc_bot_tankAI : public ScriptedAI
     {
-        npc_bot_tankAI(Creature* creature) : BossAI(creature, 0) { }
+        npc_bot_tankAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
 
         void Reset() override
         {
-            _Reset();
-
             if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
             {
                 me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 2.0f, 2.0f);
@@ -1810,7 +2002,44 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            _JustEngagedWith();
+            if (me->GetMap())
+            {
+                if (me->GetMap()->IsDungeon())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (30% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMap()->IsRaid())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMapId() == 870 && me->GetZoneId() == 6757 && me->GetAreaId() == 6830)
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+            }
 
             events.ScheduleEvent(EVENT_RIGHTEOUS_FURY, 1000);
             events.ScheduleEvent(EVENT_HAMMER_OF_RIGHTEOUS, urand(2 * IN_MILLISECONDS, 3 * IN_MILLISECONDS));
@@ -1821,7 +2050,104 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
+        }
+
+        void TempleOfJadeSerpent_Strategy()
+        {
+            if (me->GetMapId() == 960) // Temple of Jade Serpent (56511)
+            {
+                if (me->FindNearestCreature(56792, 30.0f))
+                {
+                    //Force change target
+                    if (me->FindNearestCreature(56792, 30.0f)->IsInCombat() && me->FindNearestCreature(56792, 30.0f)->GetHealthPct() >= 80)
+                        me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56792, 30.0f), 999999.0f);
+                }
+                if (me->HasAura(106653)) // Sha Residue
+                {
+                    if (me->FindNearestPlayer(30.0f))
+                    {
+                        me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0, true);
+                    }
+                }
+                if (me->GetAreaId() == 6117)
+                {
+                    if (me->FindNearestCreature(56511, 30.0f))
+                    {
+                        //Force change target
+                        if (me->FindNearestCreature(56511, 30.0f)->IsInCombat() && me->FindNearestCreature(56511, 30.0f)->GetHealthPct() >= 80)
+                            me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56511, 30.0f), 999999.0f);
+                    }
+                }
+            }
+        }
+
+        void SiegeOfOrgrimmar_Strategy_TANKDPS()
+        {
+            if (me->GetMapId() != 1136)
+                return;
+
+            if (me->GetMapId() == 1136)
+            {
+                if (me->HasAuraEffect(149164, 0)) // We are getting Frost AoE damage move.
+                {
+                    if (me->FindNearestPlayer(30.0f))
+                    {
+                        me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0.0f, true);
+                    }
+                    else
+                    {
+                        me->MonsterMoveWithSpeed(me->GetPositionX() + urand(2.0f, 4.0f), me->GetPositionY() + urand(4.0f, 5.0f), me->GetPositionZ(), 0.0f, false);
+                    }
+                }
+
+                //Immerseius
+                if (me->FindNearestCreature(71543, 100.0f) && me->FindNearestCreature(71603, 100.0f)) // Corrupted Sha
+                {
+                    // Sha puddles
+                    if (me->FindNearestCreature(71543, 100.0f)->IsInCombat()) // Make sure we are in combat with boss
+                    {
+                        if (me->FindNearestCreature(71603, 100.0f))
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(71603, 100.0f), 999999.0f);
+                        }
+                    }
+                }
+                //Protectors
+                if (me->GetAreaId() == 6798)
+                {
+                    Unit* sun = me->FindNearestCreature(71480, 50.0f, false);
+                    Unit* he = me->FindNearestCreature(71479, 50.0f, false);
+                    Unit* rook = me->FindNearestCreature(71475, 50.0f, false);
+                    if (sun && he && rook)
+                    {
+                        if (sun->IsInCombat())
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(sun, 999999.0f);
+                            // We've damaged sun down to 5% but we need to make sure others are down as well.
+                            if (sun->GetHealthPct() <= 5.0f && he->GetHealthPct() >= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(rook, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() <= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                                he->Kill(he);
+                                sun->Kill(sun);
+                                rook->Kill(rook);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1874,28 +2200,11 @@ public:
                 {
                     if (me->GetMapId() == 960) // Temple of Jade Serpent (56511)
                     {
-                        if (me->FindNearestCreature(56792, 30.0f))
-                        {
-                            //Force change target
-                            if (me->FindNearestCreature(56792, 30.0f)->IsInCombat() && me->FindNearestCreature(56792, 30.0f)->GetHealthPct() >= 80)
-                                me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56792, 30.0f), 999999.0f);
-                        }
-                        if (me->HasAura(106653)) // Sha Residue
-                        {
-                            if (me->FindNearestPlayer(30.0f))
-                            {
-                                me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0, true);
-                            }
-                        }
-                        if (me->GetAreaId() == 6117)
-                        {
-                            if (me->FindNearestCreature(56511, 30.0f))
-                            {
-                                //Force change target
-                                if (me->FindNearestCreature(56511, 30.0f)->IsInCombat() && me->FindNearestCreature(56511, 30.0f)->GetHealthPct() >= 80)
-                                    me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(56511, 30.0f), 999999.0f);
-                            }
-                        }
+                        TempleOfJadeSerpent_Strategy();
+                    }
+                    if (me->GetMapId() == 1136) // Siege of Orgrimmar
+                    {
+                        SiegeOfOrgrimmar_Strategy_TANKDPS();
                     }
                     events.ScheduleEvent(EVENT_TARGET_CHECK, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
                     break;
@@ -1932,14 +2241,14 @@ public:
         EVENT_TARGET_CHECK = 2,
     };
 
-    struct npc_bot_dps_rogueAI : public BossAI
+    struct npc_bot_dps_rogueAI : public ScriptedAI
     {
-        npc_bot_dps_rogueAI(Creature* creature) : BossAI(creature, 0) { }
+        npc_bot_dps_rogueAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
 
         void Reset() override
         {
-            _Reset();
-
             if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
             {
                 me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 4.0f, 4.0f);
@@ -1950,19 +2259,119 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            _JustEngagedWith();
-
-            if (!me->HasAura(35360))
+            if (me->GetMap())
             {
-                me->AddAura(35360, me);
+                if (me->GetMap()->IsDungeon())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (30% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMap()->IsRaid())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMapId() == 870 && me->GetZoneId() == 6757 && me->GetAreaId() == 6830)
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
             }
             events.ScheduleEvent(EVENT_ROGUE_SPELLS, 750);
             events.ScheduleEvent(EVENT_TARGET_CHECK, 3000);
         }
 
+        void SiegeOfOrgrimmar_Strategy_TANKDPS()
+        {
+            if (me->GetMapId() != 1136)
+                return;
+
+            if (me->GetMapId() == 1136)
+            {
+                if (me->HasAuraEffect(149164, 0)) // We are getting Frost AoE damage move.
+                {
+                    if (me->FindNearestPlayer(30.0f))
+                    {
+                        me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0.0f, true);
+                    }
+                    else
+                    {
+                        me->MonsterMoveWithSpeed(me->GetPositionX() + urand(2.0f, 4.0f), me->GetPositionY() + urand(4.0f, 5.0f), me->GetPositionZ(), 0.0f, false);
+                    }
+                }
+
+                //Immerseius
+                if (me->FindNearestCreature(71543, 100.0f) && me->FindNearestCreature(71603, 100.0f)) // Corrupted Sha
+                {
+                    // Sha puddles
+                    if (me->FindNearestCreature(71543, 100.0f)->IsInCombat()) // Make sure we are in combat with boss
+                    {
+                        if (me->FindNearestCreature(71603, 100.0f))
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(71603, 100.0f), 999999.0f);
+                        }
+                    }
+                }
+                //Protectors
+                if (me->GetAreaId() == 6798)
+                {
+                    Unit* sun = me->FindNearestCreature(71480, 50.0f, false);
+                    Unit* he = me->FindNearestCreature(71479, 50.0f, false);
+                    Unit* rook = me->FindNearestCreature(71475, 50.0f, false);
+                    if (sun && he && rook)
+                    {
+                        if (sun->IsInCombat())
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(sun, 999999.0f);
+                            // We've damaged sun down to 5% but we need to make sure others are down as well.
+                            if (sun->GetHealthPct() <= 5.0f && he->GetHealthPct() >= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(rook, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() <= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                                he->Kill(he);
+                                sun->Kill(sun);
+                                rook->Kill(rook);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
         }
 
         void UpdateAI(uint32 diff) override
@@ -2031,6 +2440,7 @@ public:
                             }
                         }
                     }
+                    SiegeOfOrgrimmar_Strategy_TANKDPS();
                     events.ScheduleEvent(EVENT_TARGET_CHECK, 3 * IN_MILLISECONDS);
                     break;
                 }
@@ -2066,14 +2476,14 @@ public:
         EVENT_TARGET_CHECK = 2,
     };
 
-    struct npc_bot_dps_mageAI : public BossAI
+    struct npc_bot_dps_mageAI : public ScriptedAI
     {
-        npc_bot_dps_mageAI(Creature* creature) : BossAI(creature, 0) { }
+        npc_bot_dps_mageAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
 
         void Reset() override
         {
-            _Reset();
-
             if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
             {
                 me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 4.0f, 4.0f);
@@ -2086,17 +2496,120 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            _JustEngagedWith();
-
+            if (me->GetMap())
+            {
+                if (me->GetMap()->IsDungeon())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (30% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMap()->IsRaid())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMapId() == 870 && me->GetZoneId() == 6757 && me->GetAreaId() == 6830)
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+            }
             me->SetControlled(true, UNIT_STATE_ROOT);
-            me->AddAura(35360, me);
             events.ScheduleEvent(EVENT_ARCANE_SPELLS, 750);
             events.ScheduleEvent(EVENT_TARGET_CHECK, 3000);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
+        }
+
+        void SiegeOfOrgrimmar_Strategy_TANKDPS()
+        {
+            if (me->GetMapId() != 1136)
+                return;
+
+            if (me->GetMapId() == 1136)
+            {
+                if (me->HasAuraEffect(149164, 0)) // We are getting Frost AoE damage move.
+                {
+                    if (me->FindNearestPlayer(30.0f))
+                    {
+                        me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0.0f, true);
+                    }
+                    else
+                    {
+                        me->MonsterMoveWithSpeed(me->GetPositionX() + urand(2.0f, 4.0f), me->GetPositionY() + urand(4.0f, 5.0f), me->GetPositionZ(), 0.0f, false);
+                    }
+                }
+
+                //Immerseius
+                if (me->FindNearestCreature(71543, 100.0f) && me->FindNearestCreature(71603, 100.0f)) // Corrupted Sha
+                {
+                    // Sha puddles
+                    if (me->FindNearestCreature(71543, 100.0f)->IsInCombat()) // Make sure we are in combat with boss
+                    {
+                        if (me->FindNearestCreature(71603, 100.0f))
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(71603, 100.0f), 999999.0f);
+                        }
+                    }
+                }
+                //Protectors
+                if (me->GetAreaId() == 6798)
+                {
+                    Unit* sun = me->FindNearestCreature(71480, 50.0f, false);
+                    Unit* he = me->FindNearestCreature(71479, 50.0f, false);
+                    Unit* rook = me->FindNearestCreature(71475, 50.0f, false);
+                    if (sun && he && rook)
+                    {
+                        if (sun->IsInCombat())
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(sun, 999999.0f);
+                            // We've damaged sun down to 5% but we need to make sure others are down as well.
+                            if (sun->GetHealthPct() <= 5.0f && he->GetHealthPct() >= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(rook, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() <= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                                he->Kill(he);
+                                sun->Kill(sun);
+                                rook->Kill(rook);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -2154,9 +2667,10 @@ public:
                             }
                         }
                     }
-                }
+                    SiegeOfOrgrimmar_Strategy_TANKDPS();
                     events.ScheduleEvent(EVENT_TARGET_CHECK, 3 * IN_MILLISECONDS);
                     break;
+                }
                 }
             }
 
@@ -2189,17 +2703,17 @@ public:
         EVENT_HEAL_CHECK_PLAYER = 2,
     };
 
-    struct npc_bot_healer_druidAI : public BossAI
+    struct npc_bot_healer_druidAI : public ScriptedAI
     {
-        npc_bot_healer_druidAI(Creature* creature) : BossAI(creature, 0) 
+        npc_bot_healer_druidAI(Creature* creature) : ScriptedAI(creature)
         { 
            SetCombatMovement(false);
         }
 
+        EventMap events;
+
         void Reset() override
         {
-            _Reset();
-
             if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
             {
                 me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 3.0f, 3.0f);
@@ -2210,16 +2724,50 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            _JustEngagedWith();
-
-            me->AddAura(35360, me);
+            if (me->GetMap())
+            {
+                if (me->GetMap()->IsDungeon())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (30% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMap()->IsRaid())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (90% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMapId() == 870 && me->GetZoneId() == 6757 && me->GetAreaId() == 6830)
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+            }
 
             events.ScheduleEvent(EVENT_HEAL_CHECK_UNIT, 1000);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
         }
 
         void UpdateAI(uint32 diff) override
@@ -2258,21 +2806,27 @@ public:
                                     if (!unit->HasAura(SPELL_REJUV))
                                     {
                                         me->CastSpell(unit, SPELL_REJUV, false);
+                                        me->CastSpell(me, SPELL_REJUV, false);
                                     }
                                 }
                             }
                         }
                     }
 
+                    if (!me->FindNearestCreature(98000, 30.0f))
+                        return;
+                    if (!me->FindNearestCreature(98002, 30.0f))
+                        return;
+
                     if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                     {
-                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 80 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98000, 30.0f) && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 80 && !me->FindNearestCreature(98000, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_REJUV, true);
                             }
-                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_LIFEBLOOM, true);
                                 if (me->FindNearestCreature(98000, 30.0f) && me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98000, 30.0f)->isDead())
@@ -2283,9 +2837,9 @@ public:
                             me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_REGROWTH, false);
                             return;
                         }
-                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() >= 81 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98000, 30.0f) && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() >= 81 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98000, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_REJUV, false);
                             }
@@ -2293,13 +2847,13 @@ public:
                     }
                     if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->isDead())
                     {
-                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 40 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98002, 30.0f) && me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 40 && !me->FindNearestCreature(98002, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_REJUV))
+                            if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_REJUV))
                             {
                                 me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_REJUV, true);
                             }
-                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98002, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_LIFEBLOOM, true);
                                 if (me->FindNearestCreature(98002, 30.0f) && me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_LIFEBLOOM) && !me->FindNearestCreature(98002, 30.0f)->isDead())
@@ -2310,9 +2864,9 @@ public:
                             me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_REGROWTH, false);
                             return;
                         }
-                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() >= 41 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98002, 30.0f) && me->FindNearestCreature(98002, 30.0f)->GetHealthPct() >= 41 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98002, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_REJUV) && !me->FindNearestCreature(98002, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_REJUV, false);
                             }
@@ -2350,17 +2904,17 @@ public:
         EVENT_HEAL_CHECK_PLAYER = 2,
     };
 
-    struct npc_bot_healer_priestAI : public BossAI
+    struct npc_bot_healer_priestAI : public ScriptedAI
     {
-        npc_bot_healer_priestAI(Creature* creature) : BossAI(creature, 0)
+        npc_bot_healer_priestAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
         }
 
+        EventMap events;
+
         void Reset() override
         {
-            _Reset();
-
             if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
             {
                 me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 3.0f, 3.0f);
@@ -2371,15 +2925,50 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            _JustEngagedWith();
-
+            if (me->GetMap())
+            {
+                if (me->GetMap()->IsDungeon())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (30% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMap()->IsRaid())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (90% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMapId() == 870 && me->GetZoneId() == 6757 && me->GetAreaId() == 6830)
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+            }
             events.ScheduleEvent(EVENT_HEAL_CHECK_PLAYER, 1000);
             events.ScheduleEvent(EVENT_HEAL_CHECK_UNIT, 3000);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
         }
 
         void UpdateAI(uint32 diff) override
@@ -2398,23 +2987,29 @@ public:
                 {
                 case EVENT_HEAL_CHECK_UNIT:
                     events.ScheduleEvent(EVENT_HEAL_CHECK_UNIT, 3000);
+
+                    if (!me->FindNearestCreature(98000, 30.0f))
+                        return;
+                    if (!me->FindNearestCreature(98002, 30.0f))
+                        return;
+
                     if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                     {
-                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 80 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98000, 30.0f) && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 80 && !me->FindNearestCreature(98000, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_RENEW, true);
                             }
-                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_POWER_WORD_SHIELD) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_POWER_WORD_SHIELD) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                             {
                                 me->FindNearestCreature(98000, 30.0f)->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_POWER_WORD_SHIELD, true);
                             }
                             me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_FLASH_HEAL, true);
                         }
-                        if (me->FindNearestCreature(98000, 30.0f)->GetHealthPct() >= 81 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98000, 30.0f) && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() >= 81 && me->FindNearestCreature(98000, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98000, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98000, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98000, 30.0f) && !me->FindNearestCreature(98000, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98000, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98000, 30.0f), SPELL_RENEW, true);
                             }
@@ -2422,21 +3017,21 @@ public:
                     }
                     if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->isDead())
                     {
-                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 40 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98002, 30.0f) && me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 40 && !me->FindNearestCreature(98002, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98002, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_RENEW, true);
                             }
-                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_POWER_WORD_SHIELD) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_POWER_WORD_SHIELD) && !me->FindNearestCreature(98002, 30.0f)->isDead())
                             {
                                 me->FindNearestCreature(98002, 30.0f)->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_POWER_WORD_SHIELD, true);
                             }
                             me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_FLASH_HEAL, true);
                         }
-                        if (me->FindNearestCreature(98002, 30.0f)->GetHealthPct() >= 41 && me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                        if (me->FindNearestCreature(98002, 30.0f) && me->FindNearestCreature(98002, 30.0f)->GetHealthPct() >= 41 && me->FindNearestCreature(98002, 30.0f)->GetHealthPct() <= 95 && !me->FindNearestCreature(98002, 30.0f)->isDead())
                         {
-                            if (!me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98002, 30.0f)->isDead())
+                            if (me->FindNearestCreature(98002, 30.0f) && !me->FindNearestCreature(98002, 30.0f)->HasAura(SPELL_RENEW) && !me->FindNearestCreature(98002, 30.0f)->isDead())
                             {
                                 me->CastSpell(me->FindNearestCreature(98002, 30.0f), SPELL_RENEW, false);
                             }
@@ -2466,6 +3061,7 @@ public:
                                     if (!unit->HasAura(SPELL_RENEW))
                                     {
                                         me->CastSpell(unit, SPELL_RENEW, false);
+                                        me->CastSpell(me, SPELL_RENEW, false);
                                     }
                                     return;
                                 }
@@ -2484,8 +3080,596 @@ public:
     }
 };
 
+// A-I-O Bot 98008
+class npc_bot_multi_dps : public CreatureScript
+{
+public:
+    npc_bot_multi_dps() : CreatureScript("npc_bot_multi_dps") { }
+
+    enum iSpells
+    {
+        //MAGE
+        SPELL_ARCANE_BLAST = 101816,
+        SPELL_ARCANE_BARRAGE = 145437,
+        SPELL_SCORCH = 75412,
+        // ROGUE
+        SPELL_SINISTER_STRIKE = 112931,
+        SPELL_MUTILATE = 145414,
+        SPELL_DEADLY_POISON = 145420,
+        // WARLOCK
+        SPELL_AGONY = 112999,
+        SPELL_CORRUPTION = 65810,
+        SPELL_SHADOW_BOLT = 133655,
+        SPELL_SUMMON_FELGUARD = 79958,
+        // Priest
+        SPELL_SHADOW_WORD_PAIN = 65541,
+        SPELL_DEVOUR_PLAGUE = 138490,
+        SPELL_MIND_FLAY = 85643,
+        SPELL_SHADOW_FORM = 16592,
+        SPELL_MIND_BLAST = 58850,
+        //Warrior
+        SPELL_HEROIC_STRIKE = 59035,
+        SPELL_WHIRLWIND_DAMAGE = 138190,
+        SPELL_THUNDER_CLAP = 145046,
+        //Paladin
+        SPELL_PALA_JUDGMENT = 41470,
+        SPELL_PALA_SEAL_OF_BLOOD = 111351,
+        SPELL_PALA_CRUSADER_STRIKE = 134822,
+        SPELL_PALA_DIVINE_STORM = 135404,
+        //ele shaman
+        SPELL_SHAM_LAVA_BURST = 102475,
+        SPELL_SHAM_FLAME_SHOCK = 43303,
+        SPELL_SHAM_CHAIN_LIGHTNING = 136018,
+        SPELL_SHAM_LIGHTNING_BOLT = 97474,
+        //feral druid
+        SPELL_DRU_CATFORM = 57655,
+        SPELL_DRU_MANGLE = 57657,
+        SPELL_DRU_RAKE = 125099,
+        //Death knight
+        SPELL_DK_ICY_TOCUH = 69916,
+        SPELL_DK_PLAGUESTRIKE = 55321,
+        SPELL_DK_BLOODSTRIKE = 60945,
+        SPELL_DK_OBLITERATE = 72360,
+        SPELL_DK_DEATH_DECAY = 61603,
+    };
+
+    enum iEvents
+    {
+        EVENT_ROGUE_SPELLS = 1,
+        EVENT_MAGE_SPELLS = 2,
+        EVENT_WARLOCK_SPELLS = 3,
+        EVENT_SHADOW_PRIEST_SPELLS = 4,
+        EVENT_WARRIOR_SPELLS = 5,
+        EVENT_RET_PALADIN_SPELLS = 6,
+        EVENT_ELE_SHAMAN_SPELLS = 7,
+        EVENT_FERAL_DRUID_SPELLS = 8,
+        EVENT_DEATH_KNIGHT_SPELLS = 9,
+        EVENT_STRATEGY_CHECK = 10,
+    };
+
+    struct npc_bot_multi_dpsAI : public ScriptedAI
+    {
+        npc_bot_multi_dpsAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->bot_Class = urand(0, 8);
+        }
+
+        EventMap events;
+
+
+        void Reset() override
+        {
+            me->SetControlled(false, UNIT_STATE_ROOT);
+            if (me->FindNearestPlayer(400.0f) && !me->IsInCombat())
+            {
+                me->GetMotionMaster()->MoveFollow(me->FindNearestPlayer(400.0f), 3.0f, 3.0f);
+            }
+
+            events.Reset();
+        }
+
+        void SiegeOfOrgrimmar_Strategy_TANKDPS()
+        {
+            if (me->GetMapId() != 1136)
+                return;
+
+            if (me->GetMapId() == 1136)
+            {
+                if (me->HasAura(149164) || me->HasAura(149164)) // We are getting Frost AoE damage move.
+                {
+                    if (me->FindNearestPlayer(30.0f))
+                    {
+                        me->MonsterMoveWithSpeed(me->FindNearestPlayer(30.0f)->GetPositionX(), me->FindNearestPlayer(30.0f)->GetPositionY(), me->FindNearestPlayer(30.0f)->GetPositionZ(), 0.0f, true);
+                    }
+                    else
+                    {
+                        me->MonsterMoveWithSpeed(me->GetPositionX() + urand(2.0f, 4.0f), me->GetPositionY() + urand(4.0f, 5.0f), me->GetPositionZ(), 0.0f, false);
+                    }
+                }
+
+                //Immerseius
+                if (me->FindNearestCreature(71543, 100.0f) && me->FindNearestCreature(71603, 100.0f)) // Corrupted Sha
+                {
+                    // Sha puddles
+                    if (me->FindNearestCreature(71543, 100.0f)->IsInCombat()) // Make sure we are in combat with boss
+                    {
+                        if (me->FindNearestCreature(71603, 100.0f))
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(me->FindNearestCreature(71603, 100.0f), 999999.0f);
+                        }
+                    }
+                }
+                //Protectors
+                if (me->GetAreaId() == 6798)
+                {
+                    Unit* sun = me->FindNearestCreature(71480, 50.0f, false);
+                    Unit* he = me->FindNearestCreature(71479, 50.0f, false);
+                    Unit* rook = me->FindNearestCreature(71475, 50.0f, false);
+                    if (sun && he && rook)
+                    {
+                        if (sun->IsInCombat())
+                        {
+                            me->GetThreatManager().resetAllAggro();
+                            me->GetThreatManager().doAddThreatNoRedirect(sun, 999999.0f);
+                            // We've damaged sun down to 5% but we need to make sure others are down as well.
+                            if (sun->GetHealthPct() <= 5.0f && he->GetHealthPct() >= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() >= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(rook, 999999.0f);
+                            }
+                            if (he->GetHealthPct() <= 5.0f && sun->GetHealthPct() <= 5.0f && rook->GetHealthPct() <= 5.0f)
+                            {
+                                me->GetThreatManager().resetAllAggro();
+                                me->GetThreatManager().doAddThreatNoRedirect(he, 999999.0f);
+                                he->Kill(he);
+                                sun->Kill(sun);
+                                rook->Kill(rook);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            if (me->GetMap())
+            {
+                if (me->GetMap()->IsDungeon())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (30% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMap()->IsRaid())
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (90% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+                if (me->GetMapId() == 870 && me->GetZoneId() == 6757 && me->GetAreaId() == 6830)
+                {
+                    if (!me->HasAura(62552))
+                    {
+                        me->AddAura(62552, me); // Defend (60% damage reduction)
+                        if (me->HasAura(62552))
+                        {
+                            me->GetAura(62552)->SetStackAmount(2);
+                            me->GetAura(62552)->SetDuration(3000000);
+                        }
+                    }
+                }
+            }
+
+            if (me->GetMap())
+            {
+                if (me->GetMap()->IsDungeon())
+                {
+                    me->SetLevel(urand(85, 90));
+                }
+                if (me->GetMap()->IsScenario() || me->GetMap()->IsRaid())
+                {
+                    me->SetLevel(90);
+                }
+            }
+
+            if (me->bot_Class == 0) // Rogue
+            {
+                me->SetDisplayId(51166);
+                me->SetAttackTime(WeaponAttackType::BASE_ATTACK, 1200);
+                me->SetAttackTime(WeaponAttackType::OFF_ATTACK, 2000);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 110883); // MH
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID + 1, 110883); // OH
+            }
+            if (me->bot_Class == 1) // Mage
+            {
+                me->SetDisplayId(28186);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 120755); // MH
+            }
+            if (me->bot_Class == 2) // warlock
+            {
+                me->SetDisplayId(36879);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 120755); // MH
+            }
+            if (me->bot_Class == 3) // shadow priest
+            {
+                me->SetDisplayId(28191);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 120755); // MH
+            }
+            if (me->bot_Class == 4) // warr
+            {
+                me->SetDisplayId(28201);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 119482); // MH
+            }
+            if (me->bot_Class == 5) // ret pally
+            {
+                me->SetDisplayId(36883);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 119482); // MH
+            }
+            if (me->bot_Class == 6) // shaman
+            {
+                me->SetDisplayId(28195);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 119457); // MH
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID + 1, 120225); // OH
+            }
+            if (me->bot_Class == 7) // feral
+            {
+                me->SetAttackTime(WeaponAttackType::BASE_ATTACK, 1200);
+                me->SetDisplayId(28182);
+            }
+            if (me->bot_Class == 8) // dk
+            {
+                me->SetDisplayId(28180);
+                me->SetUInt32Value(UNIT_FIELD_VIRTUAL_ITEM_ID, 119482); // MH
+            }
+            me->SetBaseWeaponDamage(WeaponAttackType::BASE_ATTACK, WeaponDamageRange::MINDAMAGE, 18554.0f);
+            me->SetBaseWeaponDamage(WeaponAttackType::BASE_ATTACK, WeaponDamageRange::MAXDAMAGE, 26554.0f);
+
+            if (me->bot_Class == 0) // Rogue
+            {
+                events.ScheduleEvent(EVENT_ROGUE_SPELLS, 750);
+            }
+            if (me->bot_Class == 1) // Mage
+            {
+                events.ScheduleEvent(EVENT_MAGE_SPELLS, 750);
+                me->SetControlled(true, UNIT_STATE_ROOT);
+            }
+            if (me->bot_Class == 2) // Warlock
+            {
+                events.ScheduleEvent(EVENT_WARLOCK_SPELLS, 750);
+                me->SetControlled(true, UNIT_STATE_ROOT);
+                if (me->GetMinionGUID() == NULL)
+                {
+                    me->CastSpell(me, SPELL_SUMMON_FELGUARD, true);
+                }
+            }
+            if (me->bot_Class == 3) // Shadow Priest
+            {
+                events.ScheduleEvent(EVENT_SHADOW_PRIEST_SPELLS, 750);
+                me->SetControlled(true, UNIT_STATE_ROOT);
+                if (!me->HasAura(SPELL_SHADOW_FORM))
+                {
+                    me->CastSpell(me, SPELL_SHADOW_FORM, false);
+                }
+            }
+            if (me->bot_Class == 4) // WARRIOR
+            {
+                events.ScheduleEvent(EVENT_WARRIOR_SPELLS, 750);
+            }
+            if (me->bot_Class == 5) // RET PALADIN
+            {
+                events.ScheduleEvent(EVENT_RET_PALADIN_SPELLS, 750);
+            }
+            if (me->bot_Class == 6) // ELEMENTAL SHAMAN
+            {
+                events.ScheduleEvent(EVENT_ELE_SHAMAN_SPELLS, 750);
+                me->SetControlled(true, UNIT_STATE_ROOT);
+            }
+            if (me->bot_Class == 7) // FERAL DRUID
+            {
+                if (!me->HasAura(SPELL_DRU_CATFORM))
+                {
+                    me->CastSpell(me, SPELL_DRU_CATFORM, false);
+                }
+                events.ScheduleEvent(EVENT_FERAL_DRUID_SPELLS, 750);
+            }
+            if (me->bot_Class == 8) // DEATH KNIGHT
+            {
+                events.ScheduleEvent(EVENT_DEATH_KNIGHT_SPELLS, 750);
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ROGUE_SPELLS:   
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_SINISTER_STRIKE, false);
+
+                            if (urand(0, 100) <= 10)
+                            {
+                                me->CastSpell(vict, SPELL_DEADLY_POISON, false);
+                            }
+
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_MUTILATE, false);
+
+                            if (urand(0, 100) <= 10)
+                            {
+                                me->CastSpell(vict, SPELL_DEADLY_POISON, false);
+                            }
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_ROGUE_SPELLS, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                case EVENT_MAGE_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 2))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_ARCANE_BARRAGE, false);
+                            if (me->HasAura(102442))
+                            {
+                                me->RemoveAura(102442);
+                            }
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_ARCANE_BLAST, false);
+                            break;
+                        case 2:
+                            me->CastSpell(vict, SPELL_SCORCH, false);
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_MAGE_SPELLS, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                case EVENT_WARLOCK_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 2))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_SHADOW_BOLT, false);
+                            break;
+                        case 1:
+                            if (!vict->HasAura(SPELL_CORRUPTION))
+                            {
+                                me->CastSpell(vict, SPELL_CORRUPTION, true);
+                            }
+                            else
+                            {
+                                me->CastSpell(vict, SPELL_SHADOW_BOLT, false);
+                            }
+                            break;
+                        case 2:
+                            if (!vict->HasAura(SPELL_AGONY))
+                            {
+                                me->CastSpell(vict, SPELL_AGONY, true);
+                            }
+                            else
+                            {
+                                me->CastSpell(vict, SPELL_SHADOW_BOLT, false);
+                            }
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_WARLOCK_SPELLS, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                case EVENT_SHADOW_PRIEST_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 2))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_MIND_BLAST, false);
+                            break;
+                        case 1:
+                            if (!vict->HasAura(SPELL_SHADOW_WORD_PAIN))
+                            {
+                                me->CastSpell(vict, SPELL_SHADOW_WORD_PAIN, true);
+                            }
+                            else
+                            {
+                                me->CastSpell(vict, SPELL_MIND_FLAY, false);
+                            }
+                            break;
+                        case 2:
+                            if (!vict->HasAura(SPELL_DEVOUR_PLAGUE))
+                            {
+                                me->CastSpell(vict, SPELL_DEVOUR_PLAGUE, false);
+                            }
+                            else
+                            {
+                                me->CastSpell(vict, SPELL_MIND_FLAY, false);
+                            }
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_SHADOW_PRIEST_SPELLS, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                case EVENT_WARRIOR_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 2))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_HEROIC_STRIKE, false);
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_WHIRLWIND_DAMAGE, false);
+                            break;
+                        case 2:
+                            me->CastSpell(vict, SPELL_THUNDER_CLAP, false);
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_WARRIOR_SPELLS, urand(2 * IN_MILLISECONDS, 3 * IN_MILLISECONDS));
+                    break;
+                case EVENT_RET_PALADIN_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 3))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_PALA_JUDGMENT, false);
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_PALA_CRUSADER_STRIKE, false);
+                            break;
+                        case 2:
+                            me->CastSpell(vict, SPELL_PALA_DIVINE_STORM, true);
+                            me->CastSpell(vict, SPELL_WHIRLWIND_DAMAGE, true);
+                            break;
+                        case 3:
+                            me->CastSpell(me, SPELL_PALA_SEAL_OF_BLOOD, true);
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_RET_PALADIN_SPELLS, urand(2 * IN_MILLISECONDS, 3 * IN_MILLISECONDS));
+                    break;
+                case EVENT_ELE_SHAMAN_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 3))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_SHAM_FLAME_SHOCK, false);
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_SHAM_LAVA_BURST, false);
+                            break;
+                        case 2:
+                            me->CastSpell(vict, SPELL_SHAM_CHAIN_LIGHTNING, true);
+                            break;
+                        case 3:
+                            me->CastSpell(me, SPELL_SHAM_LIGHTNING_BOLT, true);
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_ELE_SHAMAN_SPELLS, urand(1 * IN_MILLISECONDS, 2 * IN_MILLISECONDS));
+                    break;
+                case EVENT_FERAL_DRUID_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_DRU_MANGLE, false);
+                            break;
+                        case 1:
+                            if (!me->HasAura(SPELL_DRU_RAKE))
+                            {
+                                me->CastSpell(vict, SPELL_DRU_RAKE, false);
+                            }
+                            else
+                            {
+                                me->CastSpell(vict, SPELL_DRU_MANGLE, false);
+                            }
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_FERAL_DRUID_SPELLS, urand(2 * IN_MILLISECONDS, 3 * IN_MILLISECONDS));
+                    break;
+                case EVENT_DEATH_KNIGHT_SPELLS:
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Unit* vict = me->GetVictim())
+                    {
+                        switch (urand(0, 4))
+                        {
+                        case 0:
+                            me->CastSpell(vict, SPELL_DK_ICY_TOCUH, false);
+                            break;
+                        case 1:
+                            me->CastSpell(vict, SPELL_DK_BLOODSTRIKE, false);
+                            break;
+                        case 2:
+                            me->CastSpell(vict, SPELL_DK_PLAGUESTRIKE, false);
+                            break;
+                        case 3:
+                            me->CastSpell(vict, SPELL_DK_OBLITERATE, false);
+                            break;
+                        case 4:
+                            me->CastSpell(vict, SPELL_DK_DEATH_DECAY, false);
+                            break;
+                        }
+                    }
+
+                    events.ScheduleEvent(EVENT_DEATH_KNIGHT_SPELLS, urand(2 * IN_MILLISECONDS, 3 * IN_MILLISECONDS));
+                    break;
+                    case EVENT_STRATEGY_CHECK:
+                        SiegeOfOrgrimmar_Strategy_TANKDPS();
+                        events.ScheduleEvent(EVENT_STRATEGY_CHECK, 4000);
+                        break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bot_multi_dpsAI(creature);
+    }
+};
+
 void AddSC_elwynn_forest()
 {
+    new npc_bot_multi_dps();
+    new npc_shop_guy();
     new npc_bot_dps_rogue();
     new npc_bot_healer_priest();
     new npc_bot_healer_druid();
