@@ -425,6 +425,22 @@ PetBattle::~PetBattle()
 
 void PetBattle::StartBattle()
 {
+    // At start of battle check pet states somthing is fucked up here.
+    for (auto&& team : m_teams) 
+    {
+        for (auto&& battlePet : team->BattlePets)
+        {
+            if (battlePet->GetCurrentHealth() > 0) // Some pets get bugged bad.
+            {
+                battlePet->States[BATTLE_PET_STATE_IS_DEAD] = 0;
+            }
+            if (battlePet->GetCurrentHealth() <= 0) // Some pets get bugged bad.
+            {
+                battlePet->States[BATTLE_PET_STATE_IS_DEAD] = 1;
+            }
+        }
+    }
+
     for (auto&& team : m_teams)
     {
         if (Player* player = team->GetOwner())

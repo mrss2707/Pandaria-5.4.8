@@ -850,6 +850,16 @@ void WorldSession::HandlePetBattleSetFrontPet(WorldPacket& recvData)
 
     if (team->GetActivePet()->IsAlive())
     {
+        team->GetActivePet()->States[BATTLE_PET_STATE_IS_DEAD] = 1;
+        if (pet)
+        {
+            team->SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_DEAD_PET, 0, pet);
+        }
+        else
+        {
+            // oo hacktalon city
+            team->SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_OR_PASS, 0, team->GetActivePet());
+        }
         TC_LOG_ERROR("network", "CMSG_PET_BATTLE_SET_FRONT_PET Player %u want to swap dead pet but it is alive", GetPlayer()->GetGUID().GetCounter());
         return;
     }

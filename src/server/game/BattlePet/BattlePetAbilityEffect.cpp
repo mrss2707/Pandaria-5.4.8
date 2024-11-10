@@ -347,6 +347,10 @@ void BattlePetAbilityEffect::CalculateHit(int32 accuracy)
     accuracy += m_caster->States[BATTLE_PET_STATE_STAT_ACCURACY];
     accuracy -= m_target->States[BATTLE_PET_STATE_STAT_DODGE];
 
+    // Base Hit chance fixes
+    if (m_abilityId == 349) // Smash hit chance
+        accuracy = 85;
+
     // accuracy is reduced by 2% for every level higher the opponent is
     if (m_target->GetLevel() > m_caster->GetLevel())
         accuracy -= (m_target->GetLevel() - m_caster->GetLevel()) * 2;
