@@ -664,6 +664,10 @@ void PetBattle::HandleRound()
     firstTeam->DoCasts(PET_BATTLE_ABILITY_PROC_ON_ROUND_END);
     secondTeam->DoCasts(PET_BATTLE_ABILITY_PROC_ON_ROUND_END);
 
+    //Passive: Humanoid
+    
+    //Passive: Dragonkin
+
     bool hasAuras = firstTeam->HasAuras() || secondTeam->HasAuras();
     if (hasAuras)
     {
