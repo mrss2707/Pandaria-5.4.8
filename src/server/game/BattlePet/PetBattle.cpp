@@ -319,6 +319,23 @@ void PetBattleTeam::TurnFinished()
     if (!HasMultipleTurnAbility())
         m_ready = false;
 
+  /*  BattlePetStore avaliablePets;
+    GetAvaliablePets(avaliablePets);
+
+    if (!avaliablePets.size())
+    {
+        SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_OR_PASS, 0, nullptr);
+    }
+
+    if (avaliablePets.size() == 1)
+    {
+        BattlePet
+        if (!m_activePet->IsAlive())
+        {
+            SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_DEAD_PET, 0, m_activePet);
+        }
+    } */
+
     // Do next turn for PvE team
     if (!m_ready && !m_owner)
     {
@@ -328,12 +345,16 @@ void PetBattleTeam::TurnFinished()
                 if (CanActivePetCast(m_activePet->Abilities[i]->AbilityId))
                     avaliableAbilities.push_back(m_activePet->Abilities[i]->AbilityId);
 
-        // cast ability
+       // cast ability
         if (avaliableAbilities.size())
+        {
             SetPendingMove(PET_BATTLE_MOVE_TYPE_CAST, avaliableAbilities[rand() % avaliableAbilities.size()], nullptr);
+        }
         // skip turn
         else
+        {
             SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_OR_PASS, 0, m_activePet);
+        }
     }
 }
 
@@ -972,7 +993,19 @@ void PetBattle::Kill(BattlePet* killer, BattlePet* victim, uint32 abilityEffect,
 
     UpdatePetState(killer, victim, abilityEffect, BATTLE_PET_STATE_IS_DEAD, 1, flags);
 
-    m_roundResult = PET_BATTLE_ROUND_RESULT_CATCH_OR_KILL;
+    if (m_cagedPet == nullptr) // make sure we haven't triggered catch function
+    {
+        if (victimTeam->GetActivePet() == victim) // If our current pet was the victim 
+        {
+            m_roundResult = PET_BATTLE_ROUND_RESULT_CATCH_OR_KILL;
+        }
+        else
+        {
+            m_roundResult = PET_BATTLE_ROUND_RESULT_NORMAL;
+        }
+    }
+    else
+        m_roundResult = PET_BATTLE_ROUND_RESULT_CATCH_OR_KILL;
 }
 
 void PetBattle::Catch(BattlePet* source, BattlePet* target, uint32 abilityEffect)
