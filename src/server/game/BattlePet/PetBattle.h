@@ -171,6 +171,7 @@ public:
 
     void AddPlayer(Player* player);
     void AddWildBattlePet(Creature* creature);
+    void AddWildBattlePetAssist(Creature* creature);
 
     void ResetActiveAbility();
 

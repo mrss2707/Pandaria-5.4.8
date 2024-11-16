@@ -51,7 +51,7 @@ static BattlePetAbilityEffectHandler Handlers[PET_BATTLE_TOTAL_ABILITY_EFFECTS] 
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
-    /* Effect 022 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
+    /* Effect 022 */ { &BattlePetAbilityEffect::HandleDummy,                    PET_BATTLE_ABILITY_TARGET_CASTER   },
     /* Effect 023 */ { &BattlePetAbilityEffect::HandleHeal,                     PET_BATTLE_ABILITY_TARGET_CASTER },
     /* Effect 024 */ { &BattlePetAbilityEffect::HandleDamage,                   PET_BATTLE_ABILITY_TARGET_TARGET },
     /* Effect 025 */ { &BattlePetAbilityEffect::HandleCatch,                    PET_BATTLE_ABILITY_TARGET_TARGET },
@@ -150,14 +150,14 @@ static BattlePetAbilityEffectHandler Handlers[PET_BATTLE_TOTAL_ABILITY_EFFECTS] 
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
-    /* Effect 121 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
+    /* Effect 121 */ { &BattlePetAbilityEffect::HandleHealthConsume,            PET_BATTLE_ABILITY_TARGET_CASTER },
     /* Effect 122 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 123 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 124 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 125 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
-    /* Effect 128 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
+    /* Effect 128 */ { &BattlePetAbilityEffect::HandleSetHealthPercent,         PET_BATTLE_ABILITY_TARGET_TARGET },
     /* Effect 129 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /*   UNUSED   */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 131 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
@@ -165,8 +165,8 @@ static BattlePetAbilityEffectHandler Handlers[PET_BATTLE_TOTAL_ABILITY_EFFECTS] 
     /* Effect 133 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 134 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 135 */ { &BattlePetAbilityEffect::HandleKill,                     PET_BATTLE_ABILITY_TARGET_CASTER   },
-    /* Effect 136 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
-    /* Effect 137 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
+    /* Effect 136 */ { &BattlePetAbilityEffect::HandleCleansing,                PET_BATTLE_ABILITY_TARGET_CASTER   },
+    /* Effect 137 */ { &BattlePetAbilityEffect::HandleAuraState,                PET_BATTLE_ABILITY_TARGET_CASTER   },
     /* Effect 138 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 139 */ { &BattlePetAbilityEffect::HandleNull,                     PET_BATTLE_ABILITY_TARGET_NONE   },
     /* Effect 140 */ { &BattlePetAbilityEffect::HandleResetAuraDuration,        PET_BATTLE_ABILITY_TARGET_TARGET   },
@@ -354,6 +354,8 @@ void BattlePetAbilityEffect::CalculateHit(int32 accuracy)
     // accuracy is reduced by 2% for every level higher the opponent is
     if (m_target->GetLevel() > m_caster->GetLevel())
         accuracy -= (m_target->GetLevel() - m_caster->GetLevel()) * 2;
+
+    TC_LOG_ERROR("network", "BattlePetAbilityEffect::CalculateHit AbilityID %u has accuracy percentage of %u", m_abilityId, accuracy);
 
     if (m_caster != m_target && m_target->States[BATTLE_PET_STATE_UNTARGETABLE])
         m_flags |= PET_BATTLE_EFFECT_FLAG_MISS;
@@ -656,6 +658,24 @@ void BattlePetAbilityEffect::HandleInitialization()
     m_target->States[petTypePassiveState[petType]] = 1; */
 }
 
+//Effect 121
+void BattlePetAbilityEffect::HandleHealthConsume()
+{
+    int32 l_HealthConsumePct = m_effectEntry->Properties[0];
+
+    /// Hotfix for http://wowhead.com/petability=758
+    if (m_abilityId == 758)
+        l_HealthConsumePct = 50;
+
+    SetHealth(m_target, m_target->GetCurrentHealth() - CalculatePct(m_target->GetMaxHealth(), l_HealthConsumePct));
+}
+
+//Effect 128
+void BattlePetAbilityEffect::HandleSetHealthPercent()
+{
+    SetHealth(m_target, CalculatePct(m_target->GetMaxHealth(), m_effectEntry->Properties[0]));
+}
+
 //Effect 86
 void BattlePetAbilityEffect::HandleDamageAuraToggleAura()
 {
@@ -687,6 +707,31 @@ void BattlePetAbilityEffect::HandleModState()
         return;
 
     m_petBattle->UpdatePetState(m_caster, m_target, m_effectEntry->Id, m_effectEntry->Properties[0], m_effectEntry->Properties[1]);
+}
+
+void BattlePetAbilityEffect::HandleAuraState()
+{
+    if (m_effectEntry->Properties[5] && m_chainFailure)
+        return;
+
+    if (m_effectEntry->Properties[0] && m_caster->States[m_effectEntry->Properties[0]] != m_effectEntry->Properties[1])
+        return;
+
+    if (m_effectEntry->Properties[3] && m_caster->States[m_effectEntry->Properties[3]] != m_effectEntry->Properties[4])
+        return;
+
+    m_petBattle->AddAura(m_caster, m_target, m_effectEntry->TriggerAbility, m_effectEntry->Id, m_effectEntry->Properties[2], m_flags, 0);
+}
+
+void BattlePetAbilityEffect::HandleCleansing()
+{
+    for (auto&& aura : m_caster->Auras)
+    {
+        if (!aura->HasExpired() && m_caster == m_target)
+        {
+            aura->Expire();
+        }
+    }
 }
 
 //Effect 72
@@ -809,6 +854,17 @@ void BattlePetAbilityEffect::HandleStateDamage()
         l_Damage *= 2;
 
     Damage(m_target, l_Damage);
+}
+
+//Effect 22
+void BattlePetAbilityEffect::HandleDummy()
+{
+
+}
+
+//Effect 129
+void BattlePetAbilityEffect::HandleLockActiveAbility()
+{
 }
 
 //Effect 28

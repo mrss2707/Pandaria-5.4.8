@@ -72,6 +72,7 @@ public:
 
     bool Execute();
     void HandleNull() { }
+    void HandleDummy();
 
     void HandleHeal();
     void HandleDamage();
@@ -119,6 +120,11 @@ public:
     void HandleHealStateToggleAura();
     void HandleModState();
     void HandleDamageAuraToggleAura();
+    void HandleHealthConsume();
+    void HandleSetHealthPercent();
+    void HandleLockActiveAbility(); // NYI
+    void HandleCleansing();
+    void HandleAuraState();
 
 private:
     uint32 m_abilityId = 0;
