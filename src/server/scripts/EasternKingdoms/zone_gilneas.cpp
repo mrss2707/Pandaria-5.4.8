@@ -106,6 +106,8 @@ enum Gilneas
     WORGEN_ENRAGE_EMOTE                     = 0,
 
     QUEST_SAVE_KRENNAN_ARANAS               = 14293,
+    QUEST_BROTHER_IN_ARMS                   = 26129,
+    QUEST_THE_REBEL_LORDS_ARSENAL           = 14159,
 
     NPC_KRENNAN_ARANAS                      = 35753,
     NPC_KING_GREYMANES_HORSE                = 35905,
@@ -1348,6 +1350,13 @@ public:
         return true;
     }
 
+    /*bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest) override {
+        if (quest->GetQuestId() == QUEST_BROTHER_IN_ARMS) {
+            if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_THE_REBEL_LORDS_ARSENAL))
+                player->AddQuest(quest, player);
+        }
+    }*/
+
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_king_genn_greymaneAI (creature);
@@ -1374,6 +1383,22 @@ public:
     private:
         TaskScheduler _scheduler;
     };
+};
+
+class npc_king_genn_greymane_q14159 : public CreatureScript {
+public:
+    npc_king_genn_greymane_q14159() : CreatureScript("npc_king_genn_greymane_q14159") {}
+    
+    /*bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest) override {
+        TC_LOG_INFO("server.load", "npc_king_genn_greymane_q14159 OnQuestComplete");
+        if (quest->GetQuestId() == QUEST_BROTHER_IN_ARMS) {
+            TC_LOG_INFO("server.load", "1");
+            if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_THE_REBEL_LORDS_ARSENAL)) {
+                TC_LOG_INFO("server.load", "2");
+                player->AddQuest(quest, player);
+            }
+        }
+    }*/
 };
 
 class npc_vehicle_genn_horse : public CreatureScript
@@ -2323,6 +2348,7 @@ void AddSC_gilneas()
     new creature_script<npc_bloodfang_lurker>("npc_bloodfang_lurker");
     new spell_script<spell_attack_lurker>("spell_attack_lurker");
     new npc_king_genn_greymane();
+    new npc_king_genn_greymane_q14159();
     new npc_vehicle_genn_horse();
     new creature_script<npc_saved_aranas>("npc_saved_aranas");
     new npc_gilneas_children("npc_james", SPELL_SAVE_JAMES, PLAYER_SAY_JAMES);
