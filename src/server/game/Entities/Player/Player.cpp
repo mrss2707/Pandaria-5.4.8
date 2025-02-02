@@ -415,6 +415,8 @@ Player::Player(WorldSession* session) : Unit(true), phaseMgr(this), hasForcedMov
     transcendence_spirit = nullptr;
 
     m_dynamicValuesCount = PLAYER_DYNAMIC_END;
+
+    m_xprate = sWorld->getRate(RATE_XP_KILL);
 }
 
 Player::~Player()
@@ -746,7 +748,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
         }
     }
     // all item positions resolved
-
+    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guidlow))
+        return false;
     return true;
 }
 
@@ -7166,7 +7169,7 @@ void Player::CheckAreaExploreAndOutdoor()
                 uint32 XP = 0;
                 if (diff < -5)
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel()+5)*sWorld->getRate(RATE_XP_EXPLORE, this));
+                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel()+5)*GetXPRate(GetGUID()));
                 }
                 else if (diff > 5)
                 {
@@ -7174,11 +7177,11 @@ void Player::CheckAreaExploreAndOutdoor()
                     if (exploration_percent < 0)
                         exploration_percent = 0;
 
-                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*exploration_percent/100*sWorld->getRate(RATE_XP_EXPLORE, this));
+                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*exploration_percent/100*GetXPRate(GetGUID()));
                 }
                 else
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*sWorld->getRate(RATE_XP_EXPLORE, this));
+                    XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*GetXPRate(GetGUID()));
                 }
 
                 GiveXP(XP, NULL);
@@ -16975,7 +16978,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         SetQuestSlot(log_slot, 0);
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = IsQuestRewarded(quest_id) ? 0 : uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST, this));
+    uint32 XP = IsQuestRewarded(quest_id) ? 0 : uint32(quest->XPValue(this) * GetXPRate(GetGUID()));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
@@ -19638,6 +19641,11 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
 
     _LoadDeserterInfo(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_DESERTER_INFO));
     _LoadBattlegroundStats(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BATTLGEROUND_STATS));
+
+    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid))
+        m_xprate = result->Fetch()->GetUInt32();
+    else
+        m_xprate = sWorld->getRate(RATE_XP_KILL);
 
     return true;
 }
@@ -27660,6 +27668,23 @@ bool Player::isTotalImmune()
             return true;
     }
     return false;
+}
+
+uint32 Player::GetXPRate(uint32 guid)
+{
+    uint8 rate = 0;
+    if (QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid))
+        rate = (*result)[0].GetUInt32();
+    else
+        rate = sWorld->getRate(RATE_XP_KILL);
+
+    return rate;
+}
+
+void Player::SetXPRate(uint32 rate)
+{
+    m_xprate = rate;
+    return;
 }
 
 bool Player::HasTitle(uint32 bitIndex) const

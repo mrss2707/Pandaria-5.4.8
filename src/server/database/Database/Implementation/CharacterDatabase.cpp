@@ -731,6 +731,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_BATTLEGROUND_STATS, "DELETE FROM character_battleground_stats WHERE guid = ?", CONNECTION_ASYNC);
 
     PrepareStatement(CHAR_UPD_CHAR_LAST_LOGIN, "UPDATE characters SET last_login = UNIX_TIMESTAMP() WHERE guid = ?", CONNECTION_ASYNC);
+
+    // Custom
+    PrepareStatement(CHAR_UPD_XPRATE, "INSERT INTO character_xprate (id, xprate) VALUES(?, ?) ON DUPLICATE KEY UPDATE xprate=?", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo, ConnectionFlags connectionFlags) : MySQLConnection(connInfo, connectionFlags)

@@ -134,6 +134,8 @@ void KillRewarder::RewardHonor(Player* player)
 void KillRewarder::RewardXP(Player* player, float rate)
 {
     uint32 xp(_xp);
+    uint32 guid = player->GetGUID();
+    uint32 newrate = player->GetXPRate(guid);
     if (_group)
     {
         // 4.2.1. If player is in group, adjust XP:
@@ -159,7 +161,7 @@ void KillRewarder::RewardXP(Player* player, float rate)
             AddPct(xp, (*i)->GetAmount());
 
         int32 diff = _victim->GetLevel() - player->GetLevel();
-        xp *= diff > int32(sWorld->getIntConfig(CONFIG_XP_KILL_LEVEL_DIFFERENCE)) ? 0 : sWorld->getRate(RATE_XP_KILL, player);
+        xp *= diff > int32(sWorld->getIntConfig(CONFIG_XP_KILL_LEVEL_DIFFERENCE)) ? 0 : newrate;
 
         // 4.2.3. Calculate expansion penalty
         if (_victim->GetTypeId() == TYPEID_UNIT && player->GetLevel() >= GetMaxLevelForExpansion(_victim->ToCreature()->GetCreatureTemplate()->expansion))

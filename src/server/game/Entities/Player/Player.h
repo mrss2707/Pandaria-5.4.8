@@ -3072,7 +3072,8 @@ public:
     void RemoveTimedAchievement(CriteriaStartTypes type, uint32 entry);
     void CompletedAchievement(AchievementEntry const* entry);
     void RemoveAchievement(AchievementEntry const* entry);
-
+    void SetXPRate(uint32 rate);
+    uint32 GetXPRate(uint32 guid);
     bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const
     {
@@ -3580,6 +3581,9 @@ protected:
 
     //WorldFilter
     std::string m_sentMsgCache;
+
+    // Custom
+    uint32 m_xprate;
 
     private:
     // internal common parts for CanStore/StoreItem functions

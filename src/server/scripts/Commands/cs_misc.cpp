@@ -194,11 +194,12 @@ public:
             { "replace",        SEC_ADMINISTRATOR, true, replaceCommandTable        },
             { "checkladder",    SEC_ADMINISTRATOR,  true,   &HandleCheckLadderCommand   },
             { "wordfilter",         SEC_ADMINISTRATOR,      false, wordFilterCommandTable },
+            { "xprate",         SEC_PLAYER,         false,  &HandleXPRateCommand,         },
             { "deleteditem",    SEC_ADMINISTRATOR,  true,
             {
                 { "list",      SEC_ADMINISTRATOR,   true,   &HandleDeletedItemListCommand,    },
                 { "restore",   SEC_ADMINISTRATOR,   true,   &HandleDeletedItemRestoreCommand, },
-            } },
+            }},
         };
         return commandTable;
     }
@@ -221,6 +222,53 @@ public:
     static bool HandleToolSpawnGOCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::SpawnGO); }
     static bool HandleToolLOSCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::LOS); }
     static bool HandleToolMMapsCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::MMaps); }
+
+    static bool HandleXPRateCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        uint32 guid = player->GetGUID();
+
+        if (!*args) {
+            uint8 rate = player->GetXPRate(guid);
+            if (!rate) {
+                QueryResult result = CharacterDatabase.PQuery("SELECT xprate FROM character_xprate WHERE id = %u", guid);
+                size_t size = result ? (*result)[0].GetUInt32() : 0;
+
+                if (size) {
+                    uint32 currate = (*result)[0].GetUInt32();
+
+                    if (currate)
+                        handler->PSendSysMessage(LANG_CHAR_XPRATE, currate);
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+                handler->PSendSysMessage(LANG_CHAR_XPRATE, rate);
+            return false;
+        }
+
+        std::string argstr = (char*)args;
+        int newrate = stoi(argstr);
+        int maxrate = sWorld->getRate(Rates::RATE_XP_MAX);
+
+        if (newrate > maxrate)
+            newrate = maxrate;
+        else if (newrate < 0)
+            newrate = 0;
+        else
+            newrate = stoi(argstr);
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_XPRATE);
+        stmt->setUInt64(0, guid);
+        stmt->setUInt32(1, newrate);
+        stmt->setUInt32(2, newrate);
+        CharacterDatabase.Execute(stmt);
+        handler->PSendSysMessage("New Rates set to: %u", newrate);
+        player->SetXPRate(newrate);
+        return true;
+    }
 
     static bool HandleBadWordAddCommand(ChatHandler* handler, char const* args)
     {

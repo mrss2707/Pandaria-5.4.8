@@ -133,6 +133,9 @@ enum LoginDatabaseStatements : uint32
 
     LOGIN_INS_ARENA_GAMES,
 
+    // Custom
+    LOGIN_UPD_ACCFACTIONS,
+
     MAX_LOGINDATABASE_STATEMENTS
 };
 
