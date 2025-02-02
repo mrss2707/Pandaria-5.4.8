@@ -15,6 +15,8 @@
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cmath>
+
 #include "KillRewarder.h"
 #include "SpellAuraEffects.h"
 #include "Creature.h"
@@ -131,11 +133,30 @@ void KillRewarder::RewardHonor(Player* player)
         player->RewardHonor(_victim, _count, -1, true);
 }
 
+double KillRewarder::getVictimXP(int level)
+{
+    double base_xp = 1.0;
+    double max_xp = 70.0;
+    int max_level = 93;
+
+    if (level > max_level)
+        level = max_level;
+
+    double k = log(max_xp / base_xp) / (max_level - 1);
+    double victimXp = base_xp * exp(k * (level - 1));
+
+    return victimXp;
+}
+
 void KillRewarder::RewardXP(Player* player, float rate)
 {
     uint32 xp(_xp);
     uint32 guid = player->GetGUID();
     uint32 newrate = player->GetXPRate(guid);
+    double ixp = getVictimXP(_victim->GetLevel());
+    if(xp > 0)
+        player->GiveIXP(ixp);
+
     if (_group)
     {
         // 4.2.1. If player is in group, adjust XP:

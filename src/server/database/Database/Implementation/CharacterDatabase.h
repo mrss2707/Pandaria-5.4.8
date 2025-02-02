@@ -640,6 +640,7 @@ enum CharacterDatabaseStatements : uint32
 
     // Custom
     CHAR_UPD_XPRATE,
+    CHAR_DEL_XPRATE,
 
     MAX_CHARACTERDATABASE_STATEMENTS
 };

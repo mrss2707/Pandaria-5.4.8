@@ -195,6 +195,8 @@ public:
             { "checkladder",    SEC_ADMINISTRATOR,  true,   &HandleCheckLadderCommand   },
             { "wordfilter",         SEC_ADMINISTRATOR,      false, wordFilterCommandTable },
             { "xprate",         SEC_PLAYER,         false,  &HandleXPRateCommand,         },
+            { "dumpattune",     SEC_ADMINISTRATOR,  false,  &HandleDumpAttuneCommand,     },
+            { "dumpequip",      SEC_ADMINISTRATOR,  false,  &HandleDumpEquipCommand,      },
             { "deleteditem",    SEC_ADMINISTRATOR,  true,
             {
                 { "list",      SEC_ADMINISTRATOR,   true,   &HandleDeletedItemListCommand,    },
@@ -222,6 +224,49 @@ public:
     static bool HandleToolSpawnGOCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::SpawnGO); }
     static bool HandleToolLOSCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::LOS); }
     static bool HandleToolMMapsCommand(ChatHandler* handler, char const* args) { return SelectToolHelper(handler, args, DevToolType::MMaps); }
+
+    static bool HandleDumpEquipCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+        {
+            handler->PSendSysMessage("Error: Player doesn't have a player!");
+            return false;
+        }
+
+        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
+        {
+            Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (item)
+                handler->PSendSysMessage("Slot: %u   Item ID: %u", i, item->GetEntry());
+
+        }
+        return true;
+    }
+
+    static bool HandleDumpAttuneCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player)
+        {
+            handler->PSendSysMessage("Error: Player does not have a player!");
+            return false;
+        }
+
+        if (!player->m_attunementXP.empty())
+        {
+            for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
+            {
+                if (player->m_attunementXP[i][0] != 0)
+                    handler->PSendSysMessage("Slot: %u  Item: %u  Exp: %u", i, player->m_attunementXP[i][0], player->m_attunementXP[i][1]);
+            }
+            return true;
+        }
+
+        handler->PSendSysMessage("Error: Player has no attunement array!");
+        return false;
+    }
 
     static bool HandleXPRateCommand(ChatHandler* handler, char const* args)
     {

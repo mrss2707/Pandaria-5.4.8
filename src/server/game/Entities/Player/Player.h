@@ -2859,6 +2859,9 @@ public:
     void UpdatePhasing();
     void PlayerSendSetPhaseShift(std::set<uint32> const& phaseIds);
 
+    // Custom
+    void GiveIXP(uint32 xp);
+
     uint8 m_forced_speed_changes [MAX_MOVE_TYPE];
 
     bool HasAtLoginFlag(AtLoginFlags f) const
@@ -3282,6 +3285,9 @@ public:
     void AddTotalBGCount(bool win);
     uint32 GetTotalBGCount() { return totalBGCount; }
     uint32 GetTotalBGWins() { return totalBGWins; }
+
+    // Custom
+    std::vector<std::vector<uint32>> m_attunementXP;
 
 protected:
     void MarkQuestObjectiveToSave(uint32 questId, uint32 objectiveId)

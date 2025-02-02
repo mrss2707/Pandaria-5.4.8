@@ -1015,6 +1015,5 @@ namespace LuaGlobalFunctions
         sEluna->Push(L, oss.str());
         return 1;
     }
-
 }
 #endif

@@ -17,6 +17,10 @@
 
 #include "Common.h"
 #include "Item.h"
+
+#include <lstate.h>
+#include <cmath>
+
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "DatabaseEnv.h"
@@ -2174,4 +2178,24 @@ bool ItemTemplate::IsUsableByLootSpecialization(Player const* player, bool alway
 std::size_t ItemTemplate::CalculateItemSpecBit(ChrSpecializationEntry const* spec)
 {
     return (spec->classId - 1) * MAX_SPECIALIZATIONS + spec->TabPage;
+}
+
+bool Item::CanPlayerAttune(Player* player, Item* item)
+{
+    if (!player->CanUseItem(item))
+        return false;
+    QueryResult result = LoginDatabase.PQuery("SELECT EXISTS(SELECT id FROM attunement WHERE id = %u AND itemID = %u AND experience < 100)", player->GetSession()->GetAccountId(), item->GetEntry()); // TODO: Make this a prepared statement
+    if (result->Fetch()->GetInt8() == 0 || !result)
+        return false;
+    if (!isAttunable(item))
+        return false;
+    return true;
+}
+
+bool Item::isAttunable(Item* item)
+{
+    QueryResult result = WorldDatabase.PQuery("SELECT EXISTS(SELECT entry FROM item_template_attunable WHERE entry = %u)", item->GetEntry()); // TODO: Make this a prepared statement
+    if(result->Fetch()->GetInt8() == 0 || !result)
+        return false;
+    return true;
 }

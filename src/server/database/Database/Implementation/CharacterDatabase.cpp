@@ -734,6 +734,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     // Custom
     PrepareStatement(CHAR_UPD_XPRATE, "INSERT INTO character_xprate (id, xprate) VALUES(?, ?) ON DUPLICATE KEY UPDATE xprate=?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_XPRATE, "DELETE FROM character_xprate WHERE id = ?", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo, ConnectionFlags connectionFlags) : MySQLConnection(connInfo, connectionFlags)

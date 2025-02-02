@@ -402,6 +402,9 @@ class Item : public Object
 
         bool IsEyeOfTheBlackPrinceAllowed() const;
 
+        bool CanPlayerAttune(Player* player, Item* item);
+        bool isAttunable(Item* item);
+
     protected:
         void AddToUpdate() override;
         void RemoveFromUpdate() override;

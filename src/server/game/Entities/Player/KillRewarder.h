@@ -31,6 +31,7 @@ public:
     KillRewarder(Player* killer, Unit* victim, bool isBattleGround);
 
     void Reward();
+    double getVictimXP(int level);
 
 private:
     void InitXP(Player* player);
