@@ -848,8 +848,31 @@ void WorldSession::HandlePetBattleSetFrontPet(WorldPacket& recvData)
         }
     }
 
+    //We've swaped a pet so set it as active, sometimes this bug happens when you swap and the pet dies in the background.
+    /*if (battle->GetState() == PetBattleState::InProgress && team->GetActivePet()->IsAlive())
+    {
+        if (pet)
+        {
+            team->SetActivePet(pet); // Set new pet as front so this doesn't bug out the front pets abilties
+            TC_LOG_ERROR("network", "CMSG_PET_BATTLE_SET_FRONT_PET Player %u want to swap dead pet but it is alive (5), PET ID: %u", GetPlayer()->GetGUID().GetCounter(), pet->GetId());
+        }
+    } */
+
     if (team->GetActivePet()->IsAlive())
     {
+        /* team->GetActivePet()->States[BATTLE_PET_STATE_IS_DEAD] = 1;
+        if (pet)
+        {
+            //team->SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_DEAD_PET, 0, pet);
+            //pet->isHackFIX = true;
+            TC_LOG_ERROR("network", "CMSG_PET_BATTLE_SET_FRONT_PET Player %u want to swap dead pet but it is alive (4), PET ID: %u", GetPlayer()->GetGUID().GetCounter(), pet->GetId());
+        }
+        else
+        {
+            // oo hacktalon city (not sure why this happens)
+            team->SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_OR_PASS, 0, team->GetActivePet());
+            TC_LOG_ERROR("network", "CMSG_PET_BATTLE_SET_FRONT_PET Player %u want to swap dead pet but it is alive (3)", GetPlayer()->GetGUID().GetCounter());
+        } */
         TC_LOG_ERROR("network", "CMSG_PET_BATTLE_SET_FRONT_PET Player %u want to swap dead pet but it is alive", GetPlayer()->GetGUID().GetCounter());
         return;
     }

@@ -246,6 +246,15 @@ void BattlePet::SetXP(uint16 xpGain)
     if (m_level == BATTLE_PET_MAX_LEVEL)
         return;
 
+    if (m_owner)
+    {
+        if (m_owner->HasAura(142205)) // BP treat
+        {
+            xpGain = xpGain + urand(8, 20);
+            TC_LOG_ERROR("BP", "BONUS XP");
+        }
+    }
+
     uint16 baseValue = sGtBattlePetXpStore.LookupEntry(100 + (m_level - 1))->Value;
     uint16 multiplier = sGtBattlePetXpStore.LookupEntry(m_level - 1)->Value;
 

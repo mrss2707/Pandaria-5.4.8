@@ -1306,7 +1306,7 @@ class spell_zanvess_bombard : public SpellScript
     PrepareSpellScript(spell_zanvess_bombard);
 
     void HandleEffectHit(SpellEffIndex /*effIndex*/)
-    {
+    {       
         // tooltip miss or should calculate by anyway. in 5.4.8 has ~320-350k 
         SetHitDamage(GetHitDamage() * 10);
     }

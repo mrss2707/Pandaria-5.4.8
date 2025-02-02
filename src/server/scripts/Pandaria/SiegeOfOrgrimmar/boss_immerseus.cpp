@@ -847,6 +847,8 @@ struct npc_sha_puddle_immerseus : public ScriptedAI
     {
         reachedBoss = false;
         me->SetInCombatWithZone();
+        me->SetSpeed(MOVE_WALK, 0.1f, true);
+        me->SetSpeed(MOVE_RUN, 0.1f, true);
         me->SetReactState(REACT_PASSIVE);
         DoCast(me, SPELL_SHA_SLIME, true);
         summonerGUID = summoner->GetGUID();

@@ -209,6 +209,8 @@ class ThreatManager
 
         void addThreat(Unit* victim, float threat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = NULL);
 
+        void doAddThreatNoRedirect(Unit* victim, float threat);
+
         void doAddThreat(Unit* victim, float threat);
 
         void modifyThreatPercent(Unit* victim, int32 percent);

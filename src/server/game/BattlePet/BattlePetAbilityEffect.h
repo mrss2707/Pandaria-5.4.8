@@ -28,11 +28,11 @@ enum PetBattleAbilityTarget
     PET_BATTLE_ABILITY_TARGET_NONE                      = 0,
     PET_BATTLE_ABILITY_TARGET_CASTER                    = 1,
     PET_BATTLE_ABILITY_TARGET_TARGET                    = 2,
-    // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM               = 3,
+    //PET_BATTLE_ABILITY_TARGET_CASTER_TEAM               = 3,
     // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM_0             = 4,
     // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM_1             = 5,
     // PET_BATTLE_ABILITY_TARGET_CASTER_TEAM_2             = 6,
-    // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM               = 7,
+    PET_BATTLE_ABILITY_TARGET_TARGET_TEAM               = 7,
     // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM_0             = 8,
     // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM_1             = 9,
     // PET_BATTLE_ABILITY_TARGET_TARGET_TEAM_2             = 10,
@@ -59,6 +59,7 @@ public:
     BattlePet* GetActiveOpponent();
     void AddTargets();
     void AddTarget(BattlePet* target);
+    uint32 GetPetType();
 
     uint32 CalculateDamage(uint32 damage);
     uint32 CalculateHeal(uint32 heal);
@@ -71,6 +72,7 @@ public:
 
     bool Execute();
     void HandleNull() { }
+    void HandleDummy();
 
     void HandleHeal();
     void HandleDamage();
@@ -88,6 +90,41 @@ public:
     void HandleHealState();
     void HandleDamageNonLethal();
     void HandlePowerlessAura();
+    void HandleExtraAttack();
+    void HandleResurect();
+    void HandleHealOnSpecificWeather();
+    void HandleWeatherAura();
+    void HandleWeatherDamage();
+    void HandleDamagePercent();
+    void HandleHealLastHitTaken();
+    void HandleDamageCasterPercent();
+    void HandleDamagePercentTaken();
+    void HandleDamageStateBonus();
+    void HandleResetState();
+    void HandleHealCasterPercentNotState();
+    void HandleControlAura();
+    void HandleAuraCondAccuracyState();
+    void HandleSplittedDamage();
+    void HandleResetAuraDuration(); // Not handled
+    void HandleStopChainFailure();
+    void HandleKill();
+    void HandleCancellableAura();
+    void HandleStateDamage();
+    void HandleRemoveAura();
+    void HandleHealPercent();
+    void HandleWitchingDamage();
+    void HandleDamageRuthless();
+    void HandleEqualizeLife();
+    void HandleHealToggleAura();
+    void HandleInitialization();
+    void HandleHealStateToggleAura();
+    void HandleModState();
+    void HandleDamageAuraToggleAura();
+    void HandleHealthConsume();
+    void HandleSetHealthPercent();
+    void HandleLockActiveAbility(); // NYI
+    void HandleCleansing();
+    void HandleAuraState();
 
 private:
     uint32 m_abilityId = 0;
@@ -104,6 +141,7 @@ private:
 
     bool m_reportFailAsImmune = false;
     bool m_chainFailure = false;
+    bool m_immortalOneRound = true;
 };
 
 #endif

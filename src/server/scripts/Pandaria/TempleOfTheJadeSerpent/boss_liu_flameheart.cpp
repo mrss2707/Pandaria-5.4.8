@@ -385,7 +385,7 @@ class boss_yu_lon_tjs : public CreatureScript
                             if (Creature* liu = Unit::GetCreature(*me, instance->GetGuidData(DATA_LIU)))
                             {
                                 me->SetFacingToObject(liu);
-                                liu->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                liu->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                             }
 
                             me->CastSpell((Unit*)NULL, SPELL_CLEANSING_BREATH, false);

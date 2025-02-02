@@ -92,6 +92,8 @@ class instance_unga_ingoo : public InstanceMapScript
                         break;
                     case NPC_CAPTAIN_OOK:
                         ookOokGUID = creature->GetGUID();
+                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                        creature->SetVisible(false);
                         break;
                     case NPC_OKU_OKU:
                         okuOkuGUID = creature->GetGUID();
@@ -312,16 +314,23 @@ class instance_unga_ingoo : public InstanceMapScript
                                 // Spill no evil achievement
                                 if (!boBrew->AI()->GetData(TYPE_KEG_STILLED))
                                     boBrew->CastSpell(boBrew, SPELL_SPILL_NO_EVIL_ACHIEV, true);
+
+                                if (boBrew->FindNearestCreature(NPC_CAPTAIN_OOK, 9999.0f))
+                                {
+                                    boBrew->FindNearestCreature(NPC_CAPTAIN_OOK, 9999.0f)->SetVisible(true);
+                                    boBrew->FindNearestCreature(NPC_CAPTAIN_OOK, 9999.0f)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    boBrew->FindNearestCreature(NPC_CAPTAIN_OOK, 9999.0f)->GetMotionMaster()->MoveJump(-2890.98f, 766.64f, 0.57f, 25.0f, 20.0f);
+                                }
                             }
 
                             m_mEvents.Reset();
                             DoRemoveAurasDueToSpellOnPlayers(SPELL_UNGA_BREW_COLLECTED_AURA);
 
-                            if (Creature* Ook = instance->GetCreature(GetGuidData(NPC_CAPTAIN_OOK)))
-                                Ook->AI()->DoAction(ACTION_INTRO);
+                            //if (Creature* Ook = instance->GetCreature(GetGuidData(NPC_CAPTAIN_OOK)))
+                               // Ook->AI()->DoAction(ACTION_INTRO);
 
-                            if (Creature* boBrew = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
-                                boBrew->AI()->DoAction(ACTION_CAPTAIN_ASSAULT);
+                          //  if (Creature* boBrew = instance->GetCreature(GetGuidData(NPC_BREWMASTER_BO_BREW)))
+                              //  boBrew->AI()->DoAction(ACTION_CAPTAIN_ASSAULT);
 
                             for (auto&& itr : instance->GetPlayers())
                                 if (Player* player = itr.GetSource())

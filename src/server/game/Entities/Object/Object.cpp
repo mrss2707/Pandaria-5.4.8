@@ -3018,6 +3018,22 @@ void WorldObject::GetCreaturesWithEntryInRange(std::list<Creature*>& creatureLis
     cell.Visit(pair, grid_visitor, *(this->GetMap()), *this, radius);
 }
 
+void WorldObject::GetCreaturesInRange(std::list<Creature*>& creatureList, float radius)
+{
+    CellCoord pair(Trinity::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    Cell cell(pair);
+    cell.SetNoCreate();
+
+    Trinity::AllCreaturesInRange check(this, radius);
+    Trinity::CreatureListSearcher<Trinity::AllCreaturesInRange> searcher(this, creatureList, check);
+
+    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesInRange>, WorldTypeMapContainer> world_visitor(searcher);
+    cell.Visit(pair, world_visitor, *(this->GetMap()), *this, radius);
+
+    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllCreaturesInRange>, GridTypeMapContainer> grid_visitor(searcher);
+    cell.Visit(pair, grid_visitor, *(this->GetMap()), *this, radius);
+}
+
 /*
 namespace Trinity
 {

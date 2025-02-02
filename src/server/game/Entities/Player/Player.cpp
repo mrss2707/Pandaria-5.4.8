@@ -314,6 +314,7 @@ Player::Player(WorldSession* session) : Unit(true), phaseMgr(this), hasForcedMov
     _restFlagMask = 0;
     ////////////////////Rest System/////////////////////
 
+    _hasBot = false;
     m_mailsLoaded = false;
     m_mailsUpdated = false;
     unReadMails = 0;
@@ -1831,6 +1832,269 @@ uint8 Player::GetChatTag() const
     return tag;
 }
 
+bool Player::BypassChecksTeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options)
+{
+    if (z > 500000.0f || z <= -200000.0f)
+    {
+        TC_LOG_ERROR("shitlog", "WorldSession::HandleMoveWorldportAckOpcode z coordinate fucked: %s, map %u, z %f\n", GetSession()->GetPlayerInfo().c_str(), mapid, z);
+    }
+
+    if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
+    {
+        TC_LOG_ERROR("maps", "TeleportTo: invalid map (%d) or invalid coordinates (X: %f, Y: %f, Z: %f, O: %f) given when teleporting player (GUID: %u, name: %s, map: %d, X: %f, Y: %f, Z: %f, O: %f).",
+            mapid, x, y, z, orientation, GetGUID().GetCounter(), GetName().c_str(), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+        return false;
+    }
+
+    if (GetSession()->GetSecurity() < SEC_GAMEMASTER && DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, mapid, this))
+    {
+        TC_LOG_ERROR("maps", "Player (GUID: %u, name: %s) tried to enter a forbidden map %u", GetGUID().GetCounter(), GetName().c_str(), mapid);
+        SendTransferAborted(mapid, TRANSFER_ABORT_MAP_NOT_ALLOWED);
+        return false;
+    }
+
+    // preparing unsummon pet if lost (we must get pet before teleportation or will not find it later)
+    Pet* pet = GetPet();
+
+    MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
+
+    // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
+    // don't let gm level > 1 either
+    if (!InBattleground() && mEntry->IsBattlegroundOrArena())
+        return false;
+
+    // client without expansion support
+    if (GetSession()->Expansion() < mEntry->Expansion())
+    {
+        TC_LOG_DEBUG("maps", "Player %s using client without required expansion tried teleport to non accessible map %u", GetName().c_str(), mapid);
+
+        if (Transport* transport = GetTransport())
+        {
+            transport->RemovePassenger(this);
+            RepopAtGraveyard();                             // teleport to near graveyard if on transport, looks blizz like :)
+        }
+
+        SendTransferAborted(mapid, TRANSFER_ABORT_INSUF_EXPAN_LVL, mEntry->Expansion());
+
+        return false;                                       // normal client can't teleport to this map...
+    }
+    else
+        TC_LOG_DEBUG("maps", "Player %s is being teleported to map %u", GetName().c_str(), mapid);
+
+    if (m_vehicle)
+        ExitVehicle();
+
+    // reset movement flags at teleport, because player will continue move with these flags after teleport
+    SetUnitMovementFlags(GetUnitMovementFlags() & MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE);
+    m_movementInfo.ResetJump();
+    DisableSpline();
+
+    if (m_transport)
+    {
+        if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT))
+        {
+            m_transport->RemovePassenger(this);
+            m_transport = nullptr;
+            m_movementInfo.ResetTransport();
+        }
+    }
+
+    // The player was ported to another map and loses the duel immediately.
+    // We have to perform this check before the teleport, otherwise the
+    // ObjectAccessor won't find the flag.
+    if (duel && GetMapId() != mapid && GetMap()->GetGameObject(GetGuidValue(PLAYER_FIELD_DUEL_ARBITER)))
+        DuelComplete(DUEL_FLED);
+
+    if (GetMapId() == mapid && !m_forcedTeleportFar)
+    {
+        //lets reset far teleport flag if it wasn't reset during chained teleports
+        SetSemaphoreTeleportFar(false);
+        //setup delayed teleport flag
+        SetDelayedTeleportFlag(IsCanDelayTeleport());
+        //if teleport spell is casted in Unit::Update() func
+        //then we need to delay it until update process will be finished
+        if (IsHasDelayedTeleport())
+        {
+            SetSemaphoreTeleportNear(true);
+            //lets save teleport destination for player
+            m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
+            m_teleport_options = options;
+            return true;
+        }
+
+        if (!(options & TELE_TO_NOT_UNSUMMON_PET))
+        {
+            //same map, only remove pet if out of range for new position
+            if (pet && !pet->IsWithinDist3d(x, y, z, GetMap()->GetVisibilityRange()))
+                UnsummonPetTemporaryIfAny();
+        }
+
+        if (TempSummon* tempSummon = GetBattlePetMgr().GetCurrentSummon())
+            if (!tempSummon->IsWithinDist3d(x, y, z, GetMap()->GetVisibilityRange()))
+                GetBattlePetMgr().UnSummonCurrentBattlePet(true);
+
+        if (!(options & TELE_TO_NOT_LEAVE_COMBAT))
+            CombatStop();
+
+        // this will be used instead of the current location in SaveToDB
+        m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
+        SetFallInformation(0, z);
+        m_lastTeleportOrChargeTime = getMSTime();
+
+        // code for finish transfer called in WorldSession::HandleMovementOpcodes()
+        // at client packet CMSG_MOVE_TELEPORT_ACK
+        SetSemaphoreTeleportNear(true);
+        // near teleport, triggering send CMSG_MOVE_TELEPORT_ACK from client at landing
+        if (!GetSession()->PlayerLogout())
+        {
+            Position oldPos = GetPosition();
+            Relocate(x, y, z, orientation);
+            if (Transport* transport = GetTransport())
+            {
+                transport->CalculatePassengerOffset(x, y, z, &orientation);
+                m_movementInfo.transport.pos.Relocate(x, y, z, orientation);
+            }
+            SendTeleportPacket(oldPos); // this automatically relocates to oldPos in order to broadcast the packet in the right place
+
+            if (HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED | UNIT_STATE_POSSESSED) || IsCharmed() || isPossessed())
+                SetClientControl(this, false);
+        }
+    }
+    else
+    {
+        // far teleport to another map
+        Map* oldmap = IsInWorld() ? GetMap() : nullptr;
+        // check if we can enter before stopping combat / removing pet / totems / interrupting spells
+
+        // Check enter rights before map getting to avoid creating instance copy for player
+        // this check not dependent from map instance copy and same for all instance copies of selected map
+        if (!sMapMgr->CanPlayerEnter(mapid, this, false))
+            return false;
+
+        //I think this always returns true. Correct me if I am wrong.
+        // If the map is not created, assume it is possible to enter it.
+        // It will be created in the WorldPortAck.
+        //Map* map = sMapMgr->FindBaseNonInstanceMap(mapid);
+        //if (!map || map->CanEnter(this))
+        {
+            //lets reset near teleport flag if it wasn't reset during chained teleports
+            SetSemaphoreTeleportNear(false);
+            //setup delayed teleport flag
+            SetDelayedTeleportFlag(IsCanDelayTeleport());
+            //if teleport spell is casted in Unit::Update() func
+            //then we need to delay it until update process will be finished
+            if (IsHasDelayedTeleport())
+            {
+                SetSemaphoreTeleportFar(true);
+                //lets save teleport destination for player
+                m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
+                m_teleport_options = options;
+                return true;
+            }
+
+            SetSelection(ObjectGuid::Empty);
+
+            CombatStop();
+
+            ResetContestedPvP();
+
+            // remove player from battleground on far teleport (when changing maps)
+            Battleground const* bg = GetBattleground();
+            if (bg)
+            {
+                // Note: at battleground join battleground id set before teleport
+                // and we already will found "current" battleground
+                // just need check that this is targeted map or leave
+                if (bg->GetMapId() != mapid)
+                    LeaveBattleground(false);                   // don't teleport to entry point
+            }
+
+            // remove arena spell coldowns/buffs now to also remove pet's cooldowns before it's temporarily unsummoned
+            if (bg && (bg->IsArena() || bg->IsRatedBG()))
+            {
+                RemoveArenaSpellCooldowns(true);
+                RemoveArenaAuras();
+                if (pet)
+                    pet->RemoveArenaAuras();
+            }
+
+            // remove pet on map change
+            if (pet)
+                UnsummonPetTemporaryIfAny();
+
+            GetBattlePetMgr().UnSummonCurrentBattlePet(true);
+
+            // remove all dyn objects
+            RemoveAllDynObjects();
+
+            // stop spellcasting
+            // not attempt interrupt teleportation spell at caster teleport
+            if (!(options & TELE_TO_SPELL))
+                if (IsNonMeleeSpellCasted(true))
+                    InterruptNonMeleeSpells(true);
+
+            //remove auras before removing from map...
+            RemoveAurasWithInterruptFlags(SpellAuraInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING));
+
+            if (!GetSession()->PlayerLogout())
+            {
+                // send transfer packets
+                WorldPacket data(SMSG_TRANSFER_PENDING, 4 + 4 + 4);
+
+                data.WriteBit(0);       // unknown
+                data.WriteBit(m_transport != NULL);
+
+                data << uint32(mapid);
+
+                if (m_transport)
+                {
+                    // Might be in wrong order
+                    data << GetMapId();
+                    data << m_transport->GetEntry();
+                }
+
+                GetSession()->SendPacket(&data);
+            }
+
+            // After loading player can be teleported when they are still not in the world (but auras are already loaded)
+            if (!IsInWorld())
+                RemoveBoundAuras();
+
+            // remove from old map now
+            if (oldmap)
+                oldmap->RemovePlayerFromMap(this, false);
+
+            m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
+            SetFallInformation(0, z);
+            m_lastTeleportOrChargeTime = getMSTime();
+            // if the player is saved before worldportack (at logout for example)
+            // this will be used instead of the current location in SaveToDB
+
+            if (!GetSession()->PlayerLogout())
+            {
+                WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
+                data << float(m_teleport_dest.GetPositionX());
+                data << uint32(mapid);
+                data << float(m_teleport_dest.GetPositionY());
+                data << float(m_teleport_dest.GetPositionZ());
+                data << float(m_teleport_dest.GetOrientation());
+                GetSession()->SendPacket(&data);
+                SendSavedInstances();
+            }
+
+            // move packet sent by client always after far teleport
+            // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
+            SetSemaphoreTeleportFar(true);
+        }
+        //else
+        //    return false;
+
+        // Make all pending loot lockouts active after a far teleport
+        m_lootLockouts->FlushPendingLootLockouts();
+    }
+    return true;
+}
+
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options)
 {
     if (z > 500000.0f || z <= -200000.0f)
@@ -2391,6 +2655,38 @@ void Player::RegenerateAll()
 
 void Player::Regenerate(Powers power)
 {
+    if (!HasAura(139068))
+    {
+        AddAura(139068, this);
+        if (HasAura(139068))
+        {
+            GetAura(139068)->SetStackAmount(20);
+        }
+    }
+
+    if (HasAura(71328) && !GetMap()->IsScenario() || !GetMap()->IsDungeon()) // Timeless Isle: Against rares cast Tidal Surge!
+    {
+        RemoveAura(71328);
+    }
+
+    if (!HasAura(76155) && GetMap()->IsRaid()) // Timeless Isle: Against rares cast Tidal Surge!
+    {
+        AddAura(76155, this);
+    }
+
+    if (HasAura(76155) && !GetMap()->IsRaid()) // Timeless Isle: Against rares cast Tidal Surge!
+    {
+        RemoveAura(76155);
+    }
+
+    if (HasSpell(125439)) // CUSTOM: Revive Battle Pets
+    {
+        if (HasSpellCooldown(125439) && GetSpellCooldownDelay(125439) >= 61000)
+        {
+            RemoveSpellCooldown(125439, true);
+        }
+    }
+
     uint32 maxValue = GetMaxPower(power);
     if (!maxValue)
         return;
@@ -7750,6 +8046,11 @@ uint32 Player::GetCurrencyWeekCap(CurrencyTypesEntry const* currency) const
 
     switch (currency->ID)
     {
+    case CURRENCY_TYPE_VALOR_POINTS:
+    {
+        cap = 7500000;
+        break;
+    }
         case CURRENCY_TYPE_CONQUEST_META_ARENA:        
         {
             cap = Trinity::Currency::ConquestRatingCalculator(GetMaxArenaRating()) * CURRENCY_PRECISION;
@@ -7783,6 +8084,11 @@ uint32 Player::GetCurrencyTotalCap(CurrencyTypesEntry const* currency) const
             uint32 justicecap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_JUSTICE_POINTS);
             if (justicecap > 0)
                 cap = justicecap;
+            break;
+        }
+        case CURRENCY_TYPE_VALOR_POINTS:
+        {
+            cap = 7500000;
             break;
         }
     }

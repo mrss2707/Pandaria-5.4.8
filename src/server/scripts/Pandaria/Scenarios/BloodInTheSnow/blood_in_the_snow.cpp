@@ -1176,6 +1176,16 @@ struct npc_bloodsnow_scout_forgefellow : public customCreatureAI
     uint32 delay;
     bool hasTriggered;
 
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!hasTriggered && me->IsWithinDistInMap(who, 5.0f) && who->IsPlayer())
+        {
+            if (me->GetInstanceScript())
+                me->GetInstanceScript()->SetData(DATA_SAVE_SCOUT_FORGEFELLOW, DONE);
+            hasTriggered = true;
+        }
+    }
+
     void Reset() override
     {
         if (me->GetInstanceScript() && me->GetInstanceScript()->GetData64(me->GetEntry()) != me->GetGUID())
@@ -1203,7 +1213,7 @@ struct npc_bloodsnow_scout_forgefellow : public customCreatureAI
 
     void DoAction(int32 actionId) override
     {
-        if (actionId == ACTION_START_INTRO && --prisonersCount < 1 && !hasTriggered)
+        if (actionId == ACTION_START_INTRO && !hasTriggered)
         {
             hasTriggered = true;
 

@@ -830,7 +830,7 @@ class npc_timeless_cranes : public CreatureScript
                         case 73158:
                         {
                             ExecuteTargetEvent(SPELL_GUST_OF_WIND, 8 * IN_MILLISECONDS, EVENT_GUST_OF_WIND, eventId, PRIORITY_CHANNELED);
-                            ExecuteTargetEvent(SPELL_HEALING_SONG, 18 * IN_MILLISECONDS, EVENT_HEALING_SONG, eventId, PRIORITY_SELF);
+                            ExecuteTargetEvent(SPELL_HEALING_SONG, urand(20, 25) * IN_MILLISECONDS, EVENT_HEALING_SONG, eventId, PRIORITY_SELF);
                             ExecuteTargetEvent(SPELL_WINDFEATHER, 15 * IN_MILLISECONDS, EVENT_WIND_FEATHER, eventId, PRIORITY_SELF);
                             break;
                         }
@@ -848,7 +848,7 @@ class npc_timeless_cranes : public CreatureScript
                         }
                         case 72761:
                         {
-                            ExecuteTargetEvent(SPELL_HEALING_SONG, 10 * IN_MILLISECONDS, EVENT_HEALING_SONG, eventId, PRIORITY_SELF);
+                            ExecuteTargetEvent(SPELL_HEALING_SONG, urand(20, 25) * IN_MILLISECONDS, EVENT_HEALING_SONG, eventId, PRIORITY_SELF);
                             break;
                         }
                         default:
@@ -1120,7 +1120,7 @@ class npc_timeless_spectrals : public CreatureScript
                         break;
                     case 73025:
                         me->CastSpell(me, SPELL_HEALING_MISTS);
-                        events.ScheduleEvent(EVENT_HEALING_MISTS, urand(13, 15) * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_HEALING_MISTS, urand(16, 18) * IN_MILLISECONDS);
                         break;
                     case 73018:
                         me->CastSpell(me->GetVictim(), SPELL_SPINNING_CRANE_KICK);

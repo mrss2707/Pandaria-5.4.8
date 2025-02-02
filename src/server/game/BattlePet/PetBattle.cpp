@@ -67,6 +67,16 @@ void PetBattleTeam::AddWildBattlePet(Creature* creature)
     }
 }
 
+void PetBattleTeam::AddWildBattlePetAssist(Creature* creature)
+{
+    auto battlePet = sBattlePetSpawnMgr->GetWildBattlePet(creature);
+    ASSERT(battlePet);
+
+    battlePet->SetBattleInfo(m_teamIndex, ConvertToGlobalIndex(BattlePets.size()));
+
+    BattlePets.push_back(battlePet);
+}
+
 void PetBattleTeam::ActivePetPrepareCast(uint32 abilityId)
 {
     if (!abilityId)
@@ -320,8 +330,40 @@ void PetBattleTeam::TurnFinished()
         m_ready = false;
 
     // Do next turn for PvE team
-    if (!m_ready && !m_owner)
+    /*if (!m_ready && !m_owner)
     {
+        if (GetTeamIndex() == PET_BATTLE_TEAM_OPPONENT)
+        {
+            // This pet is dead, swap it out.
+            if (m_activePet->States[BATTLE_PET_STATE_IS_DEAD] == 1)
+            {
+                BattlePet* newPet = nullptr;
+                for (auto&& battlePet : BattlePets)
+                {
+                    if (!battlePet->IsAlive()) // Don't try to get a battle pet that is dead.
+                        continue;
+
+                    if (battlePet->GetTeamIndex() != PET_BATTLE_TEAM_OPPONENT) // If battle pet isn't from our team don't add.
+                        continue;
+
+                    // make sure local pet can be swapped with active
+                    if (!CanSwap_noChecks(battlePet))
+                        continue;
+
+                    if (newPet != nullptr) // We've found a pet
+                    {
+                        if (m_pendingMove.MoveType != PET_BATTLE_MOVE_PVE_PET_SWAP_DEAD_OR_ALIVE)
+                        {
+                            SetPendingMove(PET_BATTLE_MOVE_PVE_PET_SWAP_DEAD_OR_ALIVE, 0, newPet);
+                            TC_LOG_ERROR("network", "SET PENDING SWAP (PvE)");
+                            return;
+                        }
+                    }
+                }
+                return;
+            }
+        }
+
         std::vector<uint32> avaliableAbilities;
         for (uint8 i = 0; i < BATTLE_PET_MAX_ABILITIES; i++)
             if (m_activePet->Abilities[i])
@@ -330,11 +372,61 @@ void PetBattleTeam::TurnFinished()
 
         // cast ability
         if (avaliableAbilities.size())
+        {
             SetPendingMove(PET_BATTLE_MOVE_TYPE_CAST, avaliableAbilities[rand() % avaliableAbilities.size()], nullptr);
+        }
         // skip turn
         else
+        {
             SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_OR_PASS, 0, m_activePet);
-    }
+        }
+    } */
+   /* if (!m_ready && !m_owner)
+    {
+
+        if (!m_activePet->IsAlive() && GetTeamIndex() == PET_BATTLE_TEAM_OPPONENT && !BattlePets.empty()) // Pet's dead so swap it if we have avaliable pets.
+        {
+            TC_LOG_ERROR("network", "unsure");
+            SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_DEAD_PET, 0, m_activePet);
+            return;
+        }
+
+        std::vector<uint32> avaliableAbilities;
+        for (uint8 i = 0; i < BATTLE_PET_MAX_ABILITIES; i++)
+            if (m_activePet->Abilities[i])
+                if (CanActivePetCast(m_activePet->Abilities[i]->AbilityId))
+                    avaliableAbilities.push_back(m_activePet->Abilities[i]->AbilityId);
+
+        // cast ability
+        if (avaliableAbilities.size())
+        {
+            SetPendingMove(PET_BATTLE_MOVE_TYPE_CAST, avaliableAbilities[rand() % avaliableAbilities.size()], nullptr);
+        }
+        // skip turn
+        else
+        {
+            SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_OR_PASS, 0, m_activePet);
+        }
+    } */
+    if (!m_ready && !m_owner)
+    {
+        std::vector<uint32> avaliableAbilities;
+        for (uint8 i = 0; i < BATTLE_PET_MAX_ABILITIES; i++)
+            if (m_activePet->Abilities[i])
+                if (CanActivePetCast(m_activePet->Abilities[i]->AbilityId))
+                    avaliableAbilities.push_back(m_activePet->Abilities[i]->AbilityId);
+
+       // cast ability
+        if (avaliableAbilities.size())
+        {
+            SetPendingMove(PET_BATTLE_MOVE_TYPE_CAST, avaliableAbilities[rand() % avaliableAbilities.size()], nullptr);
+        }
+        // skip turn
+        else
+        {
+            SetPendingMove(PET_BATTLE_MOVE_TYPE_SWAP_OR_PASS, 0, m_activePet);
+        }
+    } 
 }
 
 void PetBattleTeam::SetPendingMove(uint8 moveType, uint32 abilityId, BattlePet* newActivePet)
@@ -390,6 +482,31 @@ PetBattle::PetBattle(uint32 battleId, PetBattleRequest const& request)
     {
         opponentTeam->AddWildBattlePet(request.Opponent->ToCreature());
 
+        //Custom: 35% chance to add 2nd pet, 10% chance for 3rd for battle pets within 30 yds.
+      /* std::list<Creature*> mobsinRange;
+        request.Challenger->GetCreaturesInRange(mobsinRange, 8.0f);
+        for (auto unit : mobsinRange)
+        {
+            if (urand(0, 100) <= 35 &&  unit)
+            {
+                if (unit->GetCreatureType() == 14)
+                {
+                    if (opponentTeam->BattlePets.size() < 3)
+                    {
+                        opponentTeam->AddWildBattlePetAssist(unit);
+                        TC_LOG_ERROR("battlepets", "Battle Pets # %u", opponentTeam->BattlePets.size());
+                    }
+
+                }
+            }
+        } 
+
+        if (opponentTeam->BattlePets.size() > 1) // We have more than 1 make sure the correct pet is set
+        {
+            opponentTeam->SetActivePet(sBattlePetSpawnMgr->GetWildBattlePet(request.Opponent->ToCreature()));
+            TC_LOG_ERROR("battlepets", "Total Battle Pets # %u", opponentTeam->BattlePets.size());
+        } */
+
         // TODO: nearby wild battle pets should join the pet battle as well
         // ...
     }
@@ -410,6 +527,22 @@ PetBattle::~PetBattle()
 
 void PetBattle::StartBattle()
 {
+    // At start of battle check pet states somthing is fucked up here.
+    for (auto&& team : m_teams) 
+    {
+        for (auto&& battlePet : team->BattlePets)
+        {
+            if (battlePet->GetCurrentHealth() > 0) // Some pets get bugged bad.
+            {
+                battlePet->States[BATTLE_PET_STATE_IS_DEAD] = 0;
+            }
+            if (battlePet->GetCurrentHealth() <= 0) // Some pets get bugged bad.
+            {
+                battlePet->States[BATTLE_PET_STATE_IS_DEAD] = 1;
+            }
+        }
+    }
+
     for (auto&& team : m_teams)
     {
         if (Player* player = team->GetOwner())
@@ -449,6 +582,8 @@ void PetBattle::EndBattle(PetBattleTeam* lostTeam, bool forfeit)
                 aura->OnExpire();
 
             battlePet->Auras.clear();
+            battlePet->States[BATTLE_PET_STATE_MOD_DAMAGE_DEALT_PCT] = 0;
+            battlePet->States[BATTLE_PET_STATE_MOD_DAMAGE_TAKEN_PCT] = 0;
 
             // remove any remaining mechanic states not cleaned up on aura removal
             battlePet->ResetMechanicStates();
@@ -630,6 +765,10 @@ void PetBattle::HandleRound()
     // cast abilities that have round end proc type
     firstTeam->DoCasts(PET_BATTLE_ABILITY_PROC_ON_ROUND_END);
     secondTeam->DoCasts(PET_BATTLE_ABILITY_PROC_ON_ROUND_END);
+
+    //Passive: Humanoid
+    
+    //Passive: Dragonkin
 
     bool hasAuras = firstTeam->HasAuras() || secondTeam->HasAuras();
     if (hasAuras)
@@ -935,7 +1074,19 @@ void PetBattle::Kill(BattlePet* killer, BattlePet* victim, uint32 abilityEffect,
 
     UpdatePetState(killer, victim, abilityEffect, BATTLE_PET_STATE_IS_DEAD, 1, flags);
 
-    m_roundResult = PET_BATTLE_ROUND_RESULT_CATCH_OR_KILL;
+    if (m_cagedPet == nullptr) // make sure we haven't triggered catch function
+    {
+        if (victimTeam->GetActivePet() == victim) // If our current pet was the victim 
+        {
+            m_roundResult = PET_BATTLE_ROUND_RESULT_CATCH_OR_KILL;
+        }
+        else
+        {
+            m_roundResult = PET_BATTLE_ROUND_RESULT_NORMAL;
+        }
+    }
+    else
+        m_roundResult = PET_BATTLE_ROUND_RESULT_CATCH_OR_KILL;
 }
 
 void PetBattle::Catch(BattlePet* source, BattlePet* target, uint32 abilityEffect)
@@ -1498,12 +1649,18 @@ void PetBattle::SendFinalRound(Player* player)
         data << uint32(0);                          // NpcCreatureID
 
     player->SendDirectMessage(&data);
+
+    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
+    player->SetControlled(false, UNIT_STATE_ROOT);
 }
 
 void PetBattle::SendFinished(Player* player)
 {
     WorldPacket data(SMSG_PET_BATTLE_FINISHED, 0);
     player->SendDirectMessage(&data);
+
+    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
+    player->SetControlled(false, UNIT_STATE_ROOT);
 }
 
 // -------------------------------------------------------------------------------

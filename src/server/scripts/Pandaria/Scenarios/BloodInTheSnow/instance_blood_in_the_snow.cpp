@@ -244,8 +244,26 @@ class instance_blood_in_the_snow : public InstanceMapScript
                             if (Creature* varian = instance->GetCreature(GetGuidData(NPC_KING_VARIAN_WRYNN + 1)))
                                 varian->AI()->DoAction(ACTION_LAST_STAND);
 
-                            DoFinishLFGDungeon(instance->GetDifficulty() == SCENARIO_DIFFICULTY_HEROIC ? 637 : 646);
-                            DoFinishLFGDungeon(instance->GetDifficulty() == SCENARIO_DIFFICULTY_NORMAL ? 637 : 646);
+                            if (instance->GetDifficulty() == SCENARIO_DIFFICULTY_NORMAL)
+                            {
+                                Map::PlayerList const& PlayerList = instance->GetPlayers();
+                                if (!PlayerList.isEmpty())
+                                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                        if (Player* player = i->GetSource())
+                                            if (!player->HasAchieved(7987))
+                                                player->CompletedAchievement(sAchievementStore.LookupEntry(7987));
+                                DoFinishLFGDungeon(646);
+                            }
+                            if (instance->GetDifficulty() == SCENARIO_DIFFICULTY_HEROIC)
+                            {
+                                Map::PlayerList const& PlayerList = instance->GetPlayers();
+                                if (!PlayerList.isEmpty())
+                                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                        if (Player* player = i->GetSource())
+                                            if (!player->HasAchieved(8312))
+                                                player->CompletedAchievement(sAchievementStore.LookupEntry(8312));
+                                DoFinishLFGDungeon(637);
+                            }
                         }
                         break;
                     case DATA_SHIMMERWEED:

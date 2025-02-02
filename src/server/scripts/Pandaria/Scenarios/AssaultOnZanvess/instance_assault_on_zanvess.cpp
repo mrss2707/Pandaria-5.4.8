@@ -144,11 +144,34 @@ class instance_assault_on_zanvess : public InstanceMapScript
                     case NPC_SONIC_CONTROL_TOWER_2:
                         if (++alterTowerCount >= 3) // fly to last towers
                         {
-                            for (auto&& itr : gyroGUIDs)
-                                if (Creature* gunship = instance->GetCreature(itr))
-                                    gunship->AI()->DoAction(ACTION_SECOND_TOWER_OFFENSIVE);
+                            //for (auto&& itr : gyroGUIDs)
+                                //if (Creature* gunship = instance->GetCreature(itr))
+                                   // gunship->AI()->DoAction(ACTION_SECOND_TOWER_OFFENSIVE);
 
                             SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_WHISPERING_STONES_SONIC_TOWER, 1, GetScenarioGUID(), time(NULL), 0, 0));
+
+                            SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_VENOMSTING_PITS_SONIC_TOWER, 1, GetScenarioGUID(), time(NULL), 0, 0));
+
+                            SetBossState(DATA_DEFENSES_OF_ZANVESS, DONE);
+
+                            for (auto&& itr : instance->GetPlayers())
+                                if (Player* player = itr.GetSource())
+                                    sScenarioMgr->SendScenarioState(player, 1050, DATA_DEFENSES_OF_ZANVESS, 0);
+
+                            for (auto&& itr : gyroGUIDs)
+                                if (Creature* gunship = instance->GetCreature(itr))
+                                    gunship->AI()->DoAction(ACTION_MOVE_TO_ISLAND);
+
+                            if (Creature* controller = instance->GetCreature(GetGuidData(NPC_SCENARIO_CONTROLLER)))
+                                controller->RemoveAurasDueToSpell(SPELL_ISLAND_SHIELD);
+
+                            DoCastSpellOnPlayers(SPELL_STRAFING_RAN);
+
+                            for (auto&& sNalley : NalleyGUIDs)
+                                if (Creature* Nalley = instance->GetCreature(sNalley))
+                                    Nalley->AI()->DoAction(ACTION_BEACH);
+
+                            SaveToDB();
                         }
                         break;
                 }
@@ -173,7 +196,7 @@ class instance_assault_on_zanvess : public InstanceMapScript
                     case DATA_DEFENSES_OF_ZANVESS:
                         chapterTwo++;
 
-                        if (chapterTwo >= 12)
+                       /*if (chapterTwo >= 12)
                         {
                             SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_VENOMSTING_PITS_SONIC_TOWER, 1, GetScenarioGUID(), time(NULL), 0, 0));
 
@@ -196,7 +219,7 @@ class instance_assault_on_zanvess : public InstanceMapScript
                                 if (Creature* Nalley = instance->GetCreature(sNalley))
                                     Nalley->AI()->DoAction(ACTION_BEACH);
                         }
-                        SaveToDB();
+                        SaveToDB();*/
                         break;
                     case DATA_HEART_OF_ZANVESS:
                         chapterThird++;
@@ -225,7 +248,21 @@ class instance_assault_on_zanvess : public InstanceMapScript
                         SendScenarioProgressUpdate(CriteriaProgressData(CRITERIA_DEFEAT_COMMANDER_TELVRAK, 1, GetScenarioGUID(), time(NULL), 0, 0));
 
                         // Scenario Complete
-                        uint32 lfgEntry = GetData(DATA_FACTION) ? 537 : 593;
+                        uint32 lfgEntry = 0;
+                        for (auto&& itr : instance->GetPlayers())
+                        {
+                            if (Player* player = itr.GetSource())
+                            {
+                                if (player->GetTeamId() == TEAM_ALLIANCE)
+                                {
+                                    lfgEntry = 537;
+                                }
+                                if (player->GetTeamId() == TEAM_HORDE)
+                                {
+                                    lfgEntry = 593;
+                                }
+                            }
+                        }
                         DoFinishLFGDungeon(lfgEntry);
                         break;
                 }

@@ -110,12 +110,93 @@ class boss_xuen : public CreatureScript
                 HandleDoor(me, GO_CELESTIAL_DOOR, true);
             }
 
+            void SpawnAid()
+            {
+                // Delete previous entries
+                std::list<Creature*> mobsinRange;
+                me->GetCreaturesInRange(mobsinRange, 100.0f);
+                for (auto unit : mobsinRange)
+                {
+                    if (unit)
+                    {
+                        if (unit->GetEntry() == 98000 || unit->GetEntry() == 98003 || unit->GetEntry() == 98004 || unit->GetEntry() == 98002 || unit->GetEntry() == 98002)
+                        {
+                            unit->DespawnOrUnsummon(1000);
+                        }
+                    }
+                }
+
+                me->SummonCreature(98000, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                me->SummonCreature(98000, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                me->SummonCreature(98000, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                me->SummonCreature(98000, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+
+                me->SummonCreature(98003, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98003, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98004, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98004, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98003, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98004, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98003, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98004, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98004, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98003, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98004, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                me->SummonCreature(98002, me->GetPosition(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+
+                std::list<Creature*> themobsinRange;
+                me->GetCreaturesInRange(themobsinRange, 100.0f);
+                for (auto Aunit : themobsinRange)
+                {
+                    if (Aunit)
+                    {
+                        if (Aunit->GetEntry() == 98000 || Aunit->GetEntry() == 98003 || Aunit->GetEntry() == 98004 || Aunit->GetEntry() == 98002 || Aunit->GetEntry() == 98002)
+                        {
+                            Aunit->CombatStart(me);
+                        }
+                    }
+                }
+            }
+
             void JustEngagedWith(Unit* /*who*/) override
             {
                 UpdateHealth(me);
                 me->SetWalk(false);
                 death = false;
                 Talk(SAY_AGGRO);
+                SpawnAid();
                 events.ScheduleEvent(EVENT_TIMER_HEALTH_POOL, 1000);
                 events.ScheduleEvent(EVENT_CHI_BARRAGE_AOE, 28 * IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_AGILITY_SELF_BUFF, 39 * IN_MILLISECONDS);
@@ -141,6 +222,20 @@ class boss_xuen : public CreatureScript
                     Talk(SAY_DEATH);
 
                     RewardPlayers(me);
+
+                    // Delete previous entries
+                    std::list<Creature*> mobsinRange;
+                    me->GetCreaturesInRange(mobsinRange, 100.0f);
+                    for (auto unit : mobsinRange)
+                    {
+                        if (unit)
+                        {
+                            if (unit->GetEntry() == 98000 || unit->GetEntry() == 98003 || unit->GetEntry() == 98004 || unit->GetEntry() == 98002 || unit->GetEntry() == 98002)
+                            {
+                                unit->DespawnOrUnsummon(1000);
+                            }
+                        }
+                    }
 
                     me->SetFaction(FACTION_FRIENDLY);
 

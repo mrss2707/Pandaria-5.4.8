@@ -1083,7 +1083,11 @@ struct npc_ragefire_investigated_item : public ScriptedAI
             case NPC_PROTO_DRAKE_EGGS:
             {
                 if (Creature* patch = ObjectAccessor::GetCreature(*me, me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(NPC_PATCH) : ObjectGuid::Empty))
+                {
                     patch->AI()->Talk(TALK_INTRO);
+                    me->GetInstanceScript()->SendScenarioProgressUpdate(CriteriaProgressData(investigatedItems.find(NPC_SUPPLY_CRATES)->second, 1, me->GetInstanceScript()->GetScenarioGUID(), time(NULL), 0, 0));
+                    me->GetInstanceScript()->SetData(DATA_RECONNAISSANCE, DONE);
+                }
                 break;
             }
         }

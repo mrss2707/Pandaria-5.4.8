@@ -1906,6 +1906,8 @@ public:
         return &it->second;
     }
 
+    uint32 bot_Class;
+
     void GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList);
 
     bool HasAuraEffect(uint32 spellId, uint8 effIndex, uint64 caster = 0) const;
