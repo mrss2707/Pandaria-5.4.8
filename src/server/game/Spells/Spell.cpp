@@ -2220,10 +2220,10 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
         // not found any valid target - chain ends
         if (foundItr == tempTargets.end())
             break;
-        if (!searchNearTarget)
-            target = *foundItr;
+        //if (!searchNearTarget)
+        target = *foundItr;
         tempTargets.erase(foundItr);
-        targets.push_back(*foundItr);
+        targets.push_back(target);
         --chainTargets;
     }
 }

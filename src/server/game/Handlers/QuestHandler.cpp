@@ -506,6 +506,21 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
     if (_player->CanRewardQuest(quest, reward, true))
     {
         _player->RewardQuest(quest, reward, object);
+
+        switch (object->GetTypeId()) {
+            case TYPEID_UNIT:
+            case TYPEID_PLAYER:
+                {
+                    Creature* questgiver = object->ToCreature();
+                    sScriptMgr->OnQuestReward(_player, questgiver, quest, reward);
+                    break;
+                }
+            case TYPEID_GAMEOBJECT:
+                sScriptMgr->OnQuestReward(_player, dynamic_cast<GameObject*>(object), quest, reward);
+                break;
+            default:
+                break;
+        }
     }
     else
         _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);

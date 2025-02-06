@@ -175,6 +175,8 @@ void BlackMarketMgr::LoadAuctions()
 
 void BlackMarketMgr::Update()
 {
+    // Crash
+    return;
     uint32 curTime = time(nullptr);
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
