@@ -14245,6 +14245,18 @@ void CharmInfo::SetSpellAutocast(SpellInfo const* spellInfo, bool AutocastEnable
     }
 }
 
+Unit* Unit::GetUnitBeingMoved() const {
+    if (Player const* player = ToPlayer())
+        return player->m_mover;
+    return nullptr;
+}
+
+Player* Unit::GetPlayerBeingMoved() const {
+    if (Unit* mover = GetUnitBeingMoved())
+        return mover->ToPlayer();
+    return nullptr;
+}
+
 bool Unit::isFrozen() const
 {
     return HasAuraState(AURA_STATE_FROZEN);
@@ -19427,6 +19439,18 @@ bool Unit::SetSwim(bool enable)
         Movement::PacketSender(this, SMSG_SPLINE_MOVE_START_SWIM, NULL_OPCODE).Send();
     else
         Movement::PacketSender(this, SMSG_SPLINE_MOVE_STOP_SWIM, NULL_OPCODE).Send();
+
+    return true;
+}
+
+bool Unit::SetFlying(bool enable) {
+    if (enable == IsFlying())
+        return false;
+
+    if (enable)
+        AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+    else
+        RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
 
     return true;
 }

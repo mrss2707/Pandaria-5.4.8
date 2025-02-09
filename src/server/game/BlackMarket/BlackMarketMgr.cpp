@@ -175,15 +175,16 @@ void BlackMarketMgr::LoadAuctions()
 
 void BlackMarketMgr::Update()
 {
-    // Crash
-    return;
     uint32 curTime = time(nullptr);
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     // Delete expired auctions
+    uint32 count = 0;
     for (auto&& itr : _auctions)
     {
+        TC_LOG_INFO("server.loading", "%u", count);
+        count++;
         BlackMarketAuction* auction = itr.second;
         if (auction->IsExpired())
         {

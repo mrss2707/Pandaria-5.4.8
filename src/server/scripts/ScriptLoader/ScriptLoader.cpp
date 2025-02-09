@@ -812,6 +812,7 @@ void AddSC_the_stonecore();
 void AddSC_boss_corborus();
 
 void AddSC_kezan();
+void AddSC_lost_isles();
 void AddSC_deepholm();
 
 // Events
@@ -1860,6 +1861,7 @@ void AddMaelstromScripts()
 
     AddSC_deepholm();
     AddSC_kezan();
+    AddSC_lost_isles();
 #endif
 }
 

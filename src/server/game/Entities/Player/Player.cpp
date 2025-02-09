@@ -2105,6 +2105,12 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     return true;
 }
 
+bool Player::TeleportTo(uint32 mapid, Position const& pos, uint32 options /*= 0*/) {
+    WorldLocation loc(mapid);
+    loc.Relocate(pos);
+    return TeleportTo(loc, options);
+}
+
 bool Player::TeleportTo(WorldLocation const &loc, uint32 options /*= 0*/)
 {
     return TeleportTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), options);
@@ -26260,6 +26266,17 @@ bool Player::HasQuestForGO(int32 goId) const
                         return true;
         }
     }
+
+    return false;
+}
+
+bool Player::HasQuest(uint32 questID) const {
+    if (questID == 0)
+        return false;
+
+    for (uint8 itr = 0; itr < MAX_QUEST_LOG_SIZE; ++itr)
+        if (GetQuestSlotQuestId(itr) == questID)
+            return true;
 
     return false;
 }
