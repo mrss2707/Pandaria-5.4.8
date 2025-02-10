@@ -1578,7 +1578,10 @@ public:
         return HasAuraType(SPELL_AURA_MOD_ROOT);
     }
     bool IsPolymorphed() const;
-
+    // returns the unit that this player IS CONTROLLING
+    Unit* GetUnitBeingMoved() const;
+    // returns the player that this player IS CONTROLLING
+    Player* GetPlayerBeingMoved() const;
     bool isFrozen() const;
     bool IsSef() const;
 
@@ -1616,6 +1619,7 @@ public:
     {
         CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), spellId, triggered, castItem, triggeredByAura, originalCaster);
     }
+    void CastSpell(std::nullptr_t, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty) { CastSpell((Unit*)nullptr, spellId, triggered, castItem, triggeredByAura, originalCaster); }
 
     void CastCustomSpell(Unit* victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = NULL, AuraEffect const* triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::Empty);
     void CastCustomSpell(float x, float y, float z, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = NULL, AuraEffect const *triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::Empty);
@@ -1676,6 +1680,7 @@ public:
     bool SetDisableGravity(bool disable, bool packetOnly = false);
     bool SetFall(bool enable);
     bool SetSwim(bool enable);
+    bool SetFlying(bool enable);
     bool SetCanFly(bool enable);
     bool SetWaterWalking(bool enable, bool packetOnly = false);
     bool SetFeatherFall(bool enable, bool packetOnly = false);

@@ -1265,6 +1265,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     }
 
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0);
+    bool TeleportTo(uint32 mapid, Position const& pos, uint32 options = 0);
     bool TeleportTo(WorldLocation const &loc, uint32 options = 0);
     bool TeleportToBGEntryPoint();
 
@@ -1760,6 +1761,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     void ReputationChangedQuestCheck(FactionEntry const* factionEntry);
     bool HasQuestForItem(uint32 itemId) const;
     bool HasQuestForGO(int32 goId) const;
+    bool HasQuest(uint32 questID) const;
     void UpdateForQuestWorldObjects();
     bool CanShareQuest(uint32 questId) const;
     void QuestObjectiveSatisfy(uint32 objectId, uint32 amount, uint8 type = 0u, uint64 guid = 0u);

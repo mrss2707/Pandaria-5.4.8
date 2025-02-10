@@ -106,6 +106,11 @@ enum Gilneas
     WORGEN_ENRAGE_EMOTE                     = 0,
 
     QUEST_SAVE_KRENNAN_ARANAS               = 14293,
+    QUEST_BROTHER_IN_ARMS                   = 26129,
+    QUEST_THE_REBEL_LORDS_ARSENAL           = 14159,
+    QUEST_SACRIFICES                        = 14212,
+    QUEST_LAST_STAND                        = 14222,
+    QUEST_LAST_CHANCE_AT_HUMANITY           = 14375,
 
     NPC_KRENNAN_ARANAS                      = 35753,
     NPC_KING_GREYMANES_HORSE                = 35905,
@@ -1348,6 +1353,13 @@ public:
         return true;
     }
 
+    /*bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest) override {
+        if (quest->GetQuestId() == QUEST_BROTHER_IN_ARMS) {
+            if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_THE_REBEL_LORDS_ARSENAL))
+                player->AddQuest(quest, player);
+        }
+    }*/
+
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_king_genn_greymaneAI (creature);
@@ -1374,6 +1386,65 @@ public:
     private:
         TaskScheduler _scheduler;
     };
+};
+
+class npc_king_genn_greymane_q14159 : public CreatureScript {
+public:
+    npc_king_genn_greymane_q14159() : CreatureScript("npc_king_genn_greymane_q14159") {}
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt) override {
+        if (quest->GetQuestId() == QUEST_BROTHER_IN_ARMS) {
+            if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_THE_REBEL_LORDS_ARSENAL)) {
+                player->AddQuest(quest, player);
+                player->CompleteQuest(quest->GetQuestId());
+            }
+        }
+        return true;
+    }
+};
+
+class npc_lord_darius_crowley_q14212: public CreatureScript{
+public:
+    npc_lord_darius_crowley_q14212() : CreatureScript("npc_lord_darius_crowley_q14212") {}
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override {
+        if (quest->GetQuestId() == QUEST_SACRIFICES) {
+            player->TeleportTo(player->GetMapId(), -1541.479736f, 1575.01709f, 29.207361f, 0.798393f);
+            player->CompleteQuest(quest->GetQuestId());
+        }
+        return true;
+    }
+};
+
+class npc_lord_darius_crowley_q14375 : public CreatureScript {
+public:
+    npc_lord_darius_crowley_q14375() : CreatureScript("npc_lord_darius_crowley_q14375") {}
+
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt) override {
+        if (quest->GetQuestId() == QUEST_LAST_STAND) {
+            player->SendMovieStart(21);
+            player->CastSpell(player, 93477, true);
+            player->RemoveAurasDueToSpell(72870);
+            player->CastSpell(player, 76642, true);
+            player->CastSpell(player, 68630, true);
+            player->CastSpell(player, 72788, true);
+            player->CastSpell(player, 68996, true);
+
+            player->CastSpell(player, 69123, true);
+            player->CastSpell(player, 68632, true);
+            player->CastSpell(player, 68634, true);
+
+            WorldLocation loc(654, -1818.4f, 2294.25f, 42.2135f, 3.14f);
+            player->SetHomebind(loc, 4786);
+            /*if (Quest const* quest = sObjectMgr->GetQuestTemplate(QUEST_LAST_CHANCE_AT_HUMANITY)) {
+                player->AddQuest(quest, player);
+                player->TeleportTo(player->GetMapId(), -1820.890015f, 2292.929932f, 42.112801f, 0.334925f);
+                player->GetPhaseMgr().SetCustomPhase(4097);
+                //player->CompleteQuest(quest->GetQuestId());
+            }*/
+        }
+        return true;
+    }
 };
 
 class npc_vehicle_genn_horse : public CreatureScript
@@ -2323,6 +2394,9 @@ void AddSC_gilneas()
     new creature_script<npc_bloodfang_lurker>("npc_bloodfang_lurker");
     new spell_script<spell_attack_lurker>("spell_attack_lurker");
     new npc_king_genn_greymane();
+    new npc_king_genn_greymane_q14159();
+    new npc_lord_darius_crowley_q14212();
+    new npc_lord_darius_crowley_q14375();
     new npc_vehicle_genn_horse();
     new creature_script<npc_saved_aranas>("npc_saved_aranas");
     new npc_gilneas_children("npc_james", SPELL_SAVE_JAMES, PLAYER_SAY_JAMES);
