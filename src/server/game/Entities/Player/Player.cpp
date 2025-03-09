@@ -27,7 +27,6 @@
 #include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
-#include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "CinematicMgr.h"
 #include "Common.h"
@@ -85,7 +84,6 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "Weather.h"
-#include "WeatherMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -2531,6 +2529,7 @@ void Player::ResetAllPowers()
         case POWER_RUNIC_POWER:
             SetPower(mainPower, 0);
             break;
+        default: break;
     }
 
     // Alternative powers
@@ -17811,6 +17810,7 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= 0*/, uint32 c
             case RAID_DIFFICULTY_25MAN_HEROIC:
                 count = urand(9, 11);
                 break;
+            default: break;
         }
     }
 
