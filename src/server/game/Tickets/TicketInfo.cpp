@@ -16,6 +16,7 @@
 */
 
 #include "Common.h"
+#include "CharacterCache.h"
 #include "TicketInfo.h"
 #include "TicketMgr.h"
 #include "DatabaseEnv.h"
@@ -49,7 +50,7 @@ std::string TicketInfo::GetAssignedToName() const
 {
     std::string name;
     if (!_assignedTo)
-        sObjectMgr->GetPlayerNameByGUID(_assignedTo, name);
+        sCharacterCache->GetCharacterNameByGuid(_assignedTo, name);
 
     return name;
 }
@@ -205,8 +206,10 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGE, (secsToTimeString(curTime - _lastModifiedTime, true, false)).c_str());
 
     std::string name;
-    if (sObjectMgr->GetPlayerNameByGUID(_assignedTo, name))
+    if (sCharacterCache->GetCharacterNameByGuid(_assignedTo, name))
+    {
         ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTASSIGNEDTO, name.c_str());
+    }
 
     if (detailed)
     {

@@ -27,6 +27,9 @@
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "Implementation/LoginDatabase.h"
+#include "Implementation/CharacterDatabase.h"
+#include "Implementation/WorldDatabase.h"
+#include "Implementation/PlayerbotsDatabase.h"
 
 #include "AppenderDB.h"
 #include "AsyncAcceptor.h"
@@ -189,6 +192,7 @@ void WorldUpdateLoop()
     LoginDatabase.WarnAboutSyncQueries(true);
     CharacterDatabase.WarnAboutSyncQueries(true);
     WorldDatabase.WarnAboutSyncQueries(true);
+    PlayerbotsDatabase.WarnAboutSyncQueries(true);
 
     sWorld->OnStartup();
 
@@ -224,6 +228,7 @@ void WorldUpdateLoop()
     LoginDatabase.WarnAboutSyncQueries(false);
     CharacterDatabase.WarnAboutSyncQueries(false);
     WorldDatabase.WarnAboutSyncQueries(false);
+    PlayerbotsDatabase.WarnAboutSyncQueries(false);
 }
 
 void SignalHandler(boost::system::error_code const& error, int /*signalNumber*/)
@@ -341,7 +346,8 @@ bool StartDB()
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")
-        .AddDatabase(WorldDatabase, "World");
+        .AddDatabase(WorldDatabase, "World")
+        .AddDatabase(PlayerbotsDatabase, "Playerbots");
 
     if (!loader.Load())
         return false;
@@ -386,6 +392,7 @@ void StopDB()
     CharacterDatabase.Close();
     WorldDatabase.Close();
     LoginDatabase.Close();
+    PlayerbotsDatabase.Close();
 
     MySQL::Library_End();
 }
